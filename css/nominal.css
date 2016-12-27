@@ -1,0 +1,2 @@
+#result {text-align: right;font-weight: bold;line-height: 40px;/*height: 40px;*/margin: 0 0 10px 0;}
+#result span.success {display: inline-block;background: #7DC267;color: #FFF;text-shadow: 1px 1px 1px #5E924E;padding: 0 20px;}

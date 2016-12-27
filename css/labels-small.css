@@ -1,0 +1,22 @@
+@page {size:portrait;margin-top:0px;margin-left:0px;margin-right:0px;margin-bottom:0px;}
+.label-wrap {}
+.label-wrap .label {float:left;width:33.3%;height:134px;}
+.label-wrap .label .label-inner {border:dotted 1px #fff;padding:6px 20px;height: 121px;}
+.label-wrap .label .label-inner .tick {position: absolute; margin: -10px -10px 0 133px;display: none;}
+.label-wrap .label .label-inner .price {width: 112px;height: 20px;font-size: 39px;text-align: right;color: #000;margin: 51px 0 0 95px;padding: 20px 0;line-height: 20px;background: #FFFFFF;position: absolute;}
+.label-wrap .label .label-inner .title {clear: both;float: left;width: 100%;margin: 0;font-size: 18px; text-transform:capitalize;}
+.label-wrap .label .label-inner .info {float: left;width: 65px;margin:5px 0 0 0;font-size: 14px;color: #797979;}
+.label-wrap .label.deal {width: 300px;background:#E90000;}
+.label-wrap .label.deal .price {font-weight: bold;font-size: 56px;width: 320px;color: #fff;position: relative;margin: -8px 0 8px 0;text-align: center; background:none;}
+.label-wrap .label.deal .title {color: #fff;width: 300px; text-align:center;font-size: 12px;}
+.barcode {position: absolute;margin: 102px 0 0 34px;height: 8px;display: none;}
+.no-print {opacity:0.3;}
+
+@media print {    
+	.noPrint {display: none !important;}
+	.no-print {display: none !important;}
+	label:hover {background: none;}
+	label:active {box-shadow: none;}
+	#LoadPrint {position:relative !important;left:0 !important;}
+}
+

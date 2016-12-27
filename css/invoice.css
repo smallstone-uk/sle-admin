@@ -1,0 +1,44 @@
+/* CSS Document */
+
+@media print {
+	.searchcriteria {display:none}
+}
+
+body {font-family:"Courier New", Courier, monospace; margin:0px; padding:0px;}
+table {font-family:Arial, Helvetica, sans-serif;font-size:11px;}
+th, td {padding:2px 4px;}
+/*th {background:#eee !important;} can't do this globally without messing up cfdump layout */
+
+.statementTitle {
+	font:Arial, Helvetica, sans-serif;
+	font-size:24px;
+	font-weight:bold;
+	text-align:center;
+	margin: 0px 0px 10px 0px;
+/*	border: solid 1px #000;*/
+	width:624px;
+}
+.tableList {font-family:Arial, Helvetica, sans-serif;font-size:11px;border-collapse:collapse;}
+.tableList th, .tableList td {padding:2px 4px; border: solid 1px #ccc;background:#fff;}
+.clienthead {background:#ddd;font-weight:bold;font-size:11px;}
+.client {background:#eee;}
+.normal {background:#fff;}
+.warning {background:#FFD7D7;}
+.freedel {background:#B3F4EC}
+.amount {text-align:right;padding:2px;}
+.credit {text-align:right;padding:2px;color:#ff0000;}
+.accNum {font-size:12px;}
+.amountTotal {text-align:right;padding:2px;font-weight:bold;}
+.amountTotal-box {text-align:right;padding:2px;font-weight:bold;font-size: 18px;}
+.centre {text-align:center;text-transform: uppercase;}
+.ref {font-size:12px;font-weight:bold;color:#00C;}
+.ordertotal {font-weight:bold;}
+.address td {border:none;font-size:13px;}
+.compTable td {border:none;padding:0px 4px;;}
+.compName {font-family:"Arial Black";font-size:24px;font-weight:bold;color:#075086;}
+.compAddr {font-family:Arial, Helvetica, sans-serif;font-size:12px;font-weight:bold;color:#075086;}
+.compDetailTitle {font-family:Arial, Helvetica, sans-serif;font-size:12px;font-weight:bold;color:#075086;text-align:right;}
+.compDetail {font-family:Arial, Helvetica, sans-serif;font-size:12px;font-weight:bold;}
+.clientHeader-nav ul {list-style:none;}
+.clientHeader-nav li {display:inline;}
+

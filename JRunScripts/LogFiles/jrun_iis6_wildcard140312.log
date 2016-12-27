@@ -1,0 +1,4 @@
+2014-03-12 17:00:03 jrISAPI[init:4628]  JRun ISAPI Extension DLL Detaching (FreeLibrary)
+2014-03-12 17:00:05 jrISAPI[init:5800]  JRun 4.0 (Build 108858) JRun ISAPI Extension - Apr 30 2010 10:16:45
+2014-03-12 17:00:05 jrISAPI[init:5800]  JRun ISAPI Extension DLL Attaching
+2014-03-12 17:00:53 jrISAPI[init:4628]  socket shutdown failed[1524]: 10054, Connection reset by peer

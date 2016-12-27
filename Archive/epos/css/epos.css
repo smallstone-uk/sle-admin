@@ -1,0 +1,156 @@
+body {
+    background: #333;
+}
+html {font-family: Helvetica, Arial, 'lucida grande',tahoma,verdana,arial,sans-serif;}
+/*SLEBlue: #0D58A1*/
+a {color: #008ADF;}
+p {color:#FFF;}
+.button {
+    position: fixed;  bottom: 0;  width: 10%;  
+    line-height: 50px;  
+    height: 60px;  
+    font-size: 28px;  color: #fff;  text-align: center;  text-decoration: none;  z-index: 1001;  background: #444;  border: 5px solid #333;
+    outline: 0;
+    cursor: pointer;
+}
+
+.button:active {
+    background: #008ADF;
+    color: #FFF;
+}
+#header {position: fixed;top: 0;right: 0;left: 0;height: 40px;line-height: 40px;background: #0D58A1;z-index: 99;padding: 0 20px;color: #fff;font-size: 14px;border-bottom: 1px solid #222;}
+#header #datetime {float: left;}
+#header #user {float: right;}
+#leftcontrols {position: fixed;top: 40px;left: 0;bottom: 0;width: 25%;border-right: 1px solid #222;z-index: 95;background: #444;}
+#leftcontrols ul {list-style:none;margin:0;padding:0;}
+#leftcontrols ul li {display:block;padding:0;}
+#leftcontrols ul li .lc-button {display:block;padding: 15px;text-decoration: none;color: #fff;font-size: 16px;margin: 5px;background: #333;outline: 0;border: none;width: 96.4%;cursor: pointer;text-align: center;}
+#leftcontrols ul li .lc-button:active {background: #008ADF;color: #FFF;}
+
+#overlay {position: fixed;left: 25%;top: 41px;bottom: 0;width: 45%;z-index:999;background: #333;margin:0 0 0 1px;overflow-y: scroll;}
+#overlay .list {padding: 10px;}
+#overlay .list .tile {float:left;width: 48.9%;color: #000;text-decoration: none;margin: 0 10px 10px 0;}
+#overlay .list .tile .inner {padding: 10px;  height: 78px;background: #222;color: #FFF;}
+#overlay .list .tile:nth-of-type(2n) {margin-right: 0;}
+#overlay .list .tile .inner:active {background: #008ADF;color: #FFF;}
+
+.addproduct {position:fixed;bottom: 0;width:10%;}
+
+#basket {position: fixed;left: 25%;top: 40px;bottom: 60px;width: 45%;}
+#basket div.header {font-weight:bold;border-bottom: 1px solid #999;padding: 5px 23px 5px 10px !important;}
+#basket div.footer {position: fixed;bottom: 0;width: 45%;font-weight:bold;font-size: 42px;line-height: 60px;font-weight:bold;}
+#basket div.footer span.total {float:right;padding: 0 16px;color: #008ADF;}
+#basket ul {list-style:none;margin:0;padding:0;overflow-y: scroll;position: absolute;width: 100%;bottom: 0;top: 31px;z-index: 90;}
+#basket ul li, #basket div.header {display:block;padding: 5px 10px;border-bottom: 1px solid #ccc;font-size: 12px;line-height: 20px;}
+#basket ul li span, #basket div.header span {display:inline-block;}
+#basket ul li span.title, #basket div.header span.title {width:40%;}
+#basket ul li span.qty, #basket div.header span.qty {width:20%;text-align:center;}
+#basket ul li span.price, #basket div.header span.price {width:20%;text-align:right;}
+#basket ul li span.linetotal, #basket div.header span.linetotal {width:20%;text-align:right;}
+
+#rightcontrols {position: fixed;top: 40px;left: 70%;bottom: 0;width: 30%;/* border-left: 1px solid #222; */z-index: 999999;/* background: #444; */}
+
+#commands {position: fixed;top: 40px;width: 30%;}
+#commands ul {list-style:none;margin:0;padding:0;}
+#commands ul li {display:block;padding:0;}
+#commands ul li span {cursor:pointer;float: left;text-decoration: none;text-align: center;height: 80px;width: 49%;line-height: 80px;  margin: 1px;  color: #FFF;  font-size: 22px;  background: #844;  }
+#commands ul li span:active {background: #008ADF !important;}
+#commands ul li span.clearbasket {}
+#commands ul li span.cash {width: 100%;background: #548843;}
+#commands ul li span.card {background: #A67134;}
+#commands ul li span.cheque {background: #455288;}
+
+#keypad {position: fixed;bottom: 0;width: 30%;}
+#keypad span {cursor:pointer;float:left;width: 32.2%;height: 60px;text-align:center;line-height: 60px;margin: 1px 0 1px 2px;color: #FFF;font-size: 28px;background: #444;text-decoration:none;}
+ {opacity:0.9;}
+#keypad span:active {background: #008ADF !important;}
+#keypad #result {display:block;padding: 10px 20px;text-align: right;font-size: 24px;line-height: 39px;height: 39px;margin: 0 0 1px 2px;background: #494949;width: 86.2%;color: #FFF;}
+#keypad #btnEnter {cursor:pointer;width: 97.7%;background: #444; cursor:pointer;height: 80px;line-height: 80px;font-size: 28px;}
+
+.FCEyeFocus {position: fixed;top: 0;left:0;right:0;bottom:0;background: rgba(0, 0, 0, 0.5);z-index: 999999;}
+.FCEyeFocusPopup {position: absolute;background: #FFF;color: #444;width: auto;height: auto;z-index: 99999999;max-width: 400px;}
+.FCEFPMessage {font-size: 12px;float: left;padding: 8px;color: #333;line-height: 20px;}
+
+.FCFlyoutNorth_White {	position: absolute;	background-image: url(../images/flyout-north-white.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutSouth_White {	position: absolute;	background-image: url(../images/flyout-south-white.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutEast_White {	position: absolute;	background-image: url(../images/flyout-east-white.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+.FCFlyoutWest_White {	position: absolute;	background-image: url(../images/flyout-west-white.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+
+.FCFlyoutNorth {	position: absolute;	background-image: url(../images/flyout-north.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutSouth {	position: absolute;	background-image: url(../images/flyout-south.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutEast {	position: absolute;	background-image: url(../images/flyout-east.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+.FCFlyoutWest {	position: absolute;	background-image: url(../images/flyout-west.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+
+
+table {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 14px;font-weight: normal;}
+table th {padding: 8px 10px;color: #FFF;border-color: #ccc;font-weight: bold;background: #444;border-bottom: 1px solid #222;}
+table td {padding: 8px 10px;border-color: #ccc;color: #FFF;}
+table[border="0"] {border:none;}
+
+
+.disable-select {
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {width: 25px;background: #222;}
+.custom-scrollbar::-webkit-scrollbar-thumb {background: #111;}
+.datetime_time {
+    float: right;
+    margin-left: 15px;
+}
+#keypad a:nth-of-type(3n) {
+    margin-right: 0 !important;
+}
+
+h1 {
+    margin: 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.FCEFPMessage p {
+    color: #000;
+    margin: 0;
+}
+.FCEFButton {
+    float: right;
+    border: none;
+    background: #999;
+    width: 70px;
+    height: 30px;
+    color: #FFF;
+    margin-top: 5px;
+    outline: 0;
+    cursor: pointer;
+}
+
+.FCEFButton:active {
+    background: #008ADF;
+}
+.touch_menu {
+    position: absolute;
+    z-index: 99999999;
+    background: #000;
+    color: #FFF;
+    list-style-type: none;
+    margin: 0;
+	left:0;
+	border-top:2px solid #FFF;
+    padding: 15px 0;
+	display:none;
+}
+
+.touch_menu li {
+    display: list-item;
+    font-size: 20px;
+	cursor:pointer;
+    padding: 10px 25px;
+}
+.touch_menu li:active {
+    color: #008ADF;
+}

@@ -1,0 +1,2 @@
+<link href="css/confirmation.css" rel="stylesheet" type="text/css">
+<div class="confirmation-box"><h1 class="cb-header">Confirmation</h1><p class="cb-content">Are you sure you want to do this?</p><button class="cb-yes">Yes</button><button class="cb-no">No</button></div>

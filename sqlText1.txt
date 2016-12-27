@@ -1,0 +1,159 @@
+
+// Transactions, nominal title and item amount for news invoices/credit notes
+SELECT tblTrans.*,  nomRef, nomTitle, niAmount
+FROM `tblTrans` ,tblNomItems, tblNominal
+WHERE `trnLedger` = 'sales' 
+AND `trnType` IN ('inv', 'crn')
+AND niTranID=trnID
+AND niNomID=nomID
+AND trnClientRef>0
+
+
+// news invoices/credit notes with no nomItem
+SELECT tblTrans.*, niAmount
+FROM tblTrans
+LEFT JOIN tblNomItems ON niTranID=trnID
+WHERE niID IS NULL
+AND trnType IN ('inv','crn')
+AND trnClientRef>0
+ORDER BY trnID
+
+
+// Display weekly delivery charge income
+SELECT diDate, CONCAT(YEAR(diDate), '/', WEEK(diDate)) AS week_name, sum(`diCharge`) as chargeTotal FROM `tblDelItems`
+WHERE 1
+GROUP BY week_name
+ORDER BY YEAR(diDate) ASC, WEEK(diDate) ASC
+
+
+// compare delivery charge income on two specific days
+SELECT diDate,diCharge, sum(diCharge),count(*)  
+FROM `tblDelItems` 
+WHERE `diDate` = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate,diCharge
+
+
+// Total of delivery charge income on two specific days
+SELECT diDate, sum(diCharge),count(*)  
+FROM `tblDelItems` 
+WHERE `diDate` = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate
+
+
+//Find orphaned items
+SELECT *
+FROM `tblNomItems`
+LEFT JOIN tblTrans ON nitranid = trnID
+WHERE trnid IS NULL
+LIMIT 0 , 30
+
+
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblNominal ON niNomID=nomID
+WHERE nomType="sales"
+AND nomTillBtn=0
+AND niAmount=0
+
+
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblTrans ON niTranID=trnID 
+WHERE `trnAccountID` = 241 
+AND `trnClientRef` = 0
+AND niTranID>362700
+
+
+// count duplicate nomitems for shop account
+SELECT count(*) as Count, niTranID FROM tblNomItems n WHERE niNomID=201 group by niTranID having Count > 1
+
+
+// select duplicated nomItems
+select u1.*, u2.niID FROM tblNomItems u1, tblNomItems u2 WHERE u1.niID < u2.niID AND u1.niNomID=u2.niNomID AND u1.niNomID=201 AND u1.niTranID=u2.niTranID
+ORDER BY u2.niTranID
+
+
+// find customers with more than one (rogue) order
+SELECT tblOrder.ordClientID, tblOrder.ordID, tblOrder.ordDate, tblOrder.ordRef, tblOrder.ordContact, tblOrder.ordDeliveryCode, tblOrder.ordDelCodeNew
+FROM tblOrder
+WHERE (((tblOrder.ordClientID) In (SELECT [ordClientID] FROM [tblOrder] As Tmp GROUP BY [ordClientID] HAVING Count(*)>1 )))
+ORDER BY tblOrder.ordClientID;
+
+
+// NomItems for a given nomID and Date
+SELECT *
+FROM `tblNomItems`
+INNER JOIN tblTrans ON trnID = niTranID
+WHERE `niNomID` =841
+AND trnDate > '2014-10-26'
+LIMIT 0 , 30
+
+
+// Update field based on the value of a field in another table. May not work if sub-select does not find a matching record
+UPDATE tblClients
+SET tblClients.cltDelCode=(SELECT `ordDelCodeNew` FROM tblOrder WHERE `ordClientID`=cltID)
+
+
+// load sales items and their matching balancing nom accounts. Returns two records from same table per item
+SELECT tblNomItems.*,  nomTitle,nomBalAcct,
+(SELECT a.nomTitle FROM tblNominal a WHERE a.nomID=b.nomBalAcct) AS balancer 
+FROM `tblNomItems` 
+INNER JOIN tblNominal b ON b.nomID=niNomID
+WHERE `niTranID` = 528622
+
+// Active publications
+SELECT  `pubTitle` ,  `pubShortTitle` ,  `pubRoundTitle` , COUNT( psID ) AS recs
+FROM  `kcc_sle`.`tblPublication` 
+INNER JOIN tblPubStock ON pubID = psPubID
+GROUP BY  `tblPublication`.`pubTitle` ASC 
+
+// Missing streets
+SELECT cltID,cltRef,cltName,cltDelHouse,cltDelAddr,cltAccountType,stID,stName 
+FROM `tblClients`
+LEFT JOIN tblStreets2 ON cltStreetCode=stID
+WHERE stID IS NULL
+
+// Find streetrec for missing streets.
+SELECT cltID,cltRef,cltName,cltDelHouse,cltDelAddr,cltAccountType,stID,stName,
+     (SELECT stID from tblStreets2 WHERE stName=cltDelAddr) AS StreetRec
+FROM `tblClients`
+LEFT JOIN tblStreets2 ON cltStreetCode=stID
+WHERE stID IS NULL
+
+//Assign correct streetID for missing streets
+UPDATE  tblClients
+LEFT JOIN
+        tblStreets2
+ON      tblStreets2.stID = tblClients.cltStreetCode
+SET     tblClients.cltStreetCode = (SELECT stID FROM tblStreets2 WHERE stName=cltDelAddr)
+WHERE   tblStreets2.stID IS NULL
+
+// use alias field in criteria clause
+SELECT cltID,cltRef,cltName,cltDelHouse,cltDelAddr,cltAccountType,stID,stName,
+     (SELECT stID from tblStreets2 WHERE stName=cltDelAddr) AS StreetRec
+FROM `tblClients`
+LEFT JOIN tblStreets2 ON cltStreetCode=stID
+HAVING StreetRec IS NULL
+
+// Nominal Account Manager
+SELECT *
+FROM tblNominal
+LEFT JOIN tblNomGroupItems ON ngiChild = nomID
+WHERE (`ngiParent`<>622 OR ngiID IS NULL)
+ORDER BY nomCode
+
+
+// daily cheque totals in shop
+SELECT trnDate,Sum(trnAmnt1) AS total, CONCAT(YEAR(trnDate),"/",Month(trnDate)) AS yymm
+FROM `tblTrans` 
+WHERE `trnLedger` = 'sales' 
+AND `trnType` = 'pay' 
+AND `trnMethod` LIKE 'chqs'
+GROUP BY yymm
+ORDER BY trnDate
+
+

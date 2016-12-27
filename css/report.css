@@ -1,0 +1,13 @@
+.red {background:#FF6262;}
+.green {background:#B9F98A;}
+.star {background:#E6B406;}
+.tableList tr:hover { background:#C2E3F8;}
+.amount {
+	text-align:right;
+	padding:2px;
+}
+.credit {
+	text-align:right;
+	padding:2px;
+	color:#ff0000;
+}

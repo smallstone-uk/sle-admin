@@ -1,0 +1,12 @@
+th, td {padding:4px;}
+label {display:block;}
+.roundTable {font-size:12px;}
+.streetTable {margin: 0 0 10px 0;}
+.street {/*background: url(../images/move_vert.png) no-repeat center left;*/font-size:13px;font-weight:bold;padding:4px;border-bottom:2px solid #666;}
+/*.street:hover {cursor:move !important;background: #E5F7FF url(../images/move_vert.png) no-repeat center left;}*/
+.street span {float: right;font-size: 12px;text-transform: capitalize;color: #444;font-weight: normal;}
+.house {background: url(../images/move_vert.png) no-repeat center left;font-size: 12px;font-weight: bold;padding: 4px 4px 4px 10px;border-bottom: 1px dashed #666;border-right: 1px solid #666;text-align: right;width: 230px;}
+.publication {border-bottom: 1px dashed #333;}
+.publication span {display: block;float: left;width: 145px;line-height: 16px;font-weight: normal;font-size: 12px;padding:0;border-right: 1px solid #666;}
+.publication span b {padding: 0 5px 0 0;color: #000;}
+a.map {display:none;float:left;margin: 2px 0 0 8px;height:12px;width:12px;background: url(../images/map.png) no-repeat center;background-size: 12px;}

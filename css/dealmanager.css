@@ -1,0 +1,241 @@
+* {font-family: 'Roboto', sans-serif !important;box-sizing: border-box;}
+
+.module h1 {
+	float: left !important;
+	font-size: 32px !important;
+	font-weight: 300 !important;
+	color: #444 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	line-height: 38px !important;
+}
+
+.module h2 {
+	float: left !important;
+	font-size: 22px !important;
+	font-weight: 300 !important;
+	color: #444 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	line-height: 24px !important;
+	width: 100%;
+	margin-bottom: 10px !important;
+}
+
+.deal_item, .club_item {
+	float: left;
+	width: 100%;
+	height: 25px;
+	background: #F5F5F5;
+	margin-bottom: 1px;
+	line-height: 25px;
+	padding: 0 10px;
+	box-sizing: border-box;
+	font-size: 12px;
+	text-decoration: none;
+	color: #444;
+}
+
+.deal_item:hover, .club_item:hover {
+	background: #EEE;
+	color: #000;
+}
+
+.deal_wrapper, .club_wrapper {
+	float: left;
+	width: 100%;
+	height: 100%;
+	overflow-y: scroll;
+}
+
+input[type="date"] {
+	border-radius: 3px;
+	border: 1px solid #B6B6B6;
+	color: #222;
+	padding: 2px 4px;
+	font-size: 12px;
+	margin: 0;
+}
+
+.product_selector {
+	background: #FFF;
+	padding: 20px;
+	box-shadow: 0 0 10px #DDD;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+	z-index: 9999999;
+	border-bottom: 1px solid #CCC;
+	border-width: 0 1px 1px 1px;
+	width: 500px;
+}
+
+.light_dim {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255, 255, 255, 0.75);
+	z-index: 999999;
+}
+
+.deal_items_array {
+	float: left;
+	width: 100%;
+	border: 1px solid #CCC;
+	padding: 10px;
+	box-sizing: border-box;
+	border-radius: 3px;
+	margin-top: 10px;
+	background: #F5F5F5;
+}
+
+.ps_controls {
+	float: left;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.psc_ctrl {
+	float: left;
+	color: #666;
+	text-decoration: none;
+}
+
+.psc_ctrl:hover {
+	color: #444;
+}
+
+.ps_content {
+	float: left;
+	width: 100%;
+	min-height: 150px;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+	margin-top: 10px;
+	box-sizing: border-box;
+	padding: 3px;
+}
+
+.pscc_search {
+	float: right;
+}
+
+.pscc_search i {
+	font-size: 18px;
+}
+
+.lnr {
+	font-family: Linearicons-Free !important;
+}
+
+.PSSearchForm input {
+	float: right;
+	font-size: 12px;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+	padding: 4px 6px;
+	outline: 0;
+	margin: -3px 0 0 0;
+	box-sizing: border-box;
+	width: 250px;
+}
+
+.PSSearchForm input:focus {
+	border-color: #BBB;
+}
+
+#psSearchForm {
+	float: right;
+	margin: 0;
+}
+
+.PSSearchForm {
+	float: right;
+}
+
+a {
+	color: #205BA7;
+}
+
+.deal_product_item {
+	font-size: 12px;
+	color: #205BA7;
+}
+
+.psr_item {
+	float: left;
+	width: 100%;
+	font-size: 12px;
+	color: #444;
+	padding: 5px 5px;
+	box-sizing: border-box;
+	border-radius: 3px;
+	background: #F5F5F5;
+	cursor: pointer;
+}
+
+.psr_item:hover {
+	background: #215CA8;
+	color: #FFF;
+}
+
+.sleui-button {
+	float: right;
+	background: #205BA7;
+	padding: 10px 20px;
+	border-radius: 3px;
+	text-decoration: none;
+	font-size: 14px;
+	color: #FFF;
+	box-shadow: 0 2px 0 #194782;
+	transition: all .15s ease;
+}
+
+.sleui-button:active {
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.18) inset;
+	transform: translateY(2px);
+	opacity: 1 !important;
+	background: #1E5498;
+}
+
+.sleui-button:hover {
+	opacity: .9;
+}
+
+.ctrlDelProdItem {
+	background-image: url(../images/icons/bin_black.png);
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    float: left;
+    text-align: center;
+    color: transparent;
+}
+
+.psri_title {
+    float: left;
+    height: 100%;
+    line-height: 20px;
+}
+
+.psri_size {
+    float: right;
+    background: #eac043;
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: #000;
+    font-weight: 500;
+}
+
+.psri_price {
+    float: right;
+    background: #70c333;
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: #000;
+    font-weight: 500;
+    margin-left: 5px;
+}

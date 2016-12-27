@@ -1,0 +1,139 @@
+/* CSS Document */
+#overlay-ui {display:none;position: fixed;top: 0;left: 0;right: 0;bottom: 0;background: rgba(0, 0, 0, 0.7);z-index: 9997;transition:display 0.5s;overflow: auto;}
+#overlay {display:none;position: absolute;top: 0;left: 0;right: 0;bottom: 0;z-index: 9999;}
+#overlayForm {background: #fff;padding: 20px;border-radius: 10px;box-shadow: 0 0 50px rgba(0, 0, 0, 0.4);}
+#overlayForm-inner {margin: 0;min-width:250px;}
+#overlayForm-inner h1 {background: #DDD;margin: -20px -20px 20px -20px;padding: 16px;border-bottom: 1px solid #C5C5C5;color: #181818;font-weight: normal;text-shadow: 1px 1px 1px #FFFFFF;border-radius: 8px 8px 0 0;background: -webkit-linear-gradient(top, #F1F1F1 00%, #DDD 100%);  background: -moz-linear-gradient(top, #424242 00%, #333 100%);  background: -o-linear-gradient(top, #424242 00%, #333 100%);  background: -ms-linear-gradient(top, #424242 00%, #333 100%);  background: -linear-gradient(top, #424242 00%, #333 100%);}
+#overlayForm-inner h1 .overlayNav {float:right;color: #FFF;cursor:pointer;text-decoration:none;line-height:53px;margin:-20px 18px -20px 0;border-radius:0;box-shadow: none;border-width: 0 1px;text-shadow: 1px 1px 1px #2C2C2C;}
+#overlayForm-inner h1 .overlayNav:hover {background: #444;}
+#overlayForm-inner h1 .overlayNav img {float:left;margin: 16px 5px 0 0;width: 20px;height: 20px;}
+#overlayForm-inner .overlayInnerForm {max-height: 600px;overflow-y: scroll;margin: -20px -20px 0 -20px;}
+#overlayForm-inner .overlayInnerForm .panelform {margin: 0 0 -1px 0;}
+.overlayClose {float: right;background: #CF3E3E;padding: 2px 10px;border-radius: 0 4px 0 4px;color: #FFF !important;text-decoration: none;margin: -20px -20px 0 0;border: 1px solid #743232;transition: background 0.5s;}
+.overlayClose:hover {
+    background: #CF5555;
+    border: 1px solid #AA4A4A;
+}
+
+#overlayForm-inner table button img {float: left;width: 16px;height: 16px;margin: 0 5px 0 0;}
+
+.amount {
+	text-align:right;
+	padding:2px;
+}
+.amountTotal {
+	text-align:right;
+	padding:2px;
+	font-weight:bold;
+}
+.creditAmount {
+	text-align:right;
+	padding:2px;
+	color:#F00;
+}
+
+.aifnewRow {
+	text-align:center;
+	cursor:pointer;
+	color:#C00;
+	font-weight: bold;
+	padding: 5px 5px !important;
+}
+.aifnewRow:hover {background:#EFF3F7;}
+.delRow {
+	float:left;
+	width:16px;
+	height:16px;
+	background-color:#f2f2f2;
+	background-image:url(../images/icons/bin_black.png);
+	background-repeat:no-repeat;
+	background-position:center center;
+	background-size:16px 16px;
+}
+.delTranRow {
+	float:left;
+	width:16px;
+	height:16px;
+	background-color:#f2f2f2;
+	background-image:url(../images/icons/bin_black.png);
+	background-repeat:no-repeat;
+	background-position:center center;
+	background-size:16px 16px;
+}
+.aifHover:hover {background-color:#EFF3F7; cursor:pointer;}
+.aif-headline {
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    color: #FFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-radius: 2px;
+}
+.aifCompileWrapper {
+	
+    font-size: 14px;
+    font-weight: bold;
+    color: #C00;
+    float: right;
+    height: 32px;
+    line-height: 32px;
+    cursor: default;
+}
+.FlyoutPopup {
+	display:none;
+    position: absolute;
+    background: #FFF;
+    z-index: 999999999999;
+    width: 300px;
+    height: 90px;
+    border: 1px solid #AAA;
+    border-radius: 2px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    line-height: 25px;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+.FCFlyoutNorth {	position: absolute;	background-image: url(../images/flyout-north.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutSouth {	position: absolute;	background-image: url(../images/flyout-south.png);	background-position: center center;	background-repeat: no-repeat;	height: 9px;}
+.FCFlyoutEast {	position: absolute;	background-image: url(../images/flyout-east.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+.FCFlyoutWest {	position: absolute;	background-image: url(../images/flyout-west.png);	background-position: center center;	background-repeat: no-repeat;	width: 9px;}
+.PopupBoxDim {
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,0.75);
+	z-index: 999999;
+}
+
+.PopupBoxWhite {
+	position:fixed;
+	width: 300px;
+	height: 250px;
+	background:#FFF;
+	border-radius:2px;
+	box-shadow:0px 0px 10px rgba(0,0,0,0.5);
+	z-index: 9999999;
+}
+.PBWInner {
+    padding: 20px;
+}
+button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+.pencil_edit {
+    background-image: url(../images/icons/edit_black.png);
+    float: left;
+    width: 16px;
+    height: 16px;
+    background-size: 16px;
+    background-position: center;
+    background-repeat: no-repeat;
+}

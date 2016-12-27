@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Print Test</title>
+<script>
+   // set portrait orientation
+   jsPrintSetup.setOption('orientation', jsPrintSetup.kPortraitOrientation);
+   // set top margins in millimeters
+   jsPrintSetup.setOption('marginTop', 15);
+   jsPrintSetup.setOption('marginBottom', 15);
+   jsPrintSetup.setOption('marginLeft', 20);
+   jsPrintSetup.setOption('marginRight', 10);
+   // set page header
+   jsPrintSetup.setOption('headerStrLeft', 'My custom header');
+   jsPrintSetup.setOption('headerStrCenter', '');
+   jsPrintSetup.setOption('headerStrRight', '&PT');
+   // set empty page footer
+   jsPrintSetup.setOption('footerStrLeft', '');
+   jsPrintSetup.setOption('footerStrCenter', '');
+   jsPrintSetup.setOption('footerStrRight', '');
+   // clears user preferences always silent print value
+   // to enable using 'printSilent' option
+   jsPrintSetup.clearSilentPrint();
+   // Suppress print dialog (for this context only)
+   jsPrintSetup.setOption('printSilent', 1);
+   // Do Print 
+   // When print is submitted it is executed asynchronous and
+   // script flow continues after print independently of completetion of print process! 
+   jsPrintSetup.print();
+   // next commands
+   jsPrintSetup.getVersion();
+</script>
+<style type="text/css">
+	#outer {border:solid 1px #ccc; width:100%; height:100%}
+</style>
+</head>
+
+<body>
+	<div id="outer">Print Test</div>
+</body>
+</html>

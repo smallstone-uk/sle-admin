@@ -1,0 +1,120 @@
+/* CSS Document */
+
+@media print {
+.searchcriteria {display:none}
+}
+
+body {font-family:"Courier New", Courier, monospace}
+table {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	/*border-collapse:collapse; don't do this globally */
+}
+th, td {padding:2px 4px;}
+
+.tableList {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	border-collapse:collapse;
+	
+}
+.tableList th, .tableList td {
+	padding:2px 4px; 
+	border: solid 1px #ccc;
+	background-color:#fff;
+}
+.clienthead {
+	background-color:#ddd;
+	font-weight:bold;
+	font-size:11px;
+}
+.client {
+	background-color:#eee;
+}
+.normal {
+	background-color:#fff;
+}
+.warning {
+	background-color:#FFD7D7;
+}
+.freedel {
+	background-color:#B3F4EC
+}
+.amount {
+	text-align:right;
+	padding:2px;
+}
+.credit {
+	text-align:right;
+	padding:2px;
+	color:#ff0000;
+}
+.amountTotal {
+	text-align:right;
+	padding:2px;
+	font-weight:bold;
+}
+.amountTotal-box {
+	text-align:right;
+	padding:2px;
+	font-weight:bold;
+	background: #36749E !important;  color: #FFF;  font-size: 18px;  text-shadow: 1px 1px 1px #075086;  
+	border: 1px solid #075086 !important;
+}
+.centre {
+	text-align:center;
+}
+.ref {
+		font-size:12px;
+	font-weight:bold;
+	color:#00C;
+}
+.ordertotal {
+	font-weight:bold;
+}
+
+/* Round Styles */
+.roundTable {font-size:14px;}
+.street {font-size:14px; font-weight:bold; padding:4px;}
+.house {font-size:14px; font-weight:bold; padding:4px; padding-left:30px;}
+.publication {font-size:14px; font-weight:bold; padding:4px;}
+
+/* statement layout */
+.address td {
+	border:none;
+	font-size:13px;
+}
+.compTable td {
+	border:none;
+	padding:0px 4px;;
+}
+.compName {
+	font-family:"Arial Black";
+	font-size:24px;
+	font-weight:bold;
+	color:#000099;
+}
+.compAddr {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	color:#000099;
+}
+.compDetailTitle {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	color:#000099;
+	text-align:right;
+}
+.compDetail {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+}
+.clientHeader-nav ul {
+	list-style:none;
+}
+.clientHeader-nav li {
+	display:inline;
+}

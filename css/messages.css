@@ -1,0 +1,122 @@
+#msg-outer {
+    clear: both;
+    float: left;
+    width: 600px;
+}
+#msg-outer > .msg-space {
+    float: left;
+	padding: 0;
+	-webkit-transition: padding 0.6s;
+	transition: padding 0.6s;
+}
+#msg-outer > .msg-space:hover {
+	padding:10px 0;
+}
+#msg-outer > .msg-space:hover > .msg-wrap {
+	border-color: #333;
+}
+#msg-outer > .msg-space.urgent {
+}
+#msg-outer > .msg-space.urgent > .msg-wrap {
+	border-color: #F00;
+}
+#msg-outer > .msg-space > .msg-wrap {
+    float: left;
+    clear: both;
+    border: 1px solid #ccc;
+    width: 598px;
+    margin: 0 0 10px 0;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-title {
+    padding: 5px 10px;
+    border-bottom: 1px solid #ccc;
+    background: #eee;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-title a {
+	font-weight: bold;
+	text-decoration:none;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-title a:hover {
+	text-decoration:underline;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-title > span {
+    float: right;
+    background: #fff;
+    padding: 5px 10px;
+    margin: -5px -10px 0px 0;
+    border-left: 1px solid #ccc;
+    text-transform: capitalize;
+    font-size: 12px;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-info {
+    float: left;
+    width: 598px;
+    margin: 0;
+    background: #FAFAFA;
+    border-bottom: 1px solid #ccc;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-info > span {
+    float: left;
+    width: 199px;
+    padding: 4px 0;
+    text-align: center;
+    text-transform: capitalize;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-title > span.add > a {
+    border-right: 1px solid #ccc;
+    padding: 5px 10px;
+    margin: 0 0 0 -10px;
+    background: #244c58;
+    color: #fff;
+    text-decoration: none;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-text {
+    float: left;
+    clear: both;
+    width: 578px;
+    padding: 10px;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-commentTitle {
+	float: left;
+	clear: both;
+	padding: 4px 10px;
+	border-top: 1px solid #CCC;
+	width: 578px;
+	background: #B6B4B4;
+	font-weight: bold;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-commentTitle > span {
+    float: right;
+    background: #fff;
+    padding: 1px 7px;
+    border-radius: 20px;
+    box-shadow: 0 0 2px #666 inset;
+    font-size: 11px;
+    text-align: center;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-comments {
+    float: left;
+    width: 598px;
+    clear: both;
+    border-top: 1px solid #ccc;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-comments > div.comment-wrap {
+    float: left;
+	border-top: 1px solid #CCC;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-comments > div.comment-wrap:nth-child(1) {border-top: none;}
+#msg-outer > .msg-space > .msg-wrap > div.msg-comments > div.comment-wrap > div.comment-timestamp {
+    float: left;
+    width: 120px;
+    padding: 5px 10px;
+}
+#msg-outer > .msg-space > .msg-wrap > div.msg-comments > div.comment-wrap > div.comment-text {
+    float: left;
+    padding: 5px 10px;
+    width: 437px;
+    border-left: 1px solid #ccc;
+}
+
+
+
+

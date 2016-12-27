@@ -1,0 +1,55 @@
+#items-header {display: block;float: left;padding: 4px 10px;width: 323px;font-size:12px;border-bottom:1px solid #ccc;background: #FAFAFA;}
+#items-header div {float: left;font-weight: bold;}
+#items-header div.title {width: 200px;}
+#items-header div.qty {width:20px;}
+#items-header div.price {width:50px;text-align:right;}
+#items-header div.linetotal {width:50px;text-align:right;font-weight:bold;}
+#item-list {position:fixed;top:0;left:0;bottom:0;width: 360px;border-right: 1px solid #ccc;padding: 0;margin: 0;background:#fff;}
+#item-list ul {list-style: none;margin: 0;padding: 0;}
+#item-list ul li {padding: 4px 10px;font-size:12px;border-bottom:1px solid #ccc;}
+#item-list ul li span {float: left;}
+#item-list ul li span.title {width: 200px;}
+#item-list ul li span.qty {width:20px;}
+#item-list ul li span.price {width:50px;text-align:right;}
+#item-list ul li span.linetotal {width:50px;text-align:right;font-weight:bold;}
+
+#items {position: fixed;top: 43px;left: 0;bottom: 116px;width: 360px;overflow-y: scroll;}
+#basket-header {border-bottom: 1px solid #ccc;padding: 10px;font-weight: bold;font-size: 18px;background: #eee;}
+#new-product {position:fixed;bottom:0;width: 330px;border-top: 1px solid #ccc;padding: 15px;background: #eee;}
+#total {float: right;margin: 5px 0 0 0;font-weight: bold;font-size: 16px;}
+#controls {position: fixed;top: 0;left: 361px;bottom: 0;width: 170px;border-right: 1px solid #CCC;padding: 0;margin: 0;background:#fff;}
+#controls ul {list-style: none;margin: 0;padding: 0;}
+#controls ul li {margin: 0;}
+#controls ul li a {display:block;font-size:14px;padding:6px 10px;text-decoration:none;line-height:20px;border-bottom:1px solid #ccc;text-shadow:0 1px 1px #FFF;}
+#controls ul li a:hover {background:#eee;}
+#controls ul li a:active {background:#ddd;box-shadow: 0 1px 7px #BDBDBD inset;}
+#buttons {margin: 15px -15px -15px -15px;}
+#buttons a {float: left;color: #fff;text-decoration: none;width: 179px;text-align: center;padding: 20px 0;font-weight: bold;background: #999;border-top: 1px solid #666;border-right: 1px solid #666;text-shadow:0 1px 1px #4B4B4B;}
+#buttons a:hover {background: #CCC;color: #333;}
+#buttons a:active {background: #BEBEBE;color: #333;box-shadow: 0 1px 7px #777676 inset;}
+
+#account-detail {font-size: 12px;margin: 10px;}
+#account-balance {width: 465px;height: auto;}
+.pay-button {float: left;width: 137px;margin: 5px 5px 5px 0;padding: 10px;border: 1px solid #ccc;border-radius: 5px;background: #eee;height: 70px;text-decoration: none;}
+a.pay-button.active {border: 1px solid #0B262E;background: #244C58;}
+a.pay-button:active {border: 1px solid #0B262E;background: #244C58;box-shadow: 0 1px 6px #10242B inset;}
+a.pay-button.active h3, a.pay-button:active h3, a.pay-button.active h2, a.pay-button:active h2 {color:#fff;}
+.pay-button h3 {padding: 0;margin: 0;font-size: 16px;color: #333;}
+.pay-button h2 {padding: 5px 0;margin: 0;font-size: 22px;color: #244C58;}
+.pay-button h2 #OtherPayment {width: 123px;padding: 5px;border: 1px solid #ddd;border-radius: 5px;font-size: 22px;margin: 0;}
+
+.selectedOption {float:left;width: 214px;height: 120px;padding:10px;margin: 0 10px 0 0;font-size: 12px;border: 1px solid #ccc;border-radius: 5px;}
+.selectedOption h3 {font-size: 20px;margin: -10px -10px 10px -10px;background: #eee;padding: 10px;border-radius: 4px 4px 0 0;font-weight: normal;border-bottom: 1px solid #ccc;}
+.selectedOption .changeQty {height: 30px;padding: 4px 10px 4px 10px;width: 40px;border-radius: 10px 0px 0px 10px;border: 1px solid #CCC;outline:0;}
+
+#basket-header a {float: right;}
+#basket-header a img.clearCart {width: 20px;opacity: 0.4;}
+#basket-header a img.clearCart:hover {opacity: 1;}
+
+#basket-msg {position: fixed;top: 0;right: 0;font-size: 12px;padding: 10px;}
+.basket-total {font-size: 20px;text-align: center;}
+.basket-total span {display: block;font-size: 30px;margin: 5px 0;}
+.cash-given {font-size: 20px;text-align: center;}
+.cash-given #cashGiven {width: 100px;margin: 10px 0 0 0;padding: 8px 10px;border-radius: 10px;border: 1px solid #ccc;outline: 0;font-size: 18px;text-align:center;}
+
+

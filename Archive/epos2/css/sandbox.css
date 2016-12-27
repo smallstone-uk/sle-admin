@@ -1,0 +1,177 @@
+.sandbox_title {float:left;font-size:24px;width:100%;margin:10px;text-align:center;}
+.sandbox_subtitle {float:left;font-size:18px;width:100%;margin:10px;text-align:center;}
+input:focus::-webkit-input-placeholder {color: #0077FF;}
+input:focus::-webkit-input-placeholder {color: #4C9EFC;}
+input[type="submit"] {float: left;height: 60px !important;text-align: center;margin: 0 5px 0 5px;border: none !important;background: #0077FF;font-size: 18px !important;padding: 0 20px;outline: 0;cursor: pointer;color: #FFF;width: 500px;}
+input[type="submit"]:active {color: #FFF;background: #222;}
+.VIC_ErrorFld, .VIC_ErrorFld:focus {/* border: none !important; *//* border-bottom: 1px solid #C00 !important; */}
+.barcodemsg {text-align: center;font-size: 22px;}
+.center {/* margin: 50px auto; *//* width: 535px; */}
+.boolean_response_true, .boolean_response_true:focus {
+    border-color: #C00 !important;
+    color: #C00 !important;
+}
+.barcodebox {
+    float: left;
+    padding: 30px 0;
+    text-align: center;
+    border: 3px dashed;
+    cursor: pointer;
+    width: 495px;
+}
+.sandbox {
+    margin-top: 7em;
+    float: left;
+    padding: 0 2.1em;
+    width: 100%;
+    color: #FFF;
+}
+input {
+    height: 50px !important;
+    padding: 0 15px !important;
+}
+input[disabled] {
+    opacity: 0.5;
+    cursor: default;
+}
+.spacer {
+    float: left;    
+    width: 30px;
+    height: 1px;
+}
+.colheader {
+    color: #FFF;
+    font-size: 2.5em;
+    font-weight: 200;
+    padding: 0 10px;
+    cursor: default;
+}
+.startheader {
+    color: #FFF;
+    font-size: 4em;
+    padding: 0 5px;
+    margin: -30px 0 -10px 0;
+    cursor: default;
+}
+.startusercontrols {
+    position: fixed;
+    color: #FFF;
+    top: 0;
+    right: 1em;
+    font-size: 2em;
+    cursor: default;
+}
+.suc_profile {
+    float: left;
+    background: rgba(255, 255, 255, 0.1);
+    border: 5px solid rgba(255, 255, 255, 0);
+    cursor: pointer;
+    padding: 10px 30px;
+    transition: all .1s;
+}
+
+.suc_settings {
+    float: left;  
+    background: #444;  
+    border: 5px solid rgba(255, 255, 255, 0);
+    padding: 18px 25px;
+    cursor: pointer;
+    transition: all .1s;
+}
+
+.suc_settings:active {
+    border-color: #FFF;
+    transition: all .1s;
+}
+
+.suc_profile:active {
+    border-color: #FFF;
+    transition: all .1s;
+}
+.user_profile {
+    position: absolute;
+    background: #FFF;
+    width: 183px;
+    transition: all .1s;
+    top: 78px;
+}
+
+.user_profile ul li {
+    float: left;
+    font-size: 1em;
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+    cursor: pointer;
+    color: #FFF;
+    background: #444;
+}
+.user_profile ul li:active {
+    background: #FFF;
+    color: #000;
+}
+.epos-till-page div {
+    font-size: 5em;
+    text-align: center;
+    line-height: 5em;
+    width: 100%;
+    float: left;
+    height: 100%;
+}
+.content {
+    z-index: 999999999999999;
+    position: relative;
+}
+.col {
+    float: left;
+    max-width: 480px;
+    font-size: 0.8em;
+    width: auto;
+}
+.col li {
+    list-style-type: none;
+    float: left;
+    width: 240px;
+}
+
+.col li span {
+    float: left;
+    width: 30%;
+    text-align: right;
+    height: 65px;
+    line-height: 50px;
+    font-weight: 400;
+    color: #444;
+    padding: 0 5px;
+}
+
+.col li span input {
+    width: 100px !important;
+    padding: 0 !important;
+    text-indent: 10px !important;
+}
+.controls {
+    position: absolute;  
+    bottom: 10%;
+    box-sizing: content-box;
+    left: 0;
+    right: 0;
+    padding: 0 10%;
+}
+
+.controls button, .controls input {
+    padding: 0 150px !important;
+    margin: 0 !important;
+    height: 80px !important;
+    float: right;    text-align: center;      background: #35A017;      outline: 0;  cursor: pointer;  color: #FFF;
+    width: auto !important;
+    font-size: 0.75em !important;
+}
+.col table input {
+    width: 100% !important;  padding: 0 !important;  text-indent: 10px !important;
+    margin: 0 !important;
+}
+
+.col_big li {
+    width: 480px !important;
+}

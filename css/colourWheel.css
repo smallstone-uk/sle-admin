@@ -1,0 +1,11 @@
+.wheel {
+	float:left;
+	padding:5px;
+	/*width:256px;
+	height:256px;*/
+}
+.block {
+	float:left;
+	width:25px;
+	height:25px;
+}

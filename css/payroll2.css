@@ -1,0 +1,56 @@
+.pr2_item_field {
+    border-radius: 0 !important;
+    margin: -1px !important;
+    outline: 0 !important;
+    width: 77px !important;
+    border: 1px solid #BDC9DD !important;
+	text-align:center;
+}
+
+.pr2_fixed_item_field {
+    border-radius: 0 !important;
+    margin: -1px !important;
+    outline: 0 !important;
+    width: 77px !important;
+    border: 1px solid #BDC9DD !important;
+	text-align:center;
+}
+
+.pr2_item {
+    padding: 0 !important;
+}
+
+.pr2_fixed_item {
+    padding: 0 !important;
+}
+
+.pr2_item_field[disabled="disabled"] {
+    background-color: #EFF3F7;
+}
+
+.pr2_fixed_item_field[disabled="disabled"] {
+    background-color: #EFF3F7;
+}
+
+.pr2_holiday {
+    width: 16px;
+    height: 16px;
+    margin: 4px 0 0 30px;
+}
+
+.pr2_gt_ni {
+    border-radius: 0 !important;
+    margin: -1px !important;
+    outline: 0 !important;
+    width: 152px !important;
+    border: 1px solid #BDC9DD !important;
+	text-align:right;
+}
+.pr2_gt_paye {
+    border-radius: 0 !important;
+    margin: -1px !important;
+    outline: 0 !important;
+    width: 152px !important;
+    border: 1px solid #BDC9DD !important;
+	text-align:right;
+}

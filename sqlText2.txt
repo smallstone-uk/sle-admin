@@ -1,0 +1,173 @@
+
+// Transactions, nominal title and item amount for news invoices/credit notes
+SELECT tblTrans.*,  nomRef, nomTitle, niAmount
+FROM `tblTrans` ,tblNomItems, tblNominal
+WHERE `trnLedger` = 'sales' 
+AND `trnType` IN ('inv', 'crn')
+AND niTranID=trnID
+AND niNomID=nomID
+AND trnClientRef>0
+
+
+// news invoices/credit notes with no nomItem
+SELECT tblTrans.*, niAmount
+FROM tblTrans
+LEFT JOIN tblNomItems ON niTranID=trnID
+WHERE niID IS NULL
+AND trnType IN ('inv','crn')
+AND trnClientRef>0
+ORDER BY trnID
+
+
+// Display weekly delivery charge income
+SELECT diDate, CONCAT(YEAR(diDate), '/', WEEK(diDate)) AS week_name, sum(`diCharge`) as chargeTotal FROM `tblDelItems`
+WHERE 1
+GROUP BY week_name
+ORDER BY YEAR(diDate) ASC, WEEK(diDate) ASC
+
+
+// compare delivery charge income on two specific days
+SELECT diDate,diCharge, sum(diCharge),count(*)  
+FROM `tblDelItems` 
+WHERE `diDate` = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate,diCharge
+
+
+// Total of delivery charge income on two specific days
+SELECT diDate, sum(diCharge),count(*)  
+FROM `tblDelItems` 
+WHERE `diDate` = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate
+
+
+//Find orphaned items
+SELECT *
+FROM `tblNomItems`
+LEFT JOIN tblTrans ON nitranid = trnID
+WHERE trnid IS NULL
+LIMIT 0 , 30
+
+
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblNominal ON niNomID=nomID
+WHERE nomType="sales"
+AND nomTillBtn=0
+AND niAmount=0
+
+	SELECT * FROM tblNomItems
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblTrans ON niTranID=trnID 
+WHERE `trnAccountID` = 241 
+AND `trnClientRef` = 0
+AND niTranID>362700
+
+
+// count duplicate nomitems for shop account
+SELECT count(*) as Count, niTranID FROM tblNomItems n WHERE niNomID=201 group by niTranID having Count > 1
+
+
+// select duplicated nomItems
+select u1.*, u2.niID FROM tblNomItems u1, tblNomItems u2 WHERE u1.niID < u2.niID AND u1.niNomID=u2.niNomID AND u1.niNomID=201 AND u1.niTranID=u2.niTranID
+ORDER BY u2.niTranID
+
+
+// find customers with more than one (rogue) order
+SELECT tblOrder.ordClientID, tblOrder.ordID, tblOrder.ordDate, tblOrder.ordRef, tblOrder.ordContact, tblOrder.ordDeliveryCode, tblOrder.ordDelCodeNew
+FROM tblOrder
+WHERE (((tblOrder.ordClientID) In (SELECT [ordClientID] FROM [tblOrder] As Tmp GROUP BY [ordClientID] HAVING Count(*)>1 )))
+ORDER BY tblOrder.ordClientID;
+
+
+// NomItems for a given nomID and Date
+SELECT *
+FROM `tblNomItems`
+INNER JOIN tblTrans ON trnID = niTranID
+WHERE `niNomID` =841
+AND trnDate > '2014-10-26'
+LIMIT 0 , 30
+
+
+// Update field based on the value of a field in another table. May not work if sub-select does not find a matching record
+UPDATE tblClients
+SET tblClients.cltDelCode=(SELECT `ordDelCodeNew` FROM tblOrder WHERE `ordClientID`=cltID)
+
+
+// Update field in child table base on field in parent table
+UPDATE tblTrans t, tblClients c
+SET trnClientID=cltID
+WHERE t.trnClientRef=c.cltRef
+AND trnClientRef>0
+AND trnAccountID=4
+
+
+// Fix News invoices not appearing in tran reports
+UPDATE tblTrans t, tblClients c
+SET trnClientID=cltID,
+trnAccountID=4
+WHERE t.trnClientRef=c.cltRef
+AND trnClientRef>0
+AND trnAccountID=0
+AND trnDate = '2014-12-20'
+
+
+// SELECT Transaction, items and nominal account for a given supplier
+SELECT nomCode,nomTitle,niAmount,trnID,trnDate,trnType,trnAmnt1
+FROM tblNomItems
+INNER JOIN tblTrans ON trnID=niTranID
+INNER JOIN tblNominal ON nomID=niNomID
+WHERE trnAccountID=622
+ORDER BY trnDate
+
+
+// Unbalanced transactions for financial year
+SELECT tbltrans.trnID,tbltrans.trndate,trnAccountID, sum(niamount) as total
+FROM `tblNomItems`
+inner join tbltrans on trnID=nitranid
+WHERE trndate between '2014-02-01' and '2015-01-31'
+and trnledger='sales'
+group by trnid
+having total <> 0
+order by trnDate
+
+// Monthly totals for payroll figures
+SELECT YEAR(phDate)*100 + MONTH(phDate) AS yymm,
+	SUM(phNP) AS net, 
+	SUM(phPAYE) AS PAYE, 
+	SUM(phNI) AS NI
+FROM `tblPayHeader` 
+WHERE 1
+GROUP BY yymm
+
+// Fix SV records (114 records)
+UPDATE tblNomItems
+Set niNomID = 231,
+	niAmount = -niAmount
+WHERE
+	niNomID = 1762
+
+
+// move specific records to another analysis code
+UPDATE tblNomItems i
+JOIN tblTrans t ON t.trnID=i.niTranID
+SET i.niNomID=1762
+WHERE niNomID=231
+AND trnMethod='dv'
+
+
+// total of card payments for specific year
+SELECT sum( trnAmnt1 ) AS total, count( * ) AS num
+FROM `tblTrans`
+WHERE `trnLedger` = 'sales'
+AND `trnType` = 'pay'
+AND `trnMethod` LIKE 'card'
+AND `trnDate`
+BETWEEN '2014-02-01'
+AND '2015-01-31'
+
+

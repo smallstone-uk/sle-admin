@@ -169,6 +169,16 @@ component
     }
 
     /**
+     * Encrypted column (varbinary).
+     *
+     * @return any
+     */
+    public any function encrypted(required string name)
+    {
+        return this.addColumn('varbinary(255)', name);
+    }
+
+    /**
      * Add a foreign key constraint to a column.
      *
      * @return any

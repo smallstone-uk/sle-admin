@@ -41,6 +41,16 @@ component
     }
 
     /**
+     * Returns a new validate object.
+     *
+     * @return validate
+     */
+    public any function validate(required struct data, required struct rules)
+    {
+        return new App.Framework.Validate(data, rules);
+    }
+
+    /**
      * Returns the user object in the session.
      *
      * @return user
@@ -124,7 +134,7 @@ component
      */
     public void function writeDumpToFile(required any data, string file = "")
     {
-        file = (len(file)) ? file : "#getDataDir()#logs\log-#getTimestamp()#.html";
+        file = (len(file)) ? file : "#getDataDir('logs\log-#getTimestamp()#.html')#";
         writeDump(var = data, output = file, format = "html");
     }
 

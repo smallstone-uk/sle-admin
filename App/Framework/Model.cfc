@@ -19,7 +19,6 @@ component
      */
     public any function init(any constructorData = {})
     {
-        var loc = {};
         var modelData = new App.Framework.Legacy().constructModelObject(variables.table);
 
         variables.columns = modelData.columns;
@@ -385,6 +384,16 @@ component
         var throughModel = createObject("component", "App.#through#").init();
         var theThrough = this.hasOne(through, throughKey, throughModel.getPrimaryKeyField());
         return theThrough.hasOne(related, relatedKey, relatedModel.getPrimaryKeyField());
+    }
+
+    /**
+     * Gets the model's name.
+     *
+     * @return string
+     */
+    public string function getModelName()
+    {
+        return variables.model;
     }
 
     /**

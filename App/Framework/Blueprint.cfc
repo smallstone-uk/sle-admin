@@ -52,6 +52,16 @@ component
     }
 
     /**
+     * Unique column.
+     *
+     * @return any
+     */
+    public any function unique()
+    {
+        return this.addKey('UNIQUE KEY `#this.name#` (`#this.name#`)');
+    }
+
+    /**
      * Set default value for column.
      *
      * @return any

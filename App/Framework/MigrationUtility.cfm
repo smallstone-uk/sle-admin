@@ -83,6 +83,7 @@
             <cfloop array="#new Migration().orderBy('batch', 'desc').getArray()#" index="item">
                 <tr>
                     <td>
+                        <strong>B#item.batch#</strong> &mdash;
                         #item.migration#
                         <a href="#getUrl('App/Framework/MigrationUtility.cfm?method=reverse&name=#item.migration#')#" class="btn btn-danger pull-right">Reverse</a>
                     </td>

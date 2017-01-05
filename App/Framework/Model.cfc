@@ -32,9 +32,7 @@ component
 
         if (isValid("struct", constructorData)) {
             if (!structIsEmpty(constructorData)) {
-                for (key in constructorData) {
-                    this[key] = constructorData[key];
-                }
+                return this.fill(constructorData);
             }
         } else if (isValid("numeric", constructorData)) {
             return this.find(constructorData);
@@ -716,6 +714,22 @@ component
         var getResult = variables.instance.queryBuilder.run();
         variables.instance.hasSelect = false;
         return this.queryToModels(getResult, variables.model);
+    }
+
+    /**
+     * Fills the model columns with the given data struct.
+     *
+     * @return model
+     */
+    public any function fill(required struct data)
+    {
+        for (key in data) {
+            if (structKeyExists(this, key)) {
+                this[key] = data[key];
+            }
+        }
+
+        return this;
     }
 
     /**

@@ -134,7 +134,7 @@ component
      */
     public void function writeDumpToFile(required any data, string file = "")
     {
-        file = (len(file)) ? file : "#getDataDir('logs\log-#getTimestamp()#.html')#";
+        file = (len(file)) ? file : "#getDataDir()#logs\log-#getTimestamp()#.html";
         writeDump(var = data, output = file, format = "html");
     }
 

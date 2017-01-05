@@ -23,6 +23,7 @@
 	});
 </script>
 
+<cfset fileLimit = 15>
 <cfset dataDir="#application.site.dir_data#\stock\">
 <cfdirectory directory="#dataDir#" action="list" name="QDir" sort="name DESC">
 <cfquery name="QStockOrders" datasource="#application.site.datasource1#">
@@ -31,7 +32,7 @@
 	INNER JOIN tblStockItem ON siOrder=soID
 	GROUP BY soID
 	ORDER BY soDate DESC
-	LIMIT 30
+	LIMIT #fileLimit#
 </cfquery>
 <body>
 	<div id="wrapper">
@@ -105,7 +106,7 @@
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>
-								<cfif recCount eq 30><cfbreak></cfif>
+								<cfif recCount eq fileLimit><cfbreak></cfif>
 							</cfif>
 						</cfloop>
 					</cfoutput>

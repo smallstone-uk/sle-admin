@@ -721,10 +721,10 @@ component
      *
      * @return model
      */
-    public any function fill(required struct data)
+    public any function fill(required struct data, boolean explicit = true)
     {
         for (key in data) {
-            if (structKeyExists(this, key)) {
+            if (structKeyExists(this, key) || !explicit) {
                 this[key] = data[key];
             }
         }

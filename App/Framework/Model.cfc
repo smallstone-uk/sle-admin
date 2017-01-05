@@ -26,9 +26,7 @@ component
         variables.nullColumns = modelData.nullColumns;
         variables.instance.primaryKeyField = modelData.primaryKeyField;
 
-        for (key in modelData.data) {
-            this[key] = modelData.data[key];
-        }
+        this.fill(modelData.data, false);
 
         if (isValid("struct", constructorData)) {
             if (!structIsEmpty(constructorData)) {

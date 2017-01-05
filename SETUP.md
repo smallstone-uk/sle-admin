@@ -1,7 +1,7 @@
 ## Required Software
 * **Web Server**
     * [ColdFusion Developer Edition](https://www.adobe.com/products/coldfusion/download-trial/try.html)
-    * [XAMPP (PHP, MySQL, phpMyAdmin)](https://www.apachefriends.org/index.html)
+    * [XAMPP (Apache, PHP, MySQL, phpMyAdmin)](https://www.apachefriends.org/index.html)
 
 * **Development**
     * [Node](https://nodejs.org/en/)

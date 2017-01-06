@@ -1,1 +1,0 @@
-<cfset session.eposmode = "refund">

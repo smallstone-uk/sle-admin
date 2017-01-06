@@ -1,1 +1,0 @@
-<cfset session.epos_frame.mode = "rfd">

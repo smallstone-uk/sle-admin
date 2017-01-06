@@ -84,5 +84,6 @@ component
     public any function onRequest(required string thePage)
     {
         include thePage;
+        include "settings.cfm";
     }
 }

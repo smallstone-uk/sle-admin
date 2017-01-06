@@ -16,8 +16,6 @@
         "userControlsItemShown": false,
         "MapIIS": "common/",
         "MapCF": "/kccCMS/",
-        "debug": false,
-        "showdumps": false,
         "sourceDir": "source",
         "clientID": 143,
         "vat": {

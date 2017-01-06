@@ -36,6 +36,9 @@ component
         application.site.url_data = getUrl('data');
         application.site.url_invoices = getUrl('data/invoices');
 
+        application.site.debug = false;
+        application.site.showdumps = false;
+
         include "appSite.cfm";
 
         return true;

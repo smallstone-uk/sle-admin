@@ -51,6 +51,7 @@ component
         
         if (structKeyExists(url, 'restart')) {
             onApplicationStart();
+            writeDumpToFile(application);
         }
 
         if (structKeyExists(form, 'options')) {

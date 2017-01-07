@@ -24,11 +24,7 @@
 
 6. Download [this jar file](https://github.com/small-stone-group/setup/raw/master/mysql-connector-java-5.1.40-bin.jar) and place it in both `C:\ColdFusion2016\cfusion\lib` and `C:\ColdFusion2016\cfusion\wwwroot\WEB-INF\lib`.
 
-7. Open `C:\xampp\apache\conf\mod_jk.conf` and comment the line that starts with `JkShmFile` by putting a `#` at the start of the line. Like the following:
-
-```
-# JkShmFile "C:\ColdFusion2016\config\wsconfig\1\jk_shm"
-```
+7. Open `C:\xampp\apache\conf\mod_jk.conf` and comment the line that starts with `JkShmFile` by putting a `#` at the start of the line. Like the following: `# JkShmFile "C:\ColdFusion2016\config\wsconfig\1\jk_shm"`
 
 8. Download [setup.bat](https://raw.githubusercontent.com/small-stone-group/setup/master/setup.bat) to your computer. Open command prompt and `cd` to the location of `setup.bat`, eg. `cd /D C:\Users\James\Documents`. Next run the setup script with your desired project location. The project location is the location where you will write code from, usually in your documents. Run the script by doing the following (**make sure you wrap the project path in quotes**): `setup "C:\Users\James\Documents"`. The script will then clone the repositories and set them up to use with Apache.
 

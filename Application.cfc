@@ -26,15 +26,15 @@ component
         for (key in config) { application[key] = config[key]; }
 
         application.site.start = now();
-        application.site.basedir = getBaseDir();
-        application.site.fileDir = getBaseDir('source');
+        application.site.basedir = getBaseDir('/');
+        application.site.fileDir = getBaseDir('source/');
         application.site.normal = getUrl();
         application.site.secure = getUrl();
-        application.site.dir_data = getDataDir();
-        application.site.dir_logs = getDataDir('logs');
-        application.site.dir_invoices = getDataDir('invoices');
-        application.site.url_data = getUrl('data');
-        application.site.url_invoices = getUrl('data/invoices');
+        application.site.dir_data = getDataDir('/');
+        application.site.dir_logs = getDataDir('logs/');
+        application.site.dir_invoices = getDataDir('invoices/');
+        application.site.url_data = getUrl('data/');
+        application.site.url_invoices = getUrl('data/invoices/');
 
         application.site.debug = false;
         application.site.showdumps = false;

@@ -53,7 +53,7 @@
 				<cfif cgi.REMOTE_ADDR eq "127.0.0.1">
 					<strong>LOCAL - </strong>
 				</cfif>
-				Shortlanesend Store | Admin
+				Shortlanesend Store | Adminme
 			</span>
 		</div>
 		<div id="contact">

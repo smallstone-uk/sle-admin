@@ -1,7 +1,11 @@
 <cfscript>
-    route().get('/dir', 'test');
-
-    writeDump(route().findURI(url.url_payload));
-
-    writeDump(request.routes);
+    route().get('/dir', 'ProductController@test');
+    route().post('/dir', 'dir post');
+    route().handle();
 </cfscript>
+
+<cfoutput>
+    <form method="post" action="#getUrl('/dir')#">
+        <input type="submit" value="Submit">
+    </form>
+</cfoutput>

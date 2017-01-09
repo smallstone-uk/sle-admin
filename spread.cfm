@@ -687,7 +687,7 @@
 								<td><input type="checkbox" name="srchFile" value="#name#" <cfif ListFind(srchFile,name,",")> checked </cfif> /></td>
 								<td><a href="#application.site.url_data#spreadsheets/#name#" title="download spreadsheet">#name#</a></td>
 								<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
-								<td align="right">#FormatBytes(size)#</td>
+								<td align="right">#acc.FormatBytes(size)#</td>
 							</tr>
 						</cfif>
 					</cfloop>

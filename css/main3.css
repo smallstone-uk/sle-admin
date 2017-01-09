@@ -83,10 +83,10 @@ input[type="button"]:disabled {opacity: 0.5;cursor: default;}
 
 #header-inner {margin:0 auto; width:90%}/*width: 1000px;*/
 
-#header-inner #logo {float: left;width: 400px;}
+#header-inner #logo {float: left;width: 80%;}
 #header-inner #logo span {display: block;line-height: 60px;font-size: 28px;color: #FFF;  text-shadow: 0 -1px 1px #000;  font-weight: normal;}
 
-#header-inner #contact {float: right;padding: 10px 0;text-align: right;}/*width: 400px;*/
+#header-inner #contact {float: right;padding: 10px 0;text-align: right;width: 20%;}/*width: 400px;*/
 #header-inner #contact span {display: block;font-size: 11px;color:#fff;}
 
 #header #nav {background: #0A3947;position: fixed;top: 0;left: 0;right: 0;z-index: 99999;}

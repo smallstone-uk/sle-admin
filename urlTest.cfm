@@ -1,6 +1,5 @@
 <cfscript>
-    route().get('/dir', 'ProductController@test');
-    route().post('/dir', 'dir post');
+    route().get('/dir', 'dir get');
     route().handle();
 </cfscript>
 

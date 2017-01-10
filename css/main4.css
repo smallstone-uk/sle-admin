@@ -357,6 +357,8 @@ h1 {
     padding: 25px;
     right: 0;
     bottom: 55px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .modal-wrapper {

@@ -79,4 +79,62 @@ component extends = "App.Framework.Controller"
             'eecOrder' = 100
         }).save();
     }
+
+    /**
+     * Loads transactions view.
+     *
+     * @return any
+     */
+    public any function loadTransactions(any args)
+    {
+        return view('epos.trans.header-list', {
+            'headers' = new App.EPOSHeader().timeframe(
+                'ehTimestamp',
+                joinTime(args.datefrom, args.timefrom),
+                joinTime(args.dateto, args.timeto)
+            )
+        });
+    }
+
+    /**
+     * Deletes the given header record.
+     *
+     * @return any
+     */
+    public any function deleteHeader(any args)
+    {
+        new App.EPOSHeader(val(args.id)).delete();
+    }
+
+    /**
+     * Deletes the given item record.
+     *
+     * @return any
+     */
+    public any function deleteItem(any args)
+    {
+        new App.EPOSItem(val(args.id)).delete();
+    }
+
+    /**
+     * Shows the form to edit a transaction item.
+     *
+     * @return any
+     */
+    public any function editTranItem(any args)
+    {
+        return view('epos.trans.edit-item', {
+            'item' = new App.EPOSItem(val(args.id))
+        });
+    }
+
+    /**
+     * Saves transaction item changes.
+     *
+     * @return any
+     */
+    public any function saveTranItem(any args)
+    {
+        new App.EPOSItem(val(args.eiID)).save(form);
+    }
 }

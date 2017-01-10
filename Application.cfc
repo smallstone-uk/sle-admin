@@ -86,4 +86,9 @@ component
         include thePage;
         include "settings.cfm";
     }
+
+    public any function onError(any exception)
+    {
+        writeDumpToFile(exception);
+    }
 }

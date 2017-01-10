@@ -2,31 +2,29 @@
     <cfloop array="#headers#" index="h">
         <cfset children = h.getItems()>
 
-        <li class="list-group-item tran-item">
-            <a href="javascript:void(0)" data-id="#h.ehID#" class="btn-delete-parent btn btn-danger btn-sm pull-right">Delete</a>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>#humanTimestamp(h.ehTimestamp)#</strong>
+                <a href="javascript:void(0)" data-id="#h.ehID#" class="btn-delete-parent pull-right">Delete</a>
+            </div>
 
-            <h4 class="list-group-item-heading">
-                #h.ehTimestamp#
-            </h4>
-
-            <p class="list-group-item-text">
-                <span class="label label-success">NET #h.ehNet#</span>
-                <span class="label label-warning">VAT #h.ehVAT#</span>
-
-                <cfif NOT ArrayIsEmpty(children)>
-                    <ul class="list-group mt-3 mb-0" style="display:none;">
-                        <cfloop array="#children#" index="c">
-                            <li class="list-group-item child-item">
-                                <a href="javascript:void(0)" data-id="#c.eiID#" class="btn-delete-child btn btn-danger btn-sm pull-right ml-1">Delete</a>
+            <cfif NOT ArrayIsEmpty(children)>
+                <table class="table">
+                    <cfloop array="#children#" index="c">
+                        <tr class="child-item">
+                            <td align="left">#c.getTitle()#</td>
+                            <td align="right" width="25">#c.eiQty#</td>
+                            <td align="right" width="100">&pound;#c.eiRetail#</td>
+                            <td align="right" width="50">
                                 <a href="javascript:void(0)" data-id="#c.eiID#" class="btn-edit-child btn btn-default btn-sm pull-right">Edit</a>
-                                <h4 class="list-group-item-heading">
-                                    #c.eiTimestamp#
-                                </h4>
-                            </li>
-                        </cfloop>
-                    </ul>
-                </cfif>
-            </p>
-        </li>
+                            </td>
+                            <td align="right" width="50">
+                                <a href="javascript:void(0)" data-id="#c.eiID#" class="btn-delete-child btn btn-danger btn-sm pull-right ml-1">Delete</a>
+                            </td>
+                        </tr>
+                    </cfloop>
+                </table>
+            </cfif>
+        </div>
     </cfloop>
 </cfoutput>

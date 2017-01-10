@@ -8,6 +8,7 @@
                     data: $(this).serialize(),
                     success: function(data) {
                         closeModal();
+                        $('.btn-applyfilter').click();
                     }
                 });
 
@@ -50,18 +51,6 @@
                 <div class="form-group col-md-12">
                     <label>Payment</label>
                     <input type="text" name="eiPayID" class="form-control" placeholder="Payment" value="#item.eiPayID#">
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-12">
-                    <label>Deal</label>
-                    <input type="text" name="eiDealID" class="form-control" placeholder="Deal" value="#item.eiDealID#">
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-12">
-                    <label>Nominal</label>
-                    <input type="text" name="eiNomID" class="form-control" placeholder="Nominal" value="#item.eiNomID#">
                 </div>
             </div>
             <div class="row">

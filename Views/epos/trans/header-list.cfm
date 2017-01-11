@@ -4,7 +4,7 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <strong>#humanTimestamp(h.ehTimestamp)#</strong>
+                <strong title="#h.ehTimestamp#">#humanTimeDiff(h.ehTimestamp)#</strong>
                 <a href="javascript:void(0)" data-id="#h.ehID#" class="btn-delete-parent pull-right">Delete</a>
             </div>
 
@@ -12,7 +12,7 @@
                 <table class="table">
                     <cfloop array="#children#" index="c">
                         <tr class="child-item">
-                            <td align="left">#c.getTitle()#</td>
+                            <td align="left">#c.title()#</td>
                             <td align="right" width="25">#c.eiQty#</td>
                             <td align="right" width="100">&pound;#c.eiRetail#</td>
                             <td align="right" width="50">

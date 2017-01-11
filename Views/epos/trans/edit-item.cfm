@@ -1,25 +1,16 @@
 <cfoutput>
     <script>
         $(document).ready(function(e) {
-            $('.EditItemForm').submit(function(event) {
-                $.ajax({
-                    type: 'POST',
-                    url: '#route("EPOSController", "saveTranItem")#',
-                    data: $(this).serialize(),
-                    success: function(data) {
-                        closeModal();
-                        $('.btn-applyfilter').click();
-                    }
-                });
-
-                event.preventDefault();
+            new Model('EPOSItem').bindSave('.EditItemForm', 'submit', function() {
+                closeModal();
+                $('.btn-applyfilter').click();
             });
         });
     </script>
 
     <div class="modal-inner">
         <h1>Edit Item</h1>
-        <form method="post" class="EditItemForm">
+        <form method="post" class="EditItemForm" data-id="#item.eiID#">
             <input type="hidden" name="eiID" value="#item.eiID#">
             <div class="row">
                 <div class="form-group col-md-4">

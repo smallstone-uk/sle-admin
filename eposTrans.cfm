@@ -25,43 +25,12 @@
                 event.preventDefault();
             });
 
-            $(document).on("click", ".tran-item", function(event) {
-                var child = $(this).find('.list-group');
-                $('.tran-item').removeClass("active").find('.list-group').hide();
-                $(this).addClass("active");
-                child.show();
+            new Model('EPOSHeader').bindDelete('.btn-delete-parent', 'click', function(el) {
+                el.parents('.panel').remove();
             });
 
-            $(document).on("click", ".btn-delete-parent", function(event) {
-                var caller = $(this);
-                var id = caller.data('id');
-
-                $.ajax({
-                    type: 'POST',
-                    url: '#route("EPOSController", "deleteHeader")#',
-                    data: {'id': id},
-                    success: function(data) {
-                        caller.parents('.tran-item').remove();
-                    }
-                });
-
-                event.preventDefault();
-            });
-
-            $(document).on("click", ".btn-delete-child", function(event) {
-                var caller = $(this);
-                var id = caller.data('id');
-
-                $.ajax({
-                    type: 'POST',
-                    url: '#route("EPOSController", "deleteItem")#',
-                    data: {'id': id},
-                    success: function(data) {
-                        caller.parents('.child-item').remove();
-                    }
-                });
-
-                event.preventDefault();
+            new Model('EPOSItem').bindDelete('.btn-delete-child', 'click', function(el) {
+                el.parents('.child-item').remove();
             });
 
             $(document).on("click", ".btn-edit-child", function(event) {

@@ -3,42 +3,42 @@ component extends = "Framework.Model"
     variables.table = "tblEPOS_Items";
     variables.model = "EPOSItem";
 
-    public any function getProduct()
+    public any function product()
     {
-        return new App.Product(this.eiProdID);
+        return this.hasOne('Product', 'eiProdID');
     }
 
-    public any function getPublication()
+    public any function publication()
     {
-        return new App.Publication(this.eiPubID);
+        return this.hasOne('Publication', 'eiPubID');
     }
 
-    public any function getPayment()
+    public any function payment()
     {
-        return new App.EPOSAccount(this.eiPayID);
+        return this.hasOne('EPOSAccount', 'eiPayID');
     }
 
-    public any function getAccount()
+    public any function account()
     {
-        return new App.EPOSAccount(this.eiAccID);
+        return this.hasOne('EPOSAccount', 'eiAccID');
     }
 
-    public string function getTitle()
+    public string function title()
     {
         if (this.eiProdID != 1) {
-            return this.getProduct().prodTitle;
+            return this.product().prodTitle;
         }
 
         if (this.eiPubID != 1) {
-            return this.getPublication().pubTitle;
+            return this.publication().pubTitle;
         }
 
         if (this.eiPayID != 1) {
-            return this.getPayment().eaTitle;
+            return this.payment().eaTitle;
         }
 
         if (this.eiAccID != 1) {
-            return this.getAccount().eaTitle;
+            return this.account().eaTitle;
         }
 
         return '';

@@ -91,29 +91,10 @@ component extends = "App.Framework.Controller"
             'headers' = new App.EPOSHeader().timeframe(
                 'ehTimestamp',
                 joinTime(args.datefrom, args.timefrom),
-                joinTime(args.dateto, args.timeto)
+                joinTime(args.dateto, args.timeto),
+                'desc'
             )
         });
-    }
-
-    /**
-     * Deletes the given header record.
-     *
-     * @return any
-     */
-    public any function deleteHeader(any args)
-    {
-        new App.EPOSHeader(val(args.id)).delete();
-    }
-
-    /**
-     * Deletes the given item record.
-     *
-     * @return any
-     */
-    public any function deleteItem(any args)
-    {
-        new App.EPOSItem(val(args.id)).delete();
     }
 
     /**
@@ -126,15 +107,5 @@ component extends = "App.Framework.Controller"
         return view('epos.trans.edit-item', {
             'item' = new App.EPOSItem(val(args.id))
         });
-    }
-
-    /**
-     * Saves transaction item changes.
-     *
-     * @return any
-     */
-    public any function saveTranItem(any args)
-    {
-        new App.EPOSItem(val(args.eiID)).save(form);
     }
 }

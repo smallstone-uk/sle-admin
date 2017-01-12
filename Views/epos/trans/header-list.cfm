@@ -4,9 +4,15 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <strong title="#h.ehTimestamp#">#humanTimeDiff(h.ehTimestamp)#</strong>
+                <strong title="#h.ehTimestamp#">
+                    NET #DecimalFormat(h.ehNet)# /
+                    VAT #DecimalFormat(h.ehVAT)# /
+                    #humanTimeDiff(h.ehTimestamp)#
+                </strong>
                 <a href="javascript:void(0)" data-id="#h.ehID#" class="btn-delete-parent pull-right">Delete</a>
             </div>
+
+            <cfset writeDump(h)>
 
             <cfif NOT ArrayIsEmpty(children)>
                 <table class="table">

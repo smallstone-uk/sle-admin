@@ -12,7 +12,7 @@
     # Handle Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^([\S]*)$ urlTest.cfm?url_payload=$1 [L]
+    RewriteRule ^([\S]*)$ index.cfm?url_payload=$1 [L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

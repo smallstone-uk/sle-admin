@@ -8,17 +8,16 @@ component
     this.sessionTimeout = createTimeSpan(0,0,60,0);
     this.setClientCookies = true;
 
-    // Boot Framework
-    new App.Framework.Application.Boot();
+    new App.Framework.Boot();
 
     public boolean function onApplicationStart()
     {
         application.mvc = {
             'datasource' = 'kcc_sle',
             'migrationDatasource' = 'mvc_sle',
-            'dataDirectory' = (getDirectoryFromPath(getCurrentTemplatePath()) & "..\data\"),
-            'baseDirectory' = getDirectoryFromPath(getCurrentTemplatePath()),
-            'migrationTableName' = 'migrations'
+            'migrationTableName' = 'migrations',
+            'dataDirectory' = getCurrentPath('..\data\'),
+            'baseDirectory' = getCurrentPath()
         };
 
         // Load the config into application

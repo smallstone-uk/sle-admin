@@ -13,4 +13,4 @@
 <script src="scripts/jquery.hoverIntent.minified.js"></script>
 <script src="scripts/chosen.jquery.js" type="text/javascript"></script>
 <script src="scripts/main.js" type="text/javascript"></script>
-<script type="text/javascript" src="App/Framework/Model.js"></script>
+<script type="text/javascript" src="App/Framework/Client.js"></script>

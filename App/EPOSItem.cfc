@@ -4,33 +4,6 @@ component extends = "Framework.Model"
     variables.model = "EPOSItem";
 
     /**
-     * Called when the item is updated.
-     *
-     * @return any
-     */
-    public any function onUpdated()
-    {
-        // Update header record totals
-        var header = this.header();
-        var items = new App.EPOSItem().where('eiParent', header.ehID).getArray();
-        var totalNet = 0;
-        var totalVAT = 0;
-
-        for (item in items) {
-            if (lCase(item.eiClass) != 'pay') {
-                writeDumpToFile(item);
-                totalNet += item.eiNet;
-                totalVAT += item.eiVAT;
-            }
-        }
-
-        header.ehNet = totalNet;
-        header.ehVAT = totalVAT;
-        writeDumpToFile(header);
-        header.save();
-    }
-
-    /**
      * Gets this item's header record.
      *
      * @return any

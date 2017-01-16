@@ -27,7 +27,7 @@
                 <div class="form-group col-md-4">
                     <label>Type</label>
                     <select class="form-control" name="eiType">
-                        <cfloop array="#new App.EPOSCat().where('epcType', 'IN').getArray()#" index="t">
+                        <cfloop array="#new App.EPOSCat().where('epcType', 'IN')#" index="t">
                             <option value="#t.epcKey#" <cfif item.eiType eq t.epcKey>selected="true"</cfif>>#t.epcKey#</option>
                         </cfloop>
                     </select>

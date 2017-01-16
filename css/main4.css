@@ -335,7 +335,7 @@ h1 {
     right: 0;
     bottom: 0;
     z-index: 999999;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(0,0,0,.3);
 }
 
 .modal-dialog {
@@ -345,26 +345,28 @@ h1 {
     left: 15%;
     right: 15%;
     bottom: 20%;
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 2px;
+    box-shadow: 0 27px 24px 0 rgba(0,0,0,.2), 0 40px 77px 0 rgba(0,0,0,.22);
 }
 
 .modal-inner {
     position: absolute;
     top: 0;
     left: 0;
-    padding: 25px;
+    padding: 24px;
     right: 0;
-    bottom: 55px;
+    bottom: 50px;
     overflow-y: auto;
     overflow-x: hidden;
+    border-radius: 2px 2px 0 0;
 }
 
 .modal-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
+    border-radius: 2px;
 }
 
 .modal-controls {
@@ -372,9 +374,8 @@ h1 {
     bottom: 0;
     left: 0;
     right: 0;
-    background: #f2f2f2;
-    padding: 10px;
-    border-top: 1px solid #DDD;
+    padding: 7px;
+    border-radius: 0 0 2px 2px;
 }
 
 select.form-control {

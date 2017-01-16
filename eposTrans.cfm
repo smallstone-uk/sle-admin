@@ -1,5 +1,5 @@
 <cfoutput>
-    <cfinclude template="bootstrap.cfm">
+    <cfinclude template="bootstrap_m.cfm">
     <cfinclude template="sleHeader.cfm">
 
     <script>
@@ -26,7 +26,7 @@
             });
 
             new Model('EPOSHeader').bindDelete('.btn-delete-parent', 'click', function(el) {
-                el.parents('.panel').remove();
+                el.parents('.header-panel').remove();
             });
 
             new Model('EPOSItem').bindDelete('.btn-delete-child', 'click', function(el) {
@@ -41,39 +41,41 @@
         });
     </script>
 
+    <div class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#getUrl('/eposTrans.cfm')#">EPOS Transactions</a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="module mt-5">
-            <h1>EPOS Transactions</h1>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form class="form-filter form-inline text-center">
+                    <div class="form-group label-floating mr-5" style="width:20%">
+                        <label class="control-label" for="timeframeFrom">From</label>
+                        <input type="text" id="timeframeFrom" name="timeframeFrom" class="form-control" value="#day(now())-7#/#month(now())#/#year(now())#">
+                    </div>
+
+                    <div class="form-group label-floating mr-5" style="width:20%">
+                        <label class="control-label" for="timeframeTo">To</label>
+                        <input type="text" id="timeframeTo" name="timeframeTo" class="form-control" value="#day(now())#/#month(now())#/#year(now())#">
+                    </div>
+
+                    <div class="form-group">
+                        <a href="javascript:void(0)" class="btn btn-primary btn-raised btn-applyfilter pull-right">Search</a>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="module">
-            <form method="post" class="form-inline form-filter">
-                <div class="form-group">
-                    <label class="mr-1">From</label>
-                    <input type="date" name="datefrom" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <input type="time" name="timefrom" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label class="mr-1 ml-5">To</label>
-                    <input type="date" name="dateto" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <input type="time" name="timeto" class="form-control">
-                </div>
-
-                <a href="javascript:void(0)" class="btn btn-primary pull-right btn-applyfilter">Apply Filter</a>
-            </form>
-        </div>
-
-        <div class="module tran-headers">
-            <ul class="list-group">
-                <p>Search for transactions above</p>
-            </ul>
+        <div class="panel panel-default tran-headers">
+            <div class="panel-body">
+                <ul class="list-group">
+                    <p>Search for transactions above</p>
+                </ul>
+            </div>
         </div>
     </div>
 

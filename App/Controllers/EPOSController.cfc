@@ -90,8 +90,8 @@ component extends = "App.Framework.Controller"
         return view('epos.trans.header-list', {
             'headers' = new App.EPOSHeader().timeframe(
                 'ehTimestamp',
-                joinTime(args.datefrom, args.timefrom),
-                joinTime(args.dateto, args.timeto),
+                makeTimestamp(args.timeframeFrom),
+                makeTimestamp(args.timeframeTo),
                 'desc'
             )
         });

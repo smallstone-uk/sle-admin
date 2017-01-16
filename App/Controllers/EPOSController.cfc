@@ -79,33 +79,4 @@ component extends = "App.Framework.Controller"
             'eecOrder' = 100
         }).save();
     }
-
-    /**
-     * Loads transactions view.
-     *
-     * @return any
-     */
-    public any function loadTransactions(any args)
-    {
-        return view('epos.trans.header-list', {
-            'headers' = new App.EPOSHeader().timeframe(
-                'ehTimestamp',
-                makeTimestamp(args.timeframeFrom),
-                makeTimestamp(args.timeframeTo),
-                'desc'
-            )
-        });
-    }
-
-    /**
-     * Shows the form to edit a transaction item.
-     *
-     * @return any
-     */
-    public any function editTranItem(any args)
-    {
-        return view('epos.trans.edit-item', {
-            'item' = new App.EPOSItem(val(args.id))
-        });
-    }
 }

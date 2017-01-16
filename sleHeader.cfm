@@ -121,7 +121,6 @@
 						<li class="spacer"></li>
 						<li><a href="eposCats.cfm">EPOS Categories</a></li>
 						<li><a href="eposEmpCats.cfm">EPOS Employee Categories</a></li>
-						<li><a href="eposTrans.cfm">EPOS Transactions</a></li>
 						<li><a href="missingDealChecker.cfm">Product Deal Checker</a></li>
 						<li class="spacer"></li>
 						<li><a href="bookerProcess.cfm">Import Booker Stock</a></li>

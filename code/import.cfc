@@ -289,7 +289,7 @@
 			<cfelse>
 				<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
 					INSERT INTO tblBarcodes (barCode,barType,barProdID) 
-					VALUES ('#trim(args.barcode)#','product',#loc.productID#)
+					VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.productID#)
 				</cfquery>
 				<cfset loc.result.action="#loc.result.action#barcode added<br>">
 			</cfif>

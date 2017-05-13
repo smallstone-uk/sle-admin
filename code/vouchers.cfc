@@ -54,19 +54,24 @@
 		<cfset var item={}>
 		<cfset var QVouchers="">
 
-		<cfquery name="QVouchers" datasource="#args.datasource#">
-			SELECT *
-			FROM tblVoucherTitles
-			ORDER BY vtTitle asc
-		</cfquery>
-		<cfloop query="QVouchers">
-			<cfset item={}>
-			<cfset item.ID=vtID>
-			<cfset item.Title=vtTitle>
-			<cfset item.Amount=vtValue>
-			<cfset ArrayAppend(result,item)>
-		</cfloop>
-		
+		<cftry>
+			<cfquery name="QVouchers" datasource="#args.datasource#">
+				SELECT *
+				FROM tblVoucherTitles
+				ORDER BY vtTitle asc
+			</cfquery>
+			<cfloop query="QVouchers">
+				<cfset item={}>
+				<cfset item.ID=vtID>
+				<cfset item.Title=vtTitle>
+				<cfset item.Amount=vtValue>
+				<cfset ArrayAppend(result,item)>
+			</cfloop>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadTitles" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
 		<cfreturn result>
 	</cffunction>
 

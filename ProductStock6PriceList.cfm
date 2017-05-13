@@ -14,15 +14,22 @@
 		@media print {
 			.noPrint {display:none;}
 		}
+		#priceList {
+			border:none;
+			margin:2px;
+		}
 		.display {
 			font:"Comic Sans MS", cursive; 
-			font-size:18px;
-			border-spacing: 0px;border-collapse: collapse;
-			border-color: #CCC;
-			line-height:30px;
+			font-size:16px;
+			border-spacing: 0px;
+			border-collapse: collapse;
+			border-color: #ccc;
+			line-height:24px;
 		}
-		.display th {padding:4px 5px; background:#eee; border-color: #ccc;}
-		.display td {padding: 2px 5px; background:#fff; border-color: #ccc;}
+		.display th {padding:4px 5px; background:#eee; border-left:solid 1px #ccc; border-color: #ccc;}
+		.display td {padding:2px 5px; background:#fff; border-left:solid 1px #ccc;}
+		.blankcell {padding: 2px 5px; background:#fff; border-color: #fff;}
+		.printdate {font-size:10px;}
 	</style>
 </head>
 	<cfparam name="group" default="17">
@@ -30,6 +37,8 @@
 	<cfparam name="period" default="12">
 	<cfparam name="pricelist" default="cust">
 	<cfparam name="showSize" default="0">
+	<cfparam name="ignorePM" default="0">
+	<cfparam name="twoColumn" default="0">
 	
 	<cffunction name="GetData" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
@@ -79,9 +88,9 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
-		
+
 		<cftry>
-			<cfquery name="loc.QProducts" datasource="#args.datasource#">
+			<cfquery name="loc.QProducts" datasource="#args.datasource#" result="loc.QProductsResult">
 				SELECT prodID,prodRef,prodTitle,prodPriceMarked, siID,siRef,siUnitSize,siOurPrice,soDate
 				FROM tblProducts
 				LEFT JOIN tblStockItem ON prodID = siProduct
@@ -93,11 +102,14 @@
 				)
 				WHERE prodCatID=#val(args.cat)#
 				<cfif args.period neq 99>AND soDate > DATE_ADD(CURDATE(), INTERVAL -#args.period# MONTH)</cfif>
+				<cfif args.ignorePM>AND NOT prodPriceMarked</cfif>
 				AND siStatus <> 'inactive'
 				ORDER BY prodTitle
 			</cfquery>
 			<cfset loc.result.products = loc.QProducts>
-		<cfcatch type="any">
+<!---			<cfdump var="#loc.QProductsResult#" label="GetProducts" expand="yes" format="html" 
+				output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="GetProducts" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
@@ -105,10 +117,57 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="FixProduct" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfquery name="loc.QProduct" datasource="#args.datasource#">
+				SELECT prodID,prodRef,prodTitle,prodPriceMarked, siID,siRef,siUnitSize,siOurPrice,soDate
+				FROM tblProducts
+				LEFT JOIN tblStockItem ON prodID = siProduct
+				INNER JOIN tblStockOrder ON soID = siOrder
+				AND tblStockItem.siID = (
+					SELECT MAX( siID )
+					FROM tblStockItem
+					WHERE prodID = siProduct 
+				)
+				WHERE prodID=#args.prodID#
+			</cfquery>
+			<cfset loc.lastDigit = Right(loc.QProduct.siOurPrice,1)>
+			<cfoutput>lastDigit = #loc.lastDigit#</cfoutput>
+			<cfif loc.lastDigit gt 0>
+				<cfif loc.lastDigit lt 5>
+					<cfset loc.newPrice = (int(val(loc.QProduct.siOurPrice) * 10) / 10) + 0.05>
+				<cfelseif loc.lastDigit gt 5>
+					<cfset loc.newPrice = (int(val(loc.QProduct.siOurPrice) * 10) / 10) + 0.10>
+				</cfif>
+				<cfquery name="loc.QFixProduct" datasource="#args.datasource#" result="loc.QFixResult">
+					UPDATE tblProducts
+					INNER JOIN tblStockItem ON prodID = siProduct
+					INNER JOIN tblStockOrder ON soID = siOrder
+					SET siOurPrice = #loc.newPrice#,
+						prodMinPrice = #loc.newPrice#
+					WHERE prodID=#args.prodID#
+					AND tblStockItem.siID = #loc.QProduct.siID#
+				</cfquery>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="FixProduct" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
 <body>
 <cftry>
 	<cfset parm = {}>
 	<cfset parm.datasource = application.site.datasource1>
+	<cfif StructKeyExists(url,"fixPrice")>
+		<cfset parm.prodID = url.fixPrice>
+		<cfset FixProduct(parm)>
+	</cfif>
 	<cfset groups = GetGroups(parm)>
 	<cfset parm.menu = true>
 	<cfset catmenu = GetData(parm)>
@@ -168,6 +227,12 @@
 					<td colspan="2"><input type="checkbox" value="1" name="showSize"<cfif showSize> checked="checked"</cfif>>Show Size?</td>
 				</tr>
 				<tr>
+					<td colspan="2"><input type="checkbox" value="1" name="ignorePM"<cfif ignorePM> checked="checked"</cfif>>Ignore Pricemarked?</td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="checkbox" value="1" name="twoColumn"<cfif twoColumn> checked="checked"</cfif>>Display in 2 columns?</td>
+				</tr>
+				<tr>
 					<td colspan="2"><input type="submit" name="btnRun" value="Go" /></td>
 				</tr>
 			</form>
@@ -179,11 +244,12 @@
 				<cfloop query="data.categories">
 					<cfset parm.cat = pcatID>
 					<cfset parm.period = period>
+					<cfset parm.ignorePM = StructKeyExists(form,"ignorePM")>
 					<cfset items = GetProducts(parm)>
 					<cfif items.products.recordcount gt 0>
 						<cfset recCount += items.products.recordcount>
 						<tr>
-							<th colspan="7" align="left">#pcatTitle#</th>
+							<th colspan="8" align="left">#pcatTitle#</th>
 						</tr>
 						<cfloop query="items.products">
 							<tr>
@@ -194,6 +260,8 @@
 								<td align="right">&pound;#siOurPrice#</td>
 								<td>#GetToken(" |PM",prodPriceMarked+1,"|")#</td>
 								<td align="right">#LSDateFormat(soDate)#</td>
+								<td><cfif !prodPriceMarked>
+									<a href="?fixPrice=#prodID#&amp;group=#group#&amp;period=#period#&amp;showSize=#showSize#&amp;ignorePM=#ignorePM#&amp;pricelist=#pricelist#">Fix</a></cfif></td>
 							</tr>
 						</cfloop>
 					</cfif>
@@ -204,34 +272,120 @@
 				</tr>
 			</table>
 		<cfelse>
-			<table class="display" border="1" width="500">
-				<tr>
-					<th>Description</th>
-					<cfif showSize><th>Size</th></cfif>
-					<th align="right">Price</th>
-				</tr>
-				<cfset recCount = 0>
+			<cfset recCount = 0>
+			<cfset catTitle = "">
+			<cfset lastItem = "">
+			<cfset productArray = []>
+			<cfif twoColumn>
 				<cfloop query="data.categories">
 					<cfset parm.cat = pcatID>
+					<cfset parm.period = period>
+					<cfset parm.ignorePM = StructKeyExists(form,"ignorePM")>
 					<cfset items = GetProducts(parm)>
 					<cfif items.products.recordcount gt 0>
 						<cfset recCount += items.products.recordcount>
-						<tr>
-							<th colspan="3" align="left">#pcatTitle#</th>
-						</tr>
 						<cfloop query="items.products">
-							<tr>
-								<td>#prodTitle#</td>
-								<cfif showSize><td align="center">#siUnitSize#</td></cfif>
-								<td align="right">&pound;#siOurPrice#</td>
-							</tr>
+							<cfif data.categories.pcatTitle neq catTitle>
+								<cfset ArrayAppend(productArray,{
+									pcatTitle = '#data.categories.pcatTitle#',
+									header = true
+								})>
+								<cfset catTitle = data.categories.pcatTitle>
+							</cfif>
+							<cfif items.products.siOurPrice lt 1>
+								<cfset price = '#items.products.siOurPrice * 100#p'>
+							<cfelse>
+								<cfset price = '&pound;#items.products.siOurPrice#'>
+							</cfif>
+							<cfif lastItem neq "#items.products.prodTitle#-#items.products.siUnitSize#-price">
+								<cfset ArrayAppend(productArray,{
+									prodTitle = '#items.products.prodTitle#',
+									siUnitSize = '#items.products.siUnitSize#',
+									siOurPrice = price,
+									header = false
+								})>
+							</cfif>
+							<cfset lastItem = "#items.products.prodTitle#-#items.products.siUnitSize#-price">
 						</cfloop>
 					</cfif>
 				</cfloop>
-				<tr>
-					<td colspan="3" align="right">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
-				</tr>
-			</table>		
+				<cfset halfway = int(ArrayLen(productArray) / 2)>
+				<table id="priceList" class="display" border="1">
+					<tr>
+						<th>Description</th>
+						<cfif showSize><th>Size</th></cfif>
+						<th align="right">Price</th>
+						<td width="20" class="blankcell"></td>
+						<th>Description</th>
+						<cfif showSize><th>Size</th></cfif>
+						<th align="right">Price</th>
+					</tr>
+					<cfloop from="1" to="#halfway#" index="i">
+						<cfset leftItem = productArray[i]>
+						<cfset rightItem = productArray[halfway+i]>
+						<tr>
+							<cfif leftItem.header>
+								<th colspan="3">#leftItem.pcatTitle#</th>
+							<cfelse>
+								<td>#leftItem.prodTitle#</td>
+								<td>#leftItem.siUnitSize#</td>
+								<td align="right">#leftItem.siOurPrice#</td>
+							</cfif>
+							<td class="blankcell"></td>
+							<cfif rightItem.header>
+								<th colspan="3">#rightItem.pcatTitle#</th>
+							<cfelse>
+								<td>#rightItem.prodTitle#</td>
+								<td>#rightItem.siUnitSize#</td>
+								<td align="right">#rightItem.siOurPrice#</td>
+							</cfif>
+						</tr>
+					</cfloop>
+					<cfif ArrayLen(productArray) - (halfway * 2) neq 0>
+						<cfset rightItem = productArray[ArrayLen(productArray)]>
+						<tr>
+							<td colspan="4"></td>
+							<td>#rightItem.prodTitle#</td>
+							<td>#rightItem.siUnitSize#</td>
+							<td align="right">#rightItem.siOurPrice#</td>
+						</tr>
+					</cfif>
+					<tr>
+						<td colspan="3" class="printdate">Printed: #LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
+					</tr>
+				</table>
+				
+			<cfelse>
+				<table class="display" border="1" width="500">
+					<tr>
+						<th>Description</th>
+						<cfif showSize><th>Size</th></cfif>
+						<th align="right">Price</th>
+					</tr>
+					<cfloop query="data.categories">
+						<cfset parm.cat = pcatID>
+						<cfset parm.period = period>
+						<cfset parm.ignorePM = StructKeyExists(form,"ignorePM")>
+						<cfset items = GetProducts(parm)>
+						<cfif items.products.recordcount gt 0>
+							<cfset recCount += items.products.recordcount>
+							<tr>
+								<th colspan="3" align="left">#pcatTitle#</th>
+							</tr>
+							<cfloop query="items.products">
+								<tr>
+									<td>#prodTitle#</td>
+									<cfif showSize><td align="center">#siUnitSize#</td></cfif>
+									<td align="right">&pound;#siOurPrice#</td>
+								</tr>
+							</cfloop>
+						</cfif>
+					</cfloop>
+					<tr>
+						<td colspan="3" align="right" class="printdate">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
+					</tr>
+				</table>		
+			</cfif>
 		</cfif>
 	</cfoutput>
 	<script type="text/javascript">

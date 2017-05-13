@@ -40,6 +40,7 @@
 		#prodList {overflow:auto; float:left; height:400px; width:350px}
 		#product {min-width:500px;}
 		.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
+		#newProduct {float:right}
 	</style>
 	
 	<script src="common/scripts/common.js" type="text/javascript"></script>
@@ -70,6 +71,7 @@
 				//	console.log("code " + bcode);
 					if (bcode) {
 						$('#bcode').html(bcode);
+						$('#result').html("");
 						LookupBarcode("product",bcode,0,"#productdiv");
 						$("#tabs").tabs({
 						  active: 0
@@ -81,6 +83,7 @@
 					bcode = $('#barcodefld').val()
 					if (bcode) {
 						$('#bcode').html(bcode);
+						$('#result').html("");
 						$('#barcodefld').val("");
 						LookupBarcode("product",bcode,0,"#productdiv");
 						$("#tabs").tabs({
@@ -122,6 +125,13 @@
 				if ($('#prodPriceMarked').prop('checked'))
 					$('#siOurPrice').val(retailPrice);
 			});
+			$('#newProduct').click(function(e) {
+				var	bcode = "";
+				LookupBarcode("product",bcode,0,"#productdiv");
+				$("#tabs").tabs({
+				  active: 0
+				});
+			});
 		});
 		<cfif StructKeyExists(url,"product")>
 			<cfoutput>
@@ -143,6 +153,7 @@
 						<input type="submit" name="manual" id="manual" class="btn" value="Look up" />
 					</form>
 					<div style="clear:both"></div>
+					<button id="newProduct">New Product</button>
 				</div>
 				<div id="content-header">
 					<div id="bcode">bcode</div>

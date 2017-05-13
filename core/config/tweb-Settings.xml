@@ -2,29 +2,29 @@
 
 <appsettings>
 	<company>
-		<Name>Shortlanesend Store</Name>
+		<Name>SLE Store (production)</Name>
 		<CompanyName>Shortlanesend Store</CompanyName>
-		<FinancialYear>01-04-2014</FinancialYear>
+		<FinancialYear>01-02-2017</FinancialYear>
 		<webmaster>info@shortlanesendstore.co.uk</webmaster>
 		<telephone>01872 275102</telephone>
 		<po_telephone>01872 223670</po_telephone>
 	</company>
 	<site>
 		<host>tweb</host>
-		<domain>shortlanesendstore.co.uk</domain>
+		<domain>sle-admin.co.uk</domain>
 		<datasource0>kcc_cms</datasource0>
-		<datasource1>kcc_sle</datasource1>
+		<datasource1>kcc_sle_production</datasource1>
 		<datasource2>mvc_sle</datasource2>
 		<mapping1>/kccCMS/</mapping1>
 		<useAlias>false</useAlias>
 		<userControlsItemShown>false</userControlsItemShown>
 		<MapIIS>common/</MapIIS>
 		<MapCF>/kccCMS/</MapCF>
-		<dir_data>D:\HostingSpaces\SLE\shortlanesendstore.co.uk\data\</dir_data>
-		<dir_logs>D:\HostingSpaces\SLE\shortlanesendstore.co.uk\data\logs\</dir_logs>
-		<dir_invoices>D:\HostingSpaces\SLE\shortlanesendstore.co.uk\data\invoices\</dir_invoices>
-		<url_data>http://lweb.shortlanesendstore.co.uk/data/</url_data>
-		<url_invoices>http://lweb.shortlanesendstore.co.uk/data/invoices/</url_invoices>
+		<dir_data>D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\</dir_data>
+		<dir_logs>D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\logs\</dir_logs>
+		<dir_invoices>D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\invoices\</dir_invoices>
+		<url_data>http://tweb.sle-admin.co.uk/data/</url_data>
+		<url_invoices>http://tweb.sle-admin.co.uk/data/invoices/</url_invoices>
 	</site>
 	<core>
 		<imgSuffix>jpeg|jpg|gif|png|tiff|psd|pcd|jpc|jp2|ico|bmp|mng|ptif|fax|fits|avs|pict|palm|pdb|mtv|sgi|sun|swf</imgSuffix>

@@ -33,29 +33,10 @@
 		});
 	});
 </script>
-
-<cfif cgi.REMOTE_ADDR eq "127.0.0.1">
-	<style>
-		#header {
-			background: #108873 !important;
-		}
-
-		#header #nav {
-			background: #085044 !important;
-		}
-	</style>
-</cfif>
-
+<cfoutput>
 <div id="header">
 	<div id="header-inner">
-		<div id="logo">
-			<span>
-				<cfif cgi.REMOTE_ADDR eq "127.0.0.1">
-					<strong>LOCAL - </strong>
-				</cfif>
-				Shortlanesend Store | Admin
-			</span>
-		</div>
+		<div id="logo"><span>#application.company.name#</span></div>
 		<div id="contact">
 			<span><b>Tel</b>: 01872 275102</span>
 			<span><b>Post Office</b>: 01872 223670</span>
@@ -89,7 +70,7 @@
 						<li><a href="pubStock2.cfm">Publication Stock</a></li>
 						<li><a href="voucherMain.cfm">Voucher Returns</a></li>
 						<li class="spacer"></li>
-						<li><a href="rounds5.cfm">Rounds</a></li>
+						<li><a href="rounds6.cfm">Rounds v6</a></li>
 						<li><a href="Invoicing.cfm">Invoicing</a></li>
 						<li><a href="https://mapsengine.google.com/map/edit?mid=zePprILBGHcg.k1zT53hH1b0M" target="_blank">Rounds Map</a></li>
 						<li class="spacer"></li>
@@ -128,7 +109,7 @@
 				</li>
 				<li><a href="##" tabindex="-1">Accounting</a>
 					<ul>
-						<li><a href="salesMain.cfm">Sales</a></li>
+						<li><a href="salesMain3.cfm">Sales v3</a></li>
 						<li><a href="tranMain2.cfm">Supplier Transactions</a></li>
 						<li><a href="nomTran.cfm">Nominal Ledger</a></li>
 						<li><a href="nomManager.cfm">Nominal Manager</a></li>
@@ -151,3 +132,4 @@
 		</div>
 	</div>
 </div>
+</cfoutput>

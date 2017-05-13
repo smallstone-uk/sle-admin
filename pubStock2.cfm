@@ -274,7 +274,8 @@ input[type="text"].small {width: 40px;}
 								<input type="hidden" name="psType" value="received">
 								<input type="hidden" name="listOrder" id="listOrder" value="entry">
 								<div class="form-header noPrint">
-									Publication Received&nbsp;|&nbsp;<a href="##" id="NewPub" class="button" style="float:none;font-size:12px;color:##fff;">New Publication</a>
+									Publications Received&nbsp;|&nbsp;
+									<a href="##" id="NewPub" class="button" style="float:none;font-size:12px;color:##fff;">New Publication</a>
 									<span><div id="loading" class="loading"></div></span>
 								</div>
 								

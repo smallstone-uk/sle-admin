@@ -20,7 +20,7 @@
 --->
 	<cfif parm.header.allocate>	<!--- write matching payment --->
 		<cfset parm.header.trnID=0>
-		<cfset parm.header.PaymentAccounts=181>
+		<cfset parm.header.PaymentAccounts=491>		<!--- SUPP - was 181 (cash in till) --->
 		<cfset parm.header.tranType='pay'>
 		<cfset trnTotalNum=val(Replace(parm.header.trnTotal,",","","all"))>
 		<cfset parm.header.trnAmnt1=trnTotalNum>

@@ -333,6 +333,100 @@
 		<cfreturn dateStr>
 	</cffunction>
 	
+	<!--- Ref: https://www.codeproject.com/Articles/10860/Calculating-Christian-Holidays - May 2017 --->
+	<cffunction name="BankHolidays" access="public" returntype="array" hint="Pass a year value and it returns an array of bank holidays for that year">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = []>
+		<cftry>
+			<cfloop from="1" to="12" index="loc.mm">
+				<cfif loc.mm eq 1>	<!--- new years day bank holiday --->
+					<cfset loc.theDate = CreateDate(args.yyyy,loc.mm,1)>
+					<cfif DayOfWeek(loc.theDate) eq 7>	<!--- if sat --->
+						<cfset loc.theDate = DateAdd("d",2,loc.theDate)>	<!--- jump to mon --->
+					<cfelseif DayOfWeek(loc.theDate) eq 1>	<!--- if sun --->
+						<cfset loc.theDate = DateAdd("d",1,loc.theDate)>	<!--- jump to mon --->
+					</cfif>
+					<cfset ArrayAppend(loc.result,loc.theDate)>
+				</cfif>
+				<cfif loc.mm eq 5>	<!--- may bank holidays --->
+					<cfloop from="1" to="31" index="loc.dd">
+						<cfset loc.theDate = CreateDate(args.yyyy,loc.mm,loc.dd)>
+						<cfif DayOfWeek(loc.theDate) eq 2 AND loc.dd lte 7>	<!--- 1st mon in May --->
+							<cfset ArrayAppend(loc.result,loc.theDate)>
+						<cfelseif DayOfWeek(loc.theDate) eq 2 AND loc.dd gt 24>	<!--- last mon in May --->
+							<cfset ArrayAppend(loc.result,loc.theDate)>
+						</cfif>
+					</cfloop>
+				</cfif>
+				<cfif loc.mm eq 8>	<!--- august bank holiday --->
+					<cfloop from="24" to="31" index="loc.dd">
+						<cfset loc.theDate = CreateDate(args.yyyy,loc.mm,loc.dd)>
+						<cfif DayOfWeek(loc.theDate) eq 2 AND loc.dd gt 24>	<!--- last mon in Aug --->
+							<cfset ArrayAppend(loc.result,loc.theDate)>
+						</cfif>
+					</cfloop>
+				</cfif>
+				<cfif loc.mm eq 12>	<!--- christmas day bank holiday / boxing day bank holiday--->
+					<cfset loc.theDate = CreateDate(args.yyyy,loc.mm,25)>
+					<cfif DayOfWeek(loc.theDate) eq 7>	<!--- if sat --->
+						<cfset loc.theDate = DateAdd("d",2,loc.theDate)>	<!--- jump to mon --->
+					<cfelseif DayOfWeek(loc.theDate) eq 1>	<!--- if sun --->
+						<cfset loc.theDate = DateAdd("d",1,loc.theDate)>	<!--- jump to mon --->
+					</cfif>
+					<cfset ArrayAppend(loc.result,loc.theDate)>
+					
+					<cfset loc.theDate = CreateDate(args.yyyy,loc.mm,26)>
+					<cfif DayOfWeek(loc.theDate) eq 7>	<!--- if sat --->
+						<cfset loc.theDate = DateAdd("d",2,loc.theDate)>	<!--- jump to mon --->
+					<cfelseif DayOfWeek(loc.theDate) eq 1>	<!--- if sun --->
+						<cfset loc.theDate = DateAdd("d",2,loc.theDate)>	<!--- jump to tue because xmas bh on mon --->
+					<cfelseif DayOfWeek(loc.theDate) eq 2>	<!--- if mon --->
+						<cfset loc.theDate = DateAdd("d",1,loc.theDate)>	<!--- jump to tue because xmas bh on mon --->
+					</cfif>
+					<cfset ArrayAppend(loc.result,loc.theDate)>
+				</cfif>
+			</cfloop>
+			<cfset loc.z = {}>
+			<!--- calculate Easter Sunday --->
+			<cfscript>
+			  	loc.z.g = int(args.yyyy MOD 19);
+				loc.z.c = int(args.yyyy / 100);
+				loc.z.h = (loc.z.c - int(loc.z.c / 4) - int((8 * loc.z.c + 13) / 25) + 19 * loc.z.g + 15) MOD 30;
+				loc.z.i = loc.z.h - int(loc.z.h / 28) * (1 - int(loc.z.h / 28) * int(29 / (loc.z.h + 1)) * int((21 - loc.z.g) / 11));
+				loc.z.dd  = loc.z.i - ((args.yyyy + int(args.yyyy / 4) +  loc.z.i + 2 - loc.z.c + int(loc.z.c / 4)) MOD 7) + 28;
+				loc.z.mm = 3;
+				if (loc.z.dd > 31) {
+					loc.z.mm++;
+					loc.z.dd -= 31;
+				}
+				loc.z.es = CreateDate(args.yyyy,loc.z.mm,loc.z.dd);
+				loc.z.gf = DateAdd("d",-2,loc.z.es);
+				ArrayAppend(loc.result,loc.z.gf);	// Good Friday
+				ArrayAppend(loc.result,loc.z.es);	// Easter Sunday
+			</cfscript>
+			<cfset ArraySort(loc.result,"numeric","asc")>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="IsBankHoliday" access="public" returntype="boolean" hint="Pass a date and function will return true if it is a bank holiday">
+		<cfargument name="yourDate" type="date" required="true">
+		<cfif IsDate(yourDate)>
+			<cfloop array="#application.holidays#" index="bh">
+				<cfif yourDate eq bh>
+					<cfreturn true>
+				</cfif>
+			</cfloop>
+		</cfif>
+		<cfreturn false>
+	</cffunction>
+
 	<cffunction name="ValidEmail" output="false" returnType="boolean">
 		<cfargument name="email" type="string" required="false">
 		<cfset var posAt=0>
@@ -625,34 +719,37 @@
 			<cfif loc.QLoadTran.recordCount EQ 1>
 				<cfswitch expression="#loc.QLoadTran.trnMethod#">
 					<cfcase value="card">
-						<cfset loc.nomID=191>
+						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 191) --->
 					</cfcase>
 					<cfcase value="cash">
-						<cfset loc.nomID=871>	<!--- was 181 --->
+						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 181) --->
 					</cfcase>
-					<cfcase value="chq|chqs" delimiters="|">
-						<cfset loc.nomID=1472>
+					<cfcase value="chqs">
+						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 1472) --->
+					</cfcase>
+					<cfcase value="chq">
+						<cfset loc.nomID=1472>	<!--- cheque holding account (cheques collected or posted --->
 					</cfcase>
 					<cfcase value="coll">
-						<cfset loc.nomID=1482>
+						<cfset loc.nomID=1482>	<!--- cash collected account --->
 					</cfcase>
 					<cfcase value="dv">
-						<cfset loc.nomID=231>
+						<cfset loc.nomID=231>	<!--- News Subscription Vouchers --->
 					</cfcase>
 					<cfcase value="ib">
-						<cfset loc.nomID=41>
+						<cfset loc.nomID=41>	<!--- Bank Account --->
 					</cfcase>
 					<cfcase value="qchq|qs|qsib|qslost" delimiters="|">
-						<cfset loc.nomID=1561>
+						<cfset loc.nomID=1561>	<!--- Paid Via Quickstop (no longer used) --->
 					</cfcase>
 					<cfcase value="cp">
-						<cfset loc.nomID=1752>
+						<cfset loc.nomID=1752>	<!--- Council Payments via BACS --->
 					</cfcase>
 					<cfcase value="na">
-						<cfset loc.nomID=31>
+						<cfset loc.nomID=31>	<!--- Suspense Account --->
 					</cfcase>
 					<cfdefaultcase>
-						<cfset loc.nomID=31>	<!--- suspense --->
+						<cfset loc.nomID=31>	<!--- Suspense Account --->
 					</cfdefaultcase>
 				</cfswitch>
 				<cfquery name="loc.InsertItem" datasource="#GetDatasource()#">
@@ -884,6 +981,17 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="textMessage" access="public" returntype="string" hint="Converts an html email message into a plain text message with line breaks.">
+		<cfargument name="string" required="true" type="string">
+		<cfscript>
+			var pattern = "<br />";
+			var CRLF = chr(13) & chr(10);
+			var message = ReplaceNoCase(arguments.string, pattern, CRLF , "ALL");
+			pattern = "<[^>]*>";
+		</cfscript>
+		<cfreturn REReplaceNoCase(message, pattern, "" , "ALL")>
+	</cffunction>
+
 	<cffunction name="AutoEmail" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
@@ -927,10 +1035,10 @@
 					#content#
 				</cfmailpart>
 			</cfmail>
-			<cffile action="append" addnewline="yes" file="D:\HostingSpaces\SLE\shortlanesendstore.co.uk\data\logs\email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
+			<cffile action="append" addnewline="yes" file="#application.site.dir_data#logs\email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
 				output="Message sent to: #args.email# - #args.subject#">
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="AutoEmail" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>

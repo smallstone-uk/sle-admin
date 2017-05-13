@@ -117,6 +117,7 @@
 				AND cltAccountType<>'N'
 				ORDER BY riOrder asc, riID desc
 			</cfquery>
+
 			<cfloop query="QRounds">
 				<cfquery name="QGetStreet" datasource="#args.datasource#">
 					SELECT *

@@ -6,7 +6,7 @@
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset titles=vch.LoadTitles(parm)>
-
+<cfdump var="#titles#" label="titles" expand="false">
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#btnAdd').click(function() {

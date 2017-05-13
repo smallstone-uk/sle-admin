@@ -19,7 +19,7 @@
 </head>
 
 <cfset site={}>
-<cfset site.datasource1="kcc_sle">
+<cfset site.datasource1=application.site.datasource1>
 <cfset site.fileDir="#ExpandPath(".")#\source\">
 <cfquery name="QShopSave" datasource="#application.site.datasource1#">
 	SELECT cltRef,cltName,cltDelHouse,cltDelAddr,cltDelTel,cltOverdue,cltBalance,cltLastDel,cltLastPaid,cltAccountType

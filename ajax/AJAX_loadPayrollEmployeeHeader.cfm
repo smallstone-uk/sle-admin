@@ -57,7 +57,7 @@
 					var hours = nf($(e).find('.pr2_item_field').val(), "num");
 					var holHours = nf($(e).find('.pr2_item_field').attr("data-holvalue"), "num");
 					
-					if (hours > 0) {
+					if (hours != 0) {
 						result.items.push({
 							rate: rate,
 							weekday: day,
@@ -75,7 +75,7 @@
 					var day = $(e).attr("data-day");
 					var value = nf($(e).find('.pr2_fixed_item_field').val(), "num");
 					
-					if (value > 0) {
+					if (value != 0) {
 						result.items.push({
 							rate: 0,
 							weekday: day,
@@ -308,7 +308,7 @@
 							<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 								<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
 								<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#">
-									<cfif dayItem.piHours gt 0>
+									<cfif dayItem.piHours neq 0>
 										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" value="#dayItem.piHours#">
 									<cfelse>
 										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" value="">

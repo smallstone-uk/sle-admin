@@ -23,7 +23,7 @@
 	</style>
 </head>
 <body>
-<cfif StructKeyExists(session.rounds.parms,"dispatchTicked")><cfdump var="#session.rounds.parms#" label="rounds" expand="false">
+<cfif StructKeyExists(session.rounds.parms,"dispatchTicked")>
 	<cfoutput>
 		<cfset parm.form=session.rounds.parms>
 		<cfif StructKeyExists(url,"roundDate")>

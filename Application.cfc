@@ -2,22 +2,24 @@ component
 {
     this.name = "SLE_Production";
     this.clientStorage = "kcc_cf_sle";
-    this.clientManagement = true;
+    this.clientManagement = false;
     this.sessionManagement = true;
     this.applicationTimeout = createTimeSpan(2,0,0,0);
     this.sessionTimeout = createTimeSpan(0,0,60,0);
     this.setClientCookies = true;
 
-    new App.Framework.Boot();
+    // Boot Framework
+    new App.Framework.Application.Boot();
 
     public boolean function onApplicationStart()
     {
         application.mvc = {
-            'datasource' = 'kcc_sle',
+            'datasource' = 'kcc_sle_production',
             'migrationDatasource' = 'mvc_sle',
-            'migrationTableName' = 'migrations',
-            'dataDirectory' = getCurrentPath('..\data\'),
-            'baseDirectory' = getCurrentPath()
+           // does not work  'dataDirectory' = (getDirectoryFromPath(getCurrentTemplatePath()) & "..\data\"),
+			'dataDirectory' = 'D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\',
+            'baseDirectory' = getDirectoryFromPath(getCurrentTemplatePath()),
+            'migrationTableName' = 'migrations'
         };
 
         // Load the config into application
@@ -25,15 +27,17 @@ component
         for (key in config) { application[key] = config[key]; }
 
         application.site.start = now();
-        application.site.basedir = getBaseDir('/');
-        application.site.fileDir = getBaseDir('source/');
+        application.site.basedir = getBaseDir();
+        application.site.fileDir = getBaseDir('source');
         application.site.normal = getUrl();
         application.site.secure = getUrl();
-        application.site.dir_data = getDataDir('/');
-        application.site.dir_logs = getDataDir('logs/');
-        application.site.dir_invoices = getDataDir('invoices/');
-        application.site.url_data = getUrl('data/');
-        application.site.url_invoices = getUrl('data/invoices/');
+        //application.site.dir_data = getDataDir();
+		application.site.dir_data = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\";
+        application.site.dir_invoices = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\invoices\";
+        application.site.dir_logs = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\logs\";
+       // application.site.dir_logs = getDataDir('logs');
+        application.site.url_data = getUrl('data');
+        application.site.url_invoices = getUrl('data/invoices');
 
         application.site.debug = false;
         application.site.showdumps = false;
@@ -82,12 +86,11 @@ component
 
     public any function onRequest(required string thePage)
     {
-        include thePage;
-        include "settings.cfm";
-    }
-
-    public any function onError(any exception)
-    {
-        writeDumpToFile(exception);
+		if (len(application.site.error) IS 0) {
+			include thePage;
+			include "settings.cfm";
+		} else {
+			include "error.cfm";
+		}
     }
 }

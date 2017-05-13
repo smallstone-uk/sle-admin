@@ -11,7 +11,7 @@
 		<cfset loc.result.msgs = []>
 		<cftry>
 			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
-				<cfset loc.result.barcode = Trim(args.form.barcode)>
+				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>
 				<cfquery name="loc.QBarcode" datasource="#args.datasource#">
 					SELECT *
 					FROM tblBarcodes
@@ -46,6 +46,9 @@
 				<cfelse>
 					<cfset loc.result.msg = "This product has no barcode">
 				</cfif>
+			<cfelseif LEN(args.form.barcode) eq 0 AND args.form.productID eq 0>
+				<cfset loc.result.msg = "To add a new product without a barcode, click Add Product.">
+				<cfset loc.result.action = "New">				
 			<cfelse>
 				<cfset loc.result.msg = "Invalid information supplied">
 				<cfset loc.result.action = "Clear">				
@@ -161,11 +164,12 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.newCode = NumberFormat(Left(args.form.newCode,15),"0000000000000")>
 		<cftry>
 			<cfquery name="loc.QBarcode" datasource="#args.datasource#">
 				SELECT *
 				FROM tblBarcodes
-				WHERE barCode LIKE '#args.form.newCode#'
+				WHERE barCode LIKE '#loc.newCode#'
 				AND barType = '#args.form.newType#'
 				LIMIT 1;
 			</cfquery>
@@ -175,9 +179,9 @@
 				<cfquery name="loc.QBarcodeAdd" datasource="#args.datasource#" result="loc.QAddResult">
 					INSERT INTO tblBarcodes
 					(barCode,barType,barProdID)
-					VALUES('#Left(args.form.newCode,15)#','#args.form.newType#',#args.form.prodID#)
+					VALUES('#loc.newCode#','#args.form.newType#',#args.form.prodID#)
 				</cfquery>
-				<cfset loc.result.msg = "Barcode added: #args.form.newCode#. ID: #loc.QAddResult.generatedkey#">
+				<cfset loc.result.msg = "Barcode added: #loc.newCode#. ID: #loc.QAddResult.generatedkey#">
 			</cfif>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
@@ -322,7 +326,7 @@
 						barType,
 						barProdID
 					) VALUES (
-						'#loc.result.barcode#',
+						'#NumberFormat(loc.result.barcode,"0000000000000")#',
 						'product',
 						#loc.result.productID#
 					)
@@ -1014,7 +1018,6 @@
 				ORDER BY accName
 			</cfquery>
 			<cfset loc.result = loc.QSuppliers>
-			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

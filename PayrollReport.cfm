@@ -99,6 +99,7 @@
 													<option value="date">Weekly Summary per Employee</option>
 													<option value="employee">Employee Summary per Week</option>
 													<option value="date_minimal">Payment Summary Totals</option>
+													<option value="postTrans">Post Payroll Data</option>
 												</select>
 											</td>
 										</tr>

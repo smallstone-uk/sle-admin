@@ -43,7 +43,7 @@
 				<td><a href="#parm.url#clientDetails.cfm?ref=#cltref#" target="_newtab">#cltref#</a></td>
 				<td>#clttitle# #cltinitial# #cltname#</td>
 				<td>#cltcompanyname#</td>
-				<td>#cltDelHouseName# #cltDelHouseNumber# #cltDelAddr#</td>
+				<td>#cltDelHouseName# #cltDelHouseNumber# #stName#</td>
 				<td>#cltaccounttype#</td>
 				<td>#oistatus#</td>
 				<td align="center">#rowQty#</td>

@@ -260,7 +260,7 @@
 			FROM tblProducts
 			JOIN tblProductCats ON prodCatID=pcatID
 			<cfif StructKeyExists(args.form,"srchSupplier")>JOIN tblAccount ON prodSuppID=accID</cfif>
-			INNER JOIN tblStockItem ON prodID = siProduct
+			LEFT JOIN tblStockItem ON prodID = siProduct
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )
 				FROM tblStockItem

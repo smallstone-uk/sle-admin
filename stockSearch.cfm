@@ -286,7 +286,7 @@
 							</script>
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
-									<cfset stocklist=stock.StockSearch(parm)>
+									<cfset stocklist=stock.StockSearch(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfset colspan=7>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
@@ -301,7 +301,6 @@
 													<th>Our Price</th>
 													<th>Pack Qty</th>
 													<th>Last Purchased</th>
-													<th>Valid To</th>
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
@@ -318,10 +317,9 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#prodUnitSize#</td>
-													<td>&pound;#prodOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td>&pound;#siOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#prodPackQty#</td>
 													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
-													<td>#LSDateFormat(prodValidTo,"ddd dd-mmm")#</td>
 												</tr>
 											</cfloop>
 											</table>
@@ -336,7 +334,7 @@
 										<cfset colspan=10>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
-											<table width="700" class="tableList" border="1">
+											<table width="100%" class="tableList" border="1">
 												<tr>
 													<th width="10"><input type="checkbox" class="selectAll" value="1" checked="checked" style="width:20px; height:20px;" /></th>
 													<th>ID</th>
@@ -348,7 +346,6 @@
 													<th>Unit Trade</th>
 													<th>Our Price</th>
 													<th>Last Purchased</th>
-													<th>Valid To</th>
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
@@ -369,7 +366,6 @@
 													<td>&pound;#prodUnitTrade#</td>
 													<td>&pound;#prodOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
-													<td>#LSDateFormat(prodValidTo,"ddd dd-mmm")#</td>
 												</tr>
 											</cfloop>
 											</table>
@@ -394,7 +390,6 @@
 														<th width="80">Our Price</th>
 														<th width="40">Price Marked</th>
 														<th width="100">Last Purchased</th>
-														<th width="100">Valid To</th>
 													</tr>
 												<cfset category=0>
 												<cfloop query="stocklist.stockItems">
@@ -414,7 +409,6 @@
 														<td align="right">&pound;#ourPrice#</td>
 														<td align="center">#GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 														<td align="right">#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
-														<td align="right">#LSDateFormat(prodValidTo,"ddd dd-mmm")#</td>
 													</tr>
 												</cfloop>
 												</table>
@@ -443,7 +437,7 @@
 													<th width="40">Trade Price</th>
 													<th width="40">Stock Level</th>
 													<th width="40">Value</th>
-													<th width="80">Last Purchased</th>
+													<th width="100">Last Purchased</th>
 												</tr>
 												<cfset category=0>
 												<cfset totalValue = 0>

@@ -27,6 +27,7 @@
 
 	<cffunction name="LoadRoundDrops" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
 		<cfset var result={}>
 		<cfset var r={}>
 		<cfset var street={}>
@@ -70,6 +71,7 @@
 		<cfset result.rounds=[]>
 		<cfset result.counterID={}>
 		<cfset result.batches={}>
+		<cfset result.QRndItems = []>
 		<cfif StructKeyExists(args,"showRoundOrder") AND args.showRoundOrder is "yes">
 			<cfset var rerun=false>
 		<cfelse>
@@ -101,10 +103,10 @@
 					</cfif>
 					<cfset r.list=[]>
 					<cfset r.TotalQty={}>
-					<cfset r.pubQty = 0>
-					<cfset r.dropQty = 0>	<!--- TODO sum pub & drop qtys for analysis sheet --->
+					<cfset r.pubTotal = 0>
+					<cfset r.dropTotal = 0>	<!--- TODO sum pub & drop qtys for analysis sheet --->
 					
-					<cfquery name="QRoundItems" datasource="#args.datasource#">
+					<cfquery name="QRoundItems" datasource="#args.datasource#" result="loc.rounditems">
 						SELECT *
 						FROM tblRoundItems,tblClients,tblOrder
 						WHERE 1
@@ -120,6 +122,7 @@
 							ORDER BY ordPriority asc
 						</cfif>
 					</cfquery>
+					<cfset ArrayAppend(result.QRndItems,loc.rounditems)>
 					<cfloop query="QRoundItems">
 						<cfset house={}>
 						<cfset house.ID=QRoundItems.riID>
@@ -187,12 +190,10 @@
 							<cfset i.PriceTrade=val(QOrderItems.pubTradePrice)>
 							<cfif len(pubRoundTitle)>
 								<cfset i.Title=pubRoundTitle>
+							<cfelseif len(pubShortTitle)>
+								<cfset i.Title=pubShortTitle>
 							<cfelse>
-								<cfif len(pubShortTitle)>
-									<cfset i.Title=pubShortTitle>
-								<cfelse>
-									<cfset i.Title=pubTitle>
-								</cfif>
+								<cfset i.Title=pubTitle>
 							</cfif>
 							<cfif i.pubGroup is "news">
 								<cfset i.Issue=LSDateFormat(dayDate,"ddmmm")>
@@ -206,9 +207,9 @@
 							</cfif>
 --->
 							<cfif i.pubGroup is "magazine">
-								<cfset i.sort="b_#pubShortTitle#">
+								<cfset i.sort="b_#i.Title#">
 							<cfelse>
-								<cfset i.sort="a_#pubShortTitle#">
+								<cfset i.sort="a_#i.Title#">
 							</cfif>
 							
 							<!--- Day Setup --->
@@ -362,6 +363,19 @@
 											<cfset i.ChargeItem=false>
 											<cfset i.ChargeItemDel=false>
 											<cfset i.CreditItem=false>
+										</cfif>
+										<cfif IsBankHoliday(dayDate) AND QRoundItems.cltSkipBH>
+											<cfset i.holiday=true>
+											<cfset i.AddToRound=true>
+											<cfset i.ChargeItem=true>
+											<cfset i.ChargeItemDel=false>
+											<cfif QRoundItems.cltDefaultHoliday eq "hold">
+												<cfset i.holidayAction = "bhHold">
+												<cfset i.CreditItem=false>
+											<cfelse>
+												<cfset i.holidayAction = "bhCancel">
+												<cfset i.CreditItem=true>
+											</cfif>
 										</cfif>
 									</cfif>
 								</cfif>

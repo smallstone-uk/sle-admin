@@ -1,28 +1,28 @@
 <!--- AJAX call - check client do not show debug data at all --->
-<cfset callback=1><!--- force exit of onrequestend.cfm --->
-<cfsetting showdebugoutput="no">
-<cfparam name="print" default="false">
-<cfsetting requesttimeout="300">
-<cfset testmode=0>
-<cfset GrandTotalQty={}>
+<cftry>
+	<cfset callback=1><!--- force exit of onrequestend.cfm --->
+	<cfsetting showdebugoutput="no">
+	<cfparam name="print" default="false">
+	<cfsetting requesttimeout="300">
+	<cfset testmode=0>
+	<cfset GrandTotalQty={}>
+	
+	<cfobject component="code/rounds" name="rounds">
+	<cfset parm={}>
+	<cfset parm.datasource=application.site.datasource1>
+	<cfset parm.form=form>
+	<cfset parm.form.roundDate=date>
+	<cfset parm.list=[]>
+	<cfset parm.dispatch=dispatch>
+	<cfset parm.roundID=form.rounds>
+	<cfset parm.showSummaries=showSummaries>
+	<cfset parm.showOverallSummary=showOverallSummary>
+	<cfset parm.showRoundOrder=showRoundOrder>
+	<cfset drops=rounds.LoadRoundDrops(parm)>
+	
+	<cfset dayYest=DateFormat(DateAdd("d",-1,parm.form.roundDate),"yyyy-mm-dd")>
 
-<cfobject component="code/rounds" name="rounds">
-<cfset parm={}>
-<cfset parm.datasource=application.site.datasource1>
-<cfset parm.form=form>
-<cfset parm.form.roundDate=date>
-<cfset parm.list=[]>
-<cfset parm.dispatch=dispatch>
-<cfset parm.roundID=form.rounds>
-<cfset parm.showSummaries=showSummaries>
-<cfset parm.showOverallSummary=showOverallSummary>
-<cfset parm.showRoundOrder=showRoundOrder>
-<cfset drops=rounds.LoadRoundDrops(parm)>
-
-<cfset dayYest=DateFormat(DateAdd("d",-1,parm.form.roundDate),"yyyy-mm-dd")>
-
-<cfoutput>
-    <cftry>
+	<cfoutput>
 		<cfloop array="#drops.rounds#" index="rnd">
 			<cfif ArrayLen(rnd.list)>
 				<cfloop array="#rnd.list#" index="d">
@@ -397,22 +397,10 @@
 				<div class="clear" style="page-break-before:always;"></div>
 			</cfloop>
 		</cfdocument>
-		
-        <cfcatch type="any">
-           <cfdump var="#cfcatch#" label="cfcatch" expand="no">
-        </cfcatch>
-    </cftry>
-		
-</cfoutput>
+	</cfoutput>
 
-
-
-
-
-
-
-
-
-
-
-
+<cfcatch type="any">
+	<cfdump var="#cfcatch#" label="ChargeItems" expand="yes" format="html" 
+		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+</cfcatch>
+</cftry>

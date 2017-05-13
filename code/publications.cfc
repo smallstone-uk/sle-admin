@@ -98,6 +98,30 @@
 
 <!---PSACTION,PSARRIVALDAY,PSCLAIMREF,PSDATE,PSDISCOUNT,PSDISCOUNTTYPE,PSID,PSISSUE,PSORDERID,PSPUBID,PSPWRETAIL,PSPWVATRATE,PSQTY,PSRETAIL,PSSTATUS,PSSUPID,PSTRADEPRICE,PSTYPE,PSURN,PSVAT,PSVATRATE,PUBACTIVE,PUBARRIVAL,PUBBARCODE,PUBCATEGORY,PUBCATID,PUBDISCOUNT,PUBDISCTYPE,PUBEPOS,PUBFRI,PUBGROUP,PUBID,PUBMON,PUBNEXTISSUE,PUBPRICE,PUBPRICE1,PUBPRICE2,PUBPRICE3,PUBPRICE4,PUBPRICE5,PUBPRICE6,PUBPRICE7,PUBPRICE8,PUBPWPRICE,PUBPWVAT,PUBREF,PUBROUNDTITLE,PUBSALETYPE,PUBSAT,PUBSHORTTITLE,PUBSOR,PUBSUN,PUBTHU,PUBTITLE,PUBTRADEPRICE,PUBTUE,PUBTYPE,PUBTYPEID,PUBVAT,PUBWED,
  --->
+	<cffunction name="ArrayOfStructSort" returntype="array" access="public" output="no">
+	  <cfargument name="base" type="array" required="yes" />
+	  <cfargument name="sortType" type="string" required="no" default="text" />
+	  <cfargument name="sortOrder" type="string" required="no" default="ASC" />
+	  <cfargument name="pathToSubElement" type="string" required="no" default="" />
+	
+	  <cfset var tmpStruct = StructNew()>
+	  <cfset var returnVal = ArrayNew(1)>
+	  <cfset var i = 0>
+	  <cfset var keys = "">
+	
+	  <cfloop from="1" to="#ArrayLen(base)#" index="i">
+		<cfset tmpStruct[i] = base[i]>
+	  </cfloop>
+	
+	  <cfset keys = StructSort(tmpStruct, sortType, sortOrder, pathToSubElement)>
+	
+	  <cfloop from="1" to="#ArrayLen(keys)#" index="i">
+		<cfset returnVal[i] = tmpStruct[keys[i]]>
+	  </cfloop>
+	
+	  <cfreturn returnVal>
+	</cffunction>
+
 	<cffunction name="BuildReport" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
@@ -109,15 +133,16 @@
 		<cfset var item={}>
 		
 		<cfquery name="QPubStock" datasource="#args.datasource#">
-			SELECT *
-			FROM tblPubStock,tblPublication
+			SELECT tblPublication.pubTitle, tblPubStock.*
+			FROM tblPubStock
+			INNER JOIN tblPublication ON psPubID=pubID
 			WHERE psDate >= '#LSDateFormat(args.form.from,"yyyy-mm-dd")#'
 			AND psDate <= '#LSDateFormat(args.form.to,"yyyy-mm-dd")#'
 			AND psOrderID=#val(args.form.customer)#
 			AND psPubID=pubID
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
-			ORDER by pubTitle asc, psIssue desc, psDate asc, psType
+			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
 		</cfquery>
 		<cfloop query="QPubStock">
 			<cfset item={}>
@@ -222,7 +247,7 @@
 				</cfif>
 			</cfif>
 		</cfloop>
-
+		<cfset result.list = ArrayOfStructSort(result.list,"numeric","asc","ID")>
 		<cfreturn result>
 	</cffunction>
 	

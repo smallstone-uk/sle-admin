@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Purchase Reports</title>
+<title>Transaction Reports</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link href="css/main3.css" rel="stylesheet" type="text/css">
 <link href="css/main4.css" rel="stylesheet" type="text/css">
@@ -38,7 +38,7 @@
 		border-spacing: 0px;
 		border-collapse: collapse;
 		border: 1px solid #CCC;
-		font-size: 14px;
+		font-size: 12px;
 	}
 	.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
 	.vatTable td {padding: 5px; border-color: #ccc;}
@@ -71,11 +71,11 @@
 			<div id="content-inner">
 				<div class="form-wrap">
 					<form method="post">
-						<div class="form-header">
+						<div class="form-header no-print">
 							Transaction Reports
 							<span><input type="submit" name="btnSearch" value="Search" /></span>
 						</div>
-						<div class="module">
+						<div class="module no-print">
 							<table border="0">
 								<tr>
 									<td><b>Report</b></td>
@@ -93,6 +93,7 @@
 											<option value="9"<cfif srchReport eq "9"> selected="selected"</cfif>>VAT Transactions</option>
 											<option value="10"<cfif srchReport eq "10"> selected="selected"</cfif>>Nom Totals Report</option>
 											<option value="11"<cfif srchReport eq "11"> selected="selected"</cfif>>Fix Sales Balances</option>
+											<option value="12"<cfif srchReport eq "12"> selected="selected"</cfif>>Shop News Payments</option>
 										</select>
 									</td>
 								</tr>
@@ -101,7 +102,7 @@
 									<td>
 										<select name="srchAccount">
 											<option value="0">Select...</option>
-											<option value="-1">Ignore Client Records</option>
+											<option value="-1"<cfif srchAccount eq -1> selected="selected"</cfif>>Ignore Client Records</option>
 											<cfloop array="#suppliers.list#" index="item">
 												<option value="#item.accID#"<cfif item.accID eq srchAccount> selected="selected"</cfif>>#item.accName#</option>
 											</cfloop>
@@ -164,10 +165,10 @@
 									<td><b>Transaction Type</b></td>
 									<td>
 										<select name="srchTranType" class="srchTranType" multiple="multiple" data-placeholder="Select...">
-											<option value="inv"<cfif srchTranType eq "inv"> selected="selected"</cfif>>Invoice</option>
-											<option value="crn"<cfif srchTranType eq "crn"> selected="selected"</cfif>>Credit</option>
-											<option value="pay"<cfif srchTranType eq "pay"> selected="selected"</cfif>>Payment</option>
-											<option value="jnl"<cfif srchTranType eq "jnl"> selected="selected"</cfif>>Journal</option>
+											<option value="inv"<cfif ListFind(srchTranType,"inv")> selected="selected"</cfif>>Invoice</option>
+											<option value="crn"<cfif ListFind(srchTranType,"crn")> selected="selected"</cfif>>Credit</option>
+											<option value="pay"<cfif ListFind(srchTranType,"pay")> selected="selected"</cfif>>Payment</option>
+											<option value="jnl"<cfif ListFind(srchTranType,"jnl")> selected="selected"</cfif>>Journal</option>
 										</select>
 									</td>
 								</tr>
@@ -191,6 +192,7 @@
 										<select name="srchSort">
 											<option value="trnAccountID"<cfif srchSort eq "trnAccountID"> selected="selected"</cfif>>Account</option>
 											<option value="trnID"<cfif srchSort eq "trnID"> selected="selected"</cfif>>Transaction ID</option>
+											<option value="trnRef"<cfif srchSort eq "trnRef"> selected="selected"</cfif>>Transaction Ref</option>
 											<option value="trnDate"<cfif srchSort eq "trnDate"> selected="selected"</cfif>>Transaction Date</option>
 										</select>
 									</td>
@@ -214,12 +216,14 @@
 								<cfcase value="1">
 									<cfset trans=pur.TranList(parms)>
 									<cfset accountID=0>
-									<table border="1" class="<!---tranList --->tableList" width="100%">
+									<cfset tranCountTotal = 0>
+									<table border="1" class="tableList" width="100%">
 										<cfloop array="#trans.tranArray#" index="tran">
 											<cfif accountID neq tran.accID>
 												<cfif accountID gt 0>
+													<cfset tranCountTotal += tranCount>
 													<tr>
-														<td colspan="4"></td>
+														<td colspan="4">#tranCount#</td>
 														<td class="amountTotal">Totals</td>
 														<td class="amountTotal">#DecimalFormat(accNetTotal)#</td>
 														<td class="amountTotal">#DecimalFormat(accVATTotal)#</td>
@@ -231,6 +235,7 @@
 												<cfset accNetTotal=0>
 												<cfset accVATTotal=0>
 												<cfset balance=0>
+												<cfset tranCount = 0>
 												<tr>
 													<th colspan="9"><span class="header">#tran.accName#</span></th>
 												</tr>
@@ -249,6 +254,7 @@
 											<cfset accNetTotal=accNetTotal+tran.trnAmnt1>
 											<cfset accVATTotal=accVATTotal+tran.trnAmnt2>
 											<cfset balance=balance+tran.trnTotal>
+											<cfset tranCount++>
 											<tr>
 												<td valign="top">
 													<cfif tran.accID eq 3>#tran.trnID#
@@ -268,8 +274,9 @@
 											</tr>
 										</cfloop>
 										<cfif accountID gt 0>
+											<cfset tranCountTotal += tranCount>
 											<tr>
-												<td colspan="4"></td>
+												<td colspan="4">#tranCount#</td>
 												<td class="amountTotal">Totals</td>
 												<td class="amountTotal">#DecimalFormat(accNetTotal)#</td>
 												<td class="amountTotal">#DecimalFormat(accVATTotal)#</td>
@@ -278,7 +285,7 @@
 											</tr>												
 										</cfif>
 										<tr>
-											<td colspan="4"></td>
+											<td colspan="4">#tranCountTotal#</td>
 											<td class="amountTotal">Grand Total</td>
 											<td class="amountTotal">#DecimalFormat(trans.totAmnt1)#</td>
 											<td class="amountTotal">#DecimalFormat(trans.totAmnt2)#</td>
@@ -378,7 +385,7 @@
 								<cfcase value="3">
 									<cfset parms.titleLedger="">
 									<cfset trans=pur.VATAnalysis(parms)>
-									<cfdump var="#trans#" label="trans" expand="no">
+									<!---<cfdump var="#trans#" label="trans" expand="no">--->
 									<cfset codes=ListSort(StructKeyList(trans.analysis,","),"text","asc")>
 									<h1>Transaction Analysis</h1>
 									<table border="1" class="tableList">
@@ -472,7 +479,7 @@
 								
 								<cfcase value="4">
 									<cfset trans=pur.NomTrans(parms)>
-									<cfdump var="#trans.QTrans_result#" label="QTrans_result" expand="no">				
+									<!---<cfdump var="#trans.QTrans_result#" label="QTrans_result" expand="no">--->				
 									<cfset codes=ListSort(StructKeyList(trans.nomAccount,","),"text","asc")>
 									<table border="1" class="tableList">
 									<cfloop list="#codes#" delimiters="," index="code">
@@ -523,7 +530,8 @@
 									</table>
 								</cfcase>
 								<cfcase value="5">
-									<cfset trans=pur.NomTranSummary(parms)><cfdump var="#trans#" label="trans" expand="no">
+									<cfset trans=pur.NomTranSummary(parms)>
+									<!---<cfdump var="#trans#" label="trans" expand="no">--->
 									<table border="1" class="tableList">
 										<tr>
 											<th width="50">Ledger</th>
@@ -539,10 +547,12 @@
 										<cfset codes=ListSort(StructKeyList(ledger,","),"text","asc")>
 										<cfloop list="#codes#" delimiters="," index="code">
 											<cfset item=StructFind(ledger,code)>
+											<cfset balance = item.nomTotal + item.BFwd>
 											<tr>
 												<td>#key#</td>
 												<td>#item.nomCode#</td>
 												<td>#item.nomTitle#</td>
+<!---
 												<cfif item.nomTotal lt 0>
 													<cfset rec.crTotal=rec.crTotal+item.nomTotal>
 													<td>&nbsp;</td>
@@ -550,6 +560,19 @@
 												<cfelseif item.nomTotal gt 0>
 													<cfset rec.drTotal=rec.drTotal+item.nomTotal>
 													<td align="right">#DecimalFormat(item.nomTotal)#</td>
+													<td>&nbsp;</td>
+												<cfelse>
+													<td>&nbsp;</td>
+													<td>&nbsp;</td>
+												</cfif>
+--->
+												<cfif balance lt 0>
+													<cfset rec.crTotal += balance>
+													<td>&nbsp;</td>
+													<td align="right">#DecimalFormat(-balance)#</td>
+												<cfelseif balance gt 0>
+													<cfset rec.drTotal += balance>
+													<td align="right">#DecimalFormat(balance)#</td>
 													<td>&nbsp;</td>
 												<cfelse>
 													<td>&nbsp;</td>
@@ -686,6 +709,7 @@
 											</cfloop>
 										</cfloop>
 										</table>
+										<div style="page-break-before:always"></div>
 										<h1>VAT Summary</h1>
 										<table class="vatTable" border="1">
 											<cfset boxKeys = ListSort(StructKeyList(summary,","),"text","asc",",")>
@@ -703,6 +727,7 @@
 												</tr>
 											</cfloop>
 										</table>
+										<div style="page-break-before:always"></div>
 										<h1>Sales Analysis Summary</h1>
 										<cfset analysis = {}>
 										<cfset periodKeys = ListSort(StructKeyList(data.PRD,","),"numeric","asc",",")>
@@ -994,7 +1019,7 @@
 								
 								<cfcase value="10">
 									<cfset data=pur.NomTotalReport(parms)>
-									<cfdump var="#data#" label="data" expand="no">
+									<!---<cfdump var="#data#" label="data" expand="no">--->
 									<cfset nomList = ListSort(StructKeyList(data.rows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
 									<table class="tableList" border="1">
@@ -1223,6 +1248,89 @@
 										<br />
 									</cfoutput>
 								</cfcase>
+								
+								<cfcase value="12">
+									<cfset data=pur.LoadNewsPayments(parms)>
+									<style type="text/css">
+										.footer {background-color:##eeeeee;}
+										.red {background-color:##FF0000;}
+									</style>
+									<cfset theDate = "">
+									<cfset theTotal = 0>
+									<cfset drTotal = 0>
+									<cfset crTotal = 0>
+									<cfset drGrandTotal = 0>
+									<cfset crGrandTotal = 0>
+									<table width="800">
+										<tr>
+											<th>ID</th>
+											<th>Client</th>
+											<th>Reference</th>
+											<th>Date</th>
+											<th>Paid In</th>
+											<th>Type</th>
+											<th>Method</th>
+											<th>Description</th>
+											<th align="right">DR</th>
+											<th align="right">CR</th>
+											<th align="right">Balance</th>
+										</tr>
+										<cfloop query="data.QNewsPayments">
+											<cfif len(theDate) gt 0 AND theDate neq trnDate>
+												<cfif abs(theTotal) lt 0.001><cfset theTotal = 0></cfif>
+												<tr class="footer">
+													<td colspan="8" align="right">Totals</td>
+													<td align="right">#drTotal#</td>
+													<td align="right">#crTotal#</td>
+													<td align="right"<cfif theTotal neq 0> class="red"</cfif>>#DecimalFormat(theTotal)#</td>
+												</tr>
+												<cfset theTotal = 0>
+												<cfset drTotal = 0>
+												<cfset crTotal = 0>
+											</cfif>
+											<cfset theDate = trnDate>
+											<cfset theTotal += niAmount>
+											<tr>
+												<td>#trnID#</td>
+												<td><cfif trnClientRef gt 0><a href="clientPayments.cfm?rec=#trnClientRef#" target="payments">#trnClientRef#</a></cfif></td>
+												<td>#trnRef#</td>
+												<td>#LSDateFormat(trnDate,'ddd dd-mmm-yy')#</td>
+												<td>#trnPaidIn#</td>
+												<td>#trnType#</td>
+												<td>#trnMethod#</td>
+												<td>#trnDesc#</td>
+												<td align="right">
+													<cfif niAmount gt 0>
+														<cfset drTotal += niAmount>#niAmount#
+														<cfset drGrandTotal += niAmount>
+													</cfif>
+												</td>
+												<td align="right">
+													<cfif niAmount lt 0>
+														<cfset crTotal += niAmount>#niAmount#
+														<cfset crGrandTotal += niAmount>
+													</cfif>
+												</td>
+												<td></td>
+											</tr>
+										</cfloop>
+										<cfif abs(theTotal) lt 0.001><cfset theTotal = 0></cfif>
+										<cfset finalBalance = drGrandTotal + crGrandTotal>
+										<cfif abs(finalBalance) lt 0.001><cfset finalBalance = 0></cfif>
+										<tr class="footer">
+											<td colspan="8" align="right">Totals</td>
+											<td align="right">#drTotal#</td>
+											<td align="right">#crTotal#</td>
+											<td align="right"<cfif theTotal neq 0> class="red"</cfif>>#DecimalFormat(theTotal)#</td>
+										</tr>
+										<tr class="footer">
+											<td colspan="8" align="right">Grand Totals</td>
+											<td align="right">#drGrandTotal#</td>
+											<td align="right">#crGrandTotal#</td>
+											<td align="right">#finalBalance#</td>
+										</tr>
+									</table>
+								</cfcase>
 							</cfswitch>
 						</cfif>
 					</div>
@@ -1243,6 +1351,6 @@
 </html>
 
 <cfcatch type="any">
-	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
-</cfcatch>
+	<cfdump var="#cfcatch#" label="purReports" expand="yes" format="html" 
+		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm"></cfcatch>
 </cftry>

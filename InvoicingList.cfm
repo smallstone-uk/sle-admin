@@ -2,7 +2,7 @@
 <cfset callback=1><!--- force exit of onrequestend.cfm --->
 <cfsetting showdebugoutput="no">
 <cfparam name="print" default="false">
-<cfsetting requesttimeout="1200">
+<cfsetting requesttimeout="3600">
 <cftry>
 <cfobject component="code/Invoicing" name="inv">
 <cfset parm={}>

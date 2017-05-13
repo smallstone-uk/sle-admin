@@ -43,6 +43,8 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.newTranDate = LSDateFormat(args.header.trnDate, "yyyy-mm-dd")>
+		<cfdump var="#args#" label="SaveNominalTransRecord" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 		<cftry>
 			<!---Set flag if tran exists in database--->
@@ -208,51 +210,18 @@
 		
 		<cfreturn QueryToArrayOfStruct(loc.nominal)>
 	</cffunction>
-
-	<cffunction name="AllocateItems" access="public" returntype="struct">
+	<cffunction name="AllocateItems" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
-		<cfset loc.result = {}>
-
-		<cftry>
-
-		<cfquery name="loc.QAccountID" datasource="#args.datasource#">
-				SELECT accAllocID
-				FROM tblAccount
-
-				
-				WHERE accID = #val(args.accID)#
-				LIMIT 1;
+		<cfloop array="#args.form#" index="loc.item">
+			<cfquery name="loc.items" datasource="#args.datasource#">
+				UPDATE tblTrans
+				SET trnAlloc = 1
+				WHERE trnID = #val(loc.item.id)#
 			</cfquery>
-			<cfif loc.QAccountID.recordcount eq 1>
-				<cfset loc.newID = loc.QAccountID.accAllocID + 1>
-				<cfloop array="#args.form#" index="loc.item">
-					<cfquery name="loc.items" datasource="#args.datasource#">
-						UPDATE tblTrans
-						SET trnAllocID = #loc.newID#,
-							trnAlloc = 1
-						WHERE trnID = #val(loc.item.id)#
-						AND trnAllocID = 0
-						AND trnAlloc = 0
-					</cfquery>
-				</cfloop>
-				<cfquery name="loc.QAccountIDUpdate" datasource="#args.datasource#">
-					UPDATE tblAccount
-					SET accAllocID = #loc.newID#
-					WHERE accID = #val(args.accID)#
-					LIMIT 1;
-				</cfquery>
-			</cfif>
-			
-		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
-				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-		</cfcatch>
-		</cftry>
-		<cfreturn loc.result>
-		</cffunction>
-
-		<cffunction name="EditAccount" access="public" returntype="void">
+		</cfloop>
+	</cffunction>
+	<cffunction name="EditAccount" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfquery name="loc.edit" datasource="#args.datasource#">
@@ -329,18 +298,11 @@
 		<cfargument name="grpID" type="numeric" required="yes">
 		<cfset var loc = {}>
 		
-<!---
-
+		<cfquery name="loc.noms" datasource="#GetDatasource()#" result="loc.noms_result">
 			SELECT *
 			FROM tblNominal, tblNomGroupItems
 			WHERE ngiChild = nomID
 			AND ngiParent != #val(grpID)#
---->
-		<cfquery name="loc.noms" datasource="#GetDatasource()#" result="loc.noms_result">
-			SELECT *
-			FROM tblNominal
-			LEFT JOIN tblNomGroupItems ON ngiChild = nomID
-			WHERE ngiParent != #val(grpID)# OR ngiParent IS NULL
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.noms)>
@@ -533,7 +495,19 @@
 		</cfif>
 		
 	</cffunction>
-
+	<cffunction name="LoadNominalTotalsDump" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cfquery name="loc.result.nomTotals" datasource="#args.database#">
+			SELECT *
+			FROM tblNomTotal
+			WHERE ntNomID = #val(args.form.nomID)#
+		</cfquery>
+		
+		<cfreturn loc.result>
+	</cffunction>
 	<cffunction name="LoadTransactionHeader" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -701,7 +675,7 @@
 		<cfreturn "BalanceNominalItems() Complete.">
 	</cffunction>
 
-	<cffunction name="RebuildNomTotals" access="public" returntype="struct" hint="new version 06/12/2014">
+	<cffunction name="RebuildNomTotals" access="public" returntype="struct" hint="new version 06/12/2016">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset var clearTotals = "">
@@ -729,7 +703,7 @@
 			<cfoutput>
 				<cfloop query="loc.nominals">
 
-				<cfquery name="loc.nomItems" datasource="#loc.datasource#" result="loc.nomItems_result">
+					<cfquery name="loc.nomItems" datasource="#loc.datasource#" result="loc.nomItems_result">
 						SELECT nomTitle,niNomID, DATE_FORMAT(trnDate,"%y%m") AS TranDate, SUM(niAmount) AS MonthTotal
 						FROM tblNomItems, tblTrans, tblNominal
 						WHERE niNomID=#val(loc.nominals.nomID)#
@@ -777,6 +751,71 @@
 		</cfcatch>
 		</cftry>
 		<cfreturn loc>
+	</cffunction>
+
+	<cffunction name="NominalTotalWipe" access="private" returntype="string">
+		<cfset var loc = {}>
+		<cfset loc.itemArray = []>
+		<cfset loc.datasource=GetDatasource()>
+		
+		<cfquery name="loc.clearTotals" datasource="#loc.datasource#" result="loc.clearTotals_result">
+			DELETE FROM tblNomTotal
+		</cfquery>
+		
+		<cfquery name="loc.nominals" datasource="#loc.datasource#" result="loc.nominals_result">
+			SELECT nomID
+			FROM tblNominal
+		</cfquery>
+		
+		<cfloop query="loc.nominals">
+			<cfquery name="loc.nomItems" datasource="#loc.datasource#" result="loc.nomItems_result">
+				SELECT tblNomItems.*,
+					DATE_FORMAT(trnDate, "%y%m") AS TranDate,
+					SUM(niAmount) AS MonthTotal
+				FROM tblNomItems, tblTrans
+				WHERE niNomID = #val(nomID)#
+				AND niTranID = trnID
+				GROUP BY TranDate
+			</cfquery>
+			
+			<cfloop query="loc.nomItems">
+				<cfset loc.item = {}>
+				<cfset loc.item.NomID = niNomID>
+				<cfset loc.item.Period = val(TranDate)>
+				<cfset loc.item.Balance = val(MonthTotal)>
+				<cfquery name="loc.newTotals" datasource="#loc.datasource#" result="loc.newTotals_result">
+					INSERT INTO tblNomTotal (
+						ntNomID,
+						ntPrd,
+						ntBal
+					) VALUES
+						#val(loc.item.NomID)#,
+						#val(loc.item.Period)#,
+						#val(loc.item.Balance)#
+					)
+				</cfquery>
+				<!---<cfset ArrayAppend(loc.itemArray, loc.item)>--->
+			</cfloop>
+		</cfloop>
+		
+<!---		<cfquery name="loc.newTotals" datasource="#GetDatasource()#" result="loc.newTotals_result">
+			INSERT INTO tblNomTotal (
+				ntNomID,
+				ntPrd,
+				ntBal
+			) VALUES
+			<cfset loc.counter = 0>
+			<cfloop array="#loc.itemArray#" index="i">
+				<cfset loc.counter++>
+				<cfif loc.counter neq 1>,</cfif>(
+					#val(i.NomID)#,
+					#val(i.Period)#,
+					#val(i.Balance)#
+				)
+			</cfloop>
+		</cfquery>
+--->		
+		<cfreturn "NominalTotalWipe() Complete.">
 	</cffunction>
 	
 	<cffunction name="TriggerNominalTotalWipe" access="public" returntype="struct">
@@ -938,7 +977,7 @@
 	<cffunction name="SaveNominalTransaction" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
-
+		
 		<cftry>
 			<cfset loc.result = {}>
 			<cfset loc.args = arguments>
@@ -960,6 +999,7 @@
 						trnRef,
 						trnDesc,
 						trnDate,
+						<cfif len(args.form.header.tranActual)>trnActual,</cfif>
 						trnAmnt1,
 						trnAmnt2,
 						trnType,
@@ -969,6 +1009,7 @@
 						'#args.form.header.tranRef#',
 						'#args.form.header.tranDesc#',
 						'#LSDateFormat(args.form.header.tranDate, "yyyy-mm-dd")#',
+						<cfif len(args.form.header.tranActual)>'#LSDateFormat(args.form.header.tranActual, "yyyy-mm-dd")#',</cfif>
 						#val(args.form.header.netAmount)#,
 						#val(args.form.header.tranVAT)#,
 						'nom',
@@ -999,6 +1040,7 @@
 						trnRef = '#args.form.header.tranRef#',
 						trnDesc = '#args.form.header.tranDesc#',
 						trnDate = '#LSDateFormat(args.form.header.tranDate, "yyyy-mm-dd")#',
+						<cfif len(args.form.header.tranActual)> trnActual = '#LSDateFormat(args.form.header.tranActual, "yyyy-mm-dd")#',</cfif>
 						trnAmnt1 = #val(args.form.header.netAmount)#,
 						trnAmnt2 = #val(args.form.header.tranVAT)#,
 						trnType = 'nom',
@@ -1051,12 +1093,14 @@
 		</cftry>
 		
 		<cfreturn loc.result>
-	</cffunction>
-	
+	</cffunction>		
 	<cffunction name="SaveAccountTransRecord" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
-
+<!---		<cfdump var="#args#" label="SaveAccountTransRecord" expand="yes" format="html" 
+			output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->
+		<!---WORKING VERSION AS OF 25/08/2014--->
 		<cftry>
 			<cfset loc.result = {}>
 			<cfset loc.args = arguments>
@@ -1209,7 +1253,6 @@
 						trnAmnt2 = #val(loc.vatAmount)#,
 						trnType = '#args.header.tranType#',
 						trnPayAcc = #val(args.header.paymentAccounts)#,
-						<cfif loc.allocate IS 0>trnAllocID = 0,</cfif>
 						trnAlloc = #loc.allocate#
 					WHERE trnID = #val(args.header.trnID)#
 				</cfquery>
@@ -1494,18 +1537,11 @@
 			<cfset loc.item.group.name = ngName>
 			<cfset loc.item.items = []>
 			
-<!---
+			<cfquery name="loc.items" datasource="#args.datasource#">
 				SELECT tblNomGroupItems.*, nomID, nomRef, nomCode, nomTitle, nomType, nomGroup, nomClass, nomVATCode
 				FROM tblNomGroupItems, tblNominal
 				WHERE ngiParent = #val(loc.item.group.id)#
 				AND ngiChild = nomID
-				ORDER BY ngiOrder ASC
---->
-			<cfquery name="loc.items" datasource="#args.datasource#">
-				SELECT tblNomGroupItems.*, nomID, nomRef, nomCode, nomTitle, nomType, nomGroup, nomClass, nomVATCode
-				FROM tblNominal
-				LEFT JOIN tblNomGroupItems ON ngiChild = nomID
-				WHERE ngiParent = #val(loc.item.group.id)#
 				ORDER BY ngiOrder ASC
 			</cfquery>
 			
@@ -1651,34 +1687,6 @@
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>
-	</cffunction>
-
-	<cffunction name="LoadNominalCodesX" access="public" returntype="struct">
-		<cfargument name="args" type="struct" required="yes">
-		<cfset var result={}>
-		<cfset var QNominal="">
-		<cfset var rec={}>
-		<cfquery name="QNominal" datasource="#args.datasource#">
-			SELECT *,
-				(SELECT vatRate FROM tblVATRates WHERE vatCode = nomVATCode) AS VATRate
-			FROM tblNominal
-			WHERE true
-			<cfif StructKeyExists(args,"nomType") AND Len(args.nomType)>AND nomType='#args.nomType#'</cfif>
-			<cfif StructKeyExists(args,"nomGroup")>AND nomGroup IN (#args.nomGroup#)</cfif>
-			<cfif StructKeyExists(args,"tillButtons")>AND nomTillBtn=#args.tillButtons#</cfif>
-			ORDER BY nomGroup, nomCode ASC
-		</cfquery>
-		<cfloop query="QNominal">
-			<cfset rec={}>
-			<cfset rec.nomID=nomID>
-			<cfset rec.nomCode=nomCode>
-			<cfset rec.nomTitle=nomTitle>
-			<cfset rec.nomGroup=nomGroup>
-			<cfset rec.nomVATCode=nomVATCode>
-			<cfset rec.nomVATRate=VATRate>
-			<cfset StructInsert(result,nomCode,rec)>
-		</cfloop>
-		<cfreturn result>
 	</cffunction>
 	
 	<cffunction name="LoadTransactionList" access="public" returntype="struct">
@@ -1913,70 +1921,131 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="LoadPayAccounts" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.payItems = []>
+		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
+			SELECT nomID,nomCode,nomGroup,nomTitle
+			FROM tblNominal
+			WHERE nomCode IN ('CASH','CARD','CHQ','SUPP','CB')
+			ORDER BY nomOrder
+		</cfquery>
+		<cfloop query="loc.QNomPayAccounts">
+			<cfset ArrayAppend(loc.result.payItems,{
+				"nomID" = nomID,
+				"nomCode" = nomCode,
+				"nomGroup" = nomGroup,
+				"nomTitle" = nomTitle,
+				"niID" = 0,
+				"niAmount" = ""						
+			})>
+		</cfloop>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="LoadSalesTransaction" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
 		<cfset var result={}>
 		<cfset var item={}>
-		<cfset var result.items=ArrayNew(1)>
 		<cfset var QTran="">
 		<cfset var QNomItems="">
+		<cfset var QSuppliers="">
+		<cfset var QNomPayItems="">
 		<cfset var tranTotal=0>
 		<cfset var vatTotal=0>
 		<cfset var vatRate=0>
-		<cfset var result.mode=1>
-		<cfset var result.error=0>
-
-		<cfquery name="QTran" datasource="#args.datasource#">
-			SELECT *
-			FROM tblTrans,tblAccount
-			WHERE trnID=#val(args.tranID)#
-			<cfif StructKeyExists(args.form,"accID")>AND trnAccountID=#val(args.form.accID)#<cfelse>AND trnAccountID=accID</cfif>
-			<cfif StructKeyExists(args.form,"type")>AND trnType='#args.form.type#'</cfif>
-			LIMIT 1;
-		</cfquery>
-		<cfset result.tran=QueryToArrayOfStruct(QTran)>
-		<cfset result.NetAmount=abs(QTran.trnAmnt1)>
-		<cfset result.VatAmount=abs(QTran.trnAmnt2)>
-		<cfquery name="QNomItems" datasource="#args.datasource#">
-			SELECT *
-			FROM tblNomItems,tblNominal
-			WHERE niTranID=#val(args.tranID)#
-			AND niNomID=nomID
-			AND nomType='sales'
-			ORDER BY niID asc
-		</cfquery>
-		<cfif QNomItems.recordcount gt 0>
-			<cfset tranTotal=0>
-			<cfset vatTotal=0>
-			<cfloop query="QNomItems">
-				<cfset item={}>
-				<cfset item.niID=niID>
-				<cfset item.niNomID=niNomID>
-				<cfset item.nomCode=nomCode>
-				<cfset item.nomTitle=nomTitle>
-				<cfset item.nomVATRate=StructFind(application.site.vat,nomVATCode)*100>
-				<cfset item.nomType=nomType>
-				<cfset item.niTranID=niTranID>
-				<cfif args.form.accType IS "sales" OR (StructKeyExists(args.form,"type") AND (args.form.type IS "crn"))>
-					<cfset item.niAmount=-niAmount>
+		<cfset result.items=ArrayNew(1)>
+		<cfset result.mode=1>
+		<cfset result.error=0>
+		<cfset result.payItems = []>
+		<cfset result.payTotal = 0>
+		<cftry>
+			<cfquery name="QTran" datasource="#args.datasource#">
+				SELECT *
+				FROM tblTrans,tblAccount
+				WHERE trnID=#val(args.tranID)#
+				<cfif StructKeyExists(args.form,"accID")>AND trnAccountID=#val(args.form.accID)#<cfelse>AND trnAccountID=accID</cfif>
+				<cfif StructKeyExists(args.form,"type")>AND trnType='#args.form.type#'</cfif>
+				LIMIT 1;
+			</cfquery>
+			<cfset result.tran=QueryToArrayOfStruct(QTran)>
+			<cfset result.NetAmount=abs(QTran.trnAmnt1)>
+			<cfset result.VatAmount=abs(QTran.trnAmnt2)>
+			<cfquery name="QNomItems" datasource="#args.datasource#">
+				SELECT *
+				FROM tblNomItems,tblNominal
+				WHERE niTranID=#val(args.tranID)#
+				AND niNomID=nomID
+				AND nomType='sales'
+				ORDER BY niID asc
+			</cfquery>
+			<cfif QNomItems.recordcount gt 0>
+				<cfset tranTotal=0>
+				<cfset vatTotal=0>
+				<cfloop query="QNomItems">
+					<cfset item={}>
+					<cfset item.niID=niID>
+					<cfset item.niNomID=niNomID>
+					<cfset item.nomCode=nomCode>
+					<cfset item.nomTitle=nomTitle>
+					<cfset item.nomVATRate=StructFind(application.site.vat,nomVATCode)*100>
+					<cfset item.nomType=nomType>
+					<cfset item.niTranID=niTranID>
+					<cfif args.form.accType IS "sales" OR (StructKeyExists(args.form,"type") AND (args.form.type IS "crn"))>
+						<cfset item.niAmount=-niAmount>
+					<cfelse>
+						<cfset item.niAmount=niAmount>
+					</cfif>
+	
+					<cfset vatRate=StructFind(application.site.vat,nomVATCode)>
+					<cfset item.vat=round(item.niAmount*vatRate*100)/100>
+					<cfset tranTotal=tranTotal+item.niAmount>
+					<cfset vatTotal=vatTotal+item.vat>
+					<cfset ArrayAppend(result.items,item)>
+				</cfloop>
+				<cfset result.error=0>
+				<cfset result.mode=2>
+			</cfif>
+			<cfset loc.payAccts = LoadPayAccounts(args)>
+			<cfloop array="#loc.payAccts.payItems#" index="loc.pay">
+				<cfquery name="loc.QNomPayItem" datasource="#args.datasource#">
+					SELECT niID,niAmount
+					FROM tblNomItems
+					WHERE niTranID=#val(args.tranID)#
+					AND niNomID=#loc.pay.nomID#
+					AND niLinkID=0
+				</cfquery>
+				<cfif loc.QNomPayItem.recordcount gt 0>
+					<cfif loc.pay.nomGroup eq 'R3'><cfset result.payTotal += loc.QNomPayItem.niAmount></cfif>
+					<cfset loc.amount = loc.QNomPayItem.niAmount>
+					<cfset loc.itemID = loc.QNomPayItem.niID>
 				<cfelse>
-					<cfset item.niAmount=niAmount>
+					<cfset loc.amount = 0>
+					<cfset loc.itemID = -loc.pay.nomID>	<!--- placeholder for later --->
 				</cfif>
-
-				<cfset vatRate=StructFind(application.site.vat,nomVATCode)>
-				<cfset item.vat=round(item.niAmount*vatRate*100)/100>
-				<cfset tranTotal=tranTotal+item.niAmount>
-				<cfset vatTotal=vatTotal+item.vat>
-				<cfset ArrayAppend(result.items,item)>
+				<cfset ArrayAppend(result.payItems,{
+					"nomID" = loc.pay.nomID,
+					"nomCode" = loc.pay.nomCode,
+					"nomGroup" = loc.pay.nomGroup,
+					"nomTitle" = loc.pay.nomTitle,
+					"niID" = loc.itemID,
+					"niAmount" = loc.amount
+				})>
 			</cfloop>
 			<cfset result.error=0>
-			<cfset result.mode=2>
-		<cfelse>
-			<cfset result.error=0>
 			<cfset result.mode=1>
-		</cfif>
-		<cfset result.GrandTotal=tranTotal>
-		<cfset result.GrandVatTotal=vatTotal>
+			<cfset result.payItemCount = ArrayLen(result.payItems)>
+			<cfset result.GrandTotal=tranTotal>
+			<cfset result.GrandVatTotal=vatTotal>
+				
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.html">
+		</cfcatch>
+		</cftry>
 		<cfreturn result>
 	</cffunction>
 
@@ -2125,6 +2194,58 @@
 				)
 			</cfquery>
 		</cfloop>
+			<cfloop list="#args.form.niPay#" delimiters="," index="i">	<!--- update payment totals --->
+				<cfset itemAmount = StructFind(args.form,"niPay_#i#")>
+				<cfset amount = val(REReplace(itemAmount,"[^-0-9.]","","all"))>
+				<cfif i gt 0>	<!--- got a nomItem --->
+					<cfquery name="loc.NomAccount" datasource="#args.datasource#">
+						SELECT nomCode
+						FROM tblNomItems
+						INNER JOIN tblNominal on niNomID=nomID
+						WHERE niID=#i#
+					</cfquery>
+					<cfif loc.NomAccount.nomCode eq "CB">	<!--- Insert cashback contra item --->
+						<cfquery name="loc.QUpdateCARD" datasource="#args.datasource#">
+							UPDATE tblNomItems
+							SET niAmount=#amount#
+							WHERE niLinkID=#i#
+							AND niNomID=191
+						</cfquery>
+						<cfquery name="loc.QUpdateCB" datasource="#args.datasource#">
+							UPDATE tblNomItems
+							SET niAmount=#-amount#
+							WHERE niLinkID=#i#
+							AND niNomID=1411
+						</cfquery>
+					</cfif>
+					<cfquery name="loc.QUpdateItem" datasource="#args.datasource#">
+						UPDATE tblNomItems
+						SET niAmount=#amount#
+						WHERE niID=#i#
+					</cfquery>
+				<cfelse>	<!--- got a nominal --->
+					<cfset loc.nomID = abs(i)>
+					<cfquery name="loc.NomAccount" datasource="#args.datasource#">
+						SELECT *
+						FROM tblNominal
+						WHERE nomID = #loc.nomID#
+					</cfquery>
+					<cfquery name="loc.QNomItem" datasource="#args.datasource#" result="loc.QCashBackResult">	<!--- write the pay item from the form --->
+						INSERT INTO tblNomItems (niNomID,niTranID,niAmount
+						) VALUES (#loc.nomID#,#args.form.transID#,#amount#)
+					</cfquery>
+					<cfif loc.NomAccount.nomCode eq "CB">	<!--- Insert cashback contra item --->
+						<cfquery name="loc.QCashBack" datasource="#args.datasource#">	<!--- reverse out the cashback --->
+							INSERT INTO tblNomItems (niNomID,niTranID,niAmount,niLinkID
+							) VALUES (#loc.nomID#,#args.form.transID#,#-amount#,#loc.QCashBackResult.generatedkey#)
+						</cfquery>
+						<cfquery name="loc.QNomItem" datasource="#args.datasource#">	<!--- contra to card a/c and link to previous item --->
+							INSERT INTO tblNomItems (niNomID,niTranID,niAmount,niLinkID
+							) VALUES (191,#args.form.transID#,#amount#,#loc.QCashBackResult.generatedkey#)
+						</cfquery>
+					</cfif>
+				</cfif>
+			</cfloop>
 		<cfset result.msg="Item added">
 		<cfset result.QNewNom=QNewNom>
 		<cfreturn result>
@@ -2132,6 +2253,8 @@
 
 	<cffunction name="UpdateListItem" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
+
+		<cfset var loc = {}>
 		<cfset var result={}>
 		<cfset var QNom="">
 		<cfset var QNewNom="">
@@ -2139,7 +2262,7 @@
 		<cfset var amount=0>
 		<cfset var i=0>
 		
-		<cfloop list="#args.form.niID#" delimiters="," index="i">
+		<cfloop list="#args.form.niID#" delimiters="," index="i">	<!--- update sales analysis --->
 			<cfset itemAmount=StructFind(args.form,"niAmount_#i#")>
 			<cfset amount=val(REReplace(itemAmount,"[^-0-9.]","","all"))>
 			<cfif args.form.type eq "crn" OR args.form.accType is "sales">
@@ -2151,10 +2274,64 @@
 				WHERE niID=#i#
 			</cfquery>
 		</cfloop>
+		<!---<cfif args.form.payItemCount gt 0>--->
+			<cfloop list="#args.form.niPay#" delimiters="," index="i">	<!--- update payment totals --->
+				<cfset itemAmount = StructFind(args.form,"niPay_#i#")>
+				<cfset amount = val(REReplace(itemAmount,"[^-0-9.]","","all"))>
+				<cfif i gt 0>	<!--- got a nomItem --->
+					<cfquery name="loc.NomAccount" datasource="#args.datasource#">
+						SELECT nomCode
+						FROM tblNomItems
+						INNER JOIN tblNominal on niNomID=nomID
+						WHERE niID=#i#
+					</cfquery>
+					<cfif loc.NomAccount.nomCode eq "CB">	<!--- Insert cashback contra item --->
+						<cfquery name="loc.QUpdateCARD" datasource="#args.datasource#">
+							UPDATE tblNomItems
+							SET niAmount=#amount#
+							WHERE niLinkID=#i#
+							AND niNomID=191
+						</cfquery>
+						<cfquery name="loc.QUpdateCB" datasource="#args.datasource#">
+							UPDATE tblNomItems
+							SET niAmount=#-amount#
+							WHERE niLinkID=#i#
+							AND niNomID=1411
+						</cfquery>
+					</cfif>
+					<cfquery name="loc.QUpdateItem" datasource="#args.datasource#">
+						UPDATE tblNomItems
+						SET niAmount=#amount#
+						WHERE niID=#i#
+					</cfquery>
+				<cfelse>	<!--- got a nominal --->
+					<cfset loc.nomID = abs(i)>
+					<cfquery name="loc.NomAccount" datasource="#args.datasource#">
+						SELECT *
+						FROM tblNominal
+						WHERE nomID = #loc.nomID#
+					</cfquery>
+					<cfquery name="loc.QNomItem" datasource="#args.datasource#" result="loc.QCashBackResult">	<!--- write the pay item from the form --->
+						INSERT INTO tblNomItems (niNomID,niTranID,niAmount
+						) VALUES (#loc.nomID#,#args.form.transID#,#amount#)
+					</cfquery>
+					<cfif loc.NomAccount.nomCode eq "CB">	<!--- Insert cashback contra item --->
+						<cfquery name="loc.QCashBack" datasource="#args.datasource#">	<!--- reverse out the cashback --->
+							INSERT INTO tblNomItems (niNomID,niTranID,niAmount,niLinkID
+							) VALUES (#loc.nomID#,#args.form.transID#,#-amount#,#loc.QCashBackResult.generatedkey#)
+						</cfquery>
+						<cfquery name="loc.QNomItem" datasource="#args.datasource#">	<!--- contra to card a/c and link to previous item --->
+							INSERT INTO tblNomItems (niNomID,niTranID,niAmount,niLinkID
+							) VALUES (191,#args.form.transID#,#amount#,#loc.QCashBackResult.generatedkey#)
+						</cfquery>
+					</cfif>
+				</cfif>
+			</cfloop>
+		<!---</cfif>--->
 		<cfset result.msg="Item added">
-		
 		<cfreturn result>
 	</cffunction>
+
 
 	<cffunction name="DeleteItem" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
@@ -2287,33 +2464,25 @@
 		<cfset var QTrans=0>
 		<cfset var QResult=0>
 		
-		<cftry>
-			<cfquery name="QTrans" datasource="#args.datasource#" result="QResult">
-				SELECT accCode, accName, trnID, trnLedger, trnRef, trnDate, trnAmnt1, trnAmnt2, nomCode, nomTitle, niID, niAmount, abs(niAmount) AS absAmount
-				FROM tblNomItems, tblNominal, tblTrans, tblAccount
-				<cfif StructKeyExists(args,"url")>WHERE nomCode='#args.url.code#'
-					<cfelseif StructKeyExists(args.form,"srchNom") AND len(args.form.srchNom)>WHERE nomID='#args.form.srchNom#'
-					<cfelse>WHERE nomType='sales'</cfif>
-				<cfif len(args.form.srchDateFrom)>
-					AND trnDate BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateFrom#"> 
-					AND <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateTo#">
-					<cfif StructKeyExists(args.form,"srchSunday")>AND DayOfWeek(trnDate) <> 1</cfif>
-				</cfif>
-				AND nomID=niNomID
-				AND trnID=niTranID
-				AND accID=trnAccountID
-				AND niAmount<>0
-				ORDER BY accCode, trnDate
-			</cfquery>
-			<cfset result.QTrans=QTrans>
-			<cfset result.QResult=QResult>
-			<cfset result.nom.code=QTrans.nomCode>
-			<cfset result.nom.title=QTrans.nomTitle>
-		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
-				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-		</cfcatch>
-		</cftry>
+		<cfquery name="QTrans" datasource="#args.datasource#" result="QResult">
+			SELECT accCode, accName, trnID, trnLedger, trnRef, trnDate, trnAmnt1, trnAmnt2, nomCode, nomTitle, niID, niAmount, abs(niAmount) AS absAmount
+			FROM tblNomItems, tblNominal, tblTrans, tblAccount
+			<cfif StructKeyExists(args,"url")>WHERE nomCode='#args.url.code#'
+				<cfelseif StructKeyExists(args.form,"srchNom") AND len(args.form.srchNom)>WHERE nomID='#args.form.srchNom#'
+				<cfelse>WHERE nomType='sales'</cfif>
+			<cfif len(args.form.srchDateFrom)>
+				AND trnDate BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateFrom#"> 
+				AND <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateTo#"></cfif>
+			AND nomID=niNomID
+			AND trnID=niTranID
+			AND accID=trnAccountID
+			AND niAmount<>0
+			ORDER BY accCode, trnDate
+		</cfquery>
+		<cfset result.QTrans=QTrans>
+		<cfset result.QResult=QResult>
+		<cfset result.nom.code=QTrans.nomCode>
+		<cfset result.nom.title=QTrans.nomTitle>
 		<cfreturn result>
 	</cffunction>
 
@@ -2417,6 +2586,7 @@
 		<cfset var result={}>
 		<cfset var parms={}>
 		<cfset var QTrans="">
+		<cfdump var="#args#" label="TranSearch" expand="no">
 		<cfset parms.srchDateFrom="">
 		<cfset parms.srchDateTo="">
 		<cfset parms.srchAccountID="">
@@ -2688,6 +2858,7 @@
 		<cfset var QNomItem="">
 		<cfset var i=0>
 		<cfset var actParms={}>
+		
 		<cftry>
 			<cfset result.tickList="">
 			<cfloop from="1" to="#args.form.tranCount#" index="i">
@@ -2725,9 +2896,8 @@
 				<cfset result.tickList=ListAppend(result.tickList,loc.qresult.generatedkey,",")>
 			</cfif>
 			<cfquery name="QTrans" datasource="#args.datasource#">
-				SELECT tblTrans.*, cltChase
+				SELECT *
 				FROM tblTrans
-				INNER JOIN tblClients ON trnClientRef=cltRef
 				WHERE trnClientRef=#val(args.form.clientRef)#
 				<cfif NOT StructKeyExists(args.form,"allTrans")>AND trnAlloc=0</cfif>
 				ORDER BY trnDate
@@ -2744,14 +2914,7 @@
 					LIMIT 1;
 				</cfquery>				
 			</cfloop>
-			<cfif QTrans.cltChase gt 0>
-				<cfquery name="loc.QClearChase" datasource="#args.datasource#">
-					UPDATE tblClients
-					SET cltChase=0
-					WHERE cltRef=#args.form.clientRef#
-					LIMIT 1;
-				</cfquery>				
-			</cfif>
+	
 			<cfset actParms={}>
 			<cfset actParms.datasource=args.datasource>
 			<cfset actParms.type="payment">

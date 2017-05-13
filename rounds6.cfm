@@ -95,8 +95,8 @@
 										</cfloop>
 									</td>
 									<td valign="top">
-										<label><input type="checkbox" name="showSummaries" id="showSummaries" value="1" class="checkbox" checked="checked" />&nbsp;Show Round Summaries</label><br>
-										<label><input type="checkbox" name="showOverallSummary" value="1" class="checkbox" checked="checked" />&nbsp;Show Overall Summary</label><br>
+										<label><input type="checkbox" name="showSummaries" id="showSummaries" value="1" class="checkbox" />&nbsp;Show Round Summaries</label><br>
+										<label><input type="checkbox" name="showOverallSummary" value="1" class="checkbox" />&nbsp;Show Overall Summary</label><br>
 										<label><input type="checkbox" name="showRoundOrder" id="showRoundOrder" value="1" class="checkbox" checked="checked" />&nbsp;Show in Round Order</label><br>
 										<label id="priorityLink" style="display:none;"><a href="rounds5PriorityOrdering.cfm" target="_blank" style="display:block;padding:5px 0 0 24px;">Sort Priority Order</a></label><br>
 									</td>

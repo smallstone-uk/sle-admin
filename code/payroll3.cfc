@@ -82,6 +82,7 @@
 			<cfset loc.params = {}>
 			<cfset loc.params.employee = val(emp)>
 			<cfset loc.params.database = args.database>
+			<cfset loc.params.allEmployees = args.allEmployees>
 			<cfset loc.subResult.Employee = LoadEmployee(loc.params)>
 			
 			<!---GET HEADERS--->
@@ -96,8 +97,10 @@
 					(SELECT AVG(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS WorkAvg,
 					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HolSum
 				FROM tblPayHeader
+				INNER JOIN tblEmployee ON empID = phEmployee
 				WHERE phEmployee = #val(emp)#
 				AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#'
+				<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
 				ORDER BY phDate
 			</cfquery>
 			
@@ -423,6 +426,7 @@
 				(SELECT ctlEmployerRef FROM tblControl WHERE ctlID = 1) AS EmployerRef
 			FROM tblEmployee
 			WHERE empID = #val(args.employee)#
+			<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
 			ORDER BY empLastName
 		</cfquery>
 		
@@ -456,6 +460,8 @@
 		<cfquery name="loc.employees" datasource="#args.database#">
 			SELECT empID
 			FROM tblEmployee
+			WHERE 1
+			<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
 		</cfquery>
 		
 		<cfloop query="loc.employees">

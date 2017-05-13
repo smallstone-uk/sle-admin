@@ -587,11 +587,12 @@
 		<cftry>
 			<cfquery name="loc.QCustomers" datasource="#args.datasource#" result="loc.result.QQueryResult">
 				SELECT pubID,pubTitle,pubGroup,pubPrice, oiStatus,oiSun,oiMon,oiTue,oiWed,oiThu,oiFri,oiSat,
-					cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltAccountType,cltDelHouseName,cltDelHouseNumber,cltDelAddr
+					cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltAccountType,cltDelHouseName,cltDelHouseNumber, stName
 				FROM tblOrderItem 
 				INNER JOIN tblOrder ON oiOrderID = ordID
 				INNER JOIN tblPublication ON oiPubID = pubID
 				INNER JOIN tblClients ON ordClientID = cltID
+				INNER JOIN tblStreets2 ON stID = cltStreetCode
 				WHERE tblPublication.pubID=#val(args.pubID)#
 				AND tblOrderItem.oiStatus="active"
 				AND tblClients.cltAccountType NOT IN ('N','H')

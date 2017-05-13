@@ -1,7 +1,6 @@
 <cfcomponent displayname="functions" extends="core">
 
 	<cfset this.roundPubs={}>
-	
 	<cfset this.charges={}>
 	<cfset this.roundTitleCount=0>
 	
@@ -21,30 +20,33 @@
 		}
 	</cfscript>
 	
-	<cffunction name="LoadDelCharges" access="public" returntype="void">
+	<cffunction name="LoadDelCharges" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
-		<cfset var QDelivery=0>
-		<cfset var rec={}>
-		<cfset var fld=0>
+		<cfset var loc = {}>
 		<cftry>
-		<cfquery name="QDelivery" datasource="#args.datasource#">
-			SELECT *
-			FROM tblDelCharges
-		</cfquery>
-		<cfset application.site.delcharges={}>
-		<cfloop query="QDelivery">
-			<cfset rec={}>
-			<cfloop list="#QDelivery.columnlist#" index="fld">
-				<cfset "rec.#fld#"=QDelivery[fld][currentrow]>
+			<cfset loc.result.err = 0>
+			<cfquery name="loc.QDelivery" datasource="#args.datasource#">
+				SELECT *
+				FROM tblDelCharges
+			</cfquery>
+			<cfset application.site.delcharges = {}>
+			<cfloop query="loc.QDelivery">
+				<cfset loc.rec={}>
+				<cfloop list="#loc.QDelivery.columnlist#" index="loc.fld">
+					<cfset "loc.rec.#loc.fld#"=loc.QDelivery[loc.fld][currentrow]>
+				</cfloop>
+				<cfif NOT StructKeyExists(application.site.delcharges,delCode)>
+					<cfset StructInsert(application.site.delcharges,delCode,loc.rec)>
+				</cfif>
 			</cfloop>
-			<cfif NOT StructKeyExists(application.site.delcharges,delCode)>
-				<cfset StructInsert(application.site.delcharges,delCode,rec)>
-			</cfif>
-		</cfloop>
+			
 		<cfcatch type="any">
-			<!---IGNORE ERROR FOR NOW--->
+			<cfdump var="#cfcatch#" label="LoadDelCharges" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+				<cfset loc.result.err = -1>
 		</cfcatch>
 		</cftry>
+		<cfreturn loc.result>
 	</cffunction>
 	
 	<cffunction name="LoadControls" access="public" returntype="struct">
@@ -74,11 +76,10 @@
 			</cfloop>
 
 			<cfcatch type="any">
-				<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				<cfdump var="#cfcatch#" label="LoadControls" expand="yes" format="html" 
 					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">			
 			</cfcatch>
 		</cftry>
-		
 		<cfreturn loc.result>
 	</cffunction>
 	
@@ -95,7 +96,7 @@
 			<cfset loc.result=QueryToStruct(loc.site)>
 
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="LoadSite" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">			
 		</cfcatch>
 		</cftry>
@@ -116,7 +117,7 @@
 			<cfset loc.result=QueryToStruct(loc.siteClient)>
 
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="LoadSiteClient" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">			
 		</cfcatch>
 		</cftry>
@@ -218,7 +219,8 @@
 			<cfset result.rowMax=QCustomers.recordcount>
 			<cfset result.records=QCustomers>
 		<cfcatch type="any">
-			<cfset result.err=cfcatch>
+			<cfdump var="#cfcatch#" label="ClientSearch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
 		<cfreturn result>
@@ -333,9 +335,10 @@
 			<cfset msgParms.form.notImportant=1>
 			<cfset savemsg=AddMsg(msgParms)>
 	
-			<cfcatch type="any">
-				<cfset result.error=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="UpdateClientChase" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -435,9 +438,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="UpdateClient" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -536,10 +540,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 			
-			<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="AddClient" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-			</cfcatch>
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -860,9 +864,10 @@
 				<cfset result.msg="Order Updated">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.cfcatch=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="SaveDropOrder" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -1251,9 +1256,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 			
-			<cfcatch type="any">
-				<cfset result.cfcatch=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="AddManualCharge" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 				
 		<cfreturn result>
@@ -1358,9 +1364,10 @@
 				<cfset result.msg="Items not found">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.cfcatch=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="AddCreditNote" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 				
 		<cfreturn result>
@@ -1383,9 +1390,10 @@
 				<cfset result.msg="Items not found">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.cfcatch=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="DeleteCreditNote" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 				
 		<cfreturn result>
@@ -1437,9 +1445,10 @@
 				<cfset result.msg="No charges found">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.error=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadChargesFromDate" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -1515,8 +1524,9 @@
 			<cfset result.delTotal=DecimalFormat(result.delTotal)>
 			<cfset result.QDelItems=QDelItems>
 			<cfset result.QResult=loc.QResult>
+			
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="LoadClientDelItems" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
@@ -1860,10 +1870,10 @@
 				<cfset ArrayAppend(result.list,item)>
 			</cfloop>
 			
-			<cfcatch type="any">
-				<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
-					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="processOrder" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -1906,9 +1916,10 @@
 			<cfset result.voucher=QOrderItem.oiVoucher>
 			<cfset result.lateDel=QOrderItem.oiLateDel>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadOrderItem" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -1967,9 +1978,10 @@
 				<cfset result.order.orderID=0>
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadClientOrder" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -2011,9 +2023,10 @@
 			<cfset result.Note=QGetOrder.ordNote>
 			<cfset result.Date=DateFormat(QGetOrder.ordDate,"DDDD DD MMM YYYY")>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadOrder" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -2066,9 +2079,10 @@
 				<cfset result.order.orderID=0>
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadOrderPubs" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -2115,9 +2129,10 @@
 				<cfset result.order.orderID=0>
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -2175,10 +2190,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 							
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-				<cfdump var="#cfcatch#" label="cfcatch" expand="no">
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 
 		<cfreturn result>
@@ -2227,11 +2242,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 							
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-				<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
-					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 
 		<cfreturn result>
@@ -2268,9 +2282,10 @@
 				<cfset result.msg="Order has been deleted.">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 
 		<cfreturn result>
@@ -2308,13 +2323,13 @@
 					) VALUES (
 						#orderID#,
 						#args.form.oiPubID#,
-						<cfif StructKeyExists(args.form,"oiSun")>#args.form.oiSun#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiMon")>#args.form.oiMon#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiTue")>#args.form.oiTue#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiWed")>#args.form.oiWed#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiThu")>#args.form.oiThu#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiFri")>#args.form.oiFri#,<cfelse>0,</cfif>
-						<cfif StructKeyExists(args.form,"oiSat")>#args.form.oiSat#<cfelse>0</cfif>
+						<cfif StructKeyExists(args.form,"oiSun")>#val(args.form.oiSun)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiMon")>#val(args.form.oiMon)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiTue")>#val(args.form.oiTue)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiWed")>#val(args.form.oiWed)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiThu")>#val(args.form.oiThu)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiFri")>#val(args.form.oiFri)#,<cfelse>0,</cfif>
+						<cfif StructKeyExists(args.form,"oiSat")>#val(args.form.oiSat)#<cfelse>0</cfif>
 					)
 				</cfquery>
 				<cfset result.msg="Publication has been added.">
@@ -2329,9 +2344,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 							
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 
 		<cfreturn result>
@@ -2348,22 +2364,23 @@
 					<cfquery name="Update" datasource="#args.datasource#">
 						UPDATE tblOrderItem 
 						SET 
-							<cfif StructKeyExists(args.form,"qtyMon" & i)>oiMon=#StructFind(args.form,"qtyMon" & i)#,<cfelse>oiMon=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtyTue" & i)>oiTue=#StructFind(args.form,"qtyTue" & i)#,<cfelse>oiTue=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtyWed" & i)>oiWed=#StructFind(args.form,"qtyWed" & i)#,<cfelse>oiWed=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtyThu" & i)>oiThu=#StructFind(args.form,"qtyThu" & i)#,<cfelse>oiThu=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtyFri" & i)>oiFri=#StructFind(args.form,"qtyFri" & i)#,<cfelse>oiFri=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtySat" & i)>oiSat=#StructFind(args.form,"qtySat" & i)#,<cfelse>oiSat=0,</cfif>
-							<cfif StructKeyExists(args.form,"qtySun" & i)>oiSun=#StructFind(args.form,"qtySun" & i)#<cfelse>oiSun=0</cfif>
+							<cfif StructKeyExists(args.form,"qtyMon" & i)>oiMon=#val(StructFind(args.form,"qtyMon" & i))#,<cfelse>oiMon=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtyTue" & i)>oiTue=#val(StructFind(args.form,"qtyTue" & i))#,<cfelse>oiTue=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtyWed" & i)>oiWed=#val(StructFind(args.form,"qtyWed" & i))#,<cfelse>oiWed=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtyThu" & i)>oiThu=#val(StructFind(args.form,"qtyThu" & i))#,<cfelse>oiThu=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtyFri" & i)>oiFri=#val(StructFind(args.form,"qtyFri" & i))#,<cfelse>oiFri=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtySat" & i)>oiSat=#val(StructFind(args.form,"qtySat" & i))#,<cfelse>oiSat=0,</cfif>
+							<cfif StructKeyExists(args.form,"qtySun" & i)>oiSun=#val(StructFind(args.form,"qtySun" & i))#<cfelse>oiSun=0</cfif>
 						WHERE oiID=#i#
 					</cfquery>
 				</cfloop>
 				<cfset result.msg="Order items have been updated.">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 
 		<cfreturn result>
@@ -2828,6 +2845,7 @@
 					)
 				</cfquery>
 				<cfset rowAdded=Qrec.generatedKey>
+				<cfset AddSups(args)>
 			<cfelse>
 				<cfquery name="QUpdate" datasource="#args.datasource#" result="Qrec">
 					UPDATE tblPubStock
@@ -2922,9 +2940,10 @@
 			
 			<cfset result.msg="Publication has been updated">
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="UpdatePubStock" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 					
 		<cfreturn result>
@@ -2960,9 +2979,10 @@
 				<cfset ArrayAppend(result.list,item)>
 			</cfloop>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 					
 		<cfreturn result>
@@ -2995,7 +3015,7 @@
 									AND psIssue='#QLoad.psIssue#'
 									AND psOrderID=#val(QLoad.psOrderID)#
 									AND psType='returned'
-									AND psDate LIKE '%#Year(args.form.psDate)#%'
+									<!---AND psDate LIKE '%#Year(args.form.psDate)#%'--->
 								</cfquery>
 							</cfif>
 							<cfquery name="QDelete" datasource="#args.datasource#">
@@ -3009,7 +3029,9 @@
 			</cftransaction>
 			
 			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
+				<cfdump var="#cfcatch#" label="DeletePubStockItems" expand="yes" format="html" 
+					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 			</cfcatch>
 		</cftry>
 		
@@ -3333,12 +3355,6 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset var result={}>
-		<cfset var QLoad="">
-		<cfset var QCheck="">
-		<cfset var QLoadSold="">
-		<cfset var QLoadSoldCredit="">
-		<cfset var issueID=0>
-		<cfset var issue="">
 		
 		<cftry>
 			<cfset loc.issueID=ListFirst(args.issue,"_")>
@@ -3411,9 +3427,83 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="AddSups" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.args = args>
+		<cfset loc.issue = "">
+		<cfset loc.issueID = "">
+		<cfquery name="loc.QPublication" datasource="#args.datasource#">
+			SELECT pubTitle,pubSup,pubLinkPub
+			FROM tblPublication
+			WHERE pubID=#val(args.form.psPubID)#
+		</cfquery>
+		<cfif loc.QPublication.pubSup gt 0>
+			<cfquery name="loc.QSupPub" datasource="#args.datasource#">
+				SELECT pubPrice
+				FROM tblPublication
+				WHERE pubID=#val(loc.QPublication.pubLinkPub)#
+			</cfquery>
+			<cfif StructKeyExists(args.form,"override")>
+				<cfset loc.issue=args.form.psIssue>
+			<cfelse>
+				<cfset loc.issueID=ListFirst(args.form.psIssue,"_")>
+				<cfset loc.issue=ListLast(args.form.psIssue,"_")>
+			</cfif>
+			<cfquery name="loc.QLoad" datasource="#args.datasource#">
+				SELECT *
+				FROM tblPubStock
+				WHERE psID=#val(args.form.psID)#
+			</cfquery>
+			<cfquery name="loc.QInsertSup" datasource="#args.datasource#" result="QResult">
+				INSERT INTO tblPubStock (
+					psPubID,
+					psSupID,
+					psType,
+					psDate,
+					psIssue,
+					psArrivalDay,
+					psQty,
+					psRetail,
+					psDiscount,
+					psDiscountType,
+					psVatRate,
+					psPWRetail,
+					psPWVatRate,
+					psTradePrice,
+					psOrderID,
+					<cfif StructKeyExists(args.form,"psAction")>psAction,</cfif>
+					<cfif StructKeyExists(args.form,"URN")>psURN,</cfif>
+					psVat
+				) VALUES (
+					#val(loc.QPublication.pubLinkPub)#,
+					'#loc.QLoad.psSupID#',
+					'#args.form.psType#',
+					'#LSDateFormat(args.form.psDate,"YYYY-MM-DD")#',
+					'#loc.issue#',
+					#val(loc.QLoad.psArrivalDay)#,
+					#args.form.psQty * loc.QPublication.pubSup#,
+					#loc.QSupPub.pubPrice#,
+					0,
+					'pc',
+					0,
+					0,
+					0,
+					#loc.QSupPub.pubPrice#,
+					<cfif StructKeyExists(args.form,"psOrderID")>#val(args.form.psOrderID)#,<cfelse>#val(loc.QLoad.psOrderID)#,</cfif>
+					<cfif StructKeyExists(args.form,"psAction")>'#args.form.psAction#',</cfif>
+					<cfif StructKeyExists(args.form,"URN")>'#args.form.URN#',</cfif>
+					#val(loc.QLoad.psVat)#
+				)
+			</cfquery>
+		</cfif>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="UpdateReturnedStock" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
-
+		<cfset var loc = {}>
 		<cfset var result={}>
 		<cfset var QLoad="">
 		<cfset var QInsertStock="">
@@ -3429,6 +3519,7 @@
 		<cfset var pubID=0>
 		<cfset var qty=1>
 		<cfset result.msg="none">
+
 		<cftry>
 			<cfif NOT StructIsEmpty(args.form)>
 				<cfif StructKeyExists(args.form,"override")>
@@ -3438,6 +3529,7 @@
 					<cfset issue=ListLast(args.form.psIssue,"_")>
 				</cfif>
 				<cfif StructKeyExists(args.form,"mode") AND args.form.mode is 1 AND val(args.form.psPubID) gt 0>
+					
 					<cfif NOT StructKeyExists(args.form,"override")>
 						<cfquery name="QLoad" datasource="#args.datasource#">
 							SELECT *
@@ -3484,7 +3576,7 @@
 						psPWRetail,
 						psPWVatRate,
 						psTradePrice,
-							psOrderID,
+						psOrderID,
 							<cfif StructKeyExists(args.form,"psAction")>psAction,</cfif>
 							<cfif StructKeyExists(args.form,"URN")>psURN,</cfif>
 							psVat
@@ -3494,7 +3586,7 @@
 							'#args.form.psType#',
 							'#LSDateFormat(args.form.psDate,"YYYY-MM-DD")#',
 							'#issue#',
-							#QLoad.psArrivalDay#,
+							#val(QLoad.psArrivalDay)#,
 							#args.form.psQty#,
 							#QLoad.psRetail#,
 							#QLoad.psDiscount#,
@@ -3506,9 +3598,10 @@
 							<cfif StructKeyExists(args.form,"psOrderID")>#val(args.form.psOrderID)#,<cfelse>#val(QLoad.psOrderID)#,</cfif>
 							<cfif StructKeyExists(args.form,"psAction")>'#args.form.psAction#',</cfif>
 							<cfif StructKeyExists(args.form,"URN")>'#args.form.URN#',</cfif>
-							#QLoad.psVat#
+							#val(QLoad.psVat)#
 						)
-					</cfquery>
+					</cfquery>			
+					<cfset AddSups(args)>
 					<cfif NOT StructKeyExists(args.form,"override")>
 						<cfif StructKeyExists(args.form,"psType") AND args.form.psType eq "credited">
 							<cfquery name="QCheckReturnQty" datasource="#args.datasource#">
@@ -3537,7 +3630,7 @@
 									AND psIssue='#issue#'
 									AND psOrderID=#val(QLoad.psOrderID)#
 									AND (psType='returned' OR psType='credited')
-									AND psDate LIKE '%#Year(args.form.psDate)#%'
+									<!---AND psDate LIKE '%#Year(args.form.psDate)#%'--->
 								</cfquery>
 							<cfelse>
 								<cfif QCheckReturnQty.TotalReturnQty lte QCheckCreditQty.TotalCreditQty>
@@ -3548,7 +3641,7 @@
 										AND psIssue='#issue#'
 										AND psOrderID=#val(QLoad.psOrderID)#
 										AND (psType='returned' OR psType='credited')
-										AND psDate LIKE '%#Year(args.form.psDate)#%'
+										<!---AND psDate LIKE '%#Year(args.form.psDate)#%' what is this for? How would it work across year boundary? --->
 									</cfquery>
 								</cfif>
 							</cfif>
@@ -3556,12 +3649,15 @@
 					</cfif>
 					<cfset result.msg="Done">
 				<cfelseif NOT StructKeyExists(args.form,"override")>
-					<cfquery name="QUpdateReturn" datasource="#args.datasource#">
+					<cfquery name="QUpdateReturn" datasource="#args.datasource#" result="loc.QUpdateReturnResult">
 						UPDATE tblPubStock
 						SET psQty=#args.form.psQty#
 						WHERE psID=#val(args.form.psID)#
 					</cfquery>
 					<cfset result.msg="Done">
+<cfdump var="#loc.QUpdateReturnResult#" label="QUpdateReturn" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+					
 				<cfelse>
 					<cfset result.msg="Mode is #args.form.mode# nothing happened">
 				</cfif>
@@ -4571,21 +4667,21 @@
 						</cfif>
 						
 						<cfset emailParms.Subject=QEmail.mailSubject>
-						<cfset emailParms.message=QEmail.mailText>
+						<cfset emailParms.message="#QEmail.mailText#<br />">
 						<cfset emailParms.pubs="">
 						<cfset emailParms.pubsarray=emailPubs>
 						<cfloop array="#emailPubs#" index="i">
-							<cfset emailParms.pubs=emailParms.pubs&"<li>#i.pubTitle# - #i.action#</li>">
+							<cfset emailParms.pubs=emailParms.pubs&"<li>#i.pubTitle# - #i.action#<br /></li>">
 						</cfloop>
 						<cfif StructKeyExists(args.form,"hoStart")>
-							<cfset restartTxt='Start delivery on <b>#LSDateFormat(args.form.hoStart,"ddd dd mmm yyyy")#</b>'>
+							<cfset restartTxt='Start delivery on <b>#LSDateFormat(args.form.hoStart,"ddd dd mmm yyyy")#</b><br />'>
 						<cfelse>
-							<cfset restartTxt='Until further notice.'>
+							<cfset restartTxt='Until further notice.<br />'>
 						</cfif>
 						<cfset emailParms.Text="
 							<p>#emailParms.message#</p>
-							<p>Stop delivery on <b>#LSDateFormat(args.form.hoStop,"ddd dd mmm yyyy")#</b><br>#restartTxt#</p>
-							<p>Publications affected:
+							<p>Stop delivery on <b>#LSDateFormat(args.form.hoStop,"ddd dd mmm yyyy")#</b><br />#restartTxt#</p>
+							<p>Publications affected:<br />
 								<ul>
 									#emailParms.pubs#
 								</ul>
@@ -4600,10 +4696,10 @@
 				<cfset result.msg="Please enter a stop date.">
 			</cfif>
 			
-			<cfcatch type="any">
-				<cfdump var="#cfcatch#" label="cfcatch" expand="no">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -4699,9 +4795,10 @@
 			<cfset actParms.Text="">
 			<cfset actInsert=AddActivity(actParms)>
 			
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -4766,9 +4863,10 @@
 			</cfif>
 			<cfset result.msg="Holidays Removed">
 
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>
@@ -4835,7 +4933,7 @@
 						WHERE pubID=#val(QOrderItem.oiPubID)#
 						LIMIT 1;
 					</cfquery>
-					<cfif len(QPub.pubTitle)><cfset emailPubs=emailPubs&"<li>#QPub.pubTitle#</li>"></cfif>
+					<cfif len(QPub.pubTitle)><cfset emailPubs=emailPubs&"<li>#QPub.pubTitle#<br /></li>"></cfif>
 					<cfquery name="QVoucher" datasource="#args.datasource#" result="QResult">
 						INSERT INTO tblVoucher (
 							vchOrderID,
@@ -4925,10 +5023,10 @@
 						</cfif>
 						
 						<cfset emailParms.Subject=QEmail.mailSubject>
-						<cfset emailParms.message=QEmail.mailText>
+						<cfset emailParms.message="#QEmail.mailText#<br />">
 						<cfset emailParms.Text="
 							<p>#emailParms.message#</p>
-							<p>Vouchers start on <b>#LSDateFormat(args.form.vchStart,"dd mmm yyyy")#</b><br>Vouchers stop on <b>#LSDateFormat(args.form.vchStop,"dd mmm yyyy")#</b></p>
+							<p>Vouchers start on <b>#LSDateFormat(args.form.vchStart,"dd mmm yyyy")#</b><br />Vouchers stop on <b>#LSDateFormat(args.form.vchStop,"dd mmm yyyy")#</b></p>
 							<p>Publications vouchers assigned to:
 								<ul>
 									#emailPubs#
@@ -5009,9 +5107,10 @@
 			</cfif>
 			<cfset result.msg="Vouchers Removed">
 
-			<cfcatch type="any">
-				<cfset result.msg=cfcatch>
-			</cfcatch>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
 		</cftry>
 		
 		<cfreturn result>

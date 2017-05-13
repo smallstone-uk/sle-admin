@@ -19,9 +19,9 @@
 	FROM tblTrans
 	INNER JOIN tblNomItems ON trnID=niTranID
 	WHERE trnRef IN ('DEP','COR')
-	<!---AND trnPaidIn IN--->
+	AND trnPaidIn IN (0,3)
 	AND niNomID=1501
-	AND trnDate BETWEEN '2015-02-01' AND '2016-01-31'
+	AND trnDate BETWEEN '2016-10-01' AND '2017-04-05'
 	ORDER BY trnDate ASC
 </cfquery>
 
@@ -30,7 +30,7 @@
 <cfset foundCount = 0>
 <cfoutput>
 	<p><a href="#cgi.SCRIPT_NAME#">Refresh</a></p>
-	<table class="tableList" border="1" width="600">
+	<table class="tableList" border="1" width="900">
 		<cfloop query="QCashDeposits">
 		<tr>
 			<td><a href="#cgi.SCRIPT_NAME#?add=#niID#">#niID#</a></td>
@@ -58,7 +58,6 @@
 				</cfif>
 					<cfif StructKeyExists(url,"add") AND QCashDeposits.niID eq url.add>
 						create tran for #url.add#<br />
-						Insert tran
 						<cfquery name="QItem" datasource="#application.site.datasource1#">
 							SELECT trnID,trnDate,trnRef,trnDesc,trnPaidIn, niID,niAmount,niNomID
 							FROM tblTrans
@@ -67,6 +66,7 @@
 							LIMIT 1;
 						</cfquery>
 						<cfset value = QItem.niAmount>value = #value#<br />	<!--- negative --->
+						Insert tran
 						<cfquery name="QInserTran" datasource="#application.site.datasource1#" result="QRes">
 							INSERT INTO tblTrans
 								(trnDate,trnRef,trnDesc,trnPaidIn) 

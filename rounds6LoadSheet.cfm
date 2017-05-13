@@ -83,7 +83,6 @@
 		<div class="clear"></div>
 	</div>
 	<div id="print-area">
-		<cfdump var="#drops#" label="drops" expand="no">
 		<cfloop array="#drops.rounds#" index="rounds">
 			
 			<!--- Round Setup --->
@@ -94,13 +93,13 @@
 				<cfset holWord="Hand Out">
 				<cfset holCancel="On Holiday! Do Not Hand Out">
 				<cfset holHold="Hold Back! Keep Back Until">
-				<cfset holStop="Stop! Publication has been permanently stopped">
+				<cfset holStop="Publication has been stopped">
 				<cfset totWord="Customers">
 			<cfelse>
 				<cfset holWord="Deliver">
 				<cfset holCancel="Cancelled">
 				<cfset holHold="Hold Until ">
-				<cfset holStop="Permanent Stop">
+				<cfset holStop="Stopped ">
 				<cfset totWord="Drops">
 			</cfif>
 			
@@ -124,12 +123,8 @@
 								<cfset count=count+1>
 								<cfset GrandTotalDrops=GrandTotalDrops+1>
 								<cfset countback=false>
-								<!---<cfif house.Name eq "Church House"> TODO 
-									<cfdump var="#house#" label="house" expand="false">
-								</cfif>--->
 								<div class="houses">
 									<div id="row#house.ID#" class="house<cfif house.New> new</cfif>">
-									
 										<!--- Drop Title --->
 										<div class="house-title">
 											<cfif len(house.pay)><span class="pay">#house.pay#</span></cfif>
@@ -174,6 +169,10 @@
 																		<cfset countback=true>
 																	</cfif>
 																	<i>#holStop# <cfif len(i.HolidayStart)>Until #i.HolidayStart#</cfif></i>
+																<cfelseif i.HolidayAction eq "bhHold">
+																	<i>Bank Holiday-Hold</i>
+																<cfelseif i.HolidayAction eq "bhCancel">
+																	<i>Bank Holiday-Cancelled</i>
 																</cfif>
 															</span>
 														<cfelseif i.HolidayAction eq "hold" AND len(i.HolidayStart)>
@@ -233,6 +232,8 @@
 					</table>
 				</div>
 			</div>
+			<cfset rounds.dropTotal = count>
+			<cfset rounds.pubTotal = totalQty>
 			<div style="page-break-before:always;"></div><cfif parm.showSummaries></cfif>
 			<!--- Round End --->
 		</cfloop>
@@ -281,6 +282,9 @@
 		<div class="summary" style="page-break-before:always;">
 			<table border="1" class="tableList" width="700" style="font-size: 16px;">
 				<tr>
+					<th colspan="7" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
+				</tr>
+				<tr>
 					<th>Publication</th>
 					<cfloop array="#drops.rounds#" index="round">
 						<th align="center">#round.roundTitle#</th>
@@ -290,7 +294,7 @@
 				<cfloop array="#pubArray#" index="pub">
 					<cfset pubID = ListLast(pub,"_")>
 					<tr>
-						<td>#pub#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
+						<td>#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
 						<cfloop array="#drops.rounds#" index="round">
 							<cfset rndPub = "#round.roundID#-#pubID#">
 							<cfif StructKeyExists(round.totalQty,rndPub)>
@@ -304,6 +308,24 @@
 						</td>
 					</tr>
 				</cfloop>
+				<cfset grandTotPubs = 0>
+				<cfset grandTotDrops = 0>
+				<tr>
+					<th>Total Publications</th>
+					<cfloop array="#drops.rounds#" index="round">
+						<cfset grandTotPubs += round.pubTotal>
+						<th align="center">#round.pubTotal#</th>
+					</cfloop>
+					<th>#grandTotPubs#</th>
+				</tr>
+				<tr>
+					<th>Total Drops</th>
+					<cfloop array="#drops.rounds#" index="round">
+						<cfset grandTotDrops += round.droptotal>
+						<th align="center">#round.droptotal#</th>
+					</cfloop>
+					<th>#grandTotDrops#</th>
+				</tr>
 			</table>
 		</div>
 		

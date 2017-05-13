@@ -76,7 +76,11 @@
 					<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
 				</tr>
 			</cfif>
+			<cfset tranCount = 0>
+			<cfset drTotal = 0>
+			<cfset crTotal = 0>
 			<cfloop array="#transactions.tranList#" index="item">
+				<cfset tranCount++>
 				<cfset accID = val(item.trnAccountID)>
 				<tr>
 					<td width="10" align="center">
@@ -109,9 +113,11 @@
 					<td>#item.trnRef# <cfif item.trnClientRef GT 0>#item.trnClientRef#</cfif></td>
 					<td>#item.trnDesc#</td>
 					<cfif item.niAmount GT 0>
+						<cfset drTotal += item.niAmount>
 						<td align="right">#item.niAmount#</td>
 						<td></td>
 					<cfelse>
+						<cfset crTotal += item.niAmount>
 						<td></td>
 						<td align="right">#item.niAmount#</td>
 					</cfif>
@@ -119,6 +125,11 @@
 					<td align="right">#DecimalFormat(balance)#</td>
 				</tr>
 			</cfloop>
+			<tr>
+				<td colspan="7">#tranCount#</td>
+				<td align="right">#DecimalFormat(drTotal)#</td>
+				<td align="right">#DecimalFormat(crTotal)#</td>
+			</tr>
 		</table>
 	<cfelse>
 		<table class="tableList" border="1" width="100%">

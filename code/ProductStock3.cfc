@@ -453,7 +453,7 @@
 				<cfquery name="QUpdate" datasource="#args.datasource#">
 					UPDATE tblStockItem
 					SET siSubs=#val(args.form.prodID)#,
-						siQtyItems=#QProduct.prodPackQty#,
+						siQtyItems=#val(QProduct.prodPackQty)#,
 						siWSP=#DecimalFormat(QProduct.prodPackPrice)#,
 						siUnitTrade=#DecimalFormat(QProduct.prodUnitTrade)#,
 						siRRP=#DecimalFormat(QProduct.prodRRP)#,
@@ -472,7 +472,8 @@
 			</cfif>
 		
 			<cfcatch type="any">
-				 <cfset result.error=cfcatch>
+				<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 			</cfcatch>
 		</cftry>	
 			

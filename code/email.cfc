@@ -4,7 +4,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset loc.result={}>
-		<cfset loc.path="D:\HostingSpaces\SLE\shortlanesendstore.co.uk\data\attachments\">
+		<cfset loc.path="#application.site.dir_data#attachments\">
 		<cftry>
         	<cfpop
             	action="getall"

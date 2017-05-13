@@ -23,7 +23,7 @@ function LoadRoundSheet() {
 function Print() {
 	$.ajax({
 		type: 'POST',
-		url: 'rounds5Print.cfm',
+		url: 'rounds6Print.cfm',
 		beforeSend:function(){
 			$('#dispatchnotes').remove();
 			$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Preparing Print...").fadeIn();
@@ -44,7 +44,7 @@ function Print() {
 function LoadRoundChargedList() {
 	$.ajax({
 		type: 'GET',
-		url: 'RoundLoadCharged.cfm',
+		url: 'Rounds6LoadCharged.cfm',
 		success:function(data){
 			$('#roundChargedList').html(data);
 		}
@@ -54,7 +54,7 @@ function LoadRoundChargedList() {
 function ChargeRounds() {
 	$.ajax({
 		type: 'POST',
-		url: 'rounds5ChargeItems.cfm',
+		url: 'rounds6ChargeItems.cfm',
 		beforeSend:function(){
 			$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Charging Rounds...").fadeIn();
 		},
@@ -70,7 +70,7 @@ function ChargeRounds() {
 function Archive() {
 	$.ajax({
 		type: 'POST',
-		url: 'rounds5Archive.cfm',
+		url: 'rounds6Archive.cfm',
 		data: {'html':$('#print-area').html()},
 		beforeSend:function(){
 			$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Archiving...").fadeIn();

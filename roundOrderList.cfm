@@ -29,7 +29,6 @@
 	<style type="text/css">
 		.active {background: #2D97D3;}
 	</style>
-	
 	<cfoutput>
 		<table border="1" class="tableList trhover roundTable" width="100%">
 			<tr class="nodrop nodrag">
@@ -49,7 +48,7 @@
 					<tr class="row#i.OrderID#">
 						<td><input type="hidden" name="item" value="#i.ID#"><input type="hidden" name="order#i.ID#" class="orderItem" value="#i.order#">#i.Ref#</td>
 						<td>#i.name# #i.street# </td>
-						<td align="center"><a href="http://tweb.shortlanesendstore.co.uk/clientDetails.cfm?row=0&ref=#i.ref#" target="_blank">#i.cltAccountType#</a></td>
+						<td align="center"><a href="#application.site.normal#clientDetails.cfm?row=0&ref=#i.ref#" target="_blank">#i.cltAccountType#</a></td>
 					</tr>
 				</cfloop>
 			<cfelse>

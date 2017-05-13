@@ -98,12 +98,12 @@
 				<cfset item.credit=[]>
 				<cfquery name="QCharges" datasource="#args.datasource#">
 					SELECT tblDelItems.*,tblPublication.pubID,tblPublication.pubTitle
-					FROM tblDelItems,tblPublication
-					WHERE diOrderID=#QClients.ordID#
-					AND diDate >= '#args.form.fromDate#'
-					AND diDate <= '#args.form.toDate#'
-					AND pubID=diPubID
-					ORDER BY diDate asc
+					FROM tblDelItems
+					INNER JOIN tblPublication ON pubID=diPubID
+					WHERE diOrderID = #QClients.ordID#
+					AND diDatestamp >= '#args.form.fromDate#'
+					AND diDatestamp <= '#args.form.toDate#'
+					ORDER BY diDatestamp asc
 				</cfquery>
 				<cfset item.grandtotal=0>
 				<cfset item.debittotal=0>
@@ -273,11 +273,11 @@
 			<cfif QOrders.ordDifferent>
 				<cfset result.deliverTo="To: #QOrders.ordHouseName# #QOrders.ordHouseNumber# #QOrders.stName#">
 			<cfelse><cfset result.deliverTo=""></cfif>
-			<cfquery name="QCharges" datasource="#args.datasource#">
+			<cfquery name="QCharges" datasource="#args.datasource#" result="QChargesResult">
 				SELECT tblDelItems.*,tblPublication.pubID,tblPublication.pubTitle,tblPublication.pubGroup
-				FROM tblDelItems,tblPublication
+				FROM tblDelItems
+				INNER JOIN tblPublication ON pubID=diPubID
 				WHERE diOrderID=#QOrders.ordID#
-				AND pubID=diPubID
 				<cfif StructKeyExists(args,"onlycredits") AND args.onlycredits is 1>AND diType='credit'</cfif>
 				<cfif StructKeyExists(args,"fixflag") AND args.fixflag is 1>
 					AND diDatestamp >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'
@@ -293,6 +293,7 @@
 				</cfif>
 				ORDER BY pubGroup asc, pubTitle asc, diPrice asc
 			</cfquery>
+
 			<cfloop query="QCharges">
 				<cfset charge={}>
 				<cfset charge.ID=QCharges.diID>
@@ -643,8 +644,8 @@
 					SET diInvoiceID=#val(result.InvID)#
 					WHERE diClientID=#val(args.cltID)#
 					AND diOrderID=#val(args.ordID)#
-					AND diDate >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'
-					AND diDate <= '#LSDateFormat(args.toDate,"yyyy-mm-dd")#'
+					AND diDatestamp >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'
+					AND diDatestamp <= '#LSDateFormat(args.toDate,"yyyy-mm-dd")#'
 					AND diInvoiceID=0
 					<cfif StructKeyExists(args,"onlycredits") AND args.onlycredits is 1>AND diType='credit'</cfif>
 				</cfquery>

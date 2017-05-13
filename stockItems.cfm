@@ -61,7 +61,7 @@
 				</tr>
 				<tr>
 					<th class="headleft">##</th>
-					<th class="headleft">ID</th>
+					<th class="headleft">siID</th>
 					<th class="headleft">Order</th>
 					<th class="headleft">Order <br />Status</th>
 					<th class="headleft">Date</th>

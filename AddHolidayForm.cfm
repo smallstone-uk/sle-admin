@@ -129,7 +129,8 @@
 						</td>
 					</tr>
 					<tr>
-						<th colspan="4" align="center"><label style="padding:5px 0;"><input type="checkbox" name="returnVouchers" value="1" />&nbsp;Return vouchers to customer in holiday date range (if required).</label></th>
+						<th colspan="4" align="center"><label style="padding:5px 0;">
+							<input type="checkbox" name="returnVouchers" value="1" />&nbsp;Return vouchers to customer in holiday date range (if required).</label></th>
 					</tr>
 					<tr>
 						<th colspan="4" align="center">

@@ -8,7 +8,7 @@ function scanner(e,source,id) {
 	if (keyCode == 13) { //scanner has finished scanning
 		Barcode="";
 		if (code.length == 8) {
-			code="00000"+code;
+		//	code="00000"+code;
 		} else if (code.length == 12) {
 			code="0"+code;
 		} else {

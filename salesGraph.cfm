@@ -20,8 +20,8 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchGrouped" default="">
-<cfparam name="srchSunday" default="false">
-<cfset srchSunday = val(srchSunday)>
+<cfparam name="srchShowSunday" default="false">
+<cfset showSunday = int(StructKeyExists(form,"srchShowSunday"))>
 <cfsetting requesttimeout="900">
 <cfobject component="code/accounts" name="noms">
 <cfset parm={}>
@@ -40,7 +40,7 @@
 				AND trnAccountID=1
 				AND trnDate>='#form.srchDateFrom#'
 				AND trnDate<='#form.srchDateTo#'
-				<cfif NOT srchSunday>AND DayOfWeek(trnDate) <> 1</cfif>
+				<cfif NOT showSunday>AND DayOfWeek(trnDate) <> 1</cfif>
 				GROUP BY Year(trnDate), Month(trnDate)
 			</cfquery>		
 		<cfelse>		
@@ -52,7 +52,7 @@
 				AND trnAccountID=1
 				AND trnDate>='#form.srchDateFrom#'
 				AND trnDate<='#form.srchDateTo#'
-				<cfif NOT int(srchSunday)>AND DayOfWeek(trnDate) <> 1</cfif>
+				<cfif NOT showSunday>AND DayOfWeek(trnDate) <> 1</cfif>
 			</cfquery>
 		</cfif>
 		<cfreturn DataTable>
@@ -67,7 +67,7 @@
 					<cfset parm.form=form>
 					<cfset total=0>
 					<!---<cfset nomItems=noms.TranDetails(parm)>--->
-					<cfset DataTable=getData()><cfdump var="#DataTable#" label="" expand="false">
+					<cfset DataTable=getData()>
 					<h1>Sales</h1>
 					<cfchart 
 						format="jpg"  
@@ -84,6 +84,7 @@
 						</cfchartseries> 
 					</cfchart>
 					<cfoutput>
+						<br />
 						Records: #DataTable.recordcount#<br />
 						Days: #DateDiff("d",form.srchDateFrom,form.srchDateTo)#<br />
 						Total: &pound;#NumberFormat(total)#<br />
@@ -108,12 +109,13 @@
 						<td><b>Grouped</b></td>
 						<td>
 							<input type="checkbox" name="srchGrouped" <cfif StructKeyExists(form,"srchGrouped")> checked="checked"</cfif> />
+							group by year and month
 						</td>
 					</tr>
 					<tr>
-						<td><b>Exclude Sundays</b></td>
+						<td><b>Show Sundays</b></td>
 						<td>
-							<input type="checkbox" name="srchSunday" <cfif StructKeyExists(form,"srchSunday")> checked="checked"</cfif> />
+							<input type="checkbox" name="srchShowSunday" <cfif StructKeyExists(form,"srchShowSunday")> checked="checked"</cfif> />
 						</td>
 					</tr>
 					<tr>

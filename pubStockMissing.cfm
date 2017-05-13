@@ -1,9 +1,9 @@
 
 <!---<cfdump var="#report#" label="report" expand="false">--->
 <style type="text/css">
-	.tableSheet {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 11px;}
-	.tableSheet th, .tableSheet td {padding:2px;}
-	.tableSheet th, .tableSheet td {padding:2px;}
+	.tableSheet {border-spacing: 0px;border-collapse: collapse;border: 1px solid #CCC;font-size: 11px;}
+	.tableSheet th, .tableSheet td {padding:2px;border-color: #CCC;}
+	.tableSheet th, .tableSheet td {padding:2px;border-color: #CCC;}
 	.tableSheet .qtys {width:60px; text-align:right; margin-right:2px;}
 	.tableSheet .qtytotals {width:60px; text-align:right; margin-right:2px; font-weight:bold;}
 </style>
@@ -18,6 +18,7 @@
 		<cfset totSold=0>
 		<cfset totMissing=0>
 		<cfset totValue=0>
+		<cfset grandTotValue=0>
 		<cfset prevPub="">
 		<cfset pubKeys=ListSort(StructKeyList(report.pubs,","),"text","asc",",")>
 		<cfloop list="#pubKeys#" index="key">
@@ -28,8 +29,8 @@
 					<tr>
 						<td colspan="2">&nbsp;</td>
 						<td class="qtytotals">#totReceived#</td>
-						<td class="qtytotals">#totReturned#</td>
 						<td class="qtytotals">#totClaimed#</td>
+						<td class="qtytotals">#totReturned#</td>
 						<td class="qtytotals">#totSold#</td>
 						<td class="qtytotals">#totCredited#</td>
 						<td class="qtytotals">#totMissing#</td>
@@ -54,8 +55,8 @@
 						<th width="120">Date</th>
 						<th width="60">Issue</th>
 						<th class="qtys">Received</th>
-						<th class="qtys">Returned</th>
 						<th class="qtys">Claimed</th>
+						<th class="qtys">Returned</th>
 						<th class="qtys">Sold</th>
 						<th class="qtys">Credited</th>
 						<th class="qtys">Missing</th>
@@ -69,12 +70,13 @@
 				<cfset totSold += item.sold>
 				<cfset totMissing += item.missing>
 				<cfset totValue += (item.missing * item.unitTrade)>
+				<cfset grandTotValue +=totValue>
 				<tr>
 					<td>#item.psDate#</td>
 					<td>#item.psIssue#</td>
 					<td class="qtys">#item.received#</td>
-					<td class="qtys">#item.returned#</td>
 					<td class="qtys">#item.claim#</td>
+					<td class="qtys">#item.returned#</td>
 					<td class="qtys">#item.sold#</td>
 					<td class="qtys">#item.credited#</td>
 					<td class="qtys"><cfif item.missing neq 0>#item.missing#</cfif></td>
@@ -86,12 +88,16 @@
 		<tr>
 			<td colspan="2">&nbsp;</td>
 			<td class="qtytotals">#totReceived#</td>
-			<td class="qtytotals">#totReturned#</td>
 			<td class="qtytotals">#totClaimed#</td>
+			<td class="qtytotals">#totReturned#</td>
 			<td class="qtytotals">#totSold#</td>
 			<td class="qtytotals">#totCredited#</td>
 			<td class="qtytotals">#totMissing#</td>
 			<td class="qtytotals">&pound;#totValue#</td>
+		</tr>
+		<tr>
+			<td colspan="8">Total Value</td>
+			<td class="qtytotals">&pound;#grandTotValue#</td>
 		</tr>
 		</table>
 	</cfoutput>

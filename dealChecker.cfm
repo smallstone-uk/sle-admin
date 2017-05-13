@@ -22,11 +22,12 @@
 				<cfset loc.dateRange = "">
 			</cfif>
 			<cfquery name="loc.QDeals" datasource="#args.datasource#" result="loc.QDealResult">
-				SELECT ercID,ercTitle, ediID, edID,edTitle,edDealType,edStarts,edEnds,edQty, prodID,prodRef,prodTitle
+				SELECT ercID,ercTitle, ediID, edID,edTitle,edDealType,edStarts,edEnds,edQty, prodID,prodRef,prodTitle, barcode
 				FROM tblEPOS_Deals
 				INNER JOIN tblEPOS_DealItems ON ediParent=edID
 				INNER JOIN tblProducts ON prodID=ediProduct
 				INNER JOIN tblEPOS_RetailClubs ON ercID=edRetailClub
+				INNER JOIN tblBarcodes ON barProdID = prodID
 				WHERE edStatus='active'
 				#loc.dateRange#
 				ORDER BY ercID, edID, ediProduct
@@ -48,6 +49,7 @@
 				<cfset loc.rec.prodID = prodID>
 				<cfset loc.rec.prodRef = prodRef>
 				<cfset loc.rec.prodTitle = prodTitle>
+				<cfset loc.rec.barcode = barcode>
 				<cfset loc.rec.style = "">
 				<cfset loc.prev.style = "">
 				<cfif loc.lastProd AND loc.lastProd eq prodID>
@@ -93,11 +95,12 @@
 				<cfset loc.dateRange = "">
 			</cfif>
 			<cfquery name="loc.QDeals" datasource="#args.datasource#" result="loc.QDealResult">
-				SELECT ercTitle, ediID, edID,edTitle,edDealType,edStarts,edEnds,edQty, prodID,prodRef,prodTitle
+				SELECT ercTitle, ediID, edID,edTitle,edDealType,edStarts,edEnds,edQty, prodID,prodRef,prodTitle, barcode
 				FROM tblEPOS_Deals
 				INNER JOIN tblEPOS_DealItems ON ediParent=edID
 				INNER JOIN tblProducts ON prodID=ediProduct
 				INNER JOIN tblEPOS_RetailClubs ON ercID=edRetailClub
+				INNER JOIN tblBarcodes ON barProdID = prodID
 				WHERE edStatus='active'
 				#loc.dateRange#
 				ORDER BY ediProduct
@@ -190,6 +193,7 @@
 						<th>Deal Title</th>
 						<th>Starts</th>
 						<th>Ends</th>
+						<th>Barcode</th>
 					</tr>
 					<tr>
 						<td colspan="11">
@@ -213,6 +217,7 @@
 							<td>#item.edTitle#</td>
 							<td>#item.edStarts#</td>
 							<td>#item.edEnds#</td>
+							<td>#item.barcode#</td>
 						</tr>
 					</cfloop>
 				</table>
@@ -236,6 +241,7 @@
 						<th>Deal Title</th>
 						<th>Starts</th>
 						<th>Ends</th>
+						<th>Barcode</th>
 					</tr>
 					<cfset recCount = 0>
 					<cfset dealID = 0>
@@ -259,6 +265,7 @@
 							<td>#item.edTitle#</td>
 							<td>#item.edStarts#</td>
 							<td>#item.edEnds#</td>
+							<td>#item.barcode#</td>
 						</tr>
 					</cfloop>
 				</table>

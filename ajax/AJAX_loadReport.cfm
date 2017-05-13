@@ -6,7 +6,11 @@
 <cfset parm.database = application.site.datasource1>
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.form = form>
+<cfset parm.allEmployees = true>
 <cfif parm.form.sort eq "employee">
+	<cfset Report = pr.LoadEmployeeReport(parm)>
+<cfelseif parm.form.sort eq "postTrans">
+	<cfset parm.allEmployees = false>
 	<cfset Report = pr.LoadEmployeeReport(parm)>
 <cfelseif parm.form.sort eq "date_minimal">
 	<cfset Report = pr.LoadMinimalPayrollReportByDate(parm)>
@@ -180,6 +184,11 @@
 	</cfsavecontent>
 <cfelseif parm.form.sort eq "date_minimal">
 	<cfsavecontent variable="sReport">
+		<cfset totalNet = 0>
+		<cfset totalPAYE = 0>
+		<cfset totalNI = 0>
+		<cfset totalGross = 0>
+		<cfset totalHours = 0>
 		<cfoutput>
 			<table class="tableList" width="100%" border="1">
 				<tr>
@@ -192,6 +201,11 @@
 					<th align="right">Hours</th>
 				</tr>
 				<cfloop array="#Report#" index="item">
+					<cfset totalNet += item.TotalNP>
+					<cfset totalPAYE += item.TotalPAYE>
+					<cfset totalNI += item.TotalNI>
+					<cfset totalGross += item.TotalGross>
+					<cfset totalHours += item.TotalHours>
 					<tr>
 						<td align="center">#DateFormat(item.phDate, "dd/mm/yyyy")#</td>
 						<td align="center">#item.phWeekNo#</td>
@@ -202,27 +216,65 @@
 						<td align="right">#item.TotalHours#</td>
 					</tr>
 				</cfloop>
+				<tr>
+					<th></th>
+					<th>Totals</th>
+					<th align="right">#totalNet#</th>
+					<th align="right">#totalPAYE#</th>
+					<th align="right">#totalNI#</th>
+					<th align="right">#totalGross#</th>
+					<th align="right">#totalHours#</th>
+				</tr>				
 			</table>
 		</cfoutput>
 	</cfsavecontent>
+<cfelseif parm.form.sort eq "postTrans">
+	<cfdump var="#Report#" label="Report" expand="false">
+	<cfoutput>
+	<table class="tableList" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<th width="">Name</th>
+			<th width="100">Date</th>
+			<th width="">Week No</th>
+			<th width="" align="right">Net Pay</th>
+			<th width="" align="right">PAYE</th>
+			<th width="" align="right">NI</th>
+			<th width="" align="right">Gross Pay</th>
+		</tr>
+		<cfloop array="#Report#" index="rep">
+			<cfloop array="#rep.headers#" index="item">
+				<tr>
+					<td>#rep.employee.firstname# #rep.employee.lastname#</td>
+					<td align="center">#DateFormat(item.WeekEnding, "dd/mm/yyyy")#</td>
+					<td align="center">#item.WeekNo#</td>
+					<td align="right">#item.NP#</td>
+					<td align="right">#item.PAYE#</td>
+					<td align="right">#item.NI#</td>
+					<td align="right">#item.Gross#</td>
+				</tr>
+			</cfloop>
+		</cfloop>
+	</table>
+	</cfoutput>
 </cfif>
 
-<script>
-	$(document).ready(function(e) {
-		<cfoutput>
-			var #ToScript(sReport, "content")#;
-		</cfoutput>
-		$('#ToPDFBtn').click(function(event) {
-			toPDF(content);
-			event.preventDefault();
+<cfif parm.form.sort neq "postTrans">
+	<script>
+		$(document).ready(function(e) {
+			<cfoutput>
+				var #ToScript(sReport, "content")#;
+			</cfoutput>
+			$('#ToPDFBtn').click(function(event) {
+				toPDF(content);
+				event.preventDefault();
+			});
 		});
-	});
-</script>
-
-<cfoutput>
-	<!---<a href="javascript:void(0)" class="button" id="ToPDFBtn">Export PDF</a>--->
-	#sReport#
-</cfoutput>
+	</script>
+	<cfoutput>
+		<!---<a href="javascript:void(0)" class="button" id="ToPDFBtn">Export PDF</a>--->
+		#sReport#
+	</cfoutput>
+</cfif>
 
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="cfcatch" expand="no">

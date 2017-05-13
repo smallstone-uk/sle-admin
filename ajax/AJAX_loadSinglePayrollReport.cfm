@@ -72,7 +72,7 @@
 					<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 						<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
 						<td class="pr2_item" width="75" align="center" data-day="#DayOfWeekAsString(i)#">
-							<cfif dayItem.piHours gt 0>
+							<cfif dayItem.piHours neq 0>
 								#dayItem.piHours#
 							</cfif>
 						</td>

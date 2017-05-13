@@ -52,7 +52,7 @@
 				<cfset ArrayAppend(loc.result.msgs,loc.msg)>
 			</cfloop>
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="EmailLatestInvoice" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>

@@ -14,7 +14,7 @@ function scanner(e,source,id) {
 		} else {
 			code=code;
 		}
-		console.log(code);
+		//console.log(code);
 		if (code.length == 13) {
 			LookupBarcode(code,from,id,origCode,1);
 		} else {
@@ -33,7 +33,7 @@ function scanner(e,source,id) {
 			var newString=String.fromCharCode(keyCode);
 		}
 		Barcode=newString;
-		console.log(Barcode);
+	//	console.log(Barcode);
 	}
 	return Barcode;
 }

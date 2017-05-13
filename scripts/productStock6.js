@@ -22,6 +22,9 @@ function newscanner(e) {
 	} else {
 	//	console.log("final code " + Barcode);
 		var currCode = Barcode;	// copy final barcode to return
+		if (currCode.length == 8) {
+			currCode="00000" + currCode;
+		}
 		Barcode = ""; // clear buffer
 		Ticks = 0; // clear timer
 		return currCode // return barcode
@@ -37,7 +40,7 @@ function scanner(e) {
 	if (keyCode == 13) { //scanner has finished scanning
 		Barcode = "";
 		if (currCode.length == 8) {
-		//	currCode="00000" + currCode;
+			currCode="00000" + currCode;
 		} else if (currCode.length == 12) {
 			currCode = "0" + currCode;
 		}

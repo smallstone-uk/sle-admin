@@ -28,6 +28,7 @@
 <cfparam name="srchType" default="">
 <cfparam name="srchPayType" default="">
 <cfparam name="srchMin" default="">
+<cfparam name="srchSort" default="">
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -93,9 +94,9 @@
 									<td><b>Sort By</b></td>
 									<td>
 										<select name="srchSort">
-											<option value="">Any order</option>
-											<option value="cltRef">Reference</option>
-											<option value="cltName">Name</option>
+											<option value=""<cfif srchSort eq ""> selected="selected"</cfif>>Any order</option>
+											<option value="cltRef"<cfif srchSort eq "cltRef"> selected="selected"</cfif>>Reference</option>
+											<option value="cltName"<cfif srchSort eq "cltName"> selected="selected"</cfif>>Name</option>
 										</select>
 									</td>
 								</tr>
@@ -114,7 +115,7 @@
 				<cfset parms.datasource=application.site.datasource1>
 				<cfset parms.form=form>
 				<cfobject component="code/functions" name="func">
-				<cfset sales=func.SalesReport(parms)>
+				<cfset sales=func.SalesReport(parms)><cfdump var="#sales#" label="sales" expand="false">
 				<cfset totals=[0,0,0,0,0,0,0,0,0,0,0,0,0]>
 				<cfset debitCount=0>
 				<cfset style="amount">

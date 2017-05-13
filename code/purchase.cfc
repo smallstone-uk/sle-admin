@@ -432,6 +432,8 @@
 				
 				<cfif args.form.srchSort eq 'trnAccountID'>
 					ORDER BY accName ASC, trnDate ASC
+				<cfelseif args.form.srchSort eq 'trnRef'>
+					ORDER BY accName ASC, trnRef ASC
 				<cfelse>
 					ORDER BY #args.form.srchSort#
 				</cfif>
@@ -586,6 +588,7 @@
 	
 	<cffunction name="NomTranSummary" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
 		<cfset var result={}>
 		<cfset var QTrans="">
 		<cfset var rec={}>
@@ -594,14 +597,15 @@
 		<cfset result.ledgers="">
 		
 		<cfquery name="QTrans" datasource="#args.datasource#" result="result.QTRANSRESULT">
-			SELECT nomGroup,nomCode,nomType,nomTitle,trnLedger,SUM(niAmount) AS nomTotal
+			SELECT nomID,nomGroup,nomCode,nomType,nomTitle,nomBFwd,trnLedger,SUM(niAmount) AS nomTotal
 			FROM ((tblNominal 
 			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID)
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID)
-			WHERE 1
+			WHERE 1 
 			<cfif val(args.form.srchAccount) gt 0>AND trnAccountID=#args.form.srchAccount#</cfif>
-			<cfif len(args.form.srchLedger) gt 0>AND trnLedger='#args.form.srchLedger#'</cfif>
+			<cfif len(args.form.srchLedger) gt 0>AND nomType='#args.form.srchLedger#'</cfif>
 			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
+			<cfif args.form.srchAccount eq -1>AND trnClientRef = ''</cfif>
 			<cfif val(args.form.srchNom) gt 0>AND nomID=<cfqueryparam cfsqltype="cf_sql_integer" value="#args.form.srchNom#"></cfif>
 			<cfif len(args.form.srchRange)>
 				<cfif Left(args.form.srchRange,2) eq 'FY'>
@@ -625,6 +629,20 @@
 			<cfset rec.nomCode=nomCode>
 			<cfset rec.nomTitle=nomTitle>
 			<cfset rec.nomTotal=nomTotal>
+			
+			<cfif nomBFwd>
+				<cfquery name="loc.QBalance" datasource="#args.datasource#">
+					SELECT SUM(niAmount) AS nomTotal
+					FROM tblNominal 
+					INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID
+					INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID
+					WHERE nomID=#nomID#
+					AND trnDate < <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateFrom#"> 
+				</cfquery>
+				<cfset rec.BFwd = val(loc.QBalance.nomTotal)>
+			<cfelse>
+				<cfset rec.BFwd = 0>
+			</cfif>
 			<cfif NOT StructKeyExists(result,nomType)>
 				<cfset StructInsert(result,nomType,{})>
 				<cfset result.ledgers="#result.ledgers#,#nomType#">
@@ -1047,5 +1065,41 @@
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>
+	</cffunction>		
+
+	<cffunction name="LoadNewsPayments" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfquery name="loc.result.QNewsPayments" datasource="#args.datasource#" result="loc.qResult">
+				SELECT trnID,trnRef,trnDate,trnType,trnMethod,trnDesc,trnClientRef,trnPaidIn,niAmount
+				FROM `tblnomitems` 
+				INNER JOIN tblTrans ON niTranID=trnID
+				WHERE `niNomID` = 871
+				<cfif len(args.form.srchRange)>
+					<cfif Left(args.form.srchRange,2) eq 'FY'>
+						<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
+						<cfset loc.result.prdFrom = loc.fyDate.start>
+						<cfset loc.result.prdTo = loc.fyDate.end>
+						AND trnDate >= '#loc.result.prdFrom#'
+						AND trnDate <= '#loc.result.prdTo#'		
+					</cfif>
+				<cfelseif len(args.form.srchDateFrom)>
+					<cfset loc.result.prdFrom = LSDateFormat(args.form.srchDateFrom,"yyyy-mm-dd")>
+					<cfset loc.result.prdTo = LSDateFormat(args.form.srchDateTo,"yyyy-mm-dd")>
+					AND trnDate >= '#loc.result.prdFrom#'
+					AND trnDate <= '#loc.result.prdTo#'			
+				</cfif>
+				ORDER BY trnDate,trnType
+			</cfquery>	
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadNewsPayments" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
 	</cffunction>
+	
 </cfcomponent>

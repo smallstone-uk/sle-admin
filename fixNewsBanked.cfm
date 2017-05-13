@@ -14,17 +14,20 @@
 
 <body>
 <cfset process = 0>
+<cfset identKey = 4>	<!--- news payments --->
 <cfparam name="doUpdate" default="false">
 <cfsetting requesttimeout="300">
 <cfflush interval="200">
 <cfquery name="QTrans" datasource="#application.site.datasource1#">
 	SELECT SUM(trnAmnt1) AS tranTotal, Count(*) AS num, trnPaidIn
 	FROM tblTrans
-	WHERE trnPaidIn > 1
+	WHERE trnPaidIn > 5
 	AND trnDate > '2013-02-01'
+	AND trnDate BETWEEN '2013-01-01' AND '2017-04-15'
 	GROUP BY trnPaidIn
 	<!---LIMIT 80--->
 </cfquery>
+<cfset errorCount = 0>
 <cfoutput>
 	<p><a href = "#cgi.SCRIPT_NAME#?doUpdate=true">Fix Data</a> &nbsp; <a href = "#cgi.SCRIPT_NAME#">Preview</a></p>
 	<table class="tableList" border="1">
@@ -58,7 +61,7 @@
 				<cfset paidIn = trnPaidIn>
 				<cfset bankAmnt = abs(tranTotal)>
 				<cfquery name="QBankTran" datasource="#application.site.datasource1#">
-					SELECT trnID,trnDate,trnRef,trnDesc,niAmount
+					SELECT trnID,trnDate,trnRef,trnDesc,niAmount,trnPaidIn
 					FROM tblTrans
 					INNER JOIN tblNomItems ON trnID=niTranID
 					WHERE trnRef LIKE 'DEP%'
@@ -69,6 +72,13 @@
 				</cfquery>
 				<cfif QBankTran.recordcount IS 1>
 					<cfset bankRef = Replace(ListLast(QBankTran.trnDesc," "),"_","")>
+					<cfif QBankTran.trnPaidIn neq identKey>
+						<cfquery name="QSetPaidIn" datasource="#application.site.datasource1#">
+							UPDATE tblTrans
+							SET trnPaidIn=#identKey#
+							WHERE trnID = #QBankTran.trnID#
+						</cfquery>
+					</cfif>
 					<tr class="tranheader">
 						<td>#QBankTran.trnID#</td>
 						<td align="right">#LSDateFormat(QBankTran.trnDate,'ddd dd-mmm-yyyy')#</td>
@@ -112,7 +122,7 @@
 					<cfset postTranID = 0>
 					<cfset posties = {}>
 					<cfquery name="QPostTran" datasource="#application.site.datasource1#">
-						SELECT trnID,trnDate,trnRef,trnDesc,trnAmnt1
+						SELECT trnID,trnDate,trnRef,trnDesc,trnAmnt1,trnPaidIn
 						FROM tblTrans
 						WHERE trnRef LIKE 'DEP #bankRef#'
 						LIMIT 1;
@@ -128,16 +138,17 @@
 						</tr>
 					<cfelse>
 						<tr>
-							<td colspan="5">
-								Post transaction missing.
+							<td colspan="5" bgcolor="##FF0099">
+								<cfset errorCount++>
+								Deposit transaction missing.
 							</td>
 						</tr>
 						<cfif StructKeyExists(url,"doUpdate")>
 							<cfquery name="QInsertTran" datasource="#application.site.datasource1#" result="QIns">
 								INSERT INTO tblTrans
-									(trnRef,trnDate,trnDesc)
+									(trnRef,trnDate,trnDesc,trnPaidIn)
 								VALUES
-									('DEP #bankRef#',#datePaidIn#,'Deposit reallocation')
+									('DEP #bankRef#',#datePaidIn#,'Deposit reallocation',#identKey#)
 							</cfquery>
 							<cfset postTranID = QIns.generatedkey>
 						</cfif>
@@ -154,7 +165,7 @@
 										WHERE trnID = #postTranID#
 									</cfquery>
 									<cfif QPostItems.recordcount GT 0>
-										<span>Post Tran Items</span>
+										<span>Deposit Items</span>
 										<table width="100%">
 											<cfset postTotal = 0>
 											<cfloop query="QPostItems">
@@ -175,6 +186,7 @@
 										</table>
 										<!---<cfdump var="#posties#" label="posties" expand="no">--->
 									<cfelse>
+										<cfset errorCount++>
 										No items found for post tran.
 									</cfif>
 							</td>
@@ -216,7 +228,7 @@
 											<td align="right">#num#</td>
 											<td align="right">#groupTotal#</td>
 											<td>#found#
-												<cfif StructKeyExists(url,"doUpdate") AND NOT found>
+												<cfif StructKeyExists(url,"doUpdate") AND NOT found AND groupTotal neq 0>
 													Insert Tran DEP #bankRef# #dateStr#<br />
 													Add Item: #nomCode# #groupTotal#<br />
 													<cfset addBalance = true>
@@ -245,12 +257,16 @@
 				<cfelse>
 					<tr>
 						<td colspan="5">
-							<span class="red">Corresponding bank deposit not found for #trnPaidIn#</span>
+							<cfset errorCount++>
+							<span class="red">Corresponding bank deposit not found for #trnPaidIn# of &pound;#bankAmnt#</span>
 						</td>
 					</tr>
 				</cfif>
 			</cfif>
 		</cfloop>
+		<tr>
+			<td colspan="5">Error Count #errorCount#</td>
+		</tr>
 	</table>
 </cfoutput>
 

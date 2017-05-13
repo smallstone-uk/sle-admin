@@ -38,6 +38,7 @@
 		<cfset result.ready=false>
 		<cfset result.pathFound=false>
 		<cfset result.status="">
+		<cfset result.invCount=0>
 		<cfif IsDate(args.form.srchDateFrom) AND IsDate(args.form.srchDateTo)>
 			<cfset result.dateRange=DateDiff("d",args.form.srchDateFrom,args.form.srchDateTo)+1>
 		<cfelse><cfset result.dateRange=999></cfif>
@@ -60,16 +61,19 @@
 			ORDER BY trnRef
 		</cfquery>
 		<cfset result.invPath="#invPath##mid(args.form.srchDateTo,3,8)#">
-		<cfif DirectoryExists(invPath)>
+		<cfif DirectoryExists(result.invPath)>
 			<cfdirectory action="list" directory="#result.invPath#" name="QDir">
 			<cfset result.pathFound=true>
+			<cfset result.invCount=QDir.recordcount>
 		</cfif>
-		<cfset result.invCount=QDir.recordcount>
 		<cfset result.Trans=QTrans.recCount>
 		<cfif result.dateRange LTE 28 AND result.Trans gt 0 AND result.Trans LTE 400 AND result.pathFound>
 			<cfset result.ready=true>			
 			<cfset result.status="Ready to run">
 		</cfif>
+	<cfdump var="#result#" label="rollbackCheck" expand="yes" format="html" 
+	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 		<cfreturn result>
 	</cffunction>
 
@@ -77,21 +81,23 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
 		<cfset var QTrans="">
-		<cfset var tranRef=0>
+		<cfset var tranRef=0>	<!--- before first invoice --->
 
 		<cfset result.trans=[]>
 		<cfquery name="QTrans" datasource="#args.datasource#">
-			SELECT *
+			SELECT trnRef,trnDate,trnClientRef
 			FROM tblTrans
 			WHERE trnClientRef>0
+			AND trnDate>='#args.form.srchDateFrom#'
+			AND trnDate<='#args.form.srchDateTo#'
 			AND (trnType='inv' OR trnType='crn')
 			AND trnLedger='sales'
 			ORDER BY trnRef
 		</cfquery>
 		<cfif QTrans.recordcount gt 1>
 			<cfloop query="QTrans">
-				<cfif val(tranRef) gt 0 AND tranRef+1 neq trnRef>
-					<cfset ArrayAppend(result.trans,{"Date"=LSDateFormat(trnDate,'dd-mmm-yyyy'),"Ref"='#tranRef+1#',"Client"="","msg"='missing Invoice'})>
+				<cfif tranRef gt 0 AND tranRef neq trnRef + 1>
+					<cfset ArrayAppend(result.trans,{"Date"=LSDateFormat(trnDate,'dd-mmm-yyyy'),"Ref"='#tranRef+1#',"Client"="","msg"='missing invoice number'})>
 				</cfif>
 				<cfset ArrayAppend(result.trans,{"Date"=LSDateFormat(trnDate,'dd-mmm-yyyy'),"Ref"=trnRef,"Client"=trnClientRef,"msg"=''})>
 				<cfset tranRef=val(trnRef)>
@@ -133,7 +139,7 @@
 					LIMIT 1;
 				</cfquery>
 				<cfset result.invPath="#invPath##mid(args.form.srchDateTo,3,8)#\">
-				<cfif DirectoryExists(invPath)>
+				<cfif DirectoryExists(result.invPath)>
 					<cfset result.pathFound=true>
 					<cfdirectory action="list" directory="#result.invPath#" name="QDir">
 					<cfloop query="QDir">
@@ -173,9 +179,12 @@
 		<cfset runNow=result.ready>
 		<cfoutput>
 			<h1>All missing invoice numbers</h1>
+			#invPath#<br>
 			<table width="500">
+			<cfset linecount = 0>
 			<cfloop array="#refs.trans#" index="item">
 				<cfif len(item.msg)>
+				<cfset linecount++>
 				<tr>
 					<td>#item.Date#</td>
 					<td>#item.Ref#</td>
@@ -185,18 +194,19 @@
 				</cfif>
 			</cfloop>
 			</table>
+			#linecount#<br>
 			<h1>#result.status#</h1>
 		</cfoutput>
 	</cfif>
 	<cfdump var="#result#" label="result" expand="no">
 </cfif>
-
-<cfoutput>#application.site.dir_logs#
+<cfoutput>
 <body>
 	<div id="wrapper">
 		<cfinclude template="sleHeader.cfm">
 		<div id="content">
 			<div id="content-inner">
+				#application.site.dir_logs#
 				<div class="form-wrap">
 					<form method="post">
 						<div class="form-header">

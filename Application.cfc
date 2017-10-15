@@ -9,7 +9,7 @@ component
     this.setClientCookies = true;
 
     // Boot Framework
-    new App.Framework.Application.Boot();
+    new App.Framework.App();
 
     public boolean function onApplicationStart()
     {
@@ -54,7 +54,7 @@ component
                 directoryCreate(getDataDir(dir));
             }
         }
-        
+
         if (structKeyExists(url, 'restart')) {
             onApplicationStart();
             writeDumpToFile(application);

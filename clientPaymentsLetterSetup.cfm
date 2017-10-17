@@ -5,7 +5,7 @@
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.ID=id>
-<cfset parm.clientID=user>
+<cfset parm.clientID=userID>
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -20,7 +20,7 @@
 				url: 'clientPaymentsLetter.cfm',
 				data: {
 					"id":id,
-					"user":userID,
+					"userID":userID,
 					"preview":preview
 				},
 				success: function(data){
@@ -30,10 +30,10 @@
 						$('#wrapper').addClass("noPrint");
 						$('.form-wrap').addClass("noPrint");
 						$('#print-area').removeClass("noPrint");
-						window.print();
+						//window.print();
 	
-						//	$('#print-area').printArea({extraHead:"<style type='text/css'>@media print {#LoadPrint {position:relative !important;left:0 !important;}}</style>"});
-						//$('#print-area').html(data);
+							$('#print-area').printArea({extraHead:"<style type='text/css'>@media print {#LoadPrint {position:relative !important;left:0 !important;}}</style>"});
+						$('#print-area').html(data);
 					});
 				}
 			});

@@ -3,7 +3,7 @@
 	<cfset parm={}>
 	<cfset parm.datasource=application.site.datasource1>
 	<cfset parm.ID=id>
-	<cfset parm.clientID=user>
+	<cfset parm.clientID=userID>
 	<cfset parm.preview=preview>
 	<cfset user=func.LoadClientByID(parm)>
 	<cfset letter=func.LoadLetter(parm)>

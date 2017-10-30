@@ -19,6 +19,8 @@
 <script src="common/scripts/common.js"></script>
 <script src="scripts/payroll2.js"></script>
 <script src="scripts/main.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/vue-resource.js"></script>
 </head>
 
 <cftry>
@@ -47,8 +49,7 @@
 		</body>
 	</cfoutput>
 <cfcatch type="any">
-	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
-		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+	<cfset writeDumpToBoth(cfcatch)>
 </cfcatch>
 </cftry>
 </html>

@@ -16,10 +16,10 @@ component
         application.mvc = {
             'datasource' = 'kcc_sle_production',
             'migrationDatasource' = 'mvc_sle',
-           // does not work  'dataDirectory' = (getDirectoryFromPath(getCurrentTemplatePath()) & "..\data\"),
-			'dataDirectory' = 'D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\',
-            'baseDirectory' = getDirectoryFromPath(getCurrentTemplatePath()),
-            'migrationTableName' = 'migrations'
+            'migrationTableName' = 'migrations',
+            'dataDirectory' = getCurrentPath('..\data\'),
+            'baseDirectory' = getCurrentPath(),
+            'production' = false
         };
 
         // Load the config into application
@@ -31,13 +31,12 @@ component
         application.site.fileDir = getBaseDir('source');
         application.site.normal = getUrl();
         application.site.secure = getUrl();
-        //application.site.dir_data = getDataDir();
-		application.site.dir_data = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\";
-        application.site.dir_invoices = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\invoices\";
-        application.site.dir_logs = "D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\logs\";
-       // application.site.dir_logs = getDataDir('logs');
-        application.site.url_data = getUrl('data');
-        application.site.url_invoices = getUrl('data/invoices');
+
+        application.site.dir_data = getDataDir('/');
+        application.site.dir_logs = "#getDataDir('logs')#/";
+        application.site.dir_invoices = getDataDir('invoices/');
+        application.site.url_data = getUrl('data/');
+        application.site.url_invoices = getUrl('data/invoices/');
 
         application.site.debug = false;
         application.site.showdumps = false;

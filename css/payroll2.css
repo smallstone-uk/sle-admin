@@ -1,10 +1,10 @@
 .pr2_item_field {
     border-radius: 0 !important;
-    margin: -1px !important;
+    margin: 0 !important;
     outline: 0 !important;
-    width: 77px !important;
-    border: 1px solid #BDC9DD !important;
-	text-align:center;
+    width: 100% !important;
+    border: 0px solid #BDC9DD !important;
+    text-align:center;
 }
 
 .pr2_fixed_item_field {
@@ -13,7 +13,7 @@
     outline: 0 !important;
     width: 77px !important;
     border: 1px solid #BDC9DD !important;
-	text-align:center;
+    text-align:center;
 }
 
 .pr2_item {
@@ -44,7 +44,7 @@
     outline: 0 !important;
     width: 152px !important;
     border: 1px solid #BDC9DD !important;
-	text-align:right;
+    text-align:right;
 }
 .pr2_gt_paye {
     border-radius: 0 !important;
@@ -52,5 +52,5 @@
     outline: 0 !important;
     width: 152px !important;
     border: 1px solid #BDC9DD !important;
-	text-align:right;
+    text-align:right;
 }

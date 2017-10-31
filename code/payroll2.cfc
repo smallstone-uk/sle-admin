@@ -564,6 +564,8 @@
 			<cfelse>
 				<cfset loc.result.items = {}>
 			</cfif>
+
+			<cfset loc.result.weekNumber = this.GetPayrollWeekNumber(args.form.weekending)>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="" expand="yes" format="html"
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

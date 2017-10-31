@@ -1,4 +1,4 @@
-component
+component extends = "App.Framework.App"
 {
     this.name = "SLE_Production";
     this.clientStorage = "kcc_cf_sle";
@@ -22,9 +22,7 @@ component
             'production' = false
         };
 
-        // Load the config into application
-        var config = (fileExists(getBaseDir('app.json'))) ? deserializeJSON(fileRead(getBaseDir('app.json'))) : {};
-        for (key in config) { application[key] = config[key]; }
+        super.onApplicationStart();
 
         application.site.start = now();
         application.site.basedir = getBaseDir();
@@ -48,6 +46,8 @@ component
 
     public void function onRequestStart()
     {
+        super.onRequestStart();
+
         for (dir in ['logs/epos', 'epos', 'epos/misc', 'epos/receipts']) {
             if (!directoryExists(getDataDir(dir))) {
                 directoryCreate(getDataDir(dir));
@@ -71,6 +71,9 @@ component
 
     public any function onSessionStart()
     {
+        // super.onSessionStart();
+        session.redirect = {};
+
         session.started = now();
         session.currDate = "";
         session.user = {};
@@ -85,11 +88,6 @@ component
 
     public any function onRequest(required string thePage)
     {
-		if (len(application.site.error) IS 0) {
-			include thePage;
-			include "settings.cfm";
-		} else {
-			include "error.cfm";
-		}
+        super.onRequest(thePage);
     }
 }

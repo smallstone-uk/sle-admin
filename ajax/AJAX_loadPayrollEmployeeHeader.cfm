@@ -197,7 +197,8 @@
 				var gross = calculateGrossTotal();
 				var ni = nf($('.pr2_gt_ni').val(), "num");
 				var paye = nf($('.pr2_gt_paye').val(), "num");
-				var result = nf(gross - (ni + paye), "num");
+				var pension = nf($('.pr2_gt_pension_employer').val(), "num") + nf($('.pr2_gt_pension_member').val(), "num");
+				var result = nf(gross - (ni + paye) - pension, "num");
 				return nf(result, "str");
 			}
 

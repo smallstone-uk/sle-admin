@@ -11,6 +11,7 @@ component
 
         table.decimal('phEmployerContribution', 10, 2).nullable();
         table.decimal('phMemberContribution', 10, 2).nullable();
+        table.decimal('phLotterySubs', 10, 2).nullable();
         table.decimal('phAdjustment', 10, 2).nullable();
 
         table.update();

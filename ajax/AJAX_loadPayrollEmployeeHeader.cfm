@@ -472,24 +472,8 @@
 				<td style="vertical-align: top;padding: 0;" align="right">
 					<table class="tableList pr2_gross_totals" border="1">
 						<tr>
-							<th align="left" width="150">National Insurance</th>
-							<td data-role="ni" width="150" style="padding:0;">
-								<cfif StructIsEmpty(record.header)>
-									<input type="text" class="pr2_gt_ni" value="">
-								<cfelse>
-									<input type="text" class="pr2_gt_ni" value="#record.header.phNI#">
-								</cfif>
-							</td>
-						</tr>
-						<tr>
-							<th align="left" width="150">PAYE</th>
-							<td data-role="paye" width="150" style="padding:0;">
-								<cfif StructIsEmpty(record.header)>
-									<input type="text" class="pr2_gt_paye" value="">
-								<cfelse>
-									<input type="text" class="pr2_gt_paye" value="#record.header.phPAYE#">
-								</cfif>
-							</td>
+							<th align="left" width="150">Gross Total</th>
+							<td data-role="gross" width="150" align="right"></td>
 						</tr>
 						<tr>
 							<th align="left" width="150">Pension Employer</th>
@@ -512,8 +496,24 @@
 							</td>
 						</tr>
 						<tr>
-							<th align="left" width="150">Gross Total</th>
-							<td data-role="gross" width="150" align="right"></td>
+							<th align="left" width="150">PAYE</th>
+							<td data-role="paye" width="150" style="padding:0;">
+								<cfif StructIsEmpty(record.header)>
+									<input type="text" class="pr2_gt_paye" value="">
+								<cfelse>
+									<input type="text" class="pr2_gt_paye" value="#record.header.phPAYE#">
+								</cfif>
+							</td>
+						</tr>
+						<tr>
+							<th align="left" width="150">National Insurance</th>
+							<td data-role="ni" width="150" style="padding:0;">
+								<cfif StructIsEmpty(record.header)>
+									<input type="text" class="pr2_gt_ni" value="">
+								<cfelse>
+									<input type="text" class="pr2_gt_ni" value="#record.header.phNI#">
+								</cfif>
+							</td>
 						</tr>
 						<tr>
 							<th align="left" width="150">Net Pay</th>

@@ -18,6 +18,7 @@
         "MapCF": "/kccCMS/",
         "sourceDir": "source",
         "clientID": 143,
+        "virtual_paths": [],
         "vat": {
             "0": 0,
             "1": 0,

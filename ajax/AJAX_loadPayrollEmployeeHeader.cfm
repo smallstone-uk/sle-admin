@@ -140,13 +140,13 @@
 				$('.pr2_totals').find('.pr2_item').each(function(i, e) {
 					var day = $(e).attr("data-day");
 					var gross = totals[day];
-					$(e).find('.pr2_item_field').val( "£" + nf(gross, "str") );
+					$(e).find('.pr2_item_field').val( "ï¿½" + nf(gross, "str") );
 				});
 
 				$('.pr2_fixed_totals').find('.pr2_fixed_item').each(function(i, e) {
 					var day = $(e).attr("data-day");
 					var gross = fixed_totals[day];
-					$(e).find('.pr2_fixed_item_field').val( "£" + nf(gross, "str") );
+					$(e).find('.pr2_fixed_item_field').val( "ï¿½" + nf(gross, "str") );
 				});
 			}
 
@@ -183,7 +183,7 @@
 			calculateGrossTotal = function() {
 				var result = 0;
 				$('.pr2_totals').find('.pr2_item').find('.pr2_item_field').each(function(i, e) {
-					var value = nf($(e).val().replace("£", "").trim(), "num");
+					var value = nf($(e).val().replace("ï¿½", "").trim(), "num");
 					result += value;
 				});
 				$('.pr2_fixed_item_field[data-fixed="true"]').each(function(i, e) {
@@ -472,10 +472,6 @@
 				<td style="vertical-align: top;padding: 0;" align="right">
 					<table class="tableList pr2_gross_totals" border="1">
 						<tr>
-							<th align="left" width="150">Gross Total</th>
-							<td data-role="gross" width="150" align="right"></td>
-						</tr>
-						<tr>
 							<th align="left" width="150">Pension Employer</th>
 							<td data-role="paye" width="150" style="padding:0;">
 								<cfif StructIsEmpty(record.header)>
@@ -514,6 +510,38 @@
 									<input type="text" class="pr2_gt_ni" value="#record.header.phNI#">
 								</cfif>
 							</td>
+						</tr>
+						<tr>
+							<th align="left" width="150">Lottery Subs</th>
+							<td data-role="ni" width="150" style="padding:0;">
+								<cfif StructIsEmpty(record.header)>
+									<input type="text" class="pr2_gt_lotto" value="">
+								<cfelse>
+									<input type="text" class="pr2_gt_lotto" value="#record.header.phLotterySubs#">
+								</cfif>
+							</td>
+						</tr>
+						<tr>
+							<th align="left" width="150">Adjustment</th>
+							<td data-role="ni" width="150" style="padding:0;">
+								<cfif StructIsEmpty(record.header)>
+									<input type="text" class="pr2_gt_adjustment" value="">
+								<cfelse>
+									<input type="text" class="pr2_gt_adjustment" value="#record.header.phAdjustment#">
+								</cfif>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td style="vertical-align: top;padding: 0;" align="right">
+					<table class="tableList pr2_gross_totals" border="1">
+						<tr>
+							<th align="left" width="150">Gross Pay</th>
+							<td data-role="gross" width="150" align="right"></td>
+						</tr>
+						<tr>
+							<th align="left" width="150">Total Deductions</th>
+							<td data-role="deductions" width="150" align="right"></td>
 						</tr>
 						<tr>
 							<th align="left" width="150">Net Pay</th>

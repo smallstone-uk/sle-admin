@@ -28,6 +28,7 @@ component
 
         table.dropColumn('phEmployerContribution');
         table.dropColumn('phMemberContribution');
+        table.dropColumn('phLotterySubs');
         table.dropColumn('phAdjustment');
     }
 }

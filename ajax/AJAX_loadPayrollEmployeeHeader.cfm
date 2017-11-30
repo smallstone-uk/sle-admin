@@ -195,11 +195,15 @@
 
 			calculateNetPay = function() {
 				var gross = calculateGrossTotal();
+				var pension = nf($('.pr2_gt_pension_employer').val(), "num") + nf($('.pr2_gt_pension_member').val(), "num");
+				var taxable = gross - pension;
 				var ni = nf($('.pr2_gt_ni').val(), "num");
 				var paye = nf($('.pr2_gt_paye').val(), "num");
-				var pension = nf($('.pr2_gt_pension_employer').val(), "num") + nf($('.pr2_gt_pension_member').val(), "num");
-				var result = nf(gross - (ni + paye) - pension, "num");
-				return nf(result, "str");
+				var lotto = nf($('.pr2_gt_lotto').val(), "num");
+				var adjustment = nf($('.pr2_gt_adjustment').val(), "num");
+				var subtotal = taxable - paye - ni;
+				var netpay = subtotal - lotto - adjustment;
+				return nf(netpay, "str");
 			}
 
 			hourTotals = function() {
@@ -222,7 +226,7 @@
 				grossTotals();
 			});
 
-			$('.pr2_item_field, .pr2_fixed_item_field, .pr2_gt_ni, .pr2_gt_paye, .pr2_gt_pension_employer, .pr2_gt_pension_member').keyup(function(event) {
+			$('.pr2_item_field, .pr2_fixed_item_field, .pr2_gt_ni, .pr2_gt_paye, .pr2_gt_pension_employer, .pr2_gt_pension_member, .pr2_gt_pension_adjustment, .pr2_gt_pension_lotto').keyup(function(event) {
 				hourTotals();
 				showDayTotals();
 				grossTotals();
@@ -473,7 +477,7 @@
 					<table class="tableList pr2_gross_totals" border="1">
 						<tr>
 							<th align="left" width="150">Pension Employer</th>
-							<td data-role="paye" width="150" style="padding:0;">
+							<td data-role="pension_employer" width="150" style="padding:0;">
 								<cfif StructIsEmpty(record.header)>
 									<input type="text" class="pr2_gt_pension_employer" value="">
 								<cfelse>
@@ -483,7 +487,7 @@
 						</tr>
 						<tr>
 							<th align="left" width="150">Pension Member</th>
-							<td data-role="paye" width="150" style="padding:0;">
+							<td data-role="pension_member" width="150" style="padding:0;">
 								<cfif StructIsEmpty(record.header)>
 									<input type="text" class="pr2_gt_pension_member" value="">
 								<cfelse>
@@ -513,7 +517,7 @@
 						</tr>
 						<tr>
 							<th align="left" width="150">Lottery Subs</th>
-							<td data-role="ni" width="150" style="padding:0;">
+							<td data-role="lotto" width="150" style="padding:0;">
 								<cfif StructIsEmpty(record.header)>
 									<input type="text" class="pr2_gt_lotto" value="">
 								<cfelse>
@@ -523,7 +527,7 @@
 						</tr>
 						<tr>
 							<th align="left" width="150">Adjustment</th>
-							<td data-role="ni" width="150" style="padding:0;">
+							<td data-role="adjustment" width="150" style="padding:0;">
 								<cfif StructIsEmpty(record.header)>
 									<input type="text" class="pr2_gt_adjustment" value="">
 								<cfelse>

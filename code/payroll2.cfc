@@ -240,7 +240,9 @@
 					phWorkHours,
 					phHolHours,
 					phEmployerContribution,
-					phMemberContribution
+					phMemberContribution,
+					phLotterySubs,
+					phAdjustment
 				) VALUES (
 					'#args.form.header.weekending#',
 					#val(args.form.header.employee)#,
@@ -253,7 +255,9 @@
 					#val(args.form.header.work_hours)#,
 					#val(args.form.header.hol_hours)#,
 					#val(args.form.header.pension_employer)#,
-					#val(args.form.header.pension_member)#
+					#val(args.form.header.pension_member)#,
+					#val(args.form.header.lottery_subs)#,
+					#val(args.form.header.adjustment)#
 				)
 			</cfquery>
 
@@ -272,7 +276,9 @@
 					phWorkHours = #val(args.form.header.work_hours)#,
 					phHolHours = #val(args.form.header.hol_hours)#,
 					phEmployerContribution = #val(args.form.header.pension_employer)#,
-					phMemberContribution = #val(args.form.header.pension_member)#
+					phMemberContribution = #val(args.form.header.pension_member)#,
+					phLotterySubs = #val(args.form.header.lottery_subs)#,
+					phAdjustment = #val(args.form.header.adjustment)#
 				WHERE phID = #val(loc.checkHeader.phID)#
 			</cfquery>
 

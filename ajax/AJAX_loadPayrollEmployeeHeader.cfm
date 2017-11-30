@@ -41,7 +41,9 @@
 					np: calculateNetPay(),
 					total_hours: totalHolidayHours() + totalWorkHours(),
 					work_hours: totalWorkHours(),
-					hol_hours: totalHolidayHours()
+					hol_hours: totalHolidayHours(),
+					lottery_subs: nf($('.pr2_gt_lotto').val(), "num"),
+					adjustment: nf($('.pr2_gt_adjustment').val(), "num")
 				};
 			}
 

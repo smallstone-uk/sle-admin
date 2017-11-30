@@ -130,12 +130,12 @@
 									<tr>
 										<th align="left">Pension Contribution</th>
 										<td data-role="paye" align="right">
-											&pound;#record.totals.PensionSum#
+											<cfif val(record.totals.PensionSum)>
+												&pound;#DecimalFormat(record.totals.PensionSum)#
+											</cfif>
 										</td>
 										<td data-role="paye" align="right">
-											<cfif StructIsEmpty(record.header)>
-												&pound;0.00
-											<cfelse>
+											<cfif val(record.header.phMemberContribution)>
 												&pound;#record.header.phMemberContribution#
 											</cfif>
 										</td>
@@ -143,20 +143,28 @@
 									<tr>
 										<th align="left">Lottery</th>
 										<td data-role="ni" align="right">
-											&pound;#record.totals.LotterySum#
+											<cfif val(record.totals.LotterySum)>
+												&pound;#DecimalFormat(record.totals.LotterySum)#
+											</cfif>
 										</td>
 										<td data-role="ni" align="right">
-											<cfif StructIsEmpty(record.header)>
-												&pound;0.00
-											<cfelse>
+											<cfif val(record.header.phLotterySubs)>
 												&pound;#record.header.phLotterySubs#
 											</cfif>
 										</td>
 									</tr>
 									<tr>
 										<th align="left">Adjustments</th>
-										<td data-role="gross" align="right">&pound;#DecimalFormat(record.totals.AdjustmentSum)#</td>
-										<td data-role="gross" align="right">&pound;#record.header.phAdjustment#</td>
+										<td data-role="gross" align="right">
+											<cfif val(record.header.phAdjustment)>
+												&pound;#DecimalFormat(record.totals.AdjustmentSum)#
+											</cfif>
+										</td>
+										<td data-role="gross" align="right">
+											<cfif val(record.header.phAdjustment)>
+												&pound;#record.header.phAdjustment#
+											</cfif>
+										</td>
 									</tr>
 								</table>
 							</td>

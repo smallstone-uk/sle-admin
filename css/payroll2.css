@@ -38,15 +38,7 @@
     margin: 4px 0 0 30px;
 }
 
-.pr2_gt_ni {
-    border-radius: 0 !important;
-    margin: -1px !important;
-    outline: 0 !important;
-    width: 152px !important;
-    border: 1px solid #BDC9DD !important;
-	text-align:right;
-}
-.pr2_gt_paye {
+.pr2_gt_ni, .pr2_gt_lotto, .pr2_gt_adjustment, .pr2_gt_paye, .pr2_gt_pension_employer, .pr2_gt_pension_member {
     border-radius: 0 !important;
     margin: -1px !important;
     outline: 0 !important;

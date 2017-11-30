@@ -140,13 +140,13 @@
 				$('.pr2_totals').find('.pr2_item').each(function(i, e) {
 					var day = $(e).attr("data-day");
 					var gross = totals[day];
-					$(e).find('.pr2_item_field').val( "�" + nf(gross, "str") );
+					$(e).find('.pr2_item_field').val(nf(gross, "str"));
 				});
 
 				$('.pr2_fixed_totals').find('.pr2_fixed_item').each(function(i, e) {
 					var day = $(e).attr("data-day");
 					var gross = fixed_totals[day];
-					$(e).find('.pr2_fixed_item_field').val( "�" + nf(gross, "str") );
+					$(e).find('.pr2_fixed_item_field').val(nf(gross, "str"));
 				});
 			}
 
@@ -182,14 +182,17 @@
 
 			calculateGrossTotal = function() {
 				var result = 0;
+
 				$('.pr2_totals').find('.pr2_item').find('.pr2_item_field').each(function(i, e) {
-					var value = nf($(e).val().replace("�", "").trim(), "num");
+					var value = nf($(e).val().trim(), "num");
 					result += value;
 				});
+
 				$('.pr2_fixed_item_field[data-fixed="true"]').each(function(i, e) {
 					var value = ($(e).val().length >= 0) ? nf($(e).val(), "num") : 0;
 					result += value;
 				});
+
 				return nf(result, "num");
 			}
 
@@ -226,7 +229,7 @@
 				grossTotals();
 			});
 
-			$('.pr2_item_field, .pr2_fixed_item_field, .pr2_gt_ni, .pr2_gt_paye, .pr2_gt_pension_employer, .pr2_gt_pension_member, .pr2_gt_pension_adjustment, .pr2_gt_pension_lotto').keyup(function(event) {
+			$('.pr2_item_field, .pr2_fixed_item_field, .pr2_gt_ni, .pr2_gt_paye, .pr2_gt_pension_employer, .pr2_gt_pension_member, .pr2_gt_adjustment, .pr2_gt_lotto').keyup(function(event) {
 				hourTotals();
 				showDayTotals();
 				grossTotals();

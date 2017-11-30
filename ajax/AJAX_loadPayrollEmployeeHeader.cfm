@@ -200,7 +200,7 @@
 
 			calculateNetPay = function() {
 				var gross = calculateGrossTotal();
-				var pension = nf($('.pr2_gt_pension_employer').val(), "num") + nf($('.pr2_gt_pension_member').val(), "num");
+				var pension = nf($('.pr2_gt_pension_member').val(), "num");
 				var taxable = gross - pension;
 				var ni = nf($('.pr2_gt_ni').val(), "num");
 				var paye = nf($('.pr2_gt_paye').val(), "num");
@@ -208,6 +208,9 @@
 				var adjustment = nf($('.pr2_gt_adjustment').val(), "num");
 				var subtotal = taxable - paye - ni;
 				var netpay = subtotal - lotto - adjustment;
+				$('.pr2_gross_totals')
+					.find('td[data-role="deductions"]')
+					.html(nf(gross - netpay, 'str'));
 				return nf(netpay, "str");
 			}
 

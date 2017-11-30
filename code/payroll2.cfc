@@ -413,7 +413,13 @@
 							(SELECT AVG(phWorkHours) FROM tblPayHeader
 								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS WorkAvg,
 							(SELECT SUM(phHolHours) FROM tblPayHeader
-								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS HolSum
+								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS HolSum,
+							(SELECT SUM(phMemberContribution) FROM tblPayHeader
+								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS PensionSum,
+							(SELECT SUM(phLotterySubs) FROM tblPayHeader
+								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS LotterySum,
+							(SELECT SUM(phAdjustment) FROM tblPayHeader
+								WHERE phEmployee = #val(loc.item.employee.ID)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#') AS AdjustmentSum
 						FROM tblPayHeader
 						WHERE phEmployee = #val(loc.item.employee.ID)#
 						AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.weekending#'
@@ -537,7 +543,13 @@
 					(SELECT AVG(phWorkHours) FROM tblPayHeader
 						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS WorkAvg,
 					(SELECT SUM(phHolHours) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS HolSum
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS HolSum,
+					(SELECT SUM(phMemberContribution) FROM tblPayHeader
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS PensionSum,
+					(SELECT SUM(phLotterySubs) FROM tblPayHeader
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS LotterySum,
+					(SELECT SUM(phAdjustment) FROM tblPayHeader
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#') AS AdjustmentSum
 				FROM tblPayHeader
 				WHERE phEmployee = #val(args.form.employee)#
 				AND phDate BETWEEN #loc.control.ctlHolidayStart# AND '#args.form.weekending#'

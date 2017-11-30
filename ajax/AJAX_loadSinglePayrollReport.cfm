@@ -125,6 +125,46 @@
 						<th width="80">This Period</th>
 					</tr>
 					<tr>
+						<th align="left">Pension Contribution</th>
+						<td data-role="paye" align="right">
+							&pound;#record.totals.PensionSum#
+						</td>
+						<td data-role="paye" align="right">
+							<cfif StructIsEmpty(record.header)>
+								&pound;0.00
+							<cfelse>
+								&pound;#record.header.phMemberContribution#
+							</cfif>
+						</td>
+					</tr>
+					<tr>
+						<th align="left">Lottery</th>
+						<td data-role="ni" align="right">
+							&pound;#record.totals.LotterySum#
+						</td>
+						<td data-role="ni" align="right">
+							<cfif StructIsEmpty(record.header)>
+								&pound;0.00
+							<cfelse>
+								&pound;#record.header.phLotterySubs#
+							</cfif>
+						</td>
+					</tr>
+					<tr>
+						<th align="left">Adjustments</th>
+						<td data-role="gross" align="right">&pound;#DecimalFormat(record.totals.AdjustmentSum)#</td>
+						<td data-role="gross" align="right">&pound;#record.header.phAdjustment#</td>
+					</tr>
+				</table>
+			</td>
+			<td style="vertical-align: top;padding: 0;" align="right">
+				<table class="tableList pr2_gross_totals" border="1">
+					<tr>
+						<th width="150"></th>
+						<th width="80">YTD</th>
+						<th width="80">This Period</th>
+					</tr>
+					<tr>
 						<th align="left">PAYE</th>
 						<td data-role="paye" align="right">
 							&pound;#record.totals.PAYESum#

@@ -56,7 +56,8 @@
 		});
 	</script>
 	<cfif !ArrayIsEmpty(transactions.tranList)>
-		<table class="tableList" border="1" width="100%">
+		<input value="Export" type="button" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">
+		<table id="tranTable" class="tableList" border="1" width="100%">
 			<tr>
 				<th width="10"></th>
 				<th width="100">ID</th>
@@ -100,7 +101,7 @@
 						<cfelseif accID IS 3>
 							<a href="javascript:void(0)" class="nomTranList_editLink">#item.trnID#</a>
 						<cfelseif accID IS 1>
-							<a href="#parm.url#salesMain.cfm?acc=#item.trnAccountID#&tran=#item.trnID#" 
+							<a href="#parm.url#salesMain3.cfm?acc=#item.trnAccountID#&tran=#item.trnID#" 
 								title="Go to account transaction" target="_newtab">#item.trnID#</a>
 						<cfelseif accID GT 1>
 							<a href="#parm.url#tranMain2.cfm?acc=#item.trnAccountID#&tran=#item.trnID#" 

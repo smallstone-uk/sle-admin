@@ -4,7 +4,7 @@ function scanner(e) {
 		if (code != "") {
 			if (code.length < 13) {
 				$('#barcode').val("");
-				$('#loading').html("Barcode didn't scan properley").fadeIn();
+				$('#loading').html("Barcode didn't scan properly").fadeIn();
 			} else {
 				GetVoucher();
 				//console.log(code);

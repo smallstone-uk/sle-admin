@@ -97,10 +97,25 @@
 					<cfset recCount=0>
 					<cfoutput>
 						<cfloop query="QDir">
-							<cfset recCount++>
-							<cfif type eq "file">
+							<cfif type eq "file" AND Left(name,5) eq "order">
+								<cfset recCount++>
 								<tr>
-									<td>#currentrow#</td>
+									<td>#recCount#</td>
+									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
+									<td><a href="import.cfm?fileSrc=#name#" target="_blank">import</a></td>
+									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
+									<td>#size#</td>
+								</tr>
+								<cfif recCount eq fileLimit><cfbreak></cfif>
+							</cfif>
+						</cfloop>
+						<tr><td colspan="5">&nbsp;</td></tr>
+						<cfset recCount=0>
+						<cfloop query="QDir">
+							<cfif type eq "file" AND Left(name,4) eq "prom">
+								<cfset recCount++>
+								<tr>
+									<td>#recCount#</td>
 									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
 									<td><a href="import.cfm?fileSrc=#name#" target="_blank">import</a></td>
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>

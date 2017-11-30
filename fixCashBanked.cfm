@@ -21,7 +21,7 @@
 	WHERE trnRef IN ('DEP','COR')
 	AND trnPaidIn IN (0,3)
 	AND niNomID=1501
-	AND trnDate BETWEEN '2016-10-01' AND '2017-04-05'
+	AND trnDate BETWEEN '2017-03-01' AND '2017-08-04'
 	ORDER BY trnDate ASC
 </cfquery>
 
@@ -101,6 +101,6 @@
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
 		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 </cfcatch>
-</cftry>
-</body>
+</body></cftry>
+
 </html>

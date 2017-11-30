@@ -54,12 +54,13 @@
 		<cfset var QOrder="">
 		
 		<cfquery name="QOrder" datasource="#args.datasource#">
-			SELECT *
+			SELECT ordID,ordHouseName,ordHouseNumber, cltID,cltName,cltCompanyName
 			FROM tblOrder,tblClients
 			WHERE ordType='Custom'
 			AND ordClientID=cltID
 			<cfif StructKeyExists(args,"AllowReturns")>AND ordAllowReturns=1</cfif>
 			AND ordActive
+			ORDER BY cltCompanyName, cltName
 		</cfquery>
 		<cfloop query="QOrder">
 			<cfset item={}>
@@ -73,9 +74,9 @@
 				</cfif>
 			<cfelse>
 				<cfif len(cltName) AND len(cltCompanyName)>
-					<cfset item.ClientName="#cltName# #cltCompanyName#">
+					<cfset item.ClientName="#cltCompanyName# - #cltName# ">
 				<cfelse>
-					<cfset item.ClientName="#cltName##cltCompanyName#">
+					<cfset item.ClientName="#cltCompanyName##cltName#">
 				</cfif>
 			</cfif>
 			<cfset ArrayAppend(result,item)>

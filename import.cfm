@@ -18,7 +18,7 @@
 	<cfparam name="supplierID" default="21">	<!--- Booker --->
 	<cfoutput>
 		<cfset parm={}>
-		<cfset parm.markup=100>
+		<cfset parm.markup=143>
 		<cfset parm.fileDir="#application.site.dir_data#stock\">
 		<cfset parm.sourcefile=fileSrc>
 		<cfset parm.supplierID=supplierID>
@@ -89,7 +89,7 @@
 					<td align="center">#rec.packQty#</td>
 					<td>#rec.fld04#</td>
 					<td align="right">#recResult.RRP#</td>
-					<td align="right">#recResult.ourPrice#</td>
+					<td align="right"><strong>#recResult.ourPrice#</strong></td>
 					<td align="right">#recResult.VAT#%</td>
 					<td align="right">#recResult.WSP#</td>
 					<td align="right">#DecimalFormat(recResult.totalValue)#</td>

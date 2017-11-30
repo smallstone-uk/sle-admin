@@ -1233,7 +1233,7 @@
 					#val(BatchID)#,
 					#args.form.pubID#,
 					'debit',
-					'#LSDateFormat(args.form.datefrom,"yyyy-mm-dd")#',
+					'#LSDateFormat(Now(),"yyyy-mm-dd")#',
 					'#LSDateFormat(args.form.datefrom,"yyyy-mm-dd")#',
 					'#QLoadPubStock.psIssue#',
 					#args.form.qty#,
@@ -1333,7 +1333,7 @@
 									#QLoadItem.diBatchID#,
 									#QLoadItem.diPubID#,
 									'credit',
-									'#LSDateFormat(QLoadItem.diDate,"yyyy-mm-dd")#',
+									'#LSDateFormat(Now(),"yyyy-mm-dd")#',
 									'#LSDateFormat(QLoadItem.diDate,"yyyy-mm-dd")#',
 									'#QLoadItem.diIssue#',
 									#qty#,
@@ -2877,27 +2877,27 @@
 				AND psDate > '#LSDateFormat(args.form.psDate,"YYYY-MM-DD")#'
 				LIMIT 1;
 			</cfquery>
-			<cfquery name="QPubUpdate" datasource="#args.datasource#">
-				UPDATE tblPublication
-				SET 
-					<cfif args.form.psSubType eq "normal">
-						<cfif LSDateFormat(args.form.psDate,"ddd") eq "Mon">
-							pubArrival=1,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Tue">
-							pubArrival=2,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Wed">
-							pubArrival=3,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Thu">
-							pubArrival=4,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Fri">
-							pubArrival=5,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Sat">
-							pubArrival=6,
-						<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Sun">
-							pubArrival=7,
+			<cfif QCheck.recordcount is 0>
+				<cfquery name="QPubUpdate" datasource="#args.datasource#">
+					UPDATE tblPublication
+					SET 
+						<cfif args.form.psSubType eq "normal">
+							<cfif LSDateFormat(args.form.psDate,"ddd") eq "Mon">
+								pubArrival=1,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Tue">
+								pubArrival=2,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Wed">
+								pubArrival=3,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Thu">
+								pubArrival=4,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Fri">
+								pubArrival=5,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Sat">
+								pubArrival=6,
+							<cfelseif LSDateFormat(args.form.psDate,"ddd") eq "Sun">
+								pubArrival=7,
+							</cfif>
 						</cfif>
-					</cfif>
-					<cfif QCheck.recordcount is 0>
 						pubDiscount=#args.form.psDiscount#,
 						pubDiscType='#args.form.psDiscountType#',
 						pubTradePrice=#trade#,
@@ -2905,9 +2905,9 @@
 						pubPrice=#args.form.psRetail#,
 						pubPWPrice=#args.form.psPWRetail#,
 						pubPWVat=#args.form.psPWVat#
-					</cfif>
-				WHERE pubID=#args.form.psPubID#
-			</cfquery>
+					WHERE pubID=#args.form.psPubID#
+				</cfquery>
+			</cfif>
 
 			<cfset updatePrice=args.form.psRetail+args.form.psPWRetail>
 			<cfquery name="QDelItems" datasource="#args.datasource#">
@@ -4543,7 +4543,7 @@
 												#QCheckDelItems.diPubID#,
 												'credit',
 												'#LSDateFormat(QCheckDelItems.diDate,'yyyy-mm-dd')#',
-												'#LSDateFormat(QCheckDelItems.diDate,'yyyy-mm-dd')#',
+												'#LSDateFormat(QCheckDelItems.diDatestamp,'yyyy-mm-dd')#',
 												#QCheckDelItems.diQty#,
 												#DecimalFormat(0-QCheckDelItems.diPrice)#,
 												#DecimalFormat(0-QCheckDelItems.diCharge)#,

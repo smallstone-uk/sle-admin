@@ -40,12 +40,26 @@
 				
 				<th align="left">Net Amount</th>
 				<td><input type="text" name="tranNetAmnt" value="#tran.header.trnAmnt1#" /></td>
+				<th align="left">Paid In Ref</th>
+				<td><input type="text" name="tranPaidIn" value="#tran.header.trnPaidIn#" size="2" /></td>
 			</tr>
 			<tr>
 				<th align="left">Trans Date</th>
 				<td><input type="text" name="tranDate" class="datepicker" value="#LSDateFormat(tran.header.trnDate, 'dd/mm/yyyy')#" /></td>
 				<th align="left">VAT Amount</th>
 				<td><input type="text" name="tranVATAmnt" value="#tran.header.trnAmnt2#" /></td>
+				<th>Type</th>
+				<td>
+					<!---<select name="tranType">
+						<option value="inv" <cfif tran.header.trnType eq "inv">selected="selected"</cfif>>Invoice</option>
+						<option value="crn" <cfif tran.header.trnType eq "crn">selected="selected"</cfif>>Credit Note</option>
+						<option value="pay" <cfif tran.header.trnType eq "pay">selected="selected"</cfif>>Payment</option>
+						<option value="rfd" <cfif tran.header.trnType eq "rfd">selected="selected"</cfif>>Refund</option>
+						<option value="jnl" <cfif tran.header.trnType eq "jnl">selected="selected"</cfif>>Credit Journal</option>
+						<option value="dbt" <cfif tran.header.trnType eq "dbt">selected="selected"</cfif>>Debit Journal</option>
+						<option value="nom" <cfif tran.header.trnType eq "nom">selected="selected"</cfif>>Nominal</option>
+					</select>--->
+				</td>
 			</tr>
 			<tr>
 				<th align="left">Trans Ref</th>
@@ -53,10 +67,14 @@
 				<th align="left">Gross Total</th>
 				<cfset tranGrossTotal = val(tran.header.trnAmnt1) + val(tran.header.trnAmnt2)>
 				<td><input type="text" name="tranGrossTotal" value="#tranGrossTotal#" disabled="disabled" /></td>
+				<th>Method</th>
+				<td><input type="text" name="tranMethod" value="#tran.header.trnMethod#" size="10" /></td>
 			</tr>
 			<tr>
 				<th align="left">Description</th>
 				<td colspan="3"><input type="text" name="tranDesc" style="width:100%;padding:4px 0;text-indent:4px;" value="#tran.header.trnDesc#" /></td>
+				<th></th>
+				<td></td>
 			</tr>
 		</table>
 	</div>
@@ -111,12 +129,15 @@
 					var formData = {
 						header: {
 							tranID: $('input[name="tranID"]').val(),
+							tranPaidIn: $('input[name="tranPaidIn"]').val(),
 							netAmount: nf($('input[name="tranNetAmnt"]').val(), "num"),
 							tranDate: $('input[name="tranDate"]').val(),
 							tranVAT: nf($('input[name="tranVATAmnt"]').val(), "num"),
 							tranRef: $('input[name="tranRef"]').val(),
 							tranGross:	nf($('input[name="tranGrossTotal"]').val(), "num"),
 							tranDesc: $('input[name="tranDesc"]').val(),
+						//	tranType: $('select[name="tranType]').val(),
+							tranMethod: $('input[name="tranMethod"]').val(),
 							tranAccountID: parseInt("#parm.form.nominal_account#")
 						},
 						items: []

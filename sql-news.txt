@@ -1,0 +1,83 @@
+// News System Queries
+
+
+// Credits for missed deliveries
+SELECT cltName, ordHouseName,ordHouseNumber, stName, pubTitle, diDate,diIssue,diQty,diPrice,diCharge, diRoundID
+FROM tbldelitems
+INNER JOIN tblPublication ON diPubID=pubID
+INNER JOIN tblOrder ON diOrderID=ordID
+INNER JOIN tblClients ON diClientID=cltID
+INNER JOIN tblStreets2 ON stID=cltStreetCode
+WHERE diType = 'credit' 
+AND diDate >= '2017-07-01' 
+AND diReason = ''
+ORDER BY diRoundID,diDate
+
+
+// Display weekly delivery charge income
+SELECT diDate, CONCAT(YEAR(diDate), '/', WEEK(diDate)) AS week_name, sum(diCharge) as chargeTotal FROM tblDelItems
+WHERE 1
+GROUP BY week_name
+ORDER BY YEAR(diDate) ASC, WEEK(diDate) ASC
+
+
+// compare delivery charge income on two specific days
+SELECT diDate,diCharge, sum(diCharge),count(*)  
+FROM tblDelItems 
+WHERE diDate = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate,diCharge
+
+
+// Total of delivery charge income on two specific days
+SELECT diDate, sum(diCharge),count(*)  
+FROM tblDelItems 
+WHERE diDate = '2014-08-25' 
+OR diDate='2014-09-01'
+GROUP BY diDate
+
+
+// get del items for a specific client between two dates
+SELECT *
+FROM tblDelItems
+WHERE diClientID =1641
+AND diDate
+BETWEEN '2014-08-31'
+AND '2014-09-27'
+
+
+// FIX Council del charges
+UPDATE tblDelItems 
+SET diCharge=0.50
+WHERE diClientID=1641
+AND diDate BETWEEN '2014-08-31' and '2014-09-27'
+AND diCharge <> 0
+
+
+// uninvoice tregolls
+update tblDelItems 
+set diinvoiceid=0
+WHERE diOrderID IN (7121,7952)
+AND diDatestamp >= '2015-08-30'
+
+
+// List of publications for Truro School not cancelled during the holiday period
+SELECT pubTitle AS Title, diIssue AS Issue, diDate AS Date, sum(diPrice) as Price
+FROM tbldelitems
+INNER JOIN tblPublication ON diPubID=pubID
+WHERE diOrderID = 2281 
+AND diDate BETWEEN '2017-07-08' AND '2017-09-06'
+GROUP BY diPubID,diIssue
+HAVING Price != 0
+ORDER BY pubTitle, diDate
+
+
+// Net news & mags sales allowing for returns and credits
+SELECT pubTitle, diType,diDate,diIssue,diPrice,diCharge,
+SUM(IF(diType='credit',diQty*-1,diQty)) AS QTY, Count(*) AS Count
+FROM `tbldelitems` 
+INNER JOIN tblPublication ON diPubID=pubID
+WHERE `diDate` >= '2017-09-01'
+GROUP BY pubTitle,diDate
+ORDER BY pubTitle,diType,diIssue
+

@@ -62,6 +62,7 @@
 				SELECT *
 				FROM tblBarcodes
 				WHERE barCode LIKE '%#args.form.barcode#%'	<!--- was = --->
+				AND barType='product'
 				LIMIT 1;
 			</cfquery>
 			<cfif QBarcode.recordcount is 1>

@@ -243,7 +243,7 @@
 												</script>
 												<div class="barcode#itemCount#">#item.barCode#</div>
 												</td>
-												<td><a href="stockItems.cfm?ref=#item.prodID#" target="_blank">#item.prodRef#</a>
+												<td><a href="ProductStock6.cfm?product=#item.prodID#" target="_blank">#item.prodRef#</a>
 													<cfif len(item.msg)><br /><span class="substitute">#item.msg#</span></cfif></td>
 												<td class="sod_title" data-id="#item.prodID#">#item.prodTitle#</td>
 												<td>#item.prodPackQty# X #item.prodUnitSize#</td>

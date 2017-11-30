@@ -9,6 +9,15 @@
 	<cfset parm.header.allocate=false>
 	<cfif StructKeyExists(parm.header, "paidCOD") AND parm.header.paidCOD AND parm.header.tranType IS 'inv'>
 		<cfset parm.header.allocate=true>	<!--- to be allocated to subsequent payment --->
+		<cfquery name="loc.QAccountID" datasource="#parm.database#">
+			SELECT accAllocID
+			FROM tblAccount
+			WHERE accID = #val(parm.header.accID)#
+			LIMIT 1;
+		</cfquery>
+		<cfset parm.header.allocID = loc.QAccountID.accAllocID + 1>
+	<cfelse>
+		<cfset parm.header.allocID = 0>
 	</cfif>
 	<cfset TransRecord = acc.SaveAccountTransRecord(parm)>
 
@@ -18,7 +27,7 @@
 	<cfdump var="#parm#" label="parm" expand="yes" format="html" 
 	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 --->
-	<cfif parm.header.allocate>	<!--- write matching payment --->
+	<cfif parm.header.allocate AND TransRecord.isNew>	<!--- write matching payment --->
 		<cfset parm.header.trnID=0>
 		<cfset parm.header.PaymentAccounts=491>		<!--- SUPP - was 181 (cash in till) --->
 		<cfset parm.header.tranType='pay'>
@@ -33,6 +42,12 @@
 		</cfif>
 		<cfset parm.items=[]>
 		<cfset paymentRecord = acc.SaveAccountTransRecord(parm)>
+		<cfquery name="loc.QAccountIDUpdate" datasource="#parm.database#">
+			UPDATE tblAccount
+			SET accAllocID = #parm.header.allocID#
+			WHERE accID = #val(parm.header.accID)#
+			LIMIT 1;
+		</cfquery>
 	</cfif>
 	
 	<cfset parm.form = {}>

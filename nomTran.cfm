@@ -18,6 +18,7 @@
 <script src="scripts/popup.js" type="text/javascript"></script>
 <script src="scripts/checkDates.js"></script>
 <script src="scripts/main.js"></script>
+<script src="scripts/html2csv.js"></script>
 </head>
 
 <cfobject component="code/accounts" name="accts">

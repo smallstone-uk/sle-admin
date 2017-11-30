@@ -164,7 +164,29 @@
 		<cfset var loc={}>
 		<cfset loc.result={}>
 		<cfset loc.result.action="">
-		<cftry>
+		<cfset loc.result.markup = 100>
+		<cftry>		
+			<!--- category record --->
+			<cfquery name="loc.categoryExists" datasource="#application.site.datasource1#">
+				SELECT pCatID,pgTarget,pgTitle
+				FROM tblProductCats
+				INNER JOIN tblproductgroups ON pcatGroup=pgID
+				WHERE pcatTitle='#Trim(args.category)#'
+				LIMIT 1;
+			</cfquery>
+			<cfif loc.categoryExists.recordcount eq 1>
+				<cfset loc.categoryID=loc.categoryExists.pCatID>
+				<cfset loc.result.action="#loc.result.action##loc.categoryExists.pgTitle# #loc.categoryExists.pgTarget#<br>">
+				<cfset loc.result.markup = loc.categoryExists.pgTarget + 100>
+			<cfelse>
+				<cfquery name="loc.QAddCategory" datasource="#application.site.datasource1#" result="loc.QAddCategoryResult">
+					INSERT INTO tblProductCats (pCatTitle) 
+					VALUES ('#args.category#')
+				</cfquery>
+				<cfset loc.categoryID=loc.QAddCategoryResult.generatedKey>
+				<cfset loc.result.action="#loc.result.action#cat added<br>">
+			</cfif>
+			
 			<cfset loc.result.WSP=val(args.fld05)>	<!--- get values from extracted data --->
 			<cfset loc.result.RRP=RoundDec(args.fld06)>
 			<cfset loc.result.VAT=val(args.fld07)>
@@ -181,11 +203,14 @@
 				<cfif loc.totalValue neq 0>	<!--- sanity check --->
 					<cfset loc.profit=loc.totalValue-loc.result.WSP>					<!--- profit on sale of pack --->
 					<cfset loc.POR=RoundDec((loc.profit/loc.totalValue)*100)>	<!--- POR % --->
-					<cfif loc.POR lt 30>	<!--- POR too low? --->
-						<cfset loc.unitPrice=loc.result.RRP*args.markup>	<!--- add specified markup and convert to pence --->
+					<cfif loc.POR lt loc.categoryExists.pgTarget>	<!--- POR too low? --->
+						<cfset loc.unitPrice=loc.result.unitTrade*loc.result.markup*(1+(loc.result.VAT/100))>	<!--- add specified markup to trade price and convert to pence --->
 						<cfset loc.unitInPence=int(loc.unitPrice)>	<!--- get whole pence --->
 						<cfset loc.remainder=loc.unitPrice - loc.unitInPence> <!--- get penny fraction --->
 						<cfset loc.result.ourPrice=(loc.unitInPence + int(loc.remainder GT 0))/100> <!--- add extra penny if fraction gt 0 then convert to pounds/pence--->
+						<cfif loc.result.ourPrice lt loc.result.RRP>
+							<cfset loc.result.ourPrice=loc.result.RRP>
+						</cfif>
 					</cfif>
 				</cfif>
 			</cfif>
@@ -195,25 +220,6 @@
 			<cfset loc.result.totalValue=val(args.packQty)*loc.result.retailNet>		<!--- net retail value of pack --->
 			<cfset loc.result.profit=loc.result.totalValue-loc.result.WSP>
 			<cfset loc.result.POR=DecimalFormat((loc.result.profit/loc.result.totalValue)*100)>
-			
-			<!--- category record --->
-			<cfquery name="loc.categoryExists" datasource="#application.site.datasource1#">
-				SELECT pCatID
-				FROM tblProductCats
-				WHERE pcatTitle='#Trim(args.category)#'
-				LIMIT 1;
-			</cfquery>
-			<cfif loc.categoryExists.recordcount eq 1>
-				<cfset loc.categoryID=loc.categoryExists.pCatID>
-				<cfset loc.result.action="#loc.result.action#cat found<br>">
-			<cfelse>
-				<cfquery name="loc.QAddCategory" datasource="#application.site.datasource1#" result="loc.QAddCategoryResult">
-					INSERT INTO tblProductCats (pCatTitle) 
-					VALUES ('#args.category#')
-				</cfquery>
-				<cfset loc.categoryID=loc.QAddCategoryResult.generatedKey>
-				<cfset loc.result.action="#loc.result.action#cat added<br>">
-			</cfif>
 			
 			<!--- product record --->
 			<cfquery name="loc.prodExists" datasource="#application.site.datasource1#">
@@ -353,8 +359,9 @@
 				<cfset loc.result.action="#loc.result.action#prod updated<br>">
 			</cfif>
 		<cfcatch type="any">
+			<cfdump var="#loc#" label="crash" expand="false">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
-			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>

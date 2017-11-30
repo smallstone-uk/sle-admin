@@ -115,7 +115,7 @@
 				<cfset parms.datasource=application.site.datasource1>
 				<cfset parms.form=form>
 				<cfobject component="code/functions" name="func">
-				<cfset sales=func.SalesReport(parms)><cfdump var="#sales#" label="sales" expand="false">
+				<cfset sales=func.SalesReport(parms)>
 				<cfset totals=[0,0,0,0,0,0,0,0,0,0,0,0,0]>
 				<cfset debitCount=0>
 				<cfset style="amount">

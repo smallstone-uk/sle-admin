@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="ProductStock6.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131524660461102391" remote="131524660460000000" />
+<file name="functions.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131406160615698631" remote="131406160610000000" />
+<file name="accounts.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131467790410000000" remote="131467790410000000" />
+<file name="rounds6.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131432990337045437" remote="131432990330000000" />
+<file name="ManualCharge.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131439993587072114" remote="131439993580000000" />
+<file name="purchase.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131474545099363235" remote="131474545090000000" />
+<file name="payroll2.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131468626354445393" remote="131468626350000000" />
+<file name="payroll3.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131469210784143280" remote="131469210780000000" />
+<file name="import.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131473031096450215" remote="131473031090000000" />
+<file name="products.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131299094350000000" remote="131299094350000000" />
+<file name="publications.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131500436212216098" remote="131500436210000000" />
+<file name="ProductStock3.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131519496815608363" remote="131519496810000000" />
+<file name="ProductStock3 - Copy.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131357158460000000" remote="131357158460000000" />
+<file name="accounts3.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818535997792" remote="131391818530000000" />
+<file name="analysis.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028198335531" remote="131282028190000000" />
+<file name="bank.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028198385586" remote="131282028190000000" />
+<file name="clients.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818536037785" remote="131391818530000000" />
+<file name="core.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818536228013" remote="131391818530000000" />
+<file name="deals.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028199995139" remote="131282028190000000" />
+<file name="email.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818536278065" remote="131391818530000000" />
+<file name="epos11.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028200105233" remote="131282028200000000" />
+<file name="forecasting.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818536328160" remote="131391818530000000" />
+<file name="importNews.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028200774978" remote="131282028200000000" />
+<file name="Invoicing.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818535452137" remote="131391818530000000" />
+<file name="labels.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028200835038" remote="131282028200000000" />
+<file name="messages.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028200935139" remote="131282028200000000" />
+<file name="news.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028200995197" remote="131282028200000000" />
+<file name="payroll.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028201035247" remote="131282028200000000" />
+<file name="processor.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028201285465" remote="131282028200000000" />
+<file name="products4.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028201631719" remote="131282028200000000" />
+<file name="products5.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028201811887" remote="131282028200000000" />
+<file name="ProductStock4.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028197815036" remote="131282028190000000" />
+<file name="ProductStock5.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028197905142" remote="131282028190000000" />
+<file name="purchase-kitty.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028201911994" remote="131282028200000000" />
+<file name="rounds.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818536958828" remote="131391818530000000" />
+<file name="rounds2.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028202102171" remote="131282028200000000" />
+<file name="rounds5.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131282028202152235" remote="131282028200000000" />
+<file name="stock.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131391818537079024" remote="131391818530000000" />
+<file name="vouchers.cfc" server="//thomas/HostingSpaces/SLE-Production/sle-admin.co.uk/wwwroot/" local="131555679174574466" remote="131555679170000000" />
+</dwsync>

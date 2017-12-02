@@ -165,13 +165,16 @@
 		<cfset loc.result={}>
 		<cfset loc.result.action="">
 		<cfset loc.result.markup = 100>
+		<cfset loc.doUpdate = true>
 		<cftry>		
 			<!--- category record --->
+			<cfset loc.newCat = ReReplaceNoCase(args.category,'(Cat.)',"Catering")>		<!--- replace cat with catering --->
+			<cfset loc.newCat = ReReplaceNoCase(args.category,'Retail',"")>				<!--- remove retail word --->
 			<cfquery name="loc.categoryExists" datasource="#application.site.datasource1#">
 				SELECT pCatID,pgTarget,pgTitle
 				FROM tblProductCats
 				INNER JOIN tblproductgroups ON pcatGroup=pgID
-				WHERE pcatTitle='#Trim(args.category)#'
+				WHERE pcatTitle='#Trim(loc.newCat)#'
 				LIMIT 1;
 			</cfquery>
 			<cfif loc.categoryExists.recordcount eq 1>
@@ -181,7 +184,7 @@
 			<cfelse>
 				<cfquery name="loc.QAddCategory" datasource="#application.site.datasource1#" result="loc.QAddCategoryResult">
 					INSERT INTO tblProductCats (pCatTitle) 
-					VALUES ('#args.category#')
+					VALUES ('#loc.newCat#')
 				</cfquery>
 				<cfset loc.categoryID=loc.QAddCategoryResult.generatedKey>
 				<cfset loc.result.action="#loc.result.action#cat added<br>">
@@ -228,135 +231,139 @@
 				WHERE prodRef='#args.fld02#'
 				LIMIT 1;
 			</cfquery>
-			<cfif loc.prodExists.recordcount eq 0>
-				<cfquery name="loc.QAddProduct" datasource="#application.site.datasource1#" result="loc.QAddProductResult">
-					INSERT INTO tblProducts	(
-						prodSuppID,
-						prodCatID,
-						prodRef,
-						prodRecordTitle,
-						prodTitle,
-						prodPriceMarked,
-						prodPackQty,
-						prodUnitSize,
-						prodRRP,
-						prodOurPrice,
-						<cfif len(args.validTo)>prodValidTo,</cfif>
-						prodUnitTrade,
-						prodVatRate,
-						prodPackPrice,
-						prodPOR
-					) VALUES (
-						#args.supplierID#,
-						#loc.categoryID#,
-						'#args.fld02#',
-						'#args.fld03#',
-						'#args.fld03#',
-						#int(args.pm)#,
-						#args.packQty#,
-						'#args.fld04#',
-						#loc.result.RRP#,
-						#loc.result.ourPrice#,
-						<cfif len(args.validTo)>'#LSDateFormat(args.validTo,"yyyy-mm-dd")#',</cfif>
-						#loc.result.unitTrade#,
-						#loc.result.VAT#,
-						#loc.result.WSP#,
-						#loc.result.POR#
-					)
-				</cfquery>
-				<cfset loc.productID=loc.QAddProductResult.generatedKey>
-				<cfset loc.result.action="#loc.result.action#prod added<br>">
+			<cfif NOT loc.doUpdate>
+				<cfdump var="#loc#" label="loc" expand="false">
 			<cfelse>
-				<cfset loc.productID=loc.prodExists.prodID>
-				<cfif loc.prodExists.prodMinPrice gt loc.result.ourPrice>
-					<cfset loc.result.ourPrice = loc.prodExists.prodMinPrice>
+				<cfif loc.prodExists.recordcount eq 0>
+					<cfquery name="loc.QAddProduct" datasource="#application.site.datasource1#" result="loc.QAddProductResult">
+						INSERT INTO tblProducts	(
+							prodSuppID,
+							prodCatID,
+							prodRef,
+							prodRecordTitle,
+							prodTitle,
+							prodPriceMarked,
+							prodPackQty,
+							prodUnitSize,
+							prodRRP,
+							prodOurPrice,
+							<cfif len(args.validTo)>prodValidTo,</cfif>
+							prodUnitTrade,
+							prodVatRate,
+							prodPackPrice,
+							prodPOR
+						) VALUES (
+							#args.supplierID#,
+							#loc.categoryID#,
+							'#args.fld02#',
+							'#args.fld03#',
+							'#args.fld03#',
+							#int(args.pm)#,
+							#args.packQty#,
+							'#args.fld04#',
+							#loc.result.RRP#,
+							#loc.result.ourPrice#,
+							<cfif len(args.validTo)>'#LSDateFormat(args.validTo,"yyyy-mm-dd")#',</cfif>
+							#loc.result.unitTrade#,
+							#loc.result.VAT#,
+							#loc.result.WSP#,
+							#loc.result.POR#
+						)
+					</cfquery>
+					<cfset loc.productID=loc.QAddProductResult.generatedKey>
+					<cfset loc.result.action="#loc.result.action#prod added<br>">
+				<cfelse>
+					<cfset loc.productID=loc.prodExists.prodID>
+					<cfif loc.prodExists.prodMinPrice gt loc.result.ourPrice>
+						<cfset loc.result.ourPrice = loc.prodExists.prodMinPrice>
+					</cfif>
 				</cfif>
-			</cfif>
-			
-			<!--- barcode record (remove leading zeroes --->
-			<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
-				<cfset args.barcode = mid(args.barcode,3,13)>
-			</cfif>
-			<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
-				SELECT barID
-				FROM tblBarcodes
-				WHERE barcode='#args.barcode#'
-				LIMIT 1;
-			</cfquery>
-			<!---#Trim(NumberFormat(args.barcode,"_____________"))#--->
-			<cfif loc.barcodeExists.recordcount eq 1>
-				<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
-					UPDATE tblBarcodes
-					SET barProdID=#loc.productID#,
-						barcode='#trim(args.barcode)#'
-					WHERE barID=#loc.barcodeExists.barID#
+				
+				<!--- barcode record (remove leading zeroes --->
+				<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
+					<cfset args.barcode = mid(args.barcode,3,13)>
+				</cfif>
+				<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
+					SELECT barID
+					FROM tblBarcodes
+					WHERE barcode='#args.barcode#'
+					LIMIT 1;
 				</cfquery>
-				<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
-			<cfelse>
-				<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
-					INSERT INTO tblBarcodes (barCode,barType,barProdID) 
-					VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.productID#)
+				<!---#Trim(NumberFormat(args.barcode,"_____________"))#--->
+				<cfif loc.barcodeExists.recordcount eq 1>
+					<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
+						UPDATE tblBarcodes
+						SET barProdID=#loc.productID#,
+							barcode='#trim(args.barcode)#'
+						WHERE barID=#loc.barcodeExists.barID#
+					</cfquery>
+					<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
+				<cfelse>
+					<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
+						INSERT INTO tblBarcodes (barCode,barType,barProdID) 
+						VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.productID#)
+					</cfquery>
+					<cfset loc.result.action="#loc.result.action#barcode added<br>">
+				</cfif>
+				
+				<!--- stock item record --->
+				<cfset loc.status=GetToken("open,promo",int(len(args.validTo) GT 0)+1,",")>
+				<cfquery name="loc.stockItemExists" datasource="#application.site.datasource1#">
+					SELECT siID
+					FROM tblStockItem
+					WHERE siOrder=#args.stockOrderID#
+					AND siProduct=#loc.productID#
+					LIMIT 1;
 				</cfquery>
-				<cfset loc.result.action="#loc.result.action#barcode added<br>">
-			</cfif>
-			
-			<!--- stock item record --->
-			<cfset loc.status=GetToken("open,promo",int(len(args.validTo) GT 0)+1,",")>
-			<cfquery name="loc.stockItemExists" datasource="#application.site.datasource1#">
-				SELECT siID
-				FROM tblStockItem
-				WHERE siOrder=#args.stockOrderID#
-				AND siProduct=#loc.productID#
-				LIMIT 1;
-			</cfquery>
-			<cfset loc.qtyItems = args.packQty * loc.result.ordQty>
-			<cfif loc.stockItemExists.recordcount eq 1>
-				<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
-					UPDATE tblStockItem
-					SET 
-						siPackQty=#args.packQty#,
-						siQtyPacks=#loc.result.ordQty#,
-						siQtyItems=#loc.qtyItems#,
-						siWSP=#loc.result.WSP#,
-						siUnitTrade=#loc.result.unitTrade#,
-						siRRP=#loc.result.RRP#,
-						siOurPrice=#loc.result.ourPrice#,
-						siPOR=#loc.result.POR#,
-						siStatus='#loc.status#',
-						siUnitSize='#args.fld04#',
-						siRef='#args.fld02#'
-					WHERE siID=#loc.stockItemExists.siID#
-				</cfquery>
-				<cfset loc.result.action="#loc.result.action#stock item updated<br>">
-			<cfelse>
-				<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
-					INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
-					VALUES (#args.stockOrderID#,#loc.productID#,#loc.result.ordQty#,#loc.result.WSP#,#loc.result.unitTrade#,
-						#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#',#loc.qtyItems#)
-				</cfquery>
-				<cfset loc.result.action="#loc.result.action#stock item added<br>">
-			</cfif>
-			<cfif loc.prodExists.prodLastBought LT args.orderDate>
-				<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#" result="loc.QUpdateProductResult">
-					UPDATE tblProducts
-					SET
-						prodCatID=#loc.categoryID#,
-						prodRecordTitle='#args.fld03#',
-						prodPriceMarked=#int(args.pm)#,
-						prodPackQty=#args.packQty#,
-						prodUnitSize='#args.fld04#',
-						prodRRP=#loc.result.RRP#,
-						prodOurPrice=#loc.result.ourPrice#,
-						prodLastBought=#args.orderDate#,
-						<cfif len(args.validTo)>prodValidTo='#LSDateFormat(args.validTo,"yyyy-mm-dd")#',</cfif>
-						prodUnitTrade=#loc.result.unitTrade#,
-						prodVatRate=#loc.result.VAT#,
-						prodPackPrice=#loc.result.WSP#,
-						prodPOR=#loc.result.POR#
-					WHERE
-						prodID=#loc.productID#
-				</cfquery>
-				<cfset loc.result.action="#loc.result.action#prod updated<br>">
+				<cfset loc.qtyItems = args.packQty * loc.result.ordQty>
+				<cfif loc.stockItemExists.recordcount eq 1>
+					<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
+						UPDATE tblStockItem
+						SET 
+							siPackQty=#args.packQty#,
+							siQtyPacks=#loc.result.ordQty#,
+							siQtyItems=#loc.qtyItems#,
+							siWSP=#loc.result.WSP#,
+							siUnitTrade=#loc.result.unitTrade#,
+							siRRP=#loc.result.RRP#,
+							siOurPrice=#loc.result.ourPrice#,
+							siPOR=#loc.result.POR#,
+							siStatus='#loc.status#',
+							siUnitSize='#args.fld04#',
+							siRef='#args.fld02#'
+						WHERE siID=#loc.stockItemExists.siID#
+					</cfquery>
+					<cfset loc.result.action="#loc.result.action#stock item updated<br>">
+				<cfelse>
+					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
+						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
+						VALUES (#args.stockOrderID#,#loc.productID#,#loc.result.ordQty#,#loc.result.WSP#,#loc.result.unitTrade#,
+							#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#',#loc.qtyItems#)
+					</cfquery>
+					<cfset loc.result.action="#loc.result.action#stock item added<br>">
+				</cfif>
+				<cfif loc.prodExists.prodLastBought LT args.orderDate>
+					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#" result="loc.QUpdateProductResult">
+						UPDATE tblProducts
+						SET
+							prodCatID=#loc.categoryID#,
+							prodRecordTitle='#args.fld03#',
+							prodPriceMarked=#int(args.pm)#,
+							prodPackQty=#args.packQty#,
+							prodUnitSize='#args.fld04#',
+							prodRRP=#loc.result.RRP#,
+							prodOurPrice=#loc.result.ourPrice#,
+							prodLastBought=#args.orderDate#,
+							<cfif len(args.validTo)>prodValidTo='#LSDateFormat(args.validTo,"yyyy-mm-dd")#',</cfif>
+							prodUnitTrade=#loc.result.unitTrade#,
+							prodVatRate=#loc.result.VAT#,
+							prodPackPrice=#loc.result.WSP#,
+							prodPOR=#loc.result.POR#
+						WHERE
+							prodID=#loc.productID#
+					</cfquery>
+					<cfset loc.result.action="#loc.result.action#prod updated<br>">
+				</cfif>
 			</cfif>
 		<cfcatch type="any">
 			<cfdump var="#loc#" label="crash" expand="false">

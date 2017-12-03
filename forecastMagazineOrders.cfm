@@ -45,14 +45,15 @@
 </script>
 <style type="text/css">
 	body {background-color:#FFFFFF;}
+	.tableList td {padding:5px 2px 5px 2px;}
 	@media print {
 		.noPrint {display:none;}
 		a:hover, a:visited, a:link, a:active {text-decoration: none;}
 	}
 </style>
 </head>
-<cfsetting requesttimeout="300">
 
+<cfsetting requesttimeout="300">
 <cfobject component="code/forecasting" name="cast">
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
@@ -68,27 +69,45 @@
 		<div class="clear"></div>
 	</div>
 	<div id="print-area" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;padding:10px;width:860px;background: ##fff;">
-		<span style="float: right;margin: 0 30px 0 0;line-height: 23px;font-weight: bold;">Printed: #LSDateFormat(Now(),"DD MMM YY")#</span>
+		<span style="float: right;margin: 0 30px 0 0;line-height: 23px;font-weight: bold; font-size:14px;">Printed: #LSDateFormat(Now(),"DD MMM YY")#</span>
 		<h1 style="margin: 0 0 10px 0 !important;">Publication Distribution</h1>
 		<div style="clear:both;"></div>
 		<table border="1" class="tableList trhover" style="float:left;font-size:16px;margin:0 10px 0 0;">
 			<tr>
-				<th colspan="2">Delivery Rounds</th>
+				<th colspan="4">Delivery Rounds</th>
 			</tr>
 			<tr>
-				<th colspan="2">(these go on the shelf)</th>
+				<th colspan="4">(these go on the shelf)</th>
 			</tr>
 			<tr>
 				<th>Qty</th>
-				<th align="left" width="230">Publication</th>
+				<th align="left">Publication</th>
+				<th>Qty</th>
+				<th align="left">Publication</th>
 			</tr>
-			<cfloop array="#forecast.RoundsSorted#" index="r">
-				<cfset item=StructFind(forecast.rounds,r)>
+			<cfset halfway = int(ArrayLen(forecast.RoundsSorted) / 2)>
+			<cfloop from="1" to="#halfway#" index="i">
+				<cfset ItemKeyLeft = forecast.RoundsSorted[i]>
+				<cfset item=StructFind(forecast.rounds,ItemKeyLeft)>
 				<tr>
+					<td align="center">#item.Qty#</th>
+					<td><a href="javascript:void(0)" data-id="#item.id#">#item.Title#</a></th>
+					<cfset ItemKeyRight = forecast.RoundsSorted[i+halfway]>
+					<cfset item=StructFind(forecast.rounds,ItemKeyRight)>
 					<td align="center">#item.Qty#</th>
 					<td><a href="javascript:void(0)" data-id="#item.id#">#item.Title#</a></th>
 				</tr>
 			</cfloop>
+			<cfif ArrayLen(forecast.RoundsSorted) MOD 2>
+				<cfset ItemKeyRight = forecast.RoundsSorted[ArrayLen(forecast.RoundsSorted)]>
+				<cfset item=StructFind(forecast.rounds,ItemKeyRight)>
+				<tr>
+					<td></td>
+					<td></td>
+					<td align="center">#item.Qty#</th>
+					<td><a href="javascript:void(0)" data-id="#item.id#">#item.Title#</a></th>
+				</tr>
+			</cfif>
 		</table>
 		<table border="1" class="tableList trhover" style="float:left;font-size:16px;margin:0 10px 0 0;">
 			<tr>
@@ -99,7 +118,7 @@
 			</tr>
 			<tr>
 				<th>Qty</th>
-				<th align="left" width="230">Publication</th>
+				<th align="left">Publication</th>
 			</tr>
 			<cfloop array="#forecast.shopsaveSorted#" index="s">
 				<cfset item=StructFind(forecast.shopsave,s)>

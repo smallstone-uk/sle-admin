@@ -366,6 +366,7 @@
 		<cfquery name="loc.employee" datasource="#args.datasource#">
 			SELECT *
 			FROM tblEmployee
+			WHERE empStatus='active'
 		</cfquery>
 
 		<cfloop query="loc.employee">

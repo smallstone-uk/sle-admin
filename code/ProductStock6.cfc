@@ -91,6 +91,7 @@
 						<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
 						<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
 						<cfset loc.rec.prodMinPrice = prodMinPrice>
+						<cfset loc.rec.prodOurPrice = prodOurPrice>
 						
 						<cfset loc.stockItem = {}>
 						<cfset loc.stockItem.siID = siID>
@@ -129,6 +130,7 @@
 						SELECT barID,barcode
 						FROM tblBarcodes
 						WHERE barProdID = #val(loc.result.productID)#
+						AND barType = 'product'
 					</cfquery>
 					<cfquery name="loc.CategoryGroup" datasource="#args.datasource#">
 						SELECT pcatID,pgID,pcatTitle,pgTitle,pgTarget
@@ -352,6 +354,7 @@
 					prodCatID = #val(args.form.prodCatID)#,
 					prodPriceMarked = #int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					prodMinPrice = #val(args.form.prodMinPrice)#,
+					prodOurPrice = #val(args.form.prodOurPrice)#,
 					prodVATRate = #args.form.prodVATRate#,
 					prodEposCatID = #val(args.form.prodEposCatID)#
 				WHERE prodID = #val(args.form.prodID)#
@@ -450,8 +453,6 @@
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
-		<cfdump var="#loc.result#" label="AddStockItem" expand="yes" format="html" 
-			output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		
 		<cfreturn loc.result>
 	</cffunction>

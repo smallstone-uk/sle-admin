@@ -28,7 +28,8 @@
 				INNER JOIN tblProducts ON prodID=ediProduct
 				INNER JOIN tblEPOS_RetailClubs ON ercID=edRetailClub
 				INNER JOIN tblBarcodes ON barProdID = prodID
-				WHERE edStatus='active'
+				WHERE edStatus = 'active'
+				AND barType = 'product'
 				#loc.dateRange#
 				ORDER BY ercID, edID, ediProduct
 			</cfquery>
@@ -53,15 +54,17 @@
 				<cfset loc.rec.style = "">
 				<cfset loc.prev.style = "">
 				<cfif loc.lastProd AND loc.lastProd eq prodID>
-					<cfset loc.prev = loc.result.items[ArrayLen(loc.result.items)]>
+					<cfset loc.lastItem = ArrayLen(loc.result.items)>
+					<cfset loc.prev = loc.result.items[loc.lastItem]>
 					<cfif loc.prev.edStarts gte loc.rec.edStarts AND loc.prev.edEnds lte loc.rec.edEnds>
-						<cfset loc.rec.style = "red">
-						<cfset loc.prev.style = "red">
+						<cfset loc.rec.style = "fuschia">
+					<cfset ArrayAppend(loc.result.items,loc.rec)>
+						<cfset loc.result.items[loc.lastItem].style = "blue">
+						<cfdump var="#loc.result.items[loc.lastItem]#" label="#prodTitle# #loc.lastItem#" expand="false">
 					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
 					</cfif>
-					<cfset ArrayAppend(loc.result.items,loc.rec)>
 				<cfelseif edStarts gt Now() OR edEnds lt Now()>
 					<cfset loc.rec.style = "##eee">
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
@@ -121,13 +124,16 @@
 				<cfset loc.rec.prodID = prodID>
 				<cfset loc.rec.prodRef = prodRef>
 				<cfset loc.rec.prodTitle = prodTitle>
+				<cfset loc.rec.barcode = barcode>
 				<cfset loc.rec.style = "">
 				<cfset loc.prev.style = "">
 				<cfif loc.lastProd AND loc.lastProd eq prodID>
-					<cfset loc.prev = loc.result.items[ArrayLen(loc.result.items)]>
+					<cfset loc.lastItem = ArrayLen(loc.result.items)>
+					<cfset loc.prev = loc.result.items[loc.lastItem]>
 					<cfif loc.prev.edStarts gte loc.rec.edStarts AND loc.prev.edEnds lte loc.rec.edEnds>
 						<cfset loc.rec.style = "red">
-						<cfset loc.prev.style = "red">
+						<cfset loc.result.items[loc.lastItem].style = "red">
+						<cfdump var="#loc.prev#" label="#prodTitle#" expand="false">
 					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
@@ -151,31 +157,35 @@
 	</cffunction>
 
 <body>
+<cfparam name="dealview" default="">
 <cftry>
 	<cfoutput>
+	#application.site.dir_logs#
+	#dealview#<br />
+	<br />
 		<div>
 			<form method="post" enctype="multipart/form-data">
 				Report Date: 
-				<select name="view" id="view">
-					<option value="">Select view...</option>
-					<option value="current">Current Deals</option>
-					<option value="future">Future Deals</option>
-					<option value="past">Past Deals</option>
-					<option value="all">All Deals</option>
+				<select name="dealview" id="view">
+					<option value=""<cfif dealview eq ""> selected="selected"</cfif>>Select view...</option>
+					<option value="current"<cfif dealview eq "current"> selected="selected"</cfif>>Current Deals</option>
+					<option value="future"<cfif dealview eq "future"> selected="selected"</cfif>>Future Deals</option>
+					<option value="past"<cfif dealview eq "past"> selected="selected"</cfif>>Past Deals</option>
+					<option value="all"<cfif dealview eq "all"> selected="selected"</cfif>>All Deals</option>
 					<option disabled="disabled">-</option>
-					<option value="currentx">Current Cross Check</option>
-					<option value="futurex">Future Deals Cross Check</option>
-					<option value="pastx">Past Deals Cross Check</option>
-					<option value="allx">All Deals Cross Check</option>
+					<option value="currentx"<cfif dealview eq "currentx"> selected="selected"</cfif>>Current Cross Check</option>
+					<option value="futurex"<cfif dealview eq "futurex"> selected="selected"</cfif>>Future Deals Cross Check</option>
+					<option value="pastx"<cfif dealview eq "pastx"> selected="selected"</cfif>>Past Deals Cross Check</option>
+					<option value="allx"<cfif dealview eq "allx"> selected="selected"</cfif>>All Deals Cross Check</option>
 				</select>
 				<input type="submit" name="btnGo" value="Go">
 			</form>
 		</div>
-		<cfif StructKeyExists(form,"view")>
+		<cfif StructKeyExists(form,"dealview")>
 			<cfset parm = {}>
 			<cfset parm.datasource = application.site.datasource1>
 			<!---<cfloop list="current,future,past,all" delimiters="," index="range">--->
-			<cfset parm.range = form.view>
+			<cfset parm.range = form.dealview>
 			<cfif ListFind("currentx,allx",parm.range,",")> 
 				<cfset result = DealCrossRef(parm)>
 				<h1>#parm.range#</h1>
@@ -224,7 +234,7 @@
 			</cfif>
 			<!---</cfloop>--->
 			<cfif ListFind("current,future,past,all",parm.range,",")> 
-				<cfset result = LoadDealData(parm)>
+				<cfset result = LoadDealData(parm)><cfdump var="#result#" label="result" expand="false">
 				<h1>#parm.range#</h1>
 				<table class="tableList" border="1">
 					<tr>

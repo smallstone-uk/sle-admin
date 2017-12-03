@@ -41,11 +41,12 @@
 									$('.rowList').append(
 										'<tr>' +
 											'<td><a href="javascript:void(0)" class="ctrlDelProdItem" data-prodID="' + result.PRODUCT.PRODID + '" data-dealID="#deal.edID#">D</a></td>' +
+											'<td>' + result.PRODUCT.PRODID + '</td>' +
 											'<td id="rli_name" align="left">' +
-												'<a href="javascript:void(0)" class="deal_product_item" data-title="New Row" data-id="' + result.PRODUCT.PRODID + '">' + result.PRODUCT.PRODTITLE + '</a>' +
+												'<a href="javascript:void(0)" class="deal_product_item" title=' + barcode + ' data-title="New Row" data-id="' + result.PRODUCT.PRODID + '">' + result.PRODUCT.PRODTITLE + '</a>' +
 											'</td>' +
-											'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value=""></td>' +
-											'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value=""></td>' +
+											'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value="0"></td>' +
+											'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value="0"></td>' +
 										'</tr>'
 									);
 								} else {
@@ -259,7 +260,7 @@
 							</td>
 							<td>#item.ediProduct#</td>
 							<td align="left" id="rli_name">
-								<a href="javascript:void(0)" class="deal_product_item" data-title="#item.prodTitle#" data-id="#item.ediProduct#">#item.prodTitle#</a>
+								<a href="javascript:void(0)" class="deal_product_item" title="#item.ediProduct#" data-title="#item.prodTitle#" data-id="#item.ediProduct#">#item.prodTitle#</a>
 							</td>
 							<td id="rli_min" align="right" width="100"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value="#item.ediMinQty#"></td>
 							<td id="rli_max" align="right" width="100"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value="#item.ediMaxQty#"></td>

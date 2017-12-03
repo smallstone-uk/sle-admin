@@ -139,21 +139,24 @@
 					<cfset sums = {}>
 					<tr>
 						<th align="left">Week Ending</th>
-						<td colspan="6">#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
+						<td colspan="7">#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
 					</tr>
 					<tr>
 						<th align="left">Week No</th>
-						<td colspan="6">#item.weekNo#</td>
+						<td colspan="7">#item.weekNo#</td>
 					</tr>
 					<tr>
 						<th align="left">Employee</th>
 						<th>Tax Code</th>
+						<th>Method</th>
 						<th align="right">Net Pay</th>
 						<th align="right">PAYE</th>
 						<th align="right">NI</th>
 						<th align="right">Gross Pay</th>
 						<th align="right">Hours</th>
 					</tr>
+					<cfset cashTotal = 0>
+					<cfset bacsTotal = 0>
 					<cfloop array="#item.items#" index="i">
 						<cfset sums.grossSum = i.grossSum>
 						<cfset sums.hoursSum = i.hoursSum>
@@ -163,15 +166,23 @@
 						<tr>
 							<td>#i.empFirstName# #i.empLastName#</td>
 							<td align="center">#i.empTaxCode#</td>
+							<td align="center">#i.empMethod#</td>
 							<td align="right">#DecimalFormat(i.phNP)#</td>
 							<td align="right">#DecimalFormat(i.phPAYE)#</td>
 							<td align="right">#DecimalFormat(i.phNI)#</td>
 							<td align="right">#DecimalFormat(i.phGross)#</td>
 							<td align="right">#DecimalFormat(i.phTotalHours)#</td>
 						</tr>
+						<cfif i.empMethod eq 'cash'>
+							<cfset cashTotal += i.phNP>
+						<cfelse>
+							<cfset bacsTotal += i.phNP>
+						</cfif>
 					</cfloop>
 					<tr>
-						<th colspan="2" align="right">Totals</th>
+						<th align="right">Totals</th>
+						<td align="center">Cash: #DecimalFormat(cashTotal)#</td>
+						<td align="center">BACS: #DecimalFormat(bacsTotal)#</td>
 						<td align="right"><strong>#DecimalFormat(sums.npSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.payeSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.niSum)#</strong></td>

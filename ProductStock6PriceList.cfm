@@ -26,9 +26,9 @@
 			border-color: #ccc;
 			line-height:24px;
 		}
-		.display th {padding:4px 5px; background:#eee; border-left:solid 1px #ccc; border-color: #ccc;}
-		.display td {padding:2px 5px; background:#fff; border-left:solid 1px #ccc;}
-		.blankcell {padding: 2px 5px; background:#fff; border-color: #fff;}
+		.display th {padding:4px 5px; background:#eee; border:solid 1px #ccc; border-color: #ccc;}
+		.display td {padding:2px 5px; background:#fff; border:solid 1px #ccc;}
+		.blankcell {padding: 2px 5px; background:#fff; border:none; border-color: #fff;}
 		.printdate {font-size:10px;}
 	</style>
 </head>
@@ -176,7 +176,7 @@
 	<cfoutput>
 		<div id="dashboard" class="noPrint">
 			<table>
-			<form method="post">
+			<form method="post" >
 				<tr>
 					<td>Group</td>
 					<td>
@@ -238,6 +238,7 @@
 			</form>
 			</table>
 		</div>
+		<cfset cols = 2 + int(showSize)>
 		<cfif pricelist eq "staff">
 			<table class="tableList" border="1">
 				<cfset recCount = 0>
@@ -267,7 +268,7 @@
 					</cfif>
 				</cfloop>
 				<tr>
-					<td colspan="3" height="30">#recCount# products listed</td>
+					<td colspan="#cols#" height="30">#recCount# products listed</td>
 					<td colspan="4" align="right">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
 				</tr>
 			</table>
@@ -310,33 +311,27 @@
 					</cfif>
 				</cfloop>
 				<cfset halfway = int(ArrayLen(productArray) / 2)>
+				<cfif productArray[halfway].header is true>
+					<cfset halfway-->
+				</cfif>
 				<table id="priceList" class="display" border="1">
-					<tr>
-						<th>Description</th>
-						<cfif showSize><th>Size</th></cfif>
-						<th align="right">Price</th>
-						<td width="20" class="blankcell"></td>
-						<th>Description</th>
-						<cfif showSize><th>Size</th></cfif>
-						<th align="right">Price</th>
-					</tr>
 					<cfloop from="1" to="#halfway#" index="i">
 						<cfset leftItem = productArray[i]>
 						<cfset rightItem = productArray[halfway+i]>
 						<tr>
 							<cfif leftItem.header>
-								<th colspan="3">#leftItem.pcatTitle#</th>
+								<th colspan="#cols#">#leftItem.pcatTitle#</th>
 							<cfelse>
 								<td>#leftItem.prodTitle#</td>
-								<td>#leftItem.siUnitSize#</td>
+								<cfif showSize><td>#leftItem.siUnitSize#</td></cfif>
 								<td align="right">#leftItem.siOurPrice#</td>
 							</cfif>
-							<td class="blankcell"></td>
+							<td class="blankcell">&nbsp;</td>
 							<cfif rightItem.header>
-								<th colspan="3">#rightItem.pcatTitle#</th>
+								<th colspan="#cols#">#rightItem.pcatTitle#</th>
 							<cfelse>
 								<td>#rightItem.prodTitle#</td>
-								<td>#rightItem.siUnitSize#</td>
+								<cfif showSize><td>#rightItem.siUnitSize#</td></cfif>
 								<td align="right">#rightItem.siOurPrice#</td>
 							</cfif>
 						</tr>
@@ -344,15 +339,13 @@
 					<cfif ArrayLen(productArray) - (halfway * 2) neq 0>
 						<cfset rightItem = productArray[ArrayLen(productArray)]>
 						<tr>
-							<td colspan="4"></td>
+							<td colspan="#cols#"></td>
+							<td></td>
 							<td>#rightItem.prodTitle#</td>
-							<td>#rightItem.siUnitSize#</td>
+							<cfif showSize><td>#rightItem.siUnitSize#</td></cfif>
 							<td align="right">#rightItem.siOurPrice#</td>
 						</tr>
 					</cfif>
-					<tr>
-						<td colspan="3" class="printdate">Printed: #LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
-					</tr>
 				</table>
 				
 			<cfelse>
@@ -370,7 +363,7 @@
 						<cfif items.products.recordcount gt 0>
 							<cfset recCount += items.products.recordcount>
 							<tr>
-								<th colspan="3" align="left">#pcatTitle#</th>
+								<th colspan="#cols#" align="left">#pcatTitle#</th>
 							</tr>
 							<cfloop query="items.products">
 								<tr>
@@ -381,12 +374,10 @@
 							</cfloop>
 						</cfif>
 					</cfloop>
-					<tr>
-						<td colspan="3" align="right" class="printdate">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
-					</tr>
 				</table>		
 			</cfif>
 		</cfif>
+		<span class="printdate">Printed: #LSDateFormat(Now(),"dd-mmm-yyyy")#</span>
 	</cfoutput>
 	<script type="text/javascript">
 		$(document).ready(function() {

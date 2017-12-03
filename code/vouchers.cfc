@@ -9,7 +9,6 @@
 		<cfset result.total=0>
 		<cfset result.ref="">
 		<cfset result.date=Now()>
-		
 		<cftry>
 			<cfquery name="QVouchers" datasource="#args.datasource#">
 				SELECT *
@@ -219,7 +218,6 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
 		<cfset var QUpdate="">
-		<cfdump var="#args#" label="args" expand="yes">
 		<cfif StructKeyExists(args.form,"selectitem")>
 			<cfloop list="#args.form.selectitem#" delimiters="," index="i">
 				<cfquery name="QUpdate" datasource="#args.datasource#">

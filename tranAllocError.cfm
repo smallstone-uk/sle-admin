@@ -27,7 +27,7 @@
 <cfquery name="QTrans" datasource="#application.site.datasource1#">
 	SELECT *
 	FROM tblTrans
-	WHERE trnAccountID = 251
+	WHERE trnAccountID = 321
 	<!---AND trnAllocID > 0--->
 	<!---AND trnDate>'2016-01-01'--->
 	ORDER BY trnAllocID,trnDate,trnID
@@ -41,6 +41,7 @@
 				<cfoutput>
 					<cfset allocBal = 0>
 					<cfset allocID = -1>
+					<cfset allocTotal = 0>
 					<table class="tableList" border="1" width="600">
 						<tr>
 							<td>ID</td>
@@ -62,6 +63,7 @@
 								</cfif>
 								<cfif allocBal neq 0>
 									<cfset class = "err">
+									<cfset allocTotal += allocBal>
 								<cfelse><cfset class = ""></cfif>
 								<tr>
 									<td colspan="9"></td>
@@ -95,6 +97,7 @@
 							<td class="#class#" align="right">#allocBal#</td>
 						</tr>
 					</table>
+					#allocTotal#
 				</cfoutput>
 			</div>
 		</div>

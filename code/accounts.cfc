@@ -203,7 +203,7 @@
 		<cfquery name="loc.nominal" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNominal
-			ORDER BY nomType ASC, nomCode ASC
+			ORDER BY nomType ASC, nomGroup ASC, nomCode ASC
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.nominal)>
@@ -215,12 +215,9 @@
 		<cfset loc.result = {}>
 
 		<cftry>
-
-		<cfquery name="loc.QAccountID" datasource="#args.datasource#">
+			<cfquery name="loc.QAccountID" datasource="#args.datasource#">
 				SELECT accAllocID
 				FROM tblAccount
-
-				
 				WHERE accID = #val(args.accID)#
 				LIMIT 1;
 			</cfquery>
@@ -243,7 +240,6 @@
 					LIMIT 1;
 				</cfquery>
 			</cfif>
-			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -1001,7 +997,9 @@
 						trnDate = '#LSDateFormat(args.form.header.tranDate, "yyyy-mm-dd")#',
 						trnAmnt1 = #val(args.form.header.netAmount)#,
 						trnAmnt2 = #val(args.form.header.tranVAT)#,
-						trnType = 'nom',
+						trnPaidIn = #val(args.form.header.tranPaidIn)#,
+						<!---trnType = '#args.form.header.tranType#',--->
+						trnMethod = '#args.form.header.tranMethod#',
 						trnLedger = 'nom'
 					WHERE trnID = #val(args.form.header.tranID)#
 				</cfquery>
@@ -1059,8 +1057,8 @@
 
 		<cftry>
 			<cfset loc.result = {}>
+			<cfset loc.result.isNew = true>
 			<cfset loc.args = arguments>
-			<cfset loc.isNew = true>
 			<cfset loc.typeList = "inv,rfd,dbt">
 			<cfset loc.newTranDate = LSDateFormat(args.header.trnDate, "yyyy-mm-dd")>
 		
@@ -1070,7 +1068,7 @@
 				FROM tblTrans
 				WHERE trnID = #val(args.header.trnID)#
 			</cfquery>
-			<cfset loc.isNew = loc.tranExists.recordcount eq 0>
+			<cfset loc.result.isNew = loc.tranExists.recordcount eq 0>
 			
 			<!---Set signs for both new and old transaction headers and items--->
 			<cfif Len(args.header.trnType)>
@@ -1143,7 +1141,7 @@
 				})>
 			</cfif>
 
-			<cfif loc.isNew>	<!--- add transaction --->
+			<cfif loc.result.isNew>	<!--- add transaction --->
 				<cfquery name="loc.newTrans" datasource="#args.database#" result="loc.newTrans_result">
 					INSERT INTO tblTrans (
 						trnLedger,
@@ -1157,6 +1155,7 @@
 						trnAmnt1,
 						trnAmnt2,
 						trnAlloc,
+						trnAllocID,
 						trnType,
 						trnPayAcc
 					) VALUES (
@@ -1171,6 +1170,7 @@
 						#val(loc.netAmount)#,
 						#val(loc.vatAmount)#,
 						#int(args.header.allocate)#,
+						#int(args.header.allocID)#,
 						'#args.header.tranType#',
 						#val(args.header.paymentAccounts)#
 					)
@@ -1742,7 +1742,7 @@
 						AND trnType='jnl'
 					</cfcase>
 					<cfcase value="pj">
-						AND trnType IN ('pay','jnl')
+						AND trnType IN ('pay','jnl','rfd')
 					</cfcase>
 				</cfswitch>
 			</cfif>

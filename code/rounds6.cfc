@@ -104,7 +104,7 @@
 					<cfset r.list=[]>
 					<cfset r.TotalQty={}>
 					<cfset r.pubTotal = 0>
-					<cfset r.dropTotal = 0>	<!--- TODO sum pub & drop qtys for analysis sheet --->
+					<cfset r.dropTotal = 0>
 					
 					<cfquery name="QRoundItems" datasource="#args.datasource#" result="loc.rounditems">
 						SELECT *
@@ -342,10 +342,20 @@
 												<cfset i.holidayAction="">
 											</cfif>
 											<cfif r.roundView is "street" AND house.OpenDay is 0>
+												<!--- find next available day house is open --->
+												<cfset loc.nextDelDay = "XXXday">
+												<cfloop from="#dayDate#" to="#dayDate + 6#" index="loc.nextDay">
+													<cfset loc.dayFld = "QRoundItems.ord#dateformat(loc.nextDay, 'ddd')#">
+													<cfif val(Evaluate(loc.dayFld))>
+														<cfset loc.nextDelDay = dateformat(loc.nextDay, 'dddd')>
+														<cfbreak>
+													</cfif>
+												</cfloop>
+
 												<cfset i.heldback=1>
 												<cfset i.holiday=true>
 												<cfset i.holidayAction="hold">
-												<cfset i.holidayStart="Monday">
+												<cfset i.holidayStart=loc.nextDelDay>
 												<cfset i.AddToRound=true>
 												<cfset i.ChargeItem=true>
 												<cfset i.ChargeItemDel=false>

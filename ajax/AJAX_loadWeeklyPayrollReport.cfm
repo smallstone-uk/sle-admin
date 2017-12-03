@@ -28,12 +28,12 @@
 	<ul class="pr2-reportList">
 		<cfset rowCount=0>
 		<cfloop array="#records#" index="record">
-			<cfset rowCount++>
 			<cfif !StructIsEmpty(record.header)>
+				<cfset rowCount++>
 				<li>
 					<table class="tableList" border="1" width="100%">
 						<tr>
-							<th align="left" width="200">Employee</th>
+							<th align="left" width="200">Employee #rowCount#</th>
 							<td width="250">#record.employee.FirstName# #record.employee.LastName#</td>
 							<th align="left" width="200">Week Ending</th>
 							<td width="250">#DateFormat(parm.weekending,"dd-mmm-yyyy")#</td>
@@ -54,7 +54,9 @@
 								<th width="75">#DayOfWeekAsString(i)#</th>
 							</cfloop>
 						</tr>
+						<cfset deptCount = 0>
 						<cfloop array="#record.employee.depts#" index="dept">
+							<cfset deptCount++>
 							<cfif StructKeyExists(record.items, dept.depName)>
 								<cfset deptItems = StructFind(record.items, dept.depName)>
 								<cfif StructCount(deptItems) gt 0>
@@ -83,6 +85,19 @@
 										<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#"></td>
 									</cfif>
 								</cfloop>
+							</tr>
+						</cfloop>
+						<cfloop from="#deptCount+1#" to="5" index="deptRow">	<!--- pad area to same depth --->
+							<tr class="pr2_depts">
+								<th class="pr2_dept" align="left">&nbsp;</th>
+								<td width="75" align="center"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
+								<td class="pr2_item" width="75"></td>
 							</tr>
 						</cfloop>
 					</table>
@@ -216,9 +231,9 @@
 						</tr>
 					</table>
 				</li>
-				<!---<cfif (rowCount MOD 5) EQ 0>
+				<cfif (rowCount MOD 3) EQ 0>
 					<div style="page-break-after:always;"></div>
-				</cfif>--->
+				</cfif>
 			</cfif>
 		</cfloop>
 	</ul>

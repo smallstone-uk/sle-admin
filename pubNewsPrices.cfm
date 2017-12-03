@@ -74,7 +74,7 @@
 		<th>#dayNo#</th>
 	</tr>
 	<tr>
-		<th width="210">Publication Title</th>
+		<th width="230">Publication Title</th>
 		<th align="right" width="50">Price</th>
 		<th align="center" width="50">Round Stock</th>
 		<th align="center" width="50">Shop Stock</th>

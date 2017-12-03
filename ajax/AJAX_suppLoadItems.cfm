@@ -200,7 +200,7 @@
 						<!---<cfset keys = ListSort(StructKeyList(nominals, ","), "text", "asc", ",")>
 						<cfloop list="#keys#" index="key">--->
 						<cfloop query="loadnoms.QNominal">
-							<option value="#nomCode#">#nomGroup# - #nomCode# - #nomTitle#</option>
+							<option value="#nomCode#">#nomCode# - #nomGroup# - #nomTitle#</option>
 						</cfloop>
 					</select>
 				</td>
@@ -215,8 +215,8 @@
 							<td width="75"><a href="javascript:void(0)" class="delRow" data-itemID="#item.niID#" tabindex="-1" style="margin-right:5px;" title="Delete #item.niID#"></a>#item.niID#</td>
 							<td class="aifNomTitleCell" data-nomID="#item.niNomID#" data-recID="#item.niID#">#item.nomTitle#</td>
 							<td align="right" class="aifVATRateCell">#DecimalFormat(item.nomVATRate)#%</td>
-							<td align="right" class="aifNetAmountCell">#DecimalFormat(abs(item.niAmount))#</td>
-							<td align="right" class="aifVatAmountCell">#DecimalFormat(abs(item.vat))#</td>
+							<td align="right" class="aifNetAmountCell">#DecimalFormat(item.niAmount)#</td>
+							<td align="right" class="aifVatAmountCell">#DecimalFormat(item.vat)#</td>
 						</tr>
 					</cfloop>
 				</cfif>

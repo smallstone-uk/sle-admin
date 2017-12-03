@@ -195,6 +195,7 @@
 							});
 						</script>
 						<select class="changeAccountSel" disabled="disabled">
+							<option value="">Select account to move to...</option>
 							<cfloop array="#acctsList.accounts#" index="i">
 								<option value="#i.accID#">#i.accName#</option>
 							</cfloop>

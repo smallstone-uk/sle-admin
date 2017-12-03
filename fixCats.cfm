@@ -7,13 +7,13 @@
 	.red {color:#FF0000;}
 </style>
 </head>
-
+<cfparam name="doUpdate" default="false">
 <body>
 <cftry>
 	<cfquery name="QCats" datasource="#application.site.datasource1#">
 		SELECT *
 		FROM `tblProductCats`
-		WHERE `pcatTitle` LIKE '%(%'
+		WHERE `pcatTitle` REGEXP '([[:digit:]]+))'
 		ORDER BY `pcatTitle` ASC
 	</cfquery>
 	<cfoutput>
@@ -25,15 +25,19 @@
 			<cfquery name="QCat" datasource="#application.site.datasource1#">
 				SELECT * FROM tblProductCats WHERE pcatTitle LIKE '#shortTitle#' LIMIT 1;
 			</cfquery>
-			<cfif QCat.recordcount eq 1>
-				<cfquery name="QCatUpdate" datasource="#application.site.datasource1#" result="QCatResult">
-					UPDATE tblProducts 
-					SET prodCatID=#QCat.pcatID#
-					WHERE prodCatID=#origCat#
-				</cfquery>
-				<cfset move = "Moved to: #QCat.pcatID# #QCat.pcatTitle# #QCatResult.recordcount#">
+			<cfif doUpdate>
+				<cfif QCat.recordcount eq 1>
+					<cfquery name="QCatUpdate" datasource="#application.site.datasource1#" result="QCatResult">
+						UPDATE tblProducts 
+						SET prodCatID=#QCat.pcatID#
+						WHERE prodCatID=#origCat#
+					</cfquery>
+					<cfset move = "Moved to: #QCat.pcatID# #QCat.pcatTitle# #QCatResult.recordcount#">
+				<cfelse>
+					<cfset move = "<span class='red'>dest not found</span>">
+				</cfif>
 			<cfelse>
-				<cfset move = "<span class='red'>dest not found</span>">
+				<cfset move = "Can Move to: #QCat.pcatID# #QCat.pcatTitle#">
 			</cfif>
 			<tr>
 				<td>#origCat#</td>

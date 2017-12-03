@@ -80,6 +80,7 @@
 					<th align="left" width="120"><cfif parm.form.type is "missing credit">Return Date<cfelse>Date</cfif></th>
 					<th width="50">Issue</th>
 					<th width="50">Type</th>
+					<th width="50">Sub-Type</th>
 					<th width="35">Received</th>
 					<th width="35">Returned</th>
 					<th width="35">Claimed</th>
@@ -90,14 +91,14 @@
 				<cfloop array="#report.list#" index="i">
 					<cfif title neq i.PubID>
 						<cfif title neq "">
-							<tr><td colspan="13" style="background:##ddd;padding:5px 0;"></td></tr>
+							<tr><td colspan="14" style="background:##ddd;padding:5px 0;"></td></tr>
 						</cfif>
 						<cfset title=i.PubID>
 						<cfset issue="">
 					</cfif>
 					<cfif issue neq i.Issue>
 						<cfif issue neq "">
-							<tr><td colspan="13" style="background:##eee;"></td></tr>
+							<tr><td colspan="14" style="background:##eee;"></td></tr>
 						</cfif>
 						<cfset issue=i.Issue>
 					</cfif>
@@ -109,6 +110,7 @@
 						<td align="left">#DateFormat(i.Date,"DD MMM YYYY")#<span style="float:right;color:##444;">#DateFormat(i.Date,"DDD")#</span></td>
 						<td align="center">#i.Issue#</td>
 						<td align="center">#i.Type#</td>
+						<td align="center">#i.subType#</td>
 						<td align="center" style="font-weight:bold;">
 							<cfif i.type eq "received">#i.Qty#</cfif>
 							<cfif StructKeyExists(i,"revQty")>#val(i.revQty)#</cfif>
@@ -129,7 +131,7 @@
 					</tr>
 				</cfloop>
 				<tr>
-					<th colspan="10" align="right" style="font-size:16px;">Totals</th>
+					<th colspan="11" align="right" style="font-size:16px;">Totals</th>
 					<th align="center" style="font-size:14px;"><strong>#total#</strong></th>
 					<th></th>
 					<th align="center" style="font-size:14px;"><strong>#DecimalFormat(totalCost)#</strong></th>

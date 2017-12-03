@@ -11,8 +11,8 @@ component extends="App.Framework.App"
     public boolean function onApplicationStart()
     {
         application.mvc = {
-            'datasource' = 'kcc_sle_production',
-            'migrationDatasource' = 'mvc_sle',
+            'datasource' = env('site.datasource1'),
+            'migrationDatasource' = env('site.datasource2'),
             'dataDirectory' = getCurrentPath('../data'),
             'baseDirectory' = getCurrentPath(),
             'migrationTableName' = 'migrations'

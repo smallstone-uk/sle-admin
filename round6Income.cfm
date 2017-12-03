@@ -51,9 +51,11 @@
 					<!---<cfset interval = 12>--->
 					<cfset drivers = {}>
 					<cfset drivers.alec = {1=25,2=25,3=25,4=25,5=25,6=25,7=30}>
-					<cfset drivers.dave = {1=25,2=25,3=25,4=25,5=25,6=25,7=30}>
-					<cfset drivers.allan = {1=25,2=25,3=25,4=25,5=25,6=25,7=25}>
+					<cfset drivers.dave = {1=25,2=30,3=30,4=30,5=30,6=30,7=35}>
+					<cfset drivers.allan = {1=20,2=25,3=25,4=25,5=25,6=25,7=25}>
 					<cfset drivers.sle = {1=5,2=5,3=5,4=5,5=5,6=5,7=5}>
+					<cfset mileage = {}>
+					<cfset mileage.dave = {miles=17, mpg=27,mph=17}>
 					<cfquery name="QData" datasource="#application.site.datasource1#">
 						SELECT rndID,rndTitle, Sum( diQty ) AS qty, sum((diPrice * diQty) - (diPriceTrade * diQty)) AS profit, 
 							sum( diCharge ) AS charge, count(diID) AS recCount, dayofweek( diDate ) AS dayNum

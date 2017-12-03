@@ -152,6 +152,7 @@
 			<cfset item.PubID=psPubID>
 			<cfset item.SupID=psSupID>
 			<cfset item.Type=psType>
+			<cfset item.subType=psSubType>
 			<cfset item.Status=psStatus>
 			<cfset item.Title=pubTitle>
 			<cfset item.Date=psDate>

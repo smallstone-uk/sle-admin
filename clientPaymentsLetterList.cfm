@@ -34,7 +34,7 @@
 				url: 'clientPaymentsLetterSetup.cfm',
 				data: {
 					"id":id,
-					"user":userID
+					"userID":userID
 				},
 				success:function(data){
 					$("#orderOverlay").fadeIn();
@@ -62,7 +62,7 @@
 	</div>
 	<a href="##" id="letterMenu" class="button" style="float: left;padding: 0;width: 80px;height: 30px;text-align: center;line-height: 30px;" data-user="#client.ID#">Letters</a>
 	<a href="##" id="statement" class="button" style="float:left;" data-user="#client.ID#">View Statement</a>
-	&nbsp;Brought Forward from: <input type="text" name="srchDateFrom" id="srchDateFrom" value="#srchDateFrom#" size="15" class="datepicker" />
+	&nbsp;Brought Forward from: <input type="text" name="srchDateFrom" id="srchDateFrom" value="" size="15" class="datepicker" /><!---#srchDateFrom#--->
 	<div class="clear"></div>
 </div>
 </cfoutput>

@@ -34,7 +34,7 @@
 				<cfset i.OrderRef=soRef>
 				<cfset i.boxes=val(siQtyPacks)-val(siReceived)>
 				<cfset i.UnitSize=prodUnitSize>
-				<cfset i.RRP=prodRRP>
+				<cfset i.RRP=siOurPrice>
 				<cfset i.Barcodes=[]>
 				<cfloop query="Qbarcode">
 					<cfset ArrayAppend(i.Barcodes,Qbarcode.barCode)>
@@ -229,7 +229,7 @@
 			<cfset result.boxes=QStockItem.siQtyPacks>
 			<cfset result.received=QStockItem.siReceived+1>
 			<cfset result.UnitSize=QStockItem.prodUnitSize>
-			<cfset result.RRP=QStockItem.prodRRP>
+			<cfset result.RRP=QStockItem.siOurPrice>
 			<cfset result.qtytotal=QStockItem.siQtyItems+QStockItem.prodPackQty>
 			<cfset parm={}>
 			<cfset parm.datasource=args.datasource>
@@ -258,7 +258,7 @@
 			</cfquery>
 			<cfset result.error="#QProduct.prodTitle# #QProduct.prodUnitSize#">
 			<cfset result.prodID=args.form.id>
-			<cfset result.RRP=QProduct.prodRRP>
+			<cfset result.RRP=QStockItem2.siOurPrice>
 			<cfif QStockItem2.siStatus is "closed">
 				<cfset result.msg="<h3 style='font-size:44px;'>Already Booked In</h3><h3 style='font-size:34px;'>Number of Packs: #QStockItem2.siReceived#/#QStockItem2.siQtyPacks#</h3><h3>Total Products: #QStockItem2.siQtyItems#</h3>">
 				<cfset result.img='<img src="images/tick.png" width="128" />'>
@@ -413,8 +413,8 @@
 						siQtyItems=#loc.QProduct.prodPackQty#,
 						siWSP=#loc.QProduct.prodPackPrice#,
 						siUnitTrade=#loc.QProduct.prodUnitTrade#,
-						siRRP=#loc.QProduct.prodRRP#,
-						siOurPrice=#loc.QProduct.prodOurPrice#,
+						siRRP=#loc.QStockItem.siRRP#,
+						siOurPrice=#loc.QStockItem.siOurPrice#,
 						siPOR=#loc.QProduct.prodPOR#
 					WHERE siID=#val(args.form.siID)#
 				</cfquery>
@@ -456,8 +456,8 @@
 						siQtyItems=#val(QProduct.prodPackQty)#,
 						siWSP=#DecimalFormat(QProduct.prodPackPrice)#,
 						siUnitTrade=#DecimalFormat(QProduct.prodUnitTrade)#,
-						siRRP=#DecimalFormat(QProduct.prodRRP)#,
-						siOurPrice=#DecimalFormat(QProduct.prodOurPrice)#,
+						siRRP=#DecimalFormat(QStockItem.siRRP)#,
+						siOurPrice=#DecimalFormat(QStockItem.siOurPrice)#,
 						siPOR=#DecimalFormat(QProduct.prodPOR)#
 					WHERE siID=#val(args.form.siID)#
 				</cfquery>

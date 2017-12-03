@@ -15,7 +15,7 @@ h1 {line-height: 22px !important;font-size: 20px !important;margin: 10px 0 0 0 !
 .street {clear: both;float: left;width: 780px;border-top: 2px solid #333;margin: 5px 0 0 0;page-break-inside:avoid;}
 .street-title {float: left;width: auto;padding: 0;margin: 10px 0 0 0;font-size: 18px;font-weight: bold;}
 .houses {clear: both;float: left;width: 780px;padding: 0;border-bottom: 1px dotted #999;}
-.house {float: left;}
+.house {float: none;} /*left*/
 .house-title {float: left;width: 230px;	text-transform:capitalize;font-size: 20px;text-align: right;padding: 2px 4px;border-right: 1px solid #999;/* font-weight:bold; */}
 .house-title a {font-size: 20px; color:#000;text-decoration:none; /* font-weight:bold; */}
 .house-items {float: left;width: 540px;padding: 0;border-left: 1px solid #999;margin: 0 0 0 -1px;}

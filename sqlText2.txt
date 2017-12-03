@@ -19,29 +19,6 @@ AND trnClientRef>0
 ORDER BY trnID
 
 
-// Display weekly delivery charge income
-SELECT diDate, CONCAT(YEAR(diDate), '/', WEEK(diDate)) AS week_name, sum(`diCharge`) as chargeTotal FROM `tblDelItems`
-WHERE 1
-GROUP BY week_name
-ORDER BY YEAR(diDate) ASC, WEEK(diDate) ASC
-
-
-// compare delivery charge income on two specific days
-SELECT diDate,diCharge, sum(diCharge),count(*)  
-FROM `tblDelItems` 
-WHERE `diDate` = '2014-08-25' 
-OR diDate='2014-09-01'
-GROUP BY diDate,diCharge
-
-
-// Total of delivery charge income on two specific days
-SELECT diDate, sum(diCharge),count(*)  
-FROM `tblDelItems` 
-WHERE `diDate` = '2014-08-25' 
-OR diDate='2014-09-01'
-GROUP BY diDate
-
-
 //Find orphaned items
 SELECT *
 FROM `tblNomItems`
@@ -195,3 +172,157 @@ AND `trnType` = 'pay'
 AND `trnDate` BETWEEN '2017-03-01' AND '2017-03-31' 
 AND `trnPayAcc` = 181
 AND niNomID=181
+
+// Analyse News payments by type for specified period
+SELECT YEAR( trnDate ) *100 + MONTH( trnDate ) AS yymm, trnMethod, SUM( trnAmnt1 ) AS total
+FROM `tbltrans`
+WHERE `trnLedger` = 'sales'
+AND `trnClientRef` !=0
+AND `trnType` = 'pay'
+AND `trnDate`
+BETWEEN '2016-02-01'
+AND '2017-01-31'
+GROUP BY yymm, trnMethod
+LIMIT 0 , 100
+
+// Cash deposits summary per month for specified period
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnPaidIn=3
+AND niNomID=41
+GROUP BY yymm, trnMethod
+
+
+// Cheque deposits summary per month for specified period
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnPaidIn=4
+AND niNomID=41
+GROUP BY yymm, trnMethod
+
+
+// Cardnet banking
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnRef LIKE 'BGC'
+AND niNomID=41
+AND trnClientID=0
+AND trnDesc LIKE 'CARDNET%'
+GROUP BY yymm, trnMethod
+
+
+// News Client internet banking
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND niNomID=41
+AND trnMethod='ib'
+AND trnClientRef<>0
+GROUP BY yymm, trnMethod
+
+// News Client internet banking v2
+SELECT YEAR( trnDate ) *100 + MONTH( trnDate ) AS yymm, trnMethod, SUM( niAmount ) AS total
+FROM `tbltrans`
+INNER JOIN tblNomItems ON niTranID = trnID
+WHERE `trnLedger` = 'sales'
+AND `trnClientRef` !=0
+AND `trnType` = 'pay'
+AND `trnDesc` NOT LIKE 'ppcomm'
+AND `trnMethod` LIKE 'ib'
+AND niNomID =41
+AND `trnDate`
+BETWEEN '2016-02-01'
+AND '2017-01-31'
+GROUP BY yymm, trnMethod
+
+
+// Other deposits
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnRef='TFR'
+AND niNomID=41
+AND trnType='nom'
+AND niAmount>0
+GROUP BY yymm, trnMethod
+
+
+// Collected Cash
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, trnMethod, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnMethod='coll'
+AND niNomID=41
+AND trnType='nom'
+AND niAmount>0
+GROUP BY yymm, trnMethod
+
+// Wages paid by BACS
+SELECT *
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnType='nom'
+AND trnRef IN ('TFR','FPO')
+AND niNomID=41
+AND niAmount<0
+AND trnDesc LIKE '%SLE STORE%'
+
+// wages paid by BACS grouped by staff name
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm,trnDesc,sum(niAmount) as total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+WHERE `trnDate` BETWEEN '2016-02-01' AND '2017-01-31'
+AND trnType='nom'
+AND trnRef IN ('TFR','FPO')
+AND niAmount>0
+AND trnDesc LIKE '%SLE STORE%'
+group by niNomID
+
+
+// bunnery hours by day
+SELECT piday, sum( piHours ) AS hours
+FROM `tblpayitems`
+INNER JOIN tblPayHeader ON phID = piParent
+WHERE phDate >= '2016-02-01'
+AND phDate <= '2017-01-31'
+AND piDept =52
+GROUP BY piday
+
+// bunnery hours per day by employee
+SELECT empFirstName,empLastName, piDay, AVG( piHours ) AS Avg, SUM( piHours ) AS Hours, SUM(piGross) AS Pay, Count(phID) AS Count
+FROM `tblpayitems`
+INNER JOIN tblPayHeader ON phID = piParent
+INNER JOIN tblemployee ON phEmployee=empID
+WHERE phDate >= '2017-01-01'
+AND phDate <= '2017-08-31'
+AND piDept =52
+GROUP BY empID,piDay
+
+// audit list for above
+SELECT empFirstName,empLastName, tblpayitems.*, tblPayHeader .*
+FROM `tblpayitems`
+INNER JOIN tblPayHeader ON phID = piParent
+INNER JOIN tblemployee ON phEmployee=empID
+WHERE phDate >= '2017-01-01'
+AND phDate <= '2017-12-31'
+AND piDept =52
+ORDER BY empID,phDate
+
+// bunnery sales (including o/c) to date
+SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, nomTitle, SUM(niAmount) AS total
+FROM `tbltrans` 
+INNER JOIN tblNomItems ON niTranID=trnID
+INNER JOIN tblNominal ON niNomID=nomID
+WHERE `trnDate` BETWEEN '2017-01-01' AND '2017-12-31'
+AND niNomID IN (901,2212,2152)
+GROUP BY yymm, niNomID 

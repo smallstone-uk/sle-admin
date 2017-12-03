@@ -99,6 +99,7 @@
 	#LoadPrint {position:fixed;left:-9999px;}
 	#LoadResult {float:left;width:790px;}
 	#LoadResultNav {float: left;width: 200px;margin: 0 0 0 10px;}
+	.red {color:#ff0000; font-weight:bold; }
 </style>
 </head>
 
@@ -121,7 +122,11 @@
 							Voucher Input
 							<span><div id="loading" class="loading"></div></span>
 						</div>
-						<div style="float:right;width:350px;padding:5px 10px;line-height:20px;">Scan the voucher's barcode once you have entered the <b>Date</b> and <b>Reference</b> and selected the relevant supplier.<br>You can use the <b>Quantity</b> field to add muliply vouchers in one scan.<br>Once finished, press print.</div>
+						<div style="float:right;width:350px;padding:5px 10px;line-height:20px;">
+							Scan the voucher's barcode once you have entered the <b>Date</b> 
+							and <b>Reference</b> and selected the relevant supplier.<br>You can use the <b>Quantity</b> field to add muliply vouchers in one scan.<br>
+							Once finished, press print.<br>
+						</div>
 						<input type="hidden" name="barcode" id="barcode" value="" autocomplete="off">
 						<table border="0">
 							<tr>
@@ -148,6 +153,7 @@
 						</table>
 					</form>
 				</div>
+				<span class="red">ENSURE VOUCHER ENVELOPE IS PUT OUT FOR COLLECTION ON SUNDAY IN A SEALED TOTE BOX.</span>
 				<div class="clear"></div>
 				<div id="print-area" style="padding:10px;width:700px;">
 					<div id="LoadPrint" style="display:none;"></div>

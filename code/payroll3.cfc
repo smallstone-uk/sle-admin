@@ -43,7 +43,6 @@
 				"items" = []
 			})>
 		</cfloop>
-		
 		<cfloop array="#loc.result#" index="i">
 			<cfquery name="loc.headers" datasource="#args.database#">
 				SELECT tblPayHeader.*, tblEmployee.*,

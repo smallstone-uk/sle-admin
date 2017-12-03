@@ -1,0 +1,327 @@
+
+// Transactions, nominal title and item amount for news invoices/credit notes
+SELECT tblTrans.*,  nomRef, nomTitle, niAmount
+FROM `tblTrans` ,tblNomItems, tblNominal
+WHERE `trnLedger` = 'sales' 
+AND `trnType` IN ('inv', 'crn')
+AND niTranID=trnID
+AND niNomID=nomID
+AND trnClientRef>0
+
+
+// news invoices/credit notes with no nomItem
+SELECT tblTrans.*, niAmount
+FROM tblTrans
+LEFT JOIN tblNomItems ON niTranID=trnID
+WHERE niID IS NULL
+AND trnType IN ('inv','crn')
+AND trnClientRef>0
+ORDER BY trnID
+
+
+//Find orphaned items
+SELECT *
+FROM `tblNomItems`
+LEFT JOIN tblTrans ON nitranid = trnID
+WHERE trnid IS NULL
+LIMIT 0 , 30
+
+
+// Select specific child records from table using criteria selected from its parent tables
+SELECT * FROM tblNomItems
+INNER JOIN tblNominal ON niNomID=nomID
+INNER JOIN tblTrans ON niTranID=trnID 
+WHERE nomID=41
+AND trnClientRef=112
+
+
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblNominal ON niNomID=nomID
+WHERE nomType="sales"
+AND nomTillBtn=0
+AND niAmount=0
+
+
+// Delete specific child records from table using criteria selected from parent table
+DELETE FROM tblNomItems
+USING tblNomItems
+INNER JOIN tblTrans ON niTranID=trnID 
+WHERE `trnAccountID` = 241 
+AND `trnClientRef` = 0
+AND niTranID>362700
+
+
+// count duplicate nomitems for shop account
+SELECT count(*) as Count, niTranID FROM tblNomItems n WHERE niNomID=201 group by niTranID having Count > 1
+
+
+// select duplicated nomItems
+select u1.*, u2.niID FROM tblNomItems u1, tblNomItems u2 WHERE u1.niID < u2.niID AND u1.niNomID=u2.niNomID AND u1.niNomID=201 AND u1.niTranID=u2.niTranID
+ORDER BY u2.niTranID
+
+
+// find customers with more than one (rogue) order
+SELECT tblOrder.ordClientID, tblOrder.ordID, tblOrder.ordDate, tblOrder.ordRef, tblOrder.ordContact, tblOrder.ordDeliveryCode, tblOrder.ordDelCodeNew
+FROM tblOrder
+WHERE (((tblOrder.ordClientID) In (SELECT [ordClientID] FROM [tblOrder] As Tmp GROUP BY [ordClientID] HAVING Count(*)>1 )))
+ORDER BY tblOrder.ordClientID;
+
+
+// NomItems for a given nomID and Date
+SELECT *
+FROM `tblNomItems`
+INNER JOIN tblTrans ON trnID = niTranID
+WHERE `niNomID` =841
+AND trnDate > '2014-10-26'
+LIMIT 0 , 30
+
+
+// Update field based on the value of a field in another table. May not work if sub-select does not find a matching record
+UPDATE tblClients
+SET tblClients.cltDelCode=(SELECT `ordDelCodeNew` FROM tblOrder WHERE `ordClientID`=cltID)
+
+
+// Update field in child table base on field in parent table
+UPDATE tblTrans t, tblClients c
+SET trnClientID=cltID
+WHERE t.trnClientRef=c.cltRef
+AND trnClientRef>0
+AND trnAccountID=4
+
+
+// find parent & child records
+Select * FROM `tblTrans`
+INNER JOIN tblNomItems ON trnID=niTranID
+WHERE `trnAccountID` = 3 
+AND  `trnRef` LIKE '%DD%' 
+AND `trnDesc` LIKE '%BOOKER%'
+AND niNomID=11
+
+
+// update previously found records
+UPDATE tblNomItems i
+JOIN tblTrans t ON t.trnID=i.niTranID
+SET i.niNomID=1652
+WHERE t.trnAccountID = 3 
+AND  t.trnRef LIKE '%DD%' 
+AND t.trnDesc LIKE '%BOOKER%'
+AND i.niNomID=11
+
+
+Select * FROM tblNomItems i
+JOIN tblTrans t ON t.trnID=i.niTranID
+WHERE trnClientRef=375
+AND trnType='pay'
+AND niNomID=41
+
+
+// trans for a client when nomItem is connected to bank
+SELECT *
+FROM tblNomItems i
+JOIN tblTrans t ON t.trnID = i.niTranID
+WHERE trnClientRef =382
+AND trnType = 'pay'
+AND niNomID =41
+
+
+// get client record and most recent collected payment record
+SELECT cltRef, cltName,cltAccountType,cltPaymentType,cltPayMethod,cltPayType, trnDate,trnMethod
+FROM tblClients
+INNER JOIN tblTrans ON
+(tblTrans.trnClientID = tblClients.cltID)
+WHERE tblTrans.trnClientID = tblClients.cltID
+AND tblTrans.trnID = (SELECT MAX(trnID)
+FROM tblTrans
+WHERE trnClientID = tblClients.cltID
+AND cltAccountType<>'N'
+AND trnMethod='coll')
+ORDER BY tblClients.cltRef
+
+
+// Account invoice totals for given period
+SELECT accName, trnAmnt1+trnAmnt2 AS linetotal
+FROM `tblTrans`, tblAccount
+WHERE trnAccountID=accID
+AND accPayAcc=181
+AND trnDate<'2013-03-01'
+AND trnType IN ('inv','crn')
+GROUP BY accCode
+
+
+// supplier transactions paid via shop
+SELECT accName, SUM( trnAmnt1 + trnAmnt2 ) AS linetotal
+FROM `tblTrans` , tblAccount
+WHERE trnAccountID = accID
+AND trnLedger = 'purch'
+AND trnDate
+BETWEEN '2013-06-01'
+AND '2013-06-30'
+AND trnType
+IN (
+'pay', 'jnl'
+)
+AND trnPayAcc=181
+GROUP BY accCode
+
+
+// supplier COD transaction totals by month
+SELECT SUM( trnAmnt1 + trnAmnt2 ) AS linetotal, CONCAT( YEAR( trnDate ) , '/', MONTH( trnDate ) ) AS Mnth
+FROM `tblTrans` , tblAccount
+WHERE trnAccountID = accID
+AND trnLedger = 'purch'
+AND trnDate
+BETWEEN '2015-01-01'
+AND '2015-05-31'
+AND trnType
+IN (
+'pay', 'jnl'
+)
+AND trnPayAcc =181
+GROUP BY mnth
+
+
+// total payments for supplier grouped by month
+SELECT DATE_FORMAT(trnDate,'%Y-%m') AS yymm, SUM( trnAmnt1 + trnAmnt2 ) AS linetotal
+FROM `tblTrans` , tblAccount
+WHERE trnAccountID = accID
+AND trnLedger = 'purch'
+AND trnType
+IN ('pay', 'jnl')
+AND trnAccountID=321
+GROUP BY yymm
+
+
+// FIX COUNCIL PAYMENTS
+SELECT *
+FROM tblNomItems i
+JOIN tblTrans t ON t.trnID = i.niTranID
+WHERE trnType = 'pay'
+AND niNomID =1752
+AND trnClientRef =112
+
+
+UPDATE tblNomItems i
+JOIN tblTrans t ON t.trnID=i.niTranID
+SET i.niNomID=1752
+WHERE trnClientRef=382
+AND trnType='pay'
+AND niNomID=41
+
+
+// nomItem total for specific period posted to specified nom account
+SELECT sum(niAmount)
+FROM tblNomItems i
+JOIN tblTrans t ON t.trnID = i.niTranID
+WHERE trnType = 'pay'
+AND niNomID =1752
+AND trnDate
+BETWEEN '2013-02-01'
+AND '2014-01-31'
+
+
+// fix nomItems based on values in tblTrans
+UPDATE `tblNomItems` 
+INNER JOIN tblTrans ON trnID=niTranID
+SET niAmount=-niAmount
+WHERE `niNomID` = 191
+AND trnRef='BGC'
+AND niAmount > 0
+
+
+// Find shop sales trans where nomitem total does not match net amount
+SELECT trnID,trnDate,trnAmnt1, SUM(niAmount) AS total, count(niTranID) as itemCount
+FROM tblTrans 
+LEFT JOIN tblNomItems ON niTranID=trnID
+WHERE trnLedger='sales'
+AND trnType='inv'
+AND trnAccountID=1
+AND niNomID<>201
+GROUP BY trnID
+HAVING trnAmnt1<>total
+ORDER BY trnDate DESC
+
+
+//  find bad nomitem pairings
+SELECT trnID, sum( niamount ) AS total
+FROM `tblNomItems`
+INNER JOIN tblTrans ON trnID = niTranID
+WHERE trnDate = '2013-03-05'
+GROUP BY trnID
+
+
+//Sweet Price List
+SELECT prodTitle,siRRP
+FROM tblProducts
+INNER JOIN tblProductCats ON pcatID = prodCatID
+INNER JOIN tblStockItem ON
+(tblStockItem.siProduct= tblProducts.prodID)
+WHERE tblStockItem.siProduct = tblProducts.prodID
+AND (pcatTitle LIKE '%sweet%' OR pcatTitle LIKE '%chocolate%')
+AND prodCountDate IS NOT NULL
+AND tblStockItem.siID = (SELECT MAX(siID)
+FROM tblStockItem 
+WHERE siProduct = tblProducts.prodID)
+ORDER BY tblProducts.prodTitle
+
+
+// total of news cheques banked within specified paid in range
+SELECT sum( trnAmnt1 ) AS total
+FROM `tbltrans`
+WHERE `trnLedger` = 'sales'
+AND `trnClientRef` >0
+AND `trnType` = 'pay'
+AND `trnMethod` LIKE '%chq%'
+AND trnPaidIn >160200
+AND trnPaidIn <170132
+
+
+// wages paid by BACS in specified period, grouped by employee
+SELECT nomTitle, SUM( niAmount ) AS total
+FROM `tbltrans`
+INNER JOIN tblNomItems ON niTranID = trnID
+INNER JOIN tblNominal ON niNomID = nomID
+WHERE nomGroup = 'FP'
+AND trnDate
+BETWEEN '2016-02-01'
+AND '2017-01-31'
+GROUP BY nomCode
+
+// Sum of cash payments to suppliers
+SELECT accName, accPayAcc, accGroup, trnMethod, Sum( trnAmnt1 ) AS total
+FROM `tbltrans`
+INNER JOIN tblAccount ON trnAccountID = accID
+WHERE trnLedger = 'purch'
+AND trnType = 'pay'
+AND trnDate
+BETWEEN '2016-02-01'
+AND '2017-01-31'
+AND trnMethod != 'ib'
+GROUP BY accName, trnMethod
+
+
+// cheques waiting to be banked as at 31/01/2017
+SELECT sum(trnAmnt1) as total
+FROM `tbltrans` 
+WHERE `trnMethod` LIKE '%chq%' 
+AND `trnDate` < '2017-02-01' 
+AND `trnPaidIn` = 170206
+
+
+// News debtors balance as at 31/1/2017
+SELECT sum(trnAmnt1) as total
+FROM `tbltrans` 
+WHERE `trnAccountID` = 4 
+AND `trnDate` < '2017-02-01'
+
+
+// totals for specific supplier types
+SELECT accName,accPayAcc,accGroup, trnDate,Sum(trnAmnt1) AS total
+FROM `tbltrans`
+INNER JOIN tblAccount ON trnAccountID=accID
+WHERE trnLedger='purch'
+AND trnType='pay'
+AND trnDate BETWEEN '2016-02-01' AND '2017-01-31'
+AND accPayAcc IN (131,181)
+GROUP BY accName,trnDate

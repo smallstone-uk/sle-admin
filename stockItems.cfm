@@ -50,7 +50,7 @@
 					<td colspan="14" style="background-color:##eeeeee">
 						<table class="tableList" width="100%" border="0">
 							<tr>
-								<td>#parm.ref#</td>
+								<td><a href="http://tweb.sle-admin.co.uk/productStock6.cfm?product=#parm.ref#">#parm.ref#</a></td>
 								<td>#records.stockItems.prodRef#</td>
 								<td>#records.stockItems.prodTitle#</td>
 								<td>Last Bought: #DateFormat(records.stockItems.prodLastBought,"dd-mmm-yyyy")#</td>

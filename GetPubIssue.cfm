@@ -12,7 +12,7 @@
 	<cfset parm.type=form.GetType>
 	<cfset parm.currenttype=form.psType>
 	<cfset parm.date=form.psDate>
-	<cfset parm.limit=5>
+	<cfset parm.limit=15>
 	<cfset issues=func.GetPubStockIssues(parm)>
 	
 	<cfif parm.currenttype eq "returned">

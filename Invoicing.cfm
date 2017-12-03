@@ -116,6 +116,7 @@
 							Invoicing
 							<span></span>
 						</div>
+						<div style="float:left">
 						<table border="0">
 							<tr>
 								<td><b>Deliver invoices on</b></td>
@@ -125,7 +126,7 @@
 							</tr>
 							<tr>
 								<td rowspan="3"><b>Date invoices as</b></td>
-								<td rowspan="3"><input type="text" name="invDate" class="datepicker" value="#DateFormat(DateAdd('d',2,invData.InvDate),'yyyy-mm-dd')#"></td>
+								<td rowspan="3"><input type="text" name="invDate" class="datepicker" value="#DateFormat(invData.InvDate,'yyyy-mm-dd')#"></td>
 								<td><input type="checkbox" name="fixflag" value="1" id="fixflag"></td>
 								<td><label for="fixflag"><b>Update Invoices (Admin use Only)</b></label></td>
 							</tr>
@@ -135,7 +136,7 @@
 							</tr>
 							<tr>
 								<td><input type="checkbox" name="advance" value="1" id="advance"></td>
-								<td><label for="advance"><b>Advance Invoice Period</b></label></td>
+								<td><label for="advance"><b>Advance Invoice Period (to the To Date)</b></label></td>
 							</tr>
 							<tr>
 								<td><b>From</b></td>
@@ -174,6 +175,15 @@
 								</td>
 							</tr>
 						</table>
+						</div>
+						<div style="float:right">
+							<table width="400">
+								<tr><td><strong>Notes</strong></td></tr>
+								<tr><td>Claim Vouchers for 1144 Duchy IFA before invoicing.</td></tr>
+								<tr><td>EMail copy of invoice to Crea Brooks.</td></tr>
+							</table>
+						</div>
+					<div class="clear"></div>
 					</div>
 					<div class="clear"></div>
 					<div id="InvoiceList"></div>

@@ -7,7 +7,7 @@
 	<cfset parm.datasource=application.site.datasource1>
 	<cfset parm.form=form>
 	<cfset lookup=pstock.FindProduct(parm)>
-	<!---<cfdump var="#lookup#" label="lookup" expand="false">--->
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 			<cfoutput>
@@ -148,6 +148,7 @@
 					<tr><td>Group</td><td>#lookup.groupTitle#</td></tr>
 					<tr><td>Category</td><td>#lookup.catTitle#</td></tr>
 					<tr><td>Minimum Price</td><td>#lookup.product.prodMinPrice#</td></tr>
+					<tr><td>Our Price</td><td>#lookup.product.prodOurPrice#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
@@ -213,6 +214,8 @@
 							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> /></td></tr>
 						<tr><td>Minimum Price</td><td>
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
+						<tr><td>Our Price</td><td>
+							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -243,7 +246,7 @@
 					</table>
 				</form>
 			</div>
-		<cfelseif lookup.action IS "Add">
+		<cfelseif lookup.action IS "Add" OR lookup.action IS "New">
 			<h1>#lookup.msg#</h1>
 			<button id="AddProduct">Add Product</button>
 			<div id="AddProductForm">
@@ -268,6 +271,8 @@
 						</td></tr>
 						<tr><td>Minimum Price</td><td>
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" /></td></tr>
+						<tr><td>Our Price</td><td>
+							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" /> (if no stock records)</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>

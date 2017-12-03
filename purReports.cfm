@@ -94,6 +94,7 @@
 											<option value="10"<cfif srchReport eq "10"> selected="selected"</cfif>>Nom Totals Report</option>
 											<option value="11"<cfif srchReport eq "11"> selected="selected"</cfif>>Fix Sales Balances</option>
 											<option value="12"<cfif srchReport eq "12"> selected="selected"</cfif>>Shop News Payments</option>
+											<option value="13"<cfif srchReport eq "13"> selected="selected"</cfif>>Banking Analysis</option>
 										</select>
 									</td>
 								</tr>
@@ -299,6 +300,10 @@
 									<cfset accountID=0>
 									<cfset errCount=0>
 									<cfset errArray=[]>
+									<cfset gNomDrTotal=0>
+									<cfset gTrn1Total=0>
+									<cfset gTrn2Total=0>
+									<cfset noms = {}>
 									<table border="1" class="tableList">
 									<cfloop array="#trans.tranArray#" index="tran">
 										<cfif accountID neq tran.accID>
@@ -322,6 +327,8 @@
 														<td width="70" align="right">DR</td>
 														<td width="70" align="right">CR</td>
 													</tr>
+													<cfset gTrn1Total += tran.trnAmnt1>
+													<cfset gTrn2Total += tran.trnAmnt2>
 													<cfset rec={}>
 													<cfset rec.penceGross=(tran.trnAmnt1+tran.trnAmnt2)*100>
 													<cfset rec.penceSum=0>
@@ -330,6 +337,12 @@
 													<cfset rec.drTotal=0>
 													<cfset rec.crTotal=0>
 													<cfloop query="tran.items">
+														<cfif NOT StructKeyExists(noms,nomCode)>
+															<cfset StructInsert(noms,nomCode,niAmount)>
+														<cfelse>
+															<cfset nomValue = StructFind(noms,nomCode)>
+															<cfset StructUpdate(noms,nomCode,nomValue + niAmount)>
+														</cfif>
 														<tr>
 															<td>#nomCode#</td>
 															<td>#nomTitle#</td>
@@ -344,7 +357,20 @@
 																<td align="right">#DecimalFormat(niAmount)#</td><td></td>
 															</cfif>
 														</tr>
+														<cfif tran.trnType eq 'inv' AND niAmount gt 0>
+															<cfset gNomDrTotal += niAmount>
+														<cfelseif tran.trnType eq 'crn' AND niAmount lt 0>
+															<cfset gNomDrTotal += niAmount>
+														</cfif>
 													</cfloop>
+													<cfset diff = abs((gTrn1Total + gTrn2Total) - gNomDrTotal)>
+													<cfif diff gt 0.001>
+														<tr>
+															<td colspan="4" bgcolor="##FF0000">ERROR: #gTrn1Total + gTrn2Total - gNomDrTotal#</td>
+														</tr>
+													<cfelse>
+														<cfset diff = 0>
+													</cfif>
 													<tr>
 														<td>
 															<cfif rec.penceSum eq 0>
@@ -365,7 +391,30 @@
 											</td>
 										</tr>
 									</cfloop>
-									</table>			
+									<tr>
+										<td colspan="7">
+											<table>
+												<tr>
+													<td>Trans</td>
+													<td align="right">Net</td>
+													<td align="right">VAT</td>
+													<td align="right">Gross</td>
+													<td align="right">Nom</td>
+													<td align="right">Diff</td>
+												</tr>
+												<tr>
+													<td>#ArrayLen(trans.tranArray)#</td>
+													<td align="right">#DecimalFormat(gTrn1Total)#</td>
+													<td align="right">#DecimalFormat(gTrn2Total)#</td>
+													<td align="right">#DecimalFormat(gTrn1Total + gTrn2Total)#</td>
+													<td align="right">#DecimalFormat(gNomDrTotal)#</td>
+													<td align="right">#DecimalFormat(diff)#</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									</table>
+									<cfdump var="#noms#" label="noms" expand="false">
 									<cfif ArrayLen(errArray)>
 										<cfset errTotal=0>
 										<table>
@@ -1015,11 +1064,58 @@
 											<td></td>
 										</tr>
 									</table>
+									<table class="tableList" border="1">
+									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
+									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
+										<tr>
+											<th>Group</th>
+											<th>Code</th>
+											<th>Type</th>
+											<th>Title</th>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<th align="right">#i#</th>
+											</cfloop>
+											<th>Total</th>
+										</tr>
+									<cfloop list="#nomList#" delimiters="," index="item">
+										<cfset nom = StructFind(data.purRows,item)>
+										<tr>
+											<td>#nom.nomGroup#</td>
+											<td>#nom.nomCode#</td>
+											<td>#nom.nomType#</td>
+											<td>#nom.nomTitle#</td>
+											<cfset rowTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<td align="right">
+													<cfif StructKeyExists(nom.nomBals,i)>
+														<cfset value = StructFind(nom.nomBals,i)>
+														<cfset rowTotal += value>
+														#DecimalFormat(value)#
+													</cfif>
+												</td>
+											</cfloop>
+											<td align="right">#DecimalFormat(rowTotal)#</td>
+										</tr>
+									</cfloop>
+										<tr>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th>Totals</th>
+											<cfset rowTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<cfset total = StructFind(data.totals,i)>
+												<cfset rowTotal += total>
+												<th align="right">#DecimalFormat(total)#</th>
+											</cfloop>
+											<th align="right">#DecimalFormat(rowTotal)#</th>
+										</tr>
+									</table>
 								</cfcase>
 								
 								<cfcase value="10">
 									<cfset data=pur.NomTotalReport(parms)>
-									<!---<cfdump var="#data#" label="data" expand="no">--->
+									<cfdump var="#data#" label="data" expand="no">
 									<cfset nomList = ListSort(StructKeyList(data.rows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
 									<table class="tableList" border="1">
@@ -1330,6 +1426,231 @@
 											<td align="right">#finalBalance#</td>
 										</tr>
 									</table>
+								</cfcase>
+								
+								<cfcase value="13">
+									<table class="tableList" border="1">
+									<cfquery name="QDBTotal" datasource="#application.site.datasource1#" result="rQDBTotal">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND niAmount>0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+									<cfset firstCol = 0>
+										<tr>
+											<th width="80">Method</th>
+											<cfloop query="QDBTotal">
+												<cfif firstCol IS 0><cfset firstCol = yymm></cfif>
+												<cfset thisCol = yymm>
+												<th align="right">#thisCol#</th>
+											</cfloop>
+											<cfset lastCol = thisCol>
+											<th align="right">Total</th>
+										</tr>
+										<tr>
+											<td>Receipts</td>
+											<cfloop query="QDBTotal">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal = yrtotal>
+									<cfquery name="QCashDeposits" datasource="#application.site.datasource1#">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, 'cash' AS trnMethod, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND trnPaidIn=3
+										AND niAmount>0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+										<tr>
+											<td>Shop #QCashDeposits.trnMethod#</td>
+											<cfloop query="QCashDeposits">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal -= yrtotal>
+									<cfquery name="QChqDeposits" datasource="#application.site.datasource1#">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, 'chq' AS trnMethod, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND trnPaidIn=4
+										AND niAmount>0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+										<tr>
+											<td>News #QChqDeposits.trnMethod#</td>
+											<cfloop query="QChqDeposits">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal -= yrtotal>
+									<cfquery name="QCard" datasource="#application.site.datasource1#">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, 'card' AS trnMethod, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND trnRef LIKE 'BGC'
+										AND trnClientID=0
+										AND (trnDesc LIKE 'CARDNET%'
+												OR trnDesc LIKE '%WORLDPAY 00942062%')
+										AND niAmount>0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+										<tr>
+											<td>#QCard.trnMethod#</td>
+											<cfloop query="QCard">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal -= yrtotal>
+									<cfquery name="QNewsIB" datasource="#application.site.datasource1#">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, 'ib' AS trnMethod, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND trnMethod='ib'
+										<!---AND trnClientRef<>0--->
+										AND niAmount>0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+										<tr>
+											<td>#QNewsIB.trnMethod#</td>
+											<cfloop query="QNewsIB">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal -= yrtotal>
+									<cfquery name="QOther" datasource="#application.site.datasource1#">
+										SELECT CONCAT(YEAR(trnDate),'-',LPAD(MONTH(trnDate),2,'0')) AS yymm, 'other' AS trnMethod, SUM(niAmount) AS total
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND niAmount > 0
+										<!---AND trnMethod NOT LIKE 'ib' does not work--->
+										AND trnMethod IS NULL
+										AND trnPaidIn NOT IN (3,4)
+										AND trnDesc NOT LIKE '%CARDNET%' 
+										AND trnDesc NOT LIKE '%WORLDPAY 00942062%'
+										AND trnClientRef = 0
+										GROUP BY yymm
+									</cfquery>
+									<cfset yrtotal = 0>
+									<cfif abs(chkTotal) lt 0.001><cfset chkTotal = 0></cfif>
+										<tr>
+											<td>#QOther.trnMethod#</td>
+											<cfloop query="QOther">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+										<tr>
+											<td></td>
+											<td>Difference</td>
+											<td align="right">#chkTotal#</td>
+										</tr>
+									<cfquery name="QCollDeposits" datasource="#application.site.datasource1#">
+										SELECT YEAR( trnDate ) *100 + MONTH( trnDate ) AS yymm, trnMethod, SUM( niAmount ) AS total
+										FROM `tbltrans`
+										INNER JOIN tblNomItems ON niTranID = trnID
+										WHERE trnMethod = 'coll'
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND niAmount >0
+										GROUP BY yymm, trnMethod
+									</cfquery>
+									<cfset yrtotal = 0>
+										<tr>
+											<td>News #QCollDeposits.trnMethod#</td>
+											<cfloop query="QCollDeposits">
+												<td align="right">#DecimalFormat(total)#</td>
+												<cfset yrtotal += val(total)>
+											</cfloop>
+											<td align="right">#DecimalFormat(yrtotal)#</td>
+										</tr>
+									<cfset chkTotal -= yrtotal>
+									</table>
+									<cfquery name="QOtherTrans" datasource="#application.site.datasource1#">
+										SELECT * 
+										FROM `tbltrans` 
+										INNER JOIN tblNomItems ON niTranID=trnID
+										WHERE niNomID=41
+										AND trnDate >= '#SRCHDATEFROM#'
+										AND trnDate <= '#SRCHDATETO#'
+										AND niAmount > 0
+										AND trnMethod IS NULL
+										AND trnPaidIn NOT IN (3,4)
+										AND trnDesc NOT LIKE '%CARDNET%'
+										AND trnDesc NOT LIKE '%WORLDPAY 00942062%'
+										AND trnClientRef = 0
+										ORDER BY trnDate
+									</cfquery>
+									<cfif QOtherTrans.recordcount gt 0>
+										<br>
+										<table width="800" class="tableList">
+											<tr>
+												<th align="right">ID</th>
+												<th align="right">Date</th>
+												<th>Ledger</th>
+												<th>Desc</th>
+												<th>Method</th>
+												<th>Type</th>
+												<th>PaidIn</th>
+												<th>ClientRef</th>
+												<th align="right">Amount</th>
+											</tr>
+											<cfset trantotal = 0>
+											<cfloop query="QOtherTrans">
+												<cfset trantotal += niAmount>
+											<tr>
+												<td align="right">#trnID#</td>
+												<td align="right">#DateFormat(trndate,'ddd dd-mmm-yyyy')#</td>
+												<td>#trnLedger#</td>
+												<td>#trnDesc#</td>
+												<td>#trnMethod#</td>
+												<td>#trnType#</td>
+												<td>#trnPaidIn#</td>
+												<td>#trnClientRef#</td>
+												<td align="right">#DecimalFormat(niAmount)#</td>
+											</tr>
+											</cfloop>
+											<tr>
+												<th align="right" colspan="8">Total</th>
+												<th align="right">#DecimalFormat(trantotal)#</th>
+											</tr>
+										</table>
+									</cfif>
 								</cfcase>
 							</cfswitch>
 						</cfif>

@@ -70,7 +70,7 @@
 					$('.aifNetAmountCell').each(function(i, e) {
 						var el = $(e);
 						var value = nf(el.html(), "num");
-						cellsTotal += (!value) ? (el.find('.niAmount').val() >= 0) ? nf(el.find('.niAmount').val(), "num") : 0 : value;
+						cellsTotal += nf(el.find('.niAmount').val(), 'num');
 					});
 					$('##aifNetTotalHolder').html( nf(cellsTotal, "abs_str") );
 					return nf(cellsTotal, "abs_num");
@@ -80,7 +80,7 @@
 					$('.aifVatAmountCell').each(function(i, e) {
 						var el = $(e);
 						var value = nf($(e).html(), "num");
-						cellsTotal += (!value) ? (el.find('.vatAmountFld').val() >= 0) ? nf(el.find('.vatAmountFld').val(), "num") : 0 : value;
+						cellsTotal += nf(el.find('.vatAmountFld').val(), 'num');
 					});
 					$('##aifVatTotalHolder').html( nf(cellsTotal, "abs_str") );
 					return nf(cellsTotal, "abs_num");

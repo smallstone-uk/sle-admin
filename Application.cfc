@@ -10,6 +10,8 @@ component extends="App.Framework.App"
 
     public boolean function onApplicationStart()
     {
+        super.onApplicationStart();
+
         application.mvc = {
             'datasource' = env('site.datasource1'),
             'migrationDatasource' = env('site.datasource2'),
@@ -17,8 +19,6 @@ component extends="App.Framework.App"
             'baseDirectory' = getCurrentPath(),
             'migrationTableName' = 'migrations'
         };
-
-        super.onApplicationStart();
 
         application.site.start = now();
         application.site.basedir = getBaseDir();

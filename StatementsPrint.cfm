@@ -36,10 +36,10 @@
 	<cfdump var="#print#" label="print" expand="no">--->
 </cfif>
 
-<cfset init={}>
-<cfset init.datasource=application.site.datasource1>
-<cfset init.roundType="morning">
-<cfset roundList=fnc.LoadRoundList(init)>
+<cfset initTest={}>
+<cfset initTest.datasource=application.site.datasource1>
+<cfset initTest.roundType="morning">
+<cfset roundList=fnc.LoadRoundList(initTest)>
 
 <!---<cfdump var="#GetPrinterInfo()#" label="GetPrinterInfo" expand="no">--->
 

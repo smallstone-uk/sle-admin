@@ -55,7 +55,7 @@
 					</cfif>
 					<cfset search.datasource=application.site.datasource1>
 					<cfif application.site.showdumps><cfdump var="#search#" label="search" expand="no"></cfif>					
-					<cfset init.datasource=search.datasource>
+					<cfset initTest.datasource=search.datasource>
 					<div class="form-wrap">
 						<script type="text/javascript">
 							$(function() {

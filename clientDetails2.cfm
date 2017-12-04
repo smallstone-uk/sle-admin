@@ -84,8 +84,8 @@
 					<cfset custMsgs=cust.LoadClientMsgs(customer)>
 					<cfset custDelItems=cust.LoadClientDelItems(customer)>
 										
-					<cfset init.datasource=search.datasource>
-					<cfset init.streetcode=customer.rec.cltStreetCode>
+					<cfset initTest.datasource=search.datasource>
+					<cfset initTest.streetcode=customer.rec.cltStreetCode>
 					<cfset street=cust.LoadStreets(customer)>
 					<cfset charges=cust.LoadDeliveryCharges(customer)>
 					<div class="form-wrap">

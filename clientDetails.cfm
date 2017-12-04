@@ -99,9 +99,10 @@
 					<cfset customer=cust.LoadClient(search)>
 					<cfset session.clientSearch=customer>
 					<cfset custOrder=cust.LoadClientOrder(customer)>
-															
-					<cfset init.datasource=search.datasource>
-					<cfset init.streetcode=customer.rec.cltStreetCode>
+
+					<cfset initTest.datasource=search.datasource>
+					<cfset writeDump(search)>
+					<cfset initTest.streetcode=customer.rec.cltStreetCode>
 					<cfset street=cust.LoadStreets(customer)>
 					<cfset charges=cust.LoadDeliveryCharges(customer)>
 					<div class="form-wrap">

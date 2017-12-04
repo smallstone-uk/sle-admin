@@ -101,7 +101,6 @@
 					<cfset custOrder=cust.LoadClientOrder(customer)>
 
 					<cfset initTest.datasource=search.datasource>
-					<cfset writeDump(search)>
 					<cfset initTest.streetcode=customer.rec.cltStreetCode>
 					<cfset street=cust.LoadStreets(customer)>
 					<cfset charges=cust.LoadDeliveryCharges(customer)>

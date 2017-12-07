@@ -170,6 +170,7 @@
 			<!--- category record --->
 			<cfset loc.newCat = ReReplaceNoCase(args.category,'(Cat.)',"Catering")>		<!--- replace cat with catering --->
 			<cfset loc.newCat = ReReplaceNoCase(args.category,'Retail',"")>				<!--- remove retail word --->
+			<cfset loc.newCat = ReReplaceNoCase(args.category,'\([0-9]+\)','')>			<!--- remove numbers in brackets --->
 			<cfquery name="loc.categoryExists" datasource="#application.site.datasource1#">
 				SELECT pCatID,pgTarget,pgTitle
 				FROM tblProductCats

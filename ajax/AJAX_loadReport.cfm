@@ -17,7 +17,6 @@
 <cfelse>
 	<cfset Report = pr.LoadPayrollReportByDate(parm)>
 </cfif>
-
 <cfset heighttotal=0>
 <cfset maxheight=900>
 <cfset header=100>
@@ -72,6 +71,9 @@
 							<th width="" align="right">Net Pay</th>
 							<th width="" align="right">PAYE</th>
 							<th width="" align="right">NI</th>
+							<th width="" align="right">Employer Pension</th>
+							<th width="" align="right">Member Pension</th>
+							<th width="" align="right">Lotto</th>
 							<th width="" align="right">Gross Pay</th>
 							<th width="" align="right">Hours</th>
 							<th width="" align="right">Work Hours</th>
@@ -97,6 +99,9 @@
 										<th width="" align="right">Net Pay</th>
 										<th width="" align="right">PAYE</th>
 										<th width="" align="right">NI</th>
+										<th width="" align="right">Employer Pension</th>
+										<th width="" align="right">Member Pension</th>
+										<th width="" align="right">Lotto</th>
 										<th width="" align="right">Gross Pay</th>
 										<th width="" align="right">Hours</th>
 										<th width="" align="right">Work Hours</th>
@@ -110,6 +115,9 @@
 								<td align="right">#item.NP#</td>
 								<td align="right">#item.PAYE#</td>
 								<td align="right">#item.NI#</td>
+								<td align="right">#item.EmployerPension#</td>
+								<td align="right">#item.MemberPension#</td>
+								<td align="right">#item.Lotto#</td>
 								<td align="right">#item.Gross#</td>
 								<td align="right">#item.Hours#</td>
 								<td align="right">#item.WorkHours#</td>
@@ -121,6 +129,9 @@
 							<th align="right">#rep.sums.np#</th>
 							<th align="right">#rep.sums.paye#</th>
 							<th align="right">#rep.sums.ni#</th>
+							<th align="right">#rep.sums.EmployerPensionSum#</th>
+							<th align="right">#rep.sums.MemberPensionSum#</th>
+							<th align="right">#rep.sums.LottoSum#</th>
 							<th align="right">#rep.sums.gross#</th>
 							<th align="right">#rep.sums.hours#</th>
 							<th align="right">#rep.sums.workhours#</th>
@@ -152,6 +163,9 @@
 						<th align="right">Net Pay</th>
 						<th align="right">PAYE</th>
 						<th align="right">NI</th>
+						<th align="right">Employer Pension</th>
+						<th align="right">Member Pension</th>
+						<th align="right">Lotto</th>
 						<th align="right">Gross Pay</th>
 						<th align="right">Hours</th>
 					</tr>
@@ -161,6 +175,9 @@
 						<cfset sums.grossSum = i.grossSum>
 						<cfset sums.hoursSum = i.hoursSum>
 						<cfset sums.niSum = i.niSum>
+						<cfset sums.EmployerPensionSum = i.EmployerPensionSum>
+						<cfset sums.MemberPensionSum = i.MemberPensionSum>
+						<cfset sums.LottoSum = i.LottoSum>
 						<cfset sums.npSum = i.npSum>
 						<cfset sums.payeSum = i.payeSum>
 						<tr>
@@ -170,6 +187,9 @@
 							<td align="right">#DecimalFormat(i.phNP)#</td>
 							<td align="right">#DecimalFormat(i.phPAYE)#</td>
 							<td align="right">#DecimalFormat(i.phNI)#</td>
+							<td align="right">#DecimalFormat(i.phEmployerContribution)#</td>
+							<td align="right">#DecimalFormat(i.phMemberContribution)#</td>
+							<td align="right">#DecimalFormat(i.phLotterySubs)#</td>
 							<td align="right">#DecimalFormat(i.phGross)#</td>
 							<td align="right">#DecimalFormat(i.phTotalHours)#</td>
 						</tr>
@@ -186,6 +206,9 @@
 						<td align="right"><strong>#DecimalFormat(sums.npSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.payeSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.niSum)#</strong></td>
+						<td align="right"><strong>#DecimalFormat(sums.EmployerPensionSum)#</strong></td>
+						<td align="right"><strong>#DecimalFormat(sums.MemberPensionSum)#</strong></td>
+						<td align="right"><strong>#DecimalFormat(sums.LottoSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.grossSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.hoursSum)#</strong></td>
 					</tr>
@@ -208,6 +231,9 @@
 					<th align="right">Net Pay</th>
 					<th align="right">PAYE</th>
 					<th align="right">NI</th>
+					<th align="right">Employer Pension</th>
+					<th align="right">Member Pension</th>
+					<th align="right">Lotto</th>
 					<th align="right">Gross</th>
 					<th align="right">Hours</th>
 				</tr>
@@ -215,6 +241,9 @@
 					<cfset totalNet += item.TotalNP>
 					<cfset totalPAYE += item.TotalPAYE>
 					<cfset totalNI += item.TotalNI>
+					<cfset totalEmployerPension += item.TotalEmployerPension>
+					<cfset totalMemberPension += item.TotalMemberPension>
+					<cfset totalLotto += item.TotalLotto>
 					<cfset totalGross += item.TotalGross>
 					<cfset totalHours += item.TotalHours>
 					<tr>
@@ -223,6 +252,9 @@
 						<td align="right">#item.TotalNP#</td>
 						<td align="right">#item.TotalPAYE#</td>
 						<td align="right">#item.TotalNI#</td>
+						<td align="right">#item.TotalEmployerPension#</td>
+						<td align="right">#item.TotalMemberPension#</td>
+						<td align="right">#item.TotalLotto#</td>
 						<td align="right">#item.TotalGross#</td>
 						<td align="right">#item.TotalHours#</td>
 					</tr>
@@ -233,6 +265,9 @@
 					<th align="right">#totalNet#</th>
 					<th align="right">#totalPAYE#</th>
 					<th align="right">#totalNI#</th>
+					<th align="right">#totalEmployerPension#</th>
+					<th align="right">#totalMemberPension#</th>
+					<th align="right">#totalLotto#</th>
 					<th align="right">#totalGross#</th>
 					<th align="right">#totalHours#</th>
 				</tr>				
@@ -250,6 +285,9 @@
 			<th width="" align="right">Net Pay</th>
 			<th width="" align="right">PAYE</th>
 			<th width="" align="right">NI</th>
+			<th width="" align="right">Employer Pension</th>
+			<th width="" align="right">Member Pension</th>
+			<th width="" align="right">Lotto</th>
 			<th width="" align="right">Gross Pay</th>
 		</tr>
 		<cfloop array="#Report#" index="rep">
@@ -261,6 +299,9 @@
 					<td align="right">#item.NP#</td>
 					<td align="right">#item.PAYE#</td>
 					<td align="right">#item.NI#</td>
+					<td align="right">#item.EmployerPension#</td>
+					<td align="right">#item.MemberPension#</td>
+					<td align="right">#item.Lotto#</td>
 					<td align="right">#item.Gross#</td>
 				</tr>
 			</cfloop>

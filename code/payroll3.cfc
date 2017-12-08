@@ -9,6 +9,9 @@
 				SUM(phGross) AS TotalGross,
 				SUM(phPAYE) AS TotalPAYE,
 				SUM(phNI) AS TotalNI,
+				SUM(phEmployerContribution) AS TotalEmployerPension,
+				SUM(phMemberContribution) AS TotalMemberPension,
+				SUM(phLotterySubs) AS TotalLotto,
 				SUM(phNP) AS TotalNP,
 				SUM(phTotalHours) AS TotalHours,
 				SUM(phWorkHours) AS WorkHours,
@@ -29,7 +32,7 @@
 		<cfset loc.currentDate = "">
 		
 		<cfquery name="loc.weeks" datasource="#args.database#">
-			SELECT phDate, phWeekNo
+			SELECT phDate
 			FROM tblPayHeader
 			WHERE phDate BETWEEN '#loc.fromDate#' AND '#loc.toDate#'
 			GROUP BY phDate
@@ -39,7 +42,7 @@
 		<cfloop query="loc.weeks">
 			<cfset arrayAppend(loc.result, {
 				"weekEnding" = "#DateFormat(phDate, 'yyyy-mm-dd')#",
-				"weekNo" = phWeekNo,
+				"weekNo" = <!--- phWeekNo --->'Redacted',
 				"items" = []
 			})>
 		</cfloop>
@@ -49,6 +52,9 @@
 					(SELECT SUM(phGross)		FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS GrossSum,
 					(SELECT SUM(phPAYE)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS PAYESum,
 					(SELECT SUM(phNI)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS NISum,
+					(SELECT SUM(phEmployerContribution)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS EmployerPensionSum,
+					(SELECT SUM(phMemberContribution)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS MemberPensionSum,
+					(SELECT SUM(phLotterySubs)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS LottoSum,
 					(SELECT SUM(phNP)			FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS NPSum,
 					(SELECT SUM(phTotalHours)	FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS HoursSum,
 					(SELECT SUM(phWorkHours)	FROM tblPayHeader WHERE phDate = '#i.weekEnding#') AS WorkSum,
@@ -94,7 +100,10 @@
 					(SELECT SUM(phTotalHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HoursSum,
 					(SELECT SUM(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS WorkSum,
 					(SELECT AVG(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS WorkAvg,
-					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HolSum
+					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HolSum,
+					(SELECT SUM(phEmployerContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS EmployerPensionSum,
+					(SELECT SUM(phMemberContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS MemberPensionSum,
+					(SELECT SUM(phLotterySubs) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS LottoSum
 				FROM tblPayHeader
 				INNER JOIN tblEmployee ON empID = phEmployee
 				WHERE phEmployee = #val(emp)#
@@ -113,6 +122,9 @@
 				<cfset loc.item.PAYE = phPAYE>
 				<cfset loc.item.NI = phNI>
 				<cfset loc.item.NP = phNP>
+				<cfset loc.item.EmployerPension = phEmployerContribution>
+				<cfset loc.item.MemberPension = phMemberContribution>
+				<cfset loc.item.Lotto = phLotterySubs>
 				<cfset loc.item.Hours = phTotalHours>
 				<cfset loc.item.WorkHours = phWorkHours>
 				<cfset loc.item.HolHours = phHolHours>
@@ -124,6 +136,9 @@
 			<cfset loc.subResult.Sums.PAYE = loc.headers.PAYESum>
 			<cfset loc.subResult.Sums.NI = loc.headers.NISum>
 			<cfset loc.subResult.Sums.NP = loc.headers.NPSum>
+			<cfset loc.subResult.Sums.EmployerPensionSum = loc.headers.EmployerPensionSum>
+			<cfset loc.subResult.Sums.MemberPensionSum = loc.headers.MemberPensionSum>
+			<cfset loc.subResult.Sums.LottoSum = loc.headers.LottoSum>
 			<cfset loc.subResult.Sums.Hours = loc.headers.HoursSum>
 			<cfset loc.subResult.Sums.WorkHours = loc.headers.WorkSum>
 			<cfset loc.subResult.Sums.HolHours = loc.headers.HolSum>

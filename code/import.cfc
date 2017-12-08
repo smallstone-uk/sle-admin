@@ -30,7 +30,7 @@
 							loc.fields={"supplierID"=args.supplierID,"stockOrderID"=args.stockOrderID,"markup"=args.markup,
 								"validTo"=args.validTo,"orderDate"=args.orderDate};	// struct to store data
 							StructInsert(loc.fields,"barcode",loc.image.attr("alt")); // store barcode text
-							loc.headText=ReReplace(loc.head.text(),"\(\d?\)","","all"); // remove counter
+							loc.headText=ReReplace(loc.head.text(),"\(\d+\)","","all"); // remove counter and brackets
 							loc.headText=Replace(loc.headText,"(Ret.)","","one"); // remove "(Ret.)"
 							StructInsert(loc.fields,"category",loc.headText); // store header text
 							for (loc.cell in loc.cells)	{ // loop cells
@@ -170,6 +170,7 @@
 			<!--- category record --->
 			<cfset loc.newCat = ReReplaceNoCase(args.category,'(Cat.)',"Catering")>		<!--- replace cat with catering --->
 			<cfset loc.newCat = ReReplaceNoCase(args.category,'Retail',"")>				<!--- remove retail word --->
+			<!--- <cfset loc.newCat = ReReplaceNoCase(args.category,'\([0-9]+\)','')>			remove numbers in brackets (this is now done at line 33 --->
 			<cfquery name="loc.categoryExists" datasource="#application.site.datasource1#">
 				SELECT pCatID,pgTarget,pgTitle
 				FROM tblProductCats

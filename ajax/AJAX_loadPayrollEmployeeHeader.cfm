@@ -207,7 +207,7 @@
 				var lotto = nf($('.pr2_gt_lotto').val(), "num");
 				var adjustment = nf($('.pr2_gt_adjustment').val(), "num");
 				var subtotal = taxable - paye - ni;
-				var netpay = subtotal - lotto - adjustment;
+				var netpay = subtotal - adjustment;
 				$('.pr2_gross_totals')
 					.find('td[data-role="deductions"]')
 					.html(nf(gross - netpay, 'str'));

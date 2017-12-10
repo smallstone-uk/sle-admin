@@ -2,3 +2,4 @@ core/config/dev-Settings.xml
 app.json
 node_modules/
 _notes/
+Views/temp/*.cfm

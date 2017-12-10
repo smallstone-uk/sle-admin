@@ -3,7 +3,7 @@
 
     <html>
         <head>
-            <title>#structFindDefault(variables, 'title', 'Error')#</title>
+            <title>SLE Admin</title>
             <cfset includeView('layouts.resources')>
         </head>
 

@@ -5,8 +5,8 @@ component extends = "App.Framework.Controller"
      *
      * @return any
      */
-    public any function index()
+    public any function index(struct args)
     {
-        return view('layouts.app|payroll.index');
+        return view('generic.index', args);
     }
 }

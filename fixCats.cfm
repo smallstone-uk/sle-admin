@@ -9,44 +9,66 @@
 </head>
 <cfparam name="doUpdate" default="false">
 <body>
+<h1>Product Category Cleanup</h1>
+<p>Removes counters, unwanted spaces and 'Retail' from category titles.</p>
 <cftry>
+	<cfquery name="QTrimCats" datasource="#application.site.datasource1#">
+		UPDATE tblProductCats
+		SET pcatTitle = TRIM(pcatTitle)
+		WHERE 1
+	</cfquery>
 	<cfquery name="QCats" datasource="#application.site.datasource1#">
 		SELECT *
-		FROM `tblProductCats`
-		WHERE `pcatTitle` REGEXP '([[:digit:]]+))'
-		ORDER BY `pcatTitle` ASC
+		FROM tblProductCats
+		WHERE pcatTitle REGEXP '([[:digit:]]+))'
+		OR pcatTitle LIKE '%Retail%'
+		ORDER BY pcatTitle ASC
 	</cfquery>
 	<cfoutput>
 		<table>
-		<cfloop query="QCats">
-			<cfset origCat = pcatID>
-			<cfset words = ListLen(pcatTitle," ")>
-			<cfset shortTitle = ListDeleteAt(pcatTitle,words," ")>
-			<cfquery name="QCat" datasource="#application.site.datasource1#">
-				SELECT * FROM tblProductCats WHERE pcatTitle LIKE '#shortTitle#' LIMIT 1;
-			</cfquery>
-			<cfif doUpdate>
-				<cfif QCat.recordcount eq 1>
-					<cfquery name="QCatUpdate" datasource="#application.site.datasource1#" result="QCatResult">
+			<cfloop query="QCats">
+				<cfset msg = "">
+				<cfset origCat = pcatID>
+				<cfset words = ListLen(pcatTitle," ")>
+				<cfset shortTitle = ListDeleteAt(pcatTitle,words," ")>
+				<cfset shortTitle = Trim(ReReplaceNoCase(shortTitle,'Retail',""))>
+				<cfquery name="QCat" datasource="#application.site.datasource1#">
+					SELECT * FROM tblProductCats WHERE pcatTitle LIKE '#shortTitle#' LIMIT 1;
+				</cfquery>
+				<cfif doUpdate>
+					<cfif QCat.recordcount eq 0>
+						<cfquery name="QAddCategory" datasource="#application.site.datasource1#">
+							INSERT INTO tblProductCats (pcatTitle) 
+							VALUES ('#shortTitle#')
+						</cfquery>
+						<cfset msg = "Created: #shortTitle#">
+						<cfquery name="QCatNew" datasource="#application.site.datasource1#">
+							SELECT * FROM tblProductCats WHERE pcatTitle LIKE '#shortTitle#' LIMIT 1;
+						</cfquery>
+						<cfset newCat = QCatNew.pcatID>
+					<cfelse>
+						<cfset newCat = QCat.pcatID>
+					</cfif>
+					<cfquery name="QCatUpdate" datasource="#application.site.datasource1#">
 						UPDATE tblProducts 
-						SET prodCatID=#QCat.pcatID#
+						SET prodCatID=#newCat#
 						WHERE prodCatID=#origCat#
 					</cfquery>
-					<cfset move = "Moved to: #QCat.pcatID# #QCat.pcatTitle# #QCatResult.recordcount#">
+					<cfset msg = "#msg# Moved to: #newCat# #shortTitle#">
 				<cfelse>
-					<cfset move = "<span class='red'>dest not found</span>">
+					<cfif QCat.recordcount eq 1>
+						<cfset msg = "Can move to: #QCat.pcatID# #QCat.pcatTitle#">
+					<cfelse>
+						<cfset msg = "Create: #shortTitle#">
+					</cfif>
 				</cfif>
-			<cfelse>
-				<cfset move = "Can Move to: #QCat.pcatID# #QCat.pcatTitle#">
-			</cfif>
-			<tr>
-				<td>#origCat#</td>
-				<td>#pcatTitle#</td>
-				<td>#words#</td>
-				<td>#shortTitle#</td>
-				<td>#move#</td>
-			</tr>
-		</cfloop>
+				<tr>
+					<td>#pcatID#</td>
+					<td>#pcatTitle#</td>
+					<td>#shortTitle#</td>
+					<td>#msg#</td>
+				</tr>
+			</cfloop>
 		</table>
 	</cfoutput>
 <cfcatch type="any">

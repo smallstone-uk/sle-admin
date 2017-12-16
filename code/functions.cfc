@@ -1343,7 +1343,7 @@
 									#QLoadItem.diTest#,
 									#QLoadItem.diVoucher#,
 									0,
-									''
+									'#args.form.crdReason#'
 								)
 							</cfquery>
 							

@@ -60,6 +60,18 @@
 			<td align="center"><input type="text" name="dateTo" class="datepicker" value="#DateFormat(Now(),'yyyy-mm-dd')#" /></td>
 		</tr>
 		<tr>
+			<td align="center">Credit Reason</td>
+			<td align="center">
+				<select name="crdReason">
+					<option value="">Select...</option>
+					<option value="missed">Missed Delivery</option>
+					<option value="wrong">Wrong Delivery</option>
+					<option value="unwanted">Unwanted Delivery</option>
+					<option value="holiday">Holiday</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
 			<th colspan="2"><input type="button" id="btnFindCharges" value="Find" /></th>
 		</tr>
 	</table>

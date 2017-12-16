@@ -28,7 +28,7 @@ component extends="App.Framework.App"
 
         application.site.dir_data = getDataDir('/');
         application.site.dir_logs = "#getDataDir('logs')#/";
-        application.site.dir_invoices = getDataDir('invoices/');
+        application.site.dir_invoices = "#getDataDir('invoices')#/";
         application.site.url_data = getUrl('data/');
         application.site.url_invoices = getUrl('data/invoices/');
 

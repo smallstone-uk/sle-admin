@@ -255,7 +255,7 @@
 			</cfloop>
 			<cfset loc.status = Removechars(loc.status,1,1)>
 		</cfif>
-		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsResult">
+		<cfquery name="loc.result.StockItems" datasource="#args.datasource#">
 			SELECT *
 			FROM tblProducts
 			JOIN tblProductCats ON prodCatID=pcatID

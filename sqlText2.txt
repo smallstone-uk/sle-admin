@@ -318,6 +318,7 @@ AND phDate <= '2017-12-31'
 AND piDept =52
 ORDER BY empID,phDate
 
+
 // bunnery sales (including o/c) to date
 SELECT YEAR(trnDate)*100 + MONTH(trnDate) AS yymm, nomTitle, SUM(niAmount) AS total
 FROM `tbltrans` 
@@ -326,3 +327,10 @@ INNER JOIN tblNominal ON niNomID=nomID
 WHERE `trnDate` BETWEEN '2017-01-01' AND '2017-12-31'
 AND niNomID IN (901,2212,2152)
 GROUP BY yymm, niNomID 
+
+
+// Staff birthday list
+SELECT empFirstName,empLastName,empDOB,empStart, CONCAT(LPAD(DAY(empDOB),2,'0'),'-',MONTHNAME(empDOB)) AS Birthday
+FROM `tblemployee` 
+WHERE `empStatus` = 'active' 
+ORDER BY empFirstName ASC

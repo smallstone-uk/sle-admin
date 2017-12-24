@@ -273,6 +273,7 @@
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
 			<cfif len(args.form.srchDateFrom) GT 0>AND prodLastBought >= '#args.form.srchDateFrom#'</cfif>
 			<cfif len(args.form.srchDateTo) GT 0>AND (prodLastBought IS null OR prodLastBought <= '#args.form.srchDateTo#')</cfif>
+			<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
 			ORDER BY pcatTitle ASC,prodTitle ASC
 		</cfquery>
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>

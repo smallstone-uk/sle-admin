@@ -433,7 +433,7 @@
 													<th width="40">Unit Size</th>
 													<th width="160">Category</th>
 													<th width="40">Our Price</th>
-													<th width="40">Price Marked</th>
+													<th width="30">PM</th>
 													<th width="40">Trade Price</th>
 													<th width="40">Stock Level</th>
 													<th width="40">Value</th>
@@ -441,9 +441,11 @@
 												</tr>
 												<cfset category=0>
 												<cfset totalValue = 0>
+												<cfset totalItems = 0>
 												<cfloop query="stocklist.qstock">
 													<cfset value = val(unitTrade) * prodStockLevel>
 													<cfset totalValue += value>
+													<cfset totalItems += prodStockLevel>
 													<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
 														<td><input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" value="#prodID#"></td>
 														<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
@@ -461,6 +463,7 @@
 												</cfloop>
 												<tr>
 													<td colspan="9" align="right">Stock Value</td>
+													<td align="center">#totalItems#</td>
 													<td align="right">&pound;#DecimalFormat(totalValue)#</td>
 												</tr>
 											</table>

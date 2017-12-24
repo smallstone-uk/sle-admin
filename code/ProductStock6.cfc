@@ -882,7 +882,7 @@
 				WHERE prodID = siProduct 
 				AND siStatus <> 'inactive')
 				WHERE prodCatID=#val(args.form.category)#
-				ORDER BY prodTitle
+				ORDER BY prodTitle, siUnitSize
 			</cfquery>
 			<cfset loc.result.products = loc.QProducts>
 		<cfcatch type="any">

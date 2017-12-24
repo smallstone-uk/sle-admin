@@ -104,6 +104,7 @@
 				<cfif args.period neq 99>AND soDate > DATE_ADD(CURDATE(), INTERVAL -#args.period# MONTH)</cfif>
 				<cfif args.ignorePM>AND NOT prodPriceMarked</cfif>
 				AND siStatus <> 'inactive'
+				AND siStatus <> 'promo'
 				ORDER BY prodTitle
 			</cfquery>
 			<cfset loc.result.products = loc.QProducts>

@@ -531,19 +531,19 @@
 									<!---<cfdump var="#trans.QTrans_result#" label="QTrans_result" expand="no">--->				
 									<cfset codes=ListSort(StructKeyList(trans.nomAccount,","),"text","asc")>
 									<table border="1" class="tableList">
+									<tr>
+										<td width="50">ID</td>
+										<td width="100">DATE</td>
+										<td width="70">TYPE</td>
+										<td width="70">REF</td>
+										<td width="70">CLIENT REF</td>
+										<td width="70" align="right">DR</td>
+										<td width="70" align="right">CR</td>
+									</tr>
 									<cfloop list="#codes#" delimiters="," index="code">
 										<cfset item=StructFind(trans.nomAccount,code)>
 										<tr>
 											<td colspan="7">#code# - #item.Title#</td>
-											<tr>
-												<td width="50">ID</td>
-												<td width="100">DATE</td>
-												<td width="70">TYPE</td>
-												<td width="70">REF</td>
-												<td width="70">CLIENT REF</td>
-												<td width="70" align="right">DR</td>
-												<td width="70" align="right">CR</td>
-											</tr>
 										</tr>
 										<cfset rec.drTotal=0>
 										<cfset rec.crTotal=0>

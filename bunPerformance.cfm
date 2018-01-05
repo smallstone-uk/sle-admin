@@ -15,7 +15,7 @@
 </cfif>
 <cfset emps = {}>
 <cfquery name="QLabour" datasource="#application.site.datasource1#">
-	SELECT YEAR(phDate)*100 + MONTH(phDate) AS yymm, empID,empFirstName,empLastName, piDay, AVG( piHours ) AS Avg, SUM( piHours ) AS Hours, SUM(piGross) AS Pay, Count(phID) AS Count
+	SELECT YEAR(phDate)*100 + MONTH(phDate) AS yymm, empID,empFirstName,empLastName,empStatus, piDay, AVG( piHours ) AS Avg, SUM( piHours ) AS Hours, SUM(piGross) AS Pay, Count(phID) AS Count
 	FROM `tblpayitems`
 	INNER JOIN tblPayHeader ON phID = piParent
 	INNER JOIN tblemployee ON phEmployee=empID
@@ -108,7 +108,7 @@
 				<cfset totLabour += pay>
 				<cfset totHours += hours>
 				<cfif NOT StructKeyExists(emps,empID)>
-					<cfset StructInsert(emps,empID,{name="#empFirstName# #empLastName#",hours=0,pay=0})>
+					<cfset StructInsert(emps,empID,{name="#empFirstName# #empLastName#",status = empStatus, hours=0,pay=0})>
 				</cfif>
 				<cfset emp = StructFind(emps,empID)>
 				<cfset emp.hours += hours>
@@ -170,7 +170,7 @@
 			<cfset totHours += emp.hours>
 			<cfset totPay += emp.pay>
 			<tr>
-				<td>#emp.name#</td>
+				<td>#emp.name# (#emp.status#)</td>
 				<td align="right">#DecimalFormat(emp.hours)#</td>
 				<td align="right">&pound;#DecimalFormat(emp.pay)#</td>
 				<td align="right">#DecimalFormat(emp.hours/period)#</td>

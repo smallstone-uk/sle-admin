@@ -9,6 +9,10 @@
 <cfparam name="startDate" default="#Year(Now())#-01-01">
 <cfparam name="endDate" default="#DateFormat(Now(),'yyyy-mm-dd')#">
 <cfset period = int((endDate - startDate) / 7)>
+<cfif period lt 1>
+	<cfset startDate = DateFormat(DateAdd("yyyy",-1,startDate),'yyyy-mm-dd')>
+	<cfset period = int((endDate - startDate) / 7)>
+</cfif>
 <cfset emps = {}>
 <cfquery name="QLabour" datasource="#application.site.datasource1#">
 	SELECT YEAR(phDate)*100 + MONTH(phDate) AS yymm, empID,empFirstName,empLastName, piDay, AVG( piHours ) AS Avg, SUM( piHours ) AS Hours, SUM(piGross) AS Pay, Count(phID) AS Count

@@ -22,7 +22,7 @@
 	WHERE phDate BETWEEN '#startDate#' AND '#endDate#'
 	AND piHoliday = "No"
 	AND piDept = 52
-	GROUP BY empID,yymm,piHoliday
+	GROUP BY yymm,empID,piHoliday
 </cfquery>
 
 <cfquery name="QSales" datasource="#application.site.datasource1#">

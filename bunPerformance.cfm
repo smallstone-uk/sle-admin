@@ -9,7 +9,7 @@
 <cfparam name="startDate" default="#Year(Now())#-01-01">
 <cfparam name="endDate" default="#DateFormat(Now(),'yyyy-mm-dd')#">
 <cfset period = int((endDate - startDate) / 7)>
-<cfif period lt 1>
+<cfif period lt 6>
 	<cfset startDate = DateFormat(DateAdd("yyyy",-1,startDate),'yyyy-mm-dd')>
 	<cfset period = int((endDate - startDate) / 7)>
 </cfif>

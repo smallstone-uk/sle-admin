@@ -124,7 +124,7 @@
 				<td colspan="2" align="right">Total Labour</td>
 				<td align="right">#DecimalFormat(totHours)#</td>
 				<td align="right">#DecimalFormat(totLabour)#</td>
-				<td align="right">#DecimalFormat(totSales ? (totLabour / totSales) : 0 * 100)#%</td>
+				<td align="right">#DecimalFormat(totSales ? (totLabour / totSales) * 100 : 0)#%</td>
 			</tr>
 			<cfif endDate eq DateFormat(Now(),'yyyy-mm-dd')>
 				<tr>
@@ -144,7 +144,7 @@
 				<td colspan="2" align="right">Profit</td>
 				<td></td>
 				<td align="right">#DecimalFormat(profit)#</td>
-				<td align="right">#DecimalFormat(totSales ? (profit / totSales) : 0 * 100)#%</td>
+				<td align="right">#DecimalFormat(totSales ? (profit / totSales) * 100 : 0)#%</td>
 			</tr>
 			<cfif endDate eq DateFormat(Now(),'yyyy-mm-dd')>
 				<tr>

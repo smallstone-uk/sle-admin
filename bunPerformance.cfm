@@ -94,7 +94,7 @@
 				<td colspan="2" align="right">Total Stock</td>
 				<td></td>
 				<td align="right">#DecimalFormat(totStock)#</td>
-				<td align="right">#DecimalFormat(totSales ? (totStock / totSales) : 0 * 100)#%</td>
+				<td align="right">#DecimalFormat(totSales ? (totStock / totSales) * 100 : 0)#%</td>
 			</tr>
 			<cfif endDate eq DateFormat(Now(),'yyyy-mm-dd')>
 				<tr>

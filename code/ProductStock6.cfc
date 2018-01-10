@@ -465,13 +465,14 @@
 			<cfset loc.result = {}>
 			<cfset loc.args = args>
 			<cfset loc.qtyItems = args.form.siPackQty * args.form.siQtyPacks>
-			<cfset loc.tradeNet = args.form.siWSP / loc.qtyItems>
+			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
 			<cfset loc.tradeGross = loc.tradeNet * (1 + (args.form.vatRate / 100))>
 			<cfif StructKeyExists(args.form,"siOurPrice")>
 				<cfset loc.sellprice = args.form.siOurPrice>
 			<cfelse><cfset loc.sellprice = args.form.siRRP></cfif>
 			<cfset loc.profit = loc.sellprice - loc.tradeGross>
 			<cfset loc.POR = (loc.profit / loc.sellprice) * 100>
+			
 			<cfquery name="loc.QStockItem" datasource="#args.datasource#">
 				UPDATE tblStockItem a
 				INNER JOIN tblStockOrder b ON (a.siOrder = b.soID)
@@ -479,6 +480,7 @@
 					siOurPrice = #loc.sellprice#,
 					siPackQty = #args.form.siPackQty#,
 					siQtyPacks = #args.form.siQtyPacks#,
+					siQtyItems = #loc.qtyItems#,
 					siRef = '#args.form.siRef#',
 					siRRP = #args.form.siRRP#,
 					siUnitSize = '#args.form.siUnitSize#',

@@ -201,7 +201,7 @@
 					</cfloop>
 					<tr>
 						<th align="right">Totals</th>
-						<td align="center">Cash: #DecimalFormat(cashTotal + sums.LottoSum)#</td>
+						<td align="center">Cash: #DecimalFormat(cashTotal)#</td>
 						<td align="center">BACS: #DecimalFormat(bacsTotal)#</td>
 						<td align="right"><strong>#DecimalFormat(sums.npSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.payeSum)#</strong></td>

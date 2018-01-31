@@ -223,6 +223,9 @@
 		<cfset totalNI = 0>
 		<cfset totalGross = 0>
 		<cfset totalHours = 0>
+		<cfset totalEmployerPension = 0>
+		<cfset totalMemberPension = 0>
+		<cfset totalLotto = 0>
 		<cfoutput>
 			<table class="tableList" width="100%" border="1">
 				<tr>

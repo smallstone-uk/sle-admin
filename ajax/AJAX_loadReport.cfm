@@ -226,6 +226,7 @@
 		<cfset totalEmployerPension = 0>
 		<cfset totalMemberPension = 0>
 		<cfset totalLotto = 0>
+		<cfset totalAdjustment = 0>
 		<cfoutput>
 			<table class="tableList" width="100%" border="1">
 				<tr>
@@ -237,6 +238,7 @@
 					<th align="right">Employer Pension</th>
 					<th align="right">Member Pension</th>
 					<th align="right">Lotto</th>
+					<th align="right">Adjustment</th>
 					<th align="right">Gross</th>
 					<th align="right">Hours</th>
 				</tr>
@@ -244,9 +246,10 @@
 					<cfset totalNet += item.TotalNP>
 					<cfset totalPAYE += item.TotalPAYE>
 					<cfset totalNI += item.TotalNI>
-					<cfset totalEmployerPension += item.TotalEmployerPension>
+					<cfset totalEmployerPension += val(item.TotalEmployerPension)>
 					<cfset totalMemberPension += item.TotalMemberPension>
 					<cfset totalLotto += item.TotalLotto>
+					<cfset totalAdjustment += item.TotalAdjustment>
 					<cfset totalGross += item.TotalGross>
 					<cfset totalHours += item.TotalHours>
 					<tr>
@@ -258,6 +261,7 @@
 						<td align="right">#item.TotalEmployerPension#</td>
 						<td align="right">#item.TotalMemberPension#</td>
 						<td align="right">#item.TotalLotto#</td>
+						<td align="right">#item.TotalAdjustment#</td>
 						<td align="right">#item.TotalGross#</td>
 						<td align="right">#item.TotalHours#</td>
 					</tr>
@@ -271,6 +275,7 @@
 					<th align="right">#totalEmployerPension#</th>
 					<th align="right">#totalMemberPension#</th>
 					<th align="right">#totalLotto#</th>
+					<th align="right">#totalAdjustment#</th>
 					<th align="right">#totalGross#</th>
 					<th align="right">#totalHours#</th>
 				</tr>				

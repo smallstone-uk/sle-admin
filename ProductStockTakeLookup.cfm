@@ -4,7 +4,7 @@
 	<cfsetting showdebugoutput="no">
 	<cfparam name="print" default="false">
 	
-	<cfobject component="code/ProductStock5" name="pstock">
+	<cfobject component="code/ProductStock6" name="pstock">
 	<cfset parm={}>
 	<cfset parm.form=form>
 	<cfset parm.datasource=application.site.datasource1>
@@ -40,12 +40,12 @@
 			<cfcase value="found">
 				<table class="showTable" width="600">
 					<tr><td width="200">Barcode</td><td>#lookup.barcode#</td></tr>
-					<tr><td>Supplier</td><td>#lookup.product.accName#</td></tr>
-					<tr><td>Product ID</td><td>#lookup.product.prodID#</td></tr>
-					<tr><td>Reference</td><td><a href="stockItems.cfm?ref=#lookup.product.prodID#" target="_blank">#lookup.product.prodRef#</a></td></tr>
+					<tr><td>Supplier</td><td>#lookup.supplier#</td></tr>
+					<tr><td>Product ID</td><td><a href="productStock6.cfm?product=#lookup.product.prodID#" target="_blank">#lookup.product.prodID#</a></td></tr>
+					<tr><td>Reference</td><td><a href="productStock6.cfm?product=#lookup.product.prodID#" target="_blank">#lookup.product.prodRef#</a></td></tr>
 					<tr><td>Product</td><td>#lookup.product.prodTitle#</td></tr>
-					<tr><td>Unit Size</td><td>#lookup.product.prodUnitSize#</td></tr>
-					<tr><td>Outer Pack Qty</td><td>#lookup.product.prodPackQty#</td></tr>
+					<tr><td>Unit Size</td><td>#lookup.stockitem.siUnitSize#</td></tr>
+					<tr><td>Outer Pack Qty</td><td>#lookup.stockitem.siPackQty#</td></tr>
 					<tr><td>Last Counted</td><td>#LSDateFormat(lookup.product.prodCountDate)#</td></tr>
 					<tr><td>Expected Stock Level</td><td>#lookup.product.prodStockLevel#</td></tr>
 					<tr><td>Message</td><td>#lookup.msg#</td></tr>
@@ -56,15 +56,15 @@
 						<input name="prodID" type="hidden" value="#lookup.product.prodID#" />
 						<input name="prodRef" type="hidden" value="#lookup.product.prodRef#" />
 						<input name="prodTitle" type="hidden" value="#lookup.product.prodTitle#" />
-						<input name="maxLevel" id="maxLevel" type="hidden" value="#lookup.product.prodPackQty * 3#" />				
+						<input name="maxLevel" id="maxLevel" type="hidden" value="#lookup.stockitem.siPackQty * 3#" />				
 						<table class="tableList2" border="1" width="340">
-							<cfif val(lookup.QOrders.recordcount) gt 0>
+							<!---<cfif val(lookup.QOrders.recordcount) gt 0>
 								<input name="siID" type="hidden" value="#lookup.msgs[1].item#" />
 								<tr>
 									<td><b>Product Expiry Date</b></td>
 									<td><input type="text" size="10" name="expiryDate" id="expiryDate" class="datepicker" /></td>
 								</tr>
-							</cfif>
+							</cfif>--->
 							<tr>
 								<td><b>Please enter the current stock level</b></td>
 								<td><input type="text" size="4" name="stockLevel" id="stockLevel" /></td>

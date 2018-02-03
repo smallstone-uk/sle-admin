@@ -79,11 +79,13 @@
 					<cfloop query="loc.QProduct">
 						<cfset loc.rec = {}>
 						<cfset loc.rec.prodID = prodID>
+						<cfset loc.rec.prodRef = prodRef>
 						<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
 						<cfset loc.rec.prodRecordTitle = prodRecordTitle>
 						<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
 						<cfset loc.rec.prodTitle = prodTitle>
 						<cfset loc.rec.prodCountDate = prodCountDate>
+						<cfset loc.rec.prodStockLevel = prodStockLevel + int(prodStockLevel eq 0)>	<!--- add 1 if zero --->
 						<cfset loc.rec.prodCatID = prodCatID>
 						<cfset loc.rec.prodEposCatID = prodEposCatID>
 						<cfset loc.rec.prodPriceMarked = prodPriceMarked>

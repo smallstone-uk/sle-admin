@@ -138,6 +138,8 @@
 	</script>
 	<style type="text/css">
 		@page {size:portrait;margin:40px;}
+		.lowPOR {background-color:#FF8080;}
+		.pm {background-color: #D2E9FF;}
 	</style>
 </head>
 
@@ -434,37 +436,75 @@
 													<th width="160">Category</th>
 													<th width="40">Our Price</th>
 													<th width="30">PM</th>
+													<th width="30">VAT</th>
 													<th width="40">Trade Price</th>
 													<th width="40">Stock Level</th>
 													<th width="40">Value</th>
+													<th width="40">POR%</th>
 													<th width="100">Last Purchased</th>
 												</tr>
-												<cfset category=0>
-												<cfset totalValue = 0>
+												<cfset lineCount = 0>
+												<cfset lowCount = 0>
+												<cfset pmCount = 0>
+												<cfset category = 0>
+												<cfset totalTradeValue = 0>
+												<cfset totalRetailValue = 0>
+												<cfset totalPOR = 0>
 												<cfset totalItems = 0>
 												<cfloop query="stocklist.qstock">
-													<cfset value = val(unitTrade) * prodStockLevel>
-													<cfset totalValue += value>
+													<cfset lineCount++>
+													<cfset unitVAT = val(unitTrade) * (prodVATRate / 100)>
+													<cfset unitGross = val(unitTrade) + unitVAT>
+													<cfset profit = ourPrice - unitGross>
+													<cfset POR = profit / ourPrice>
+													<cfset tradeValue = val(unitTrade) * prodStockLevel>
+													<cfset retailValue = val(ourPrice) * prodStockLevel>
+													
+													<cfset totalTradeValue += tradeValue>
+													<cfset totalRetailValue += retailValue>
+													<cfset totalPOR += POR>
 													<cfset totalItems += prodStockLevel>
-													<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
+													<cfset target = int((pgTarget / (100 + pgTarget)) * 100) / 100>
+													<cfif prodPriceMarked>
+														<cfset class = "pm">
+														<cfset pmCount++>
+													<cfelseif POR lt target>
+														<cfset class = "lowPOR">
+														<cfset lowCount++>
+													<cfelse>
+														<cfset class = "">
+													</cfif>
+													<tr class="searchrow #class#" data-title="#prodTitle#" data-prodID="#prodID#">
 														<td><input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" value="#prodID#"></td>
 														<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 														<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 														<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 														<td align="center">#prodUnitSize#</td>
-														<td>#pcatTitle#</td>
-														<td align="right">&pound;#ourPrice#</td>
+														<td>#pcatTitle#<br>#pgTitle# (#target*100#%)</td>
+														<td align="right"><strong>&pound;#ourPrice#</strong></td>
 														<td align="center">#GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+														<td align="right">#prodVATRate#%</td>
 														<td align="right">&pound;#unitTrade#</td>
 														<td align="center">#prodStockLevel#</td>
-														<td align="right">&pound;#DecimalFormat(value)#</td>
+														<td align="right">&pound;#DecimalFormat(tradeValue)#</td>
+														<td align="right">#DecimalFormat(int(POR*10000)/100)#%</td>
 														<td align="right">#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
 													</tr>											
 												</cfloop>
 												<tr>
-													<td colspan="9" align="right">Stock Value</td>
-													<td align="center">#totalItems#</td>
-													<td align="right">&pound;#DecimalFormat(totalValue)#</td>
+													<th>#lineCount#</th>
+													<th align="right">Items</th>
+													<th align="center">#totalItems#</th>
+													<th align="right">Retail Value</th>
+													<th align="right">&pound;#DecimalFormat(totalRetailValue)#</th>
+													<th align="right">Trade Value</th>
+													<th align="right" colspan="2">&pound;#DecimalFormat(totalTradeValue)#</th>
+													<th>POR</th>
+													<th align="left">#DecimalFormat((totalPOR/lineCount))*100#%</th>
+													<th></th>
+													<th>Low</th>
+													<th>#lowCount#</th>
+													<th align="right"></th>
 												</tr>
 											</table>
 										</cfoutput>

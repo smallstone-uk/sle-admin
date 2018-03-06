@@ -372,15 +372,16 @@
 		
 		<cftry>
 			<cfquery name="loc.QStock" datasource="#args.datasource#" result="loc.result.QStockResult">
-				SELECT prodID,prodCatID,prodRef,prodTitle,prodUnitSize,prodCountDate,prodStockLevel,prodUnitTrade,prodPriceMarked,prodLastBought,
+				SELECT prodID,prodCatID,prodRef,prodTitle,prodUnitSize,prodCountDate,prodStockLevel,prodUnitTrade,prodPriceMarked,prodLastBought,prodVATRate,
 					(SELECT siOurPrice FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS ourPrice,
 					(SELECT siUnitTrade FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS unitTrade,
-					pcatTitle
+					pcatTitle,pgTitle,pgTarget
 				FROM tblProducts
 				INNER JOIN tblProductCats ON prodCatID=pcatID
+				INNER JOIN tblproductgroups ON pcatGroup=pgID
 				WHERE prodCountDate IS NOT NULL
 				<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
-				ORDER BY pCatID,prodTitle
+				ORDER BY pgTitle,pcatTitle,prodTitle
 			</cfquery>
 			<cfset loc.result.QStock = loc.QStock>
 			<cfset loc.result.recCount = loc.QStock.recordcount>

@@ -8,7 +8,7 @@
 
 <body>
 <cftry>
-	<cfset doIt=false>
+	<cfset doIt=true>
 	<cfquery name="QDels" datasource="#application.site.datasource1#" result="QDelResult">
 		SELECT pubTitle, cltRef,cltName,cltCompanyName, tbldelitems.*
 		FROM `tbldelitems` 

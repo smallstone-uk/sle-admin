@@ -34,7 +34,7 @@
 			<cfset rec = {}>
 			<cfset sqlCols = "">
 			<cfset sqlValues = "">
-			<cfloop list="#flds#" item="name">
+			<cfloop list="#flds#" index="name">
 				<cfset "rec.#name#" = QDels[name][qline]>
 			</cfloop>
 			<cfset rec.diPrice = -rec.diPrice>

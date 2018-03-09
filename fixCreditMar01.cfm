@@ -24,7 +24,7 @@
 		<table class="tableList" width="800">
 		<cfset flds = "">
 		<cfset qline = 0>
-		<cfloop list="#QDels.columnList#" item="name">
+		<cfloop list="#QDels.columnList#" index="name">
 			<cfif Left(name,2) eq "di" AND name neq "diID">
 				<cfset flds = "#flds#,#name#">
 			</cfif>

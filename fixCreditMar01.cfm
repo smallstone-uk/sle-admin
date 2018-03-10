@@ -75,7 +75,7 @@
 				<cfloop collection="#rec#" item="key">
 					<cfset value = StructFind(rec,key)>
 					<cfif IsDate(value)>
-						<cfset value = DateFormat(value,"yyyy-mm-dd")>
+						<cfset value = "'#value#'">
 					<cfelseif NOT IsNumeric(value)>
 						<cfset value = "'#value#'">
 					</cfif>

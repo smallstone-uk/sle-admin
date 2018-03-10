@@ -7,18 +7,25 @@
 </head>
 
 <body>
+<cfparam name="target" default="">
+
+<cfif len(target) is 0 OR NOT IsDate(target)>
+	Please choose a target date e.g. ?target=2018-01-01<br />
+	<cfexit>
+</cfif>
 <cftry>
-	<cfset doIt=true>
+	<cfset doIt=false>
 	<cfquery name="QDels" datasource="#application.site.datasource1#" result="QDelResult">
 		SELECT pubTitle, cltRef,cltName,cltCompanyName, tbldelitems.*
 		FROM `tbldelitems` 
 		INNER JOIN tblPublication ON pubID=diPubID
 		INNER JOIN tblClients ON cltID=diClientID
 		WHERE `diType` = 'debit' 
-		AND `diDate` = '2018-03-01'
+		AND `diDate` = '#target#'
 		AND pubGroup='news'
 		AND pubType='morning'
 		ORDER BY diClientID,diPubID
+		LIMIT 10
 	</cfquery>
 	<cfoutput>
 		<table class="tableList" width="800">
@@ -44,7 +51,9 @@
 			<cfset delim = "">
 			<cfloop collection="#rec#" item="key">
 				<cfset value = StructFind(rec,key)>
-				<cfif IsDate(value) OR NOT IsNumeric(value)>
+				<cfif IsDate(value)>
+					<cfset value = "'#value#'">
+				<cfelseif NOT IsNumeric(value)>
 					<cfset value = "'#value#'">
 				</cfif>
 				<cfset sqlCols = "#sqlCols##delim##key#">
@@ -76,6 +85,7 @@
 						Done.
 					</cfif>
 				</td>
+				<td><cfdump var="#rec#" label="" expand="false"></td>
 			</tr>
 		</cfloop>
 		</table>

@@ -131,7 +131,7 @@
 		<cfset var QCredited="">
 		<cfset var QReceived="">
 		<cfset var item={}>
-		
+		<cftry>
 		<cfquery name="QPubStock" datasource="#args.datasource#">
 			SELECT tblPublication.pubTitle, tblPubStock.*
 			FROM tblPubStock
@@ -144,6 +144,7 @@
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
 		</cfquery>
+
 		<cfloop query="QPubStock">
 			<cfset item={}>
 			<cfset item.ID=psID>
@@ -157,6 +158,7 @@
 			<cfset item.Title=pubTitle>
 			<cfset item.Date=psDate>
 			<cfset item.Issue=psIssue>
+			<cfset item.psAction=psAction>
 			<cfset item.ArrivalDay=psArrivalDay>
 			<cfset item.Qty=psQty>
 			<cfset item.Retail=psRetail>
@@ -249,6 +251,13 @@
 			</cfif>
 		</cfloop>
 		<cfset result.list = ArrayOfStructSort(result.list,"numeric","asc","ID")>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="BuildReport" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		
 		<cfreturn result>
 	</cffunction>
 	

@@ -105,7 +105,7 @@
 					<tr>
 						<td align="center" width="10" class="no-print"><input type="checkbox" name="selectitem" value="#i.ID#" /></td>
 						<td align="center" width="10" class="no-print">#i.ID#</td>
-						<td align="left">#i.Title# <span style="float:right;color:##333;padding:0 10px 0 0;"><cfif len(i.ref)>(#i.Ref#)</cfif></span> <span style="float:right;color:##333;padding:0 10px 0 0;">#i.URN#</span></td>
+						<td align="left">#i.Title# <span style="float:right;color:##333;padding:0 10px 0 0;"><cfif len(i.ref)>(#i.Ref#)</cfif></span> <span style="float:right;color:##333;padding:0 10px 0 0;">#i.URN# #I.psAction#</span></td>
 						<td align="center" style="font-weight:bold;">#DecimalFormat(i.Retail)#</td>
 						<td align="left">#DateFormat(i.Date,"DD MMM YYYY")#<span style="float:right;color:##444;">#DateFormat(i.Date,"DDD")#</span></td>
 						<td align="center">#i.Issue#</td>

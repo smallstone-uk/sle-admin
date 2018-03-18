@@ -225,18 +225,20 @@
 		<cfset loc.parms=args>
 		<cfset loc.result.PRD = {}>
 		
-		<cfquery name="loc.QSalesTrans" datasource="#args.datasource#">
+		<cfquery name="loc.QSalesTrans" datasource="#args.datasource#" result="loc.QSalesTransResult">
 			SELECT nomClass,nomType,SUM(niAmount) AS gross, 
 				year(trnDate) as DA, month(trnDate) As DB, count(*) AS trans
 			FROM ((tblNominal INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID) 
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
 			WHERE trnLedger='sales' 
 			AND nomType='sales'
-			AND nomClass <> 'other'	<!--- exclude news account payments & owners account --->
+			<!--- AND nomClass <> 'other'	exclude news account payments & owners account --->
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#' 
 			GROUP BY DA,DB,nomClass
 		</cfquery>
-		
+		<cfdump var="#loc.QSalesTransResult#" label="QSalesTrans" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 		<cfloop query="loc.QSalesTrans">
 			<cfset loc.yymm = "#DA#-#NumberFormat(DB,"00")#">
 			<cfif NOT StructKeyExists(loc.result.PRD,loc.yymm)>
@@ -376,7 +378,7 @@
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
 			WHERE trnLedger='sales' 
 			AND nomType='sales'
-			AND nomClass<>'other'
+			<!---AND nomClass<>'other'--->
 			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 			AND niAmount<>0
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
@@ -565,7 +567,7 @@
 		<cfset var nomAcc={}>
 		<cfset var QTrans_result="">
 		<cfquery name="QTrans" datasource="#args.datasource#" result="QTrans_result">
-			SELECT nomCode,nomTitle,trnID,trnLedger,trnRef,trnClientRef,trnDate,trnAccountID,trnType,niAmount
+			SELECT nomCode,nomTitle,trnID,trnLedger,trnRef,trnClientRef,trnDate,trnAccountID,trnType,trnMethod,niAmount
 			FROM ((tblNominal 
 			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID)
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID)
@@ -608,6 +610,7 @@
 			<cfset rec.accID=trnAccountID>
 			<cfset rec.trnAccountID=trnAccountID>
 			<cfset rec.trnType=trnType>
+			<cfset rec.trnMethod=trnMethod>
 			<cfset rec.niAmount=niAmount>
 			<cfset ArrayAppend(nomAcc.tranArray,rec)>
 			<cfset nomAcc.total=nomAcc.total+niAmount>

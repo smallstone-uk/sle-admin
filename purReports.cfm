@@ -535,15 +535,18 @@
 										<td width="50">ID</td>
 										<td width="100">DATE</td>
 										<td width="70">TYPE</td>
+										<td width="70">METHOD</td>
 										<td width="70">REF</td>
 										<td width="70">CLIENT REF</td>
 										<td width="70" align="right">DR</td>
 										<td width="70" align="right">CR</td>
 									</tr>
+									<cfset rec.grandDRTotal=0>
+									<cfset rec.grandCRTotal=0>
 									<cfloop list="#codes#" delimiters="," index="code">
 										<cfset item=StructFind(trans.nomAccount,code)>
 										<tr>
-											<td colspan="7">#code# - #item.Title#</td>
+											<td colspan="8">#code# - #item.Title#</td>
 										</tr>
 										<cfset rec.drTotal=0>
 										<cfset rec.crTotal=0>
@@ -553,11 +556,18 @@
 												<td valign="top"><a href="tranMain2.cfm?acc=#tran.accID#&tran=#tran.trnID#" target="_newtab">#tran.trnID#</a></td>
 												<td valign="top">#tran.trnDate#</td>
 												<td valign="top">#tran.trnType#</td>
+												<td valign="top">#tran.trnMethod#</td>
 												<td valign="top">#tran.trnRef#</td>
 												<td valign="top">#tran.trnClientRef#</td>
 												<cfif tran.niAmount lt 0>
-													<cfset rec.crTotal=rec.crTotal+tran.niAmount><td></td><td align="right">#DecimalFormat(tran.niAmount)#</td>
-													<cfelse><cfset rec.drTotal=rec.drTotal+tran.niAmount><td align="right">#DecimalFormat(tran.niAmount)#</td><td></td></cfif>
+													<cfset rec.crTotal += tran.niAmount>
+													<cfset rec.grandCRTotal += tran.niAmount>
+													<td></td><td align="right">#DecimalFormat(tran.niAmount)#</td>
+												<cfelse>
+													<cfset rec.drTotal += tran.niAmount>
+													<cfset rec.grandDRTotal += tran.niAmount>
+													<td align="right">#DecimalFormat(tran.niAmount)#</td><td></td>
+												</cfif>
 											</tr>
 											<cfset diffStruct.id = tran.trnID>
 											<cfset diffStruct.dr = rec.drTotal>
@@ -567,14 +577,22 @@
 											</cfif>
 										</cfloop>
 											<tr>
-												<td colspan="5" align="right">Totals</td>
-												<td align="right">#DecimalFormat(rec.drTotal)#</td>
-												<td align="right">#DecimalFormat(rec.crTotal)#</td>
+												<td colspan="6" align="right"></td>
+												<td align="right"><b>#DecimalFormat(rec.drTotal)#</b></td>
+												<td align="right"><b>#DecimalFormat(rec.crTotal)#</b></td>
 											</tr>
 									</cfloop>
 										<tr>
-											<td colspan="5">Grand Total</td>
-											<td align="right">#DecimalFormat(trans.total)#</td>
+											<td colspan="8">&nbsp;</td>
+										</tr>
+										<tr>
+											<td colspan="6" align="right"></td>
+											<td align="right"><b>#DecimalFormat(rec.grandDRTotal)#</b></td>
+											<td align="right"><b>#DecimalFormat(rec.grandCRTotal)#</b></td>
+										</tr>
+										<tr>
+											<td colspan="7" align="right"><b>Grand Total</b></td>
+											<td align="right"><b>#DecimalFormat(trans.total)#</b></td>
 										</tr>
 									</table>
 								</cfcase>
@@ -618,7 +636,7 @@
 												<cfif balance lt 0>
 													<cfset rec.crTotal += balance>
 													<td>&nbsp;</td>
-													<td align="right">#DecimalFormat(-balance)#</td>
+													<td align="right">#DecimalFormat(balance)#</td>
 												<cfelseif balance gt 0>
 													<cfset rec.drTotal += balance>
 													<td align="right">#DecimalFormat(balance)#</td>
@@ -630,7 +648,6 @@
 											</tr>
 										</cfloop>
 									</cfloop>
-									<cfset rec.crTotal=-rec.crTotal>
 									<tr>
 										<td colspan="3"></td>
 										<td align="right">#DecimalFormat(rec.drTotal)#</td>
@@ -638,10 +655,9 @@
 									</tr>
 									<tr>
 										<td colspan="4"></td>
-										<td align="right">#DecimalFormat(rec.crTotal-rec.drTotal)#</td>
+										<td align="right">#DecimalFormat(rec.crTotal+rec.drTotal)#</td>
 									</tr>
 									</table>
-                                    <p>#trans.QTRANSRESULT.sql#</p>
 								</cfcase>
 								
 								<cfcase value="6">
@@ -686,6 +702,9 @@
 								
 								<cfcase value="8">
 									<cfset data=pur.VATReturn(parms)>
+									<cfdump var="#data#" label="VATReturn" expand="yes" format="html" 
+										output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 									<cfset summary = {
 										"box1" = {"title" = "VAT due on sales and other outputs", "value" = 0},
 										"box2" = {"title" = "VAT due on acquisitions from other EC States", "value" = 0},
@@ -857,7 +876,7 @@
 								
 								<cfcase value="9">
 									<cfset data=pur.VATTransactions(parms)>
-									<!---<cfdump var="#data#" label="data" expand="yes">--->
+									<cfdump var="#data#" label="data" expand="yes">
 									<cfset analysis = {}>
 									<table class="tableList" border="1">
 										<cfset nCode = "">
@@ -897,8 +916,8 @@
 												<cfelse>
 													<cfset StructInsert(analysis,"EXT",{"title" = "External Suppliers", "value" = -niAmount})>
 												</cfif>
-												<cfset nTotal -= niAmount>
-												<cfset gTotal -= niAmount>
+												<!---<cfset nTotal -= niAmount>
+												<cfset gTotal -= niAmount>--->
 											</cfif>
 										</cfloop>
 										<tr>

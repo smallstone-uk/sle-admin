@@ -188,6 +188,12 @@
 							<cfset i.heldback=0>
 							<cfset i.Price=QOrderItems.pubPrice+QOrderItems.pubPWPrice>
 							<cfset i.PriceTrade=val(QOrderItems.pubTradePrice)>
+							
+							<!--- handle VAT for publication --->
+							<cfset i.vatCode = pubVATCode>
+							<cfset i.vatRate = StructFind(application.site.vat,pubVATCode)>
+							<cfset i.vatAmount = i.Price - (int(i.Price / (1 + i.vatRate) * 100) / 100)>
+							
 							<cfif len(pubRoundTitle)>
 								<cfset i.Title=pubRoundTitle>
 							<cfelseif len(pubShortTitle)>
@@ -200,12 +206,6 @@
 							<cfelse>
 								<cfset i.Issue="">
 							</cfif>
-<!---							<cfif i.pubGroup is "magazine">
-								<cfset i.sort="x"&pubGroup&i.Title>
-							<cfelse>
-								<cfset i.sort=pubGroup&i.Title>
-							</cfif>
---->
 							<cfif i.pubGroup is "magazine">
 								<cfset i.sort="b_#i.Title#">
 							<cfelse>
@@ -228,6 +228,7 @@
 										FROM tblPubStock
 										WHERE psPubID=#i.pubID#
 										AND psType='received'
+										AND psSubType = 'normal'
 										AND psDate >= '#LSDateFormat(DateAdd("d",-4,dayDate),"yyyy-mm-dd")#'
 										AND psDate < '#LSDateFormat(dayDate,"yyyy-mm-dd")#'
 										LIMIT 1;
@@ -237,6 +238,7 @@
 										FROM tblPubStock
 										WHERE psPubID=#i.pubID#
 										AND psType='claim'
+										AND psSubType = 'normal'
 										AND psDate >= '#LSDateFormat(DateAdd("d",-4,dayDate),"yyyy-mm-dd")#'
 										AND psDate < '#LSDateFormat(dayDate,"yyyy-mm-dd")#'
 										LIMIT 1;
@@ -497,7 +499,12 @@
 									<cfset c.price=i.price>
 									<cfset c.priceTrade=i.PriceTrade>
 									<cfset c.charge=0>
-									<cfset c.vat=0>
+									<!---<cfset c.vat=0>--->
+									
+									<cfset c.vatCode = i.vatCode>
+									<cfset c.vatRate = i.vatRate>
+									<cfset c.vatAmount = i.vatAmount>
+
 									<cfset c.test=testmode>
 									<cfset c.voucher=0>
 									<cfset c.invoice=0>
@@ -601,7 +608,12 @@
 												<cfset cc.price="-"&val(i.price)>
 												<cfset cc.priceTrade="-"&val(i.PriceTrade)>
 												<cfset cc.charge=0>
-												<cfset cc.vat=0>
+												<!---<cfset cc.vat=0>--->
+												
+												<cfset cc.vatCode = i.vatCode>
+												<cfset cc.vatRate = i.vatRate>
+												<cfset cc.vatAmount = i.vatAmount>
+
 												<cfset cc.test=testmode>
 												<cfset cc.voucher=c.voucher>
 												<cfset cc.invoice=0>
@@ -678,7 +690,7 @@
 					<cfloop array="#args.charges#" index="i">
 						<cfset row=row+1>
 						<cfset drops=0>
-						(#i.ClientID#,#i.OrderID#,#i.BatchID#,#i.RoundID#,#i.PubID#,'#i.Type#','#i.Datestamp#','#i.Date#','#i.Issue#',#i.Qty#,#i.Price#,#i.PriceTrade#,#i.charge#,#i.vat#,#i.test#,#i.voucher#,#i.invoice#,#i.heldback#,'#i.reason#')
+						(#i.ClientID#,#i.OrderID#,#i.BatchID#,#i.RoundID#,#i.PubID#,'#i.Type#','#i.Datestamp#','#i.Date#','#i.Issue#',#i.Qty#,#i.Price#,#i.PriceTrade#,#i.charge#,#i.vatAmount#,#i.test#,#i.voucher#,#i.invoice#,#i.heldback#,'#i.reason#')
 						<cfif row neq array>,</cfif>
 						<cfif NOT i.ignore>
 							<cfif StructKeyExists(rounds,i.RoundID)>

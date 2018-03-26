@@ -649,7 +649,7 @@
 			<cfelseif len(args.form.srchDateFrom)>
 				AND trnDate BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateFrom#"> 
 				AND <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateTo#"></cfif>
-			GROUP BY trnLedger,nomCode
+			GROUP BY trnLedger,nomGroup,nomCode
 		</cfquery>
 
 		<cfif len(args.form.srchDateFrom)>

@@ -602,6 +602,7 @@
 									<table border="1" class="tableList">
 										<tr>
 											<th width="50">Ledger</th>
+											<th width="50">Group</th>
 											<th width="50">CODE</th>
 											<th width="150">TITLE</th>
 											<th width="70" align="right">DR</th>
@@ -617,6 +618,7 @@
 											<cfset balance = item.nomTotal + item.BFwd>
 											<tr>
 												<td>#key#</td>
+												<td>#item.nomGroup#</td>
 												<td>#item.nomCode#</td>
 												<td>#item.nomTitle#</td>
 <!---
@@ -649,12 +651,12 @@
 										</cfloop>
 									</cfloop>
 									<tr>
-										<td colspan="3"></td>
+										<td colspan="4"></td>
 										<td align="right">#DecimalFormat(rec.drTotal)#</td>
 										<td align="right">#DecimalFormat(rec.crTotal)#</td>
 									</tr>
 									<tr>
-										<td colspan="4"></td>
+										<td colspan="5"></td>
 										<td align="right">#DecimalFormat(rec.crTotal+rec.drTotal)#</td>
 									</tr>
 									</table>

@@ -402,8 +402,10 @@
 				}
 				loc.z.es = CreateDate(args.yyyy,loc.z.mm,loc.z.dd);
 				loc.z.gf = DateAdd("d",-2,loc.z.es);
+				loc.z.em = DateAdd("d",1,loc.z.es);
 				ArrayAppend(loc.result,loc.z.gf);	// Good Friday
 				ArrayAppend(loc.result,loc.z.es);	// Easter Sunday
+				ArrayAppend(loc.result,loc.z.em);	// Easter Monday
 			</cfscript>
 			<cfset ArraySort(loc.result,"numeric","asc")>
 			

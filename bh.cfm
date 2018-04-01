@@ -8,19 +8,25 @@
 </head>
 <body>
 <table class="tableList">
+<cfset thisYear = Year(Now())>
 <cfoutput>
 	<cfset parm = {}>
 	<cfobject component="code/core" name="x">
-	<cfloop from="2013" to="2018" index="yr">
+	<cfloop from="2013" to="#thisYear#" index="yr">
 		<cfset parm.yyyy = yr>
 		<cfset result = x.BankHolidays(parm)>
 			<cfloop array="#result#" index="hol">
 				<tr><td align="right" colspan="2">#DateFormat(hol,"ddd dd-mmm-yyyy")#</td></tr>
 			</cfloop>
 	</cfloop>
+	<tr>
+		<th>Date</th>
+		<th>Is Bank Holiday?</th>
+	</tr>
 	<cfloop from="1" to="31" index="i">
-		<cfset newDate = CreateDate(2017,05,i)>
-		<tr><td>#newDate#</td><td align="right">#x.IsBankHoliday(newDate)#</td></tr>
+		<cfset newDate = CreateDate(thisYear,05,i)>
+		<tr><td>#DateFormat(newDate,"ddd dd-mmm-yyyy")#</td>
+		<td align="center">#x.IsBankHoliday(newDate)#</td></tr>
 	</cfloop>
 </cfoutput>
 </table>

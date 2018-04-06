@@ -181,6 +181,7 @@
 					<th width="60" align="right">84 Days</th>
 					<th width="60" align="right">112+ Days</th>
 					<th width="60" align="right">Balance</th>
+					<th width="40" align="left">Level</th>
 					<th width="90" align="left">Chased</th>
 				</tr>
 				<cfif parms.form.srchSort eq "cltBalance">
@@ -215,6 +216,7 @@
 							<td class="#style#">#showNum(item.balance3)#</td>
 							<td class="#style#">#showNum(item.balance4)#</td>
 							<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
+							<td align="center">#item.cltChase#</td>
 							<td>#LSDateFormat(item.cltChaseDate)#</td>
 						</tr>
 					</cfloop>
@@ -248,7 +250,8 @@
 							<td class="#style#">#showNum(item.balance3)#</td>
 							<td class="#style#">#showNum(item.balance4)#</td>
 							<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-							<td>#item.cltChase# - #LSDateFormat(item.cltChaseDate)#</td>
+							<td align="center">#item.cltChase#</td>
+							<td>#LSDateFormat(item.cltChaseDate)#</td>
 						</tr>
 					</cfloop>
 				</cfif>

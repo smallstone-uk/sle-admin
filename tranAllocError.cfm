@@ -40,7 +40,7 @@
 			<div id="content-inner">
 				<cfoutput>
 					<cfset allocBal = 0>
-					<cfset allocID = -99>
+					<cfset allocID = -1>
 					<cfset allocTotal = 0>
 					<table class="tableList" border="1" width="600">
 						<tr>
@@ -57,7 +57,7 @@
 							<td></td>
 						</tr>
 						<cfloop query="QTrans">
-							<cfif allocID gt -99 AND allocID neq trnAllocID>
+							<cfif allocID gt -1 AND allocID neq trnAllocID>
 								<cfif abs(allocBal) lt 0.001>
 									<cfset allocBal = 0>
 								</cfif>

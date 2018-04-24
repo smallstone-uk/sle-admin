@@ -27,7 +27,7 @@
 <cfquery name="QTrans" datasource="#application.site.datasource1#">
 	SELECT *
 	FROM tblTrans
-	WHERE trnAccountID = 251
+	WHERE trnAccountID = 21
 	<!---AND trnAllocID > 0--->
 	<!---AND trnDate>'2016-01-01'--->
 	ORDER BY trnAllocID,trnDate,trnID

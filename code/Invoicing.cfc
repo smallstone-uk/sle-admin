@@ -386,7 +386,7 @@
 						<cfset result.debitchargetotal=result.debitchargetotal+charge.Charge>
 						
 						<cfset result.TotalNet=result.TotalNet+(charge.Net*charge.Qty)>
-						<cfset result.TotalVAT=result.TotalVAT+(charge.VAT*charge.Qty)>
+						<cfset result.TotalVAT=0>	<!--- result.TotalVAT+(charge.VAT*charge.Qty)> --->
 						<cfif charge.VATRate is 0.2>
 							<cfset result.net20=result.net20+(charge.Net*charge.Qty)>
 							<cfset result.vat20=result.vat20+(charge.VAT*charge.Qty)>
@@ -510,7 +510,7 @@
 			<cfelse>
 				<cfset result.net0=result.net0+result.delChargeTotal>	<!--- add in del charges to match net amount (assume all zero VAT) --->
 			</cfif>
-			
+			<cfset result.vat0=0> <!--- bug fix --->
 			<cfset result.debit=StructSort(result.debitGroup,"textnocase", "asc","sort")>
 			<cfset result.credit=StructSort(result.creditGroup,"textnocase", "asc","sort")>
 			<cfset result.vouchers=StructSort(result.voucherGroup,"textnocase", "asc","sort")>

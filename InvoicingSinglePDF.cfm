@@ -195,7 +195,7 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfset lineGroup="">
 					<cfloop array="#invoice.debit#" index="index">
@@ -211,7 +211,7 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfif ArrayLen(invoice.debit) gte 20>
@@ -227,7 +227,7 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif>
+							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -248,7 +248,7 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfset lineGroup="">
 					<cfloop array="#invoice.credit#" index="index">
@@ -264,7 +264,7 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfif ArrayLen(invoice.credit) gte 20>
@@ -280,7 +280,7 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif>
+							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -301,7 +301,7 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfloop array="#invoice.vouchers#" index="item">
 						<cfset i=StructFind(invoice.voucherGroup,item)>
@@ -316,7 +316,7 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif>
+									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfset HeightTotal=HeightTotal+rowHeight>
@@ -325,7 +325,7 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif>
+							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -410,7 +410,7 @@
 								<tr>
 									<th align="right">0.00%</th>
 									<td align="right">&pound;#DecimalFormat(invoice.net0)#</td>
-									<td align="right">&pound;#DecimalFormat(invoice.vat0)#</td>
+									<td align="right">&pound;0.00</td>
 								</tr>
 								<tr>
 									<th align="right">20.00%</th>

@@ -76,8 +76,7 @@
 		
 		<div style="font-size:13px; width:600px; margin:60px 60px 0 60px;">
 			<p>Dear 
-				<cfif len(user[1].cltTitle)>#user[1].cltTitle#
-					<cfelse>Mr. </cfif>
+				<cfif len(user[1].cltTitle)>#user[1].cltTitle# </cfif>
 				<cfif len(user[1].cltName)>#user[1].cltName#,
 					<cfelse>Sirs,</cfif>
 			</p>

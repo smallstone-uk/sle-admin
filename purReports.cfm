@@ -42,6 +42,8 @@
 	}
 	.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
 	.vatTable td {padding: 5px; border-color: #ccc;}
+	.err {background-color:#FF0000}
+	.ok {background-color:#00DF00}
 </style>
 
 </head>
@@ -95,6 +97,8 @@
 											<option value="11"<cfif srchReport eq "11"> selected="selected"</cfif>>Fix Sales Balances</option>
 											<option value="12"<cfif srchReport eq "12"> selected="selected"</cfif>>Shop News Payments</option>
 											<option value="13"<cfif srchReport eq "13"> selected="selected"</cfif>>Banking Analysis</option>
+											<option value="14"<cfif srchReport eq "14"> selected="selected"</cfif>>Transaction Check</option>
+											<option value="15"<cfif srchReport eq "15"> selected="selected"</cfif>>Allocation Check</option>
 										</select>
 									</td>
 								</tr>
@@ -1672,6 +1676,87 @@
 											</tr>
 										</table>
 									</cfif>
+								</cfcase>
+								<cfcase value="14">
+									<cfset trans=pur.TranDetail(parms)><cfdump var="#trans#" label="trans" expand="false">
+									<cfloop array="#trans.tranArray#" index="tran">
+										<cfif tran.itemTotal neq 0>
+											<cfdump var="#tran#" label="#tran.trnDate#" expand="false">
+										</cfif>
+									</cfloop>
+								</cfcase>
+								<cfcase value="15">
+									<cfset parms.sortOrder = "trnAllocID,trnDate,trnID">
+									<cfset trans=pur.TranDetail(parms)>
+									<cfoutput>
+										<cfset allocBal = 0>
+										<cfset allocID = -1>
+										<cfset allocTotal = 0>
+										<cfset errorCount = 0>
+										<table class="tableList" border="1" width="900">
+											<tr>
+												<td width="150">Name</td>
+												<td>ID</td>
+												<td width="80">Date</td>
+												<td>Type</td>
+												<td>Method</td>
+												<td>Reference</td>
+												<td>Description</td>
+												<td>Amount1</td>
+												<td>Amount2</td>
+												<td>Allocated</td>
+												<td>AllocID</td>
+												<td></td>
+											</tr>
+											<cfloop query="trans.QTrans">
+												<cfif allocID gt -1 AND allocID neq trnAllocID>
+													<cfif abs(allocBal) lt 0.001>
+														<cfset allocBal = 0>
+													</cfif>
+													<cfif allocBal neq 0>
+														<cfset class = "err">
+														<cfset allocTotal += allocBal>
+														<cfset errorCount++>
+													<cfelse><cfset class = "ok"></cfif>
+													<tr>
+														<td height="30" colspan="10"></td>
+														<td class="#class#" align="right">#allocID#</td>
+														<td class="#class#" align="center">#allocBal#</td>
+													</tr>
+													<cfset allocBal = 0>
+												</cfif>
+												<cfset allocBal += (trnAmnt1 + trnAmnt2)>
+												<cfset allocID = trnAllocID>
+												<cfif abs(allocBal) lt 0.001>
+													<cfset allocBal = 0>
+												</cfif>
+												<tr>
+													<td>#accName#</td>
+													<td align="right">#trnID#</td>
+													<td align="right">#LSDateFormat(trnDate,'dd-mmm-yyyy')#</td>
+													<td>#trnType#</td>
+													<td>#trnMethod#</td>
+													<td>#trnRef#</td>
+													<td>#trnDesc#</td>
+													<td align="right">#trnAmnt1#</td>
+													<td align="right">#trnAmnt2#</td>
+													<td align="center">#trnAlloc#</td>
+													<td align="right">#trnAllocID#</td>
+													<td align="right">#DecimalFormat(allocBal)#</td>
+												</tr>
+											</cfloop>
+											<tr>
+												<td height="30" colspan="10"></td>
+												<td class="#class#" align="right">#allocID#</td>
+												<td class="#class#" align="center">#allocBal#</td>
+											</tr>
+											<tr>
+												<th height="30" colspan="9">#errorCount# errors. </th>
+												<th colspan="2">Total Error</th>
+												<th>#allocTotal#</th>
+											</tr>
+										</table>
+									</cfoutput>
 								</cfcase>
 							</cfswitch>
 						</cfif>

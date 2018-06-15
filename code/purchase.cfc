@@ -513,7 +513,7 @@
 		
 		<cfset result.args=args>
 		<cfquery name="QTrans" datasource="#args.datasource#" result="QResult">
-			SELECT accID,accName, trnID, trnLedger, trnRef,trnDate, trnAccountID, trnType,trnAmnt1,trnAmnt2
+			SELECT accID,accName, trnID, trnLedger, trnRef,trnDate, trnAccountID, trnType,trnAmnt1,trnAmnt2,trnAlloc,trnAllocID,trnMethod,trnDesc
 			FROM tblTrans,tblAccount
 			WHERE trnAccountID=accID
 			
@@ -532,7 +532,11 @@
 				<cfif StructKeyExists(args.form, "srchTranType") AND len(args.form.srchTranType)>
 					AND trnType IN ('#REReplaceNoCase(args.form.srchTranType, ",", "','", "all")#')
 				</cfif>
-			ORDER BY trnAccountID,trnDate,trnID
+			<cfif StructKeyExists(args,"sortOrder")>
+				ORDER BY #args.sortOrder#
+			<cfelse>
+				ORDER BY trnAccountID,trnDate,trnID
+			</cfif>
 		</cfquery>
 		<cfset result.QTrans=QTrans>
 		<cfset result.QResult=QResult>
@@ -553,6 +557,11 @@
 				WHERE nomID=niNomID
 				AND niTranID=<cfqueryparam cfsqltype="cf_sql_integer" value="#trnID#">
 			</cfquery>
+			<cfset rec.itemtotal = 0>
+			<cfloop query="QItems">
+				<cfset rec.itemtotal += niAmount>
+			</cfloop>
+			<cfif rec.itemtotal lt 0.001><cfset rec.itemtotal = 0></cfif>
 			<cfset rec.items=QItems>
 			<cfset ArrayAppend(result.tranArray,rec)>
 		</cfloop>		
@@ -1106,7 +1115,7 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cftry>
-			<cfquery name="loc.result.QNewsPayments" datasource="#args.datasource#" result="loc.qResult">
+			<cfquery name="loc.result.QNewsPayments" datasource="#args.datasource#" result="loc.result.qResult">
 				SELECT trnID,trnRef,trnDate,trnType,trnMethod,trnDesc,trnClientRef,trnPaidIn,niAmount
 				FROM `tblnomitems` 
 				INNER JOIN tblTrans ON niTranID=trnID

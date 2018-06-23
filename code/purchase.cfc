@@ -232,13 +232,14 @@
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
 			WHERE trnLedger='sales' 
 			AND nomType='sales'
+			AND nomClass != 'exclude'
 			<!--- AND nomClass <> 'other'	exclude news account payments & owners account --->
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#' 
 			GROUP BY DA,DB,nomClass
 		</cfquery>
-		<cfdump var="#loc.QSalesTransResult#" label="QSalesTrans" expand="yes" format="html" 
+<!---		<cfdump var="#loc.QSalesTransResult#" label="QSalesTrans" expand="yes" format="html" 
 	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
+--->
 		<cfloop query="loc.QSalesTrans">
 			<cfset loc.yymm = "#DA#-#NumberFormat(DB,"00")#">
 			<cfif NOT StructKeyExists(loc.result.PRD,loc.yymm)>
@@ -272,6 +273,7 @@
 			WHERE trnClientRef=0 
 			AND trnLedger='purch' 
 			AND nomType='purch' 
+			AND nomClass != 'exclude'
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 			GROUP BY DA,DB,nomClass,nomVATCode
 		</cfquery>
@@ -378,6 +380,7 @@
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
 			WHERE trnLedger='sales' 
 			AND nomType='sales'
+			AND nomClass != 'exclude'
 			<!---AND nomClass<>'other'--->
 			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 			AND niAmount<>0
@@ -396,6 +399,7 @@
 			WHERE trnClientRef=0 
 			AND trnLedger='purch' 
 			AND nomType='purch' 
+			AND nomClass != 'exclude'
 			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 			ORDER BY accCode,trnDate,trnID

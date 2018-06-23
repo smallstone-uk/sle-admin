@@ -870,7 +870,7 @@
 								
 								<cfcase value="9">
 									<cfset data=pur.VATTransactions(parms)>
-									<cfdump var="#data#" label="data" expand="yes">
+									<!---<cfdump var="#data#" label="data" expand="yes">--->
 									<cfset analysis = {}>
 									<table class="tableList" border="1">
 										<cfset nCode = "">

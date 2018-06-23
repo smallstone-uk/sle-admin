@@ -607,6 +607,7 @@
 										<tr>
 											<th width="50">Ledger</th>
 											<th width="50">Group</th>
+											<th width="50">Class</th>
 											<th width="50">CODE</th>
 											<th width="150">TITLE</th>
 											<th width="70" align="right">DR</th>
@@ -623,22 +624,9 @@
 											<tr>
 												<td>#key#</td>
 												<td>#item.nomGroup#</td>
+												<td>#item.nomClass#</td>
 												<td>#item.nomCode#</td>
 												<td>#item.nomTitle#</td>
-<!---
-												<cfif item.nomTotal lt 0>
-													<cfset rec.crTotal=rec.crTotal+item.nomTotal>
-													<td>&nbsp;</td>
-													<td align="right">#DecimalFormat(-item.nomTotal)#</td>
-												<cfelseif item.nomTotal gt 0>
-													<cfset rec.drTotal=rec.drTotal+item.nomTotal>
-													<td align="right">#DecimalFormat(item.nomTotal)#</td>
-													<td>&nbsp;</td>
-												<cfelse>
-													<td>&nbsp;</td>
-													<td>&nbsp;</td>
-												</cfif>
---->
 												<cfif balance lt 0>
 													<cfset rec.crTotal += balance>
 													<td>&nbsp;</td>
@@ -655,12 +643,12 @@
 										</cfloop>
 									</cfloop>
 									<tr>
-										<td colspan="4"></td>
+										<td colspan="5"></td>
 										<td align="right">#DecimalFormat(rec.drTotal)#</td>
 										<td align="right">#DecimalFormat(rec.crTotal)#</td>
 									</tr>
 									<tr>
-										<td colspan="5"></td>
+										<td colspan="6"></td>
 										<td align="right">#DecimalFormat(rec.crTotal+rec.drTotal)#</td>
 									</tr>
 									</table>

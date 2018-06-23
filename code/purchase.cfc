@@ -639,7 +639,7 @@
 		<cfset result.ledgers="">
 		
 		<cfquery name="QTrans" datasource="#args.datasource#" result="result.QTRANSRESULT">
-			SELECT nomID,nomGroup,nomCode,nomType,nomTitle,nomBFwd,trnLedger,SUM(niAmount) AS nomTotal
+			SELECT nomID,nomGroup,nomCode,nomType,nomClass,nomTitle,nomBFwd,trnLedger,SUM(niAmount) AS nomTotal
 			FROM ((tblNominal 
 			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID)
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID)
@@ -668,6 +668,7 @@
 		<cfloop query="QTrans">
 			<cfset rec={}>
 			<cfset rec.nomGroup=nomGroup>
+			<cfset rec.nomClass=nomClass>
 			<cfset rec.nomCode=nomCode>
 			<cfset rec.nomTitle=nomTitle>
 			<cfset rec.nomTotal=nomTotal>

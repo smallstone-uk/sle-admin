@@ -835,7 +835,9 @@
 												<cfset totals.gross = 0>
 												<cfset periodKeys = ListSort(StructKeyList(dept,","),"numeric","asc",",")>
 												<tr>
-													<td>#ledgerKey#</td>
+													<td colspan="4">#ledgerKey#</td>
+												</tr>
+												<tr>
 													<td>#deptKey#</td>
 													<td align="right">Net</td>											
 													<td align="right">VAT</td>											
@@ -844,7 +846,6 @@
 												<cfloop list="#periodKeys#" index="prdKey">
 													<cfset period = StructFind(dept,prdKey)>
 													<tr>
-														<td></td>
 														<td>#prdKey#</td>
 														<td align="right">#DecimalFormat(period.net)#</td>
 														<td align="right">#DecimalFormat(period.vat)#</td>
@@ -855,7 +856,6 @@
 													<cfset totals.gross += period.gross>
 												</cfloop>
 												<tr>
-													<th></th>
 													<th>#deptKey# total</th>
 													<th align="right">#DecimalFormat(totals.net)#</th>
 													<th align="right">#DecimalFormat(totals.vat)#</th>

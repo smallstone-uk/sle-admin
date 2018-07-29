@@ -280,9 +280,9 @@
 		</cfloop>
 		<cfset ArraySort(pubArray,"text","asc")>
 		<div class="summary" style="page-break-before:always;">
-			<table border="1" class="tableList" width="700" style="font-size: 16px;">
+			<table border="1" class="tableList" width="700" style="font-size: 20px;">
 				<tr>
-					<th colspan="7" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
+					<th colspan="8" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
 				</tr>
 				<tr>
 					<th>Publication</th>
@@ -290,11 +290,12 @@
 						<th align="center">#round.roundTitle#</th>
 					</cfloop>
 					<th>Total</th>
+					<th>Round<br />Shortages</th>
 				</tr>
 				<cfloop array="#pubArray#" index="pub">
 					<cfset pubID = ListLast(pub,"_")>
 					<tr>
-						<td>#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
+						<td height="40">#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
 						<cfloop array="#drops.rounds#" index="round">
 							<cfset rndPub = "#round.roundID#-#pubID#">
 							<cfif StructKeyExists(round.totalQty,rndPub)>
@@ -306,6 +307,7 @@
 							<cfset grandQty = StructFind(drops.grandTotalQty,pubID).qty>
 							#grandQty#
 						</td>
+						<td></td>
 					</tr>
 				</cfloop>
 				<cfset grandTotPubs = 0>
@@ -317,6 +319,7 @@
 						<th align="center">#round.pubTotal#</th>
 					</cfloop>
 					<th>#grandTotPubs#</th>
+					<th></th>
 				</tr>
 				<tr>
 					<th>Total Drops</th>
@@ -325,8 +328,14 @@
 						<th align="center">#round.droptotal#</th>
 					</cfloop>
 					<th>#grandTotDrops#</th>
+					<th></th>
 				</tr>
 			</table>
+			<h3>
+				<br />
+				<strong>Drivers:</strong> If any round is short, please make a note in the shortages column.<br /><br />
+				<strong>Shop Staff:</strong> Please claim for any round shortages as well.
+			</h3>
 		</div>
 		
 		<!--- include shop stock sheet if all rounds printed--->

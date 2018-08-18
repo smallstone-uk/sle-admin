@@ -87,7 +87,7 @@
 							</tr>
 							<tr>
 								<td width="150">To</td>
-								<td><input type="text" name="to" class="datepicker" value="#DateFormat(DateAdd('d',-1,Now()),'yyyy-mm-dd')#"></td>
+								<td><input type="text" name="to" class="datepicker" value="#DateFormat(Now(),'yyyy-mm-dd')#"></td>
 							</tr>
 							<tr>
 								<td width="150">Publication</td>
@@ -125,6 +125,7 @@
 								</td>
 							</tr>
 						</table>
+						(reports exclude supplements)
 						<div class="clear"></div>
 					</form>
 				</div>

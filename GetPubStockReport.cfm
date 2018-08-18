@@ -131,10 +131,9 @@
 					</tr>
 				</cfloop>
 				<tr>
-					<th colspan="11" align="right" style="font-size:16px;">Totals</th>
+					<th colspan="12" align="right" style="font-size:16px;">Totals</th>
 					<th align="center" style="font-size:14px;"><strong>#total#</strong></th>
-					<th></th>
-					<th align="center" style="font-size:14px;"><strong>#DecimalFormat(totalCost)#</strong></th>
+					<th align="right" style="font-size:14px;"><strong>#DecimalFormat(totalCost)#</strong></th>
 				</tr>
 			</table>
 		</form>

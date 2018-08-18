@@ -15,6 +15,7 @@
 				AND psDate >= '#LSDateFormat(args.form.from,"yyyy-mm-dd")#'
 				AND psDate <= '#LSDateFormat(args.form.to,"yyyy-mm-dd")#'
 				AND psOrderID=#val(args.form.customer)#
+				AND pubPrice >= 0	<!--- no sups --->
 				<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
 				ORDER by pubTitle asc, psDate, psIssue desc, psDate asc				
 			</cfquery>
@@ -31,6 +32,7 @@
 					WHERE pubID=#loc.itempubID#
 					AND psDate>='#loc.itemDate#'
 					AND psIssue='#loc.itemIssue#'
+					AND pubPrice >= 0	<!--- no sups --->
 				</cfquery>
 				<cfloop query="loc.QPubStock">
 					<cfif ReFind("[a-zA-Z]",psIssue,1,false)>
@@ -139,7 +141,8 @@
 			WHERE psDate >= '#LSDateFormat(args.form.from,"yyyy-mm-dd")#'
 			AND psDate <= '#LSDateFormat(args.form.to,"yyyy-mm-dd")#'
 			AND psOrderID=#val(args.form.customer)#
-			AND psPubID=pubID
+			<!---AND psPubID=pubID--->
+			AND pubPrice >= 0	<!--- no sups --->
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
@@ -234,13 +237,12 @@
 						<cfset item.crdQty=QCredited.TotalQty>
 						<cfset item.class="red">
 						<cfset item.diff=val(QCredited.TotalQty)-val(psQty)>
-						<cfset item.diffInt=ReReplace(item.diff,"-","","all")>
-						<cfset item.LineTotal=item.Retail*item.diffInt/(1+item.Vat)>
+						<cfset item.LineTotal=item.Retail*item.diff/(1+item.Vat)>
 						<cfif item.DiscountType eq "pc">
 							<cfset item.LineDisc=item.LineTotal*(item.Discount/100)>
 							<cfset item.LineTotal=item.LineTotal-item.LineDisc>
 						<cfelse>
-							<cfset item.LineDisc=item.Discount*item.diffInt>
+							<cfset item.LineDisc=item.Discount*item.diff>
 							<cfset item.LineTotal=item.LineTotal-item.LineDisc>
 						</cfif>
 						<cfset ArrayAppend(result.list,item)>

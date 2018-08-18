@@ -141,10 +141,10 @@
 			WHERE psDate >= '#LSDateFormat(args.form.from,"yyyy-mm-dd")#'
 			AND psDate <= '#LSDateFormat(args.form.to,"yyyy-mm-dd")#'
 			AND psOrderID=#val(args.form.customer)#
-			<!---AND psPubID=pubID--->
 			AND pubPrice >= 0	<!--- no sups --->
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
+			<cfif StructKeyExists(args.form,"urn")>AND psURN LIKE '%#args.form.urn#%'</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
 		</cfquery>
 
@@ -263,6 +263,29 @@
 		<cfreturn result>
 	</cffunction>
 	
+	<cffunction name="getURNs" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.QURNS" datasource="#args.datasource#">
+				SELECT psDate, psURN, count(*) as total 
+				FROM `tblpubstock` 
+				WHERE `psType` = 'returned' 
+				AND `psDate` >= '#LSDateFormat(DateAdd("d",-30,Now()),"yyyy-mm-dd")#'
+				GROUP BY psURN
+				ORDER BY psDate DESC
+			</cfquery>
+			<cfset loc.result.QURNS = loc.QURNS>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="UpdateReportStock" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>

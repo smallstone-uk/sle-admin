@@ -60,10 +60,11 @@
 </head>
 
 <cfobject component="code/functions" name="func">
+<cfobject component="code/publications" name="pub">
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset pubs=func.GetPubs(parm)>
-
+<cfset urns=pub.GetURNs(parm)>
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -103,6 +104,17 @@
 							<tr>
 								<td width="150">Issue</td>
 								<td><input type="text" name="issue" value=""></td>
+							</tr>
+							<tr>
+								<td width="150">URN</td>
+								<td>
+									<select name="urn" data-placeholder="Select..." id="urnList">
+										<option value=""></option>
+										<cfloop query="urns.qurns">
+											<option value="#psURN#">#DateFormat(psDate,'ddd dd-mmm')# - #psURN# - #total#</option>
+										</cfloop>
+									</select>
+								</td>
 							</tr>
 							<tr>
 								<td width="150">Type</td>

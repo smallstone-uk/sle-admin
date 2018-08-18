@@ -144,7 +144,7 @@
 			AND pubPrice >= 0	<!--- no sups --->
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
-			<cfif StructKeyExists(args.form,"urn")>AND psURN LIKE '%#args.form.urn#%'</cfif>
+			<cfif StructKeyExists(args.form,"urn") AND len(args.form.urn)>AND psURN LIKE '%#args.form.urn#%'</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
 		</cfquery>
 

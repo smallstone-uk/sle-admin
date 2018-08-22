@@ -175,13 +175,13 @@
 			<table border="1" class="tableList" width="100%">
 				<tr>
 					<td width="10"><a href="javascript:void(0)" class="pencil_edit" data-code="#acctData.Account.accCode#" tabindex="-1"></a></td>
-					<th width="100" align="left">Account Code</th>
+					<th width="60" align="left">Acct Code</th>
 					<td>#acctData.Account.accCode#</td>
-					<th width="100" align="left">Name</th>
+					<th width="40" align="left">Name</th>
 					<td>#acctData.Account.accName#</td>
-					<th width="100" align="left">Type</th>
+					<th width="40" align="right">Type</th>
 					<td>#acctData.Account.accType#</td>
-					<th width="100" align="left">Group</th>
+					<th width="40" align="right">Group</th>
 					<td>#acctData.Account.accGroup#</td>
 					<td align="center">#acctData.Account.BalAccCode#</td>
 					<td align="center">#acctData.Account.PayAccNomCode#</td>
@@ -191,9 +191,9 @@
 			<cfif ArrayLen(trans.tranList)>
 				<table border="1" class="tableList" width="100%" id="tranListTable">
 					<tr>
-						<th width="10"></th>
+						<th width="10" class="noPrint"></th>
 						<th align="left">ID</th>
-						<th align="right">Date</th>
+						<th align="right" width="100">Date</th>
 						<th>Type</th>
 						<th align="left">Ref</th>
 						<th align="left">Description</th>
@@ -201,13 +201,14 @@
 						<th align="right">VAT/<br />Disc</th>
 						<th align="right">Gross</th>
 						<th align="right">Balance</th>
-						<th>Allocated<br><input type="checkbox" name="selectAllOnList" class="selectAllOnList" style="width:20px; height:20px;"></th>
+						<th class="noPrint">Allocated<br><input type="checkbox" name="selectAllOnList" class="selectAllOnList" style="width:20px; height:20px;"></th>
 					</tr>
 					<cfset balance=trans.bfwd>
 					<cfif balance NEQ 0>
-						<tr><td colspan="9" align="right"><strong>Brought Forward</strong>&nbsp;</td>
+						<tr><td width="10" class="noPrint"></td>
+							<td colspan="8" align="right"><strong>Brought Forward</strong>&nbsp;</td>
 							<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
-							<td align="center"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" value="0" /></td>
+							<td align="center" class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" value="0" /></td>
 						</tr>
 					</cfif>
 					<cfif StructKeyExists(trans,"allocError")>
@@ -223,7 +224,7 @@
 						<cfset amountClass="amount">
 						<cfif ListFind("crn,pay,jnl",item.trnType,",")><cfset amountClass="creditAmount"></cfif>
 						<tr id="trnItem_#item.trnID#">
-							<td><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
+							<td class="noPrint"><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
 							<td id="trnItem_ID"><a href="javascript:void(0)" class="trnIDLink" data-id="#item.trnID#" data-type="#item.trnType#" tabindex="-1">#item.trnID#</a></td>
 							<td id="trnItem_Date" align="right">#LSDateFormat(item.trnDate,"ddd dd/mm/yyyy")#</td>
 							<td id="trnItem_Type" align="center">#item.trnType#</td>
@@ -233,7 +234,7 @@
 							<td id="trnItem_Amount2" class="#amountClass#">#DecimalFormat(val(item.trnAmnt2))#</td>
 							<td id="trnItem_Amount3" class="#amountClass#">#DecimalFormat(val(item.trnAmnt1) + val(item.trnAmnt2))#</td>
 							<td id="trnItem_Balance" class="#amountClass#">#DecimalFormat(totAmnt1 + totAmnt2)#</td>
-							<td id="trnItem_Alloc" align="center">
+							<td id="trnItem_Alloc" align="center" class="noPrint">
 								<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
 									value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> /> #item.trnAllocID#</td>
 						</tr>
@@ -243,14 +244,14 @@
 						<td class="amountTotal">#DecimalFormat(totAmnt1)#</td>
 						<td class="amountTotal">#DecimalFormat(totAmnt2)#</td>
 						<td class="amountTotal">#DecimalFormat(totAmnt1 + totAmnt2)#</td>
-						<td class="amountAllocatedTotal" style="font-weight:bold;" align="right"></td>
-						<td><a href="javascript:void(0)" id="btnAllocItems" class="button" style="display:none;">Allocate</a></td>
+						<td class="amountAllocatedTotal noPrint" style="font-weight:bold;" align="right"></td>
+						<td class="noPrint"><a href="javascript:void(0)" id="btnAllocItems" class="button" style="display:none;">Allocate</a></td>
 					</tr>
 					<tr>
 						<td colspan="5"></td>
 						<td colspan="3" align="right">Page Total</td>
 						<td>#DecimalFormat(totAmnt1+totAmnt2-balance)#</td>
-						<td colspan="2"></td>
+						<td colspan="2" class="noPrint"></td>
 				</table>
 			<cfelse>
 				No records.

@@ -427,7 +427,8 @@
 						</div>
 					</form>
 					
---->					<div id="tran-list" class="module" style="display:none;"></div>
+--->
+					<div id="tran-list" class="module" style="display:none;"></div>
 					<div id="tran-list-toggle" class="module noPrint"><a href="javascript:toggleTranList();" tabindex="-1">Toggle Transactions List</a></div>
 					<div id="tran-form" class="module" style="display:none;"></div>
 					<div id="tran-items" class="module" style="display:none;"></div>

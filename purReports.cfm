@@ -1692,6 +1692,7 @@
 												<td>Description</td>
 												<td>Amount1</td>
 												<td>Amount2</td>
+												<td>Total</td>
 												<td>Allocated</td>
 												<td>AllocID</td>
 												<td></td>
@@ -1707,7 +1708,7 @@
 														<cfset errorCount++>
 													<cfelse><cfset class = "ok"></cfif>
 													<tr>
-														<td height="30" colspan="10"></td>
+														<td height="30" colspan="11"></td>
 														<td class="#class#" align="right">#allocID#</td>
 														<td class="#class#" align="center">#allocBal#</td>
 													</tr>
@@ -1728,18 +1729,19 @@
 													<td>#trnDesc#</td>
 													<td align="right">#trnAmnt1#</td>
 													<td align="right">#trnAmnt2#</td>
+													<td align="right">#DecimalFormat(trnAmnt1+trnAmnt2)#</td>
 													<td align="center">#trnAlloc#</td>
 													<td align="right">#trnAllocID#</td>
 													<td align="right">#DecimalFormat(allocBal)#</td>
 												</tr>
 											</cfloop>
 											<tr>
-												<td height="30" colspan="10"></td>
+												<td height="30" colspan="11"></td>
 												<td class="#class#" align="right">#allocID#</td>
 												<td class="#class#" align="center">#allocBal#</td>
 											</tr>
 											<tr>
-												<th height="30" colspan="9">#errorCount# errors. </th>
+												<th height="30" colspan="10">#errorCount# errors. </th>
 												<th colspan="2">Total Error</th>
 												<th>#allocTotal#</th>
 											</tr>

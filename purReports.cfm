@@ -1681,7 +1681,7 @@
 										<cfset allocID = -1>
 										<cfset allocTotal = 0>
 										<cfset errorCount = 0>
-										<table class="tableList" border="1" width="900">
+										<table class="tableList" border="1">
 											<tr>
 												<td width="150">Name</td>
 												<td>ID</td>

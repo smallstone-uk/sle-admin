@@ -12,7 +12,7 @@
 <cfoutput>
 	<cfset parm = {}>
 	<cfobject component="code/core" name="x">
-	<cfloop from="2013" to="#thisYear#" index="yr">
+	<cfloop from="2013" to="#thisYear+2#" index="yr">
 		<cfset parm.yyyy = yr>
 		<cfset result = x.BankHolidays(parm)>
 			<cfloop array="#result#" index="hol">

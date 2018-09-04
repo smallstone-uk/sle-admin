@@ -21,24 +21,10 @@
 <cfset maxheight=900>
 <cfset header=100>
 <cfset row=20>
-
+<cfdump var="#Report#" label="Report" expand="false">
 <cfif parm.form.sort eq "employee">
 	<cfoutput>
 		<cfsavecontent variable="sReport">
-			<!---<style type="text/css">
-				body {font-family:Arial, Helvetica, sans-serif;}
-				.RepTable {padding: 20px 0px;}
-				.tableList {font-size:11px;border-left: solid 1px ##ccc;border-top: solid 1px ##ccc;}
-				.tableList th {padding:2px 4px;border-bottom: solid 1px ##ccc;border-right: solid 1px ##ccc;background:##eee;}
-				.tableList th.subtitle {padding:2px 4px;border-bottom: solid 1px ##ccc;border-right: solid 1px ##ccc;background:##fff;}
-				.tableList td {padding:2px 4px;border-bottom: solid 1px ##ccc;border-right: solid 1px ##ccc;background:##fff;}
-				.tableList.morespace {font-size: 12px;}
-				.tableList.morespace th {padding:4px 5px;}
-				.tableList.morespace td {padding:4px 5px;}
-				.tableList.trhover tr:hover {background:##EEE;}
-				.tableList.trhover tr.active:hover {background:##0F5E8B;}
-			</style>--->
-			
 			<cfloop array="#Report#" index="rep">
 				<cfset heighttotal += header>
 				<cfif heighttotal gte maxheight>
@@ -54,7 +40,7 @@
 							<td>#rep.employee.NI#</td>
 							<th>Tax Code</th>
 							<td>#rep.employee.taxCode#</td>
-							<th colspan="3"></th>
+							<th colspan="6"></th>
 						</tr>
 						<tr>
 							<th align="left">Employer Ref:</th>
@@ -63,7 +49,7 @@
 							<td>#DateFormat(rep.employee.start,"dd-mmm-yyyy")#</td>
 							<th>Status</th>
 							<td>#rep.employee.status#</td>
-							<th colspan="3"></th>
+							<th colspan="6"></th>
 						</tr>
 						<tr>
 							<th width="100">Date</th>
@@ -74,6 +60,7 @@
 							<th width="" align="right">Employer Pension</th>
 							<th width="" align="right">Member Pension</th>
 							<th width="" align="right">Lotto</th>
+							<th width="" align="right">Adjustment</th>
 							<th width="" align="right">Gross Pay</th>
 							<th width="" align="right">Hours</th>
 							<th width="" align="right">Work Hours</th>
@@ -102,6 +89,7 @@
 										<th width="" align="right">Employer Pension</th>
 										<th width="" align="right">Member Pension</th>
 										<th width="" align="right">Lotto</th>
+										<th width="" align="right">Adjustment</th>
 										<th width="" align="right">Gross Pay</th>
 										<th width="" align="right">Hours</th>
 										<th width="" align="right">Work Hours</th>
@@ -118,6 +106,7 @@
 								<td align="right">#item.EmployerPension#</td>
 								<td align="right">#item.MemberPension#</td>
 								<td align="right">#item.Lotto#</td>
+								<td align="right">#item.Adjustment#</td>
 								<td align="right">#item.Gross#</td>
 								<td align="right">#item.Hours#</td>
 								<td align="right">#item.WorkHours#</td>
@@ -132,6 +121,7 @@
 							<th align="right">#rep.sums.EmployerPensionSum#</th>
 							<th align="right">#rep.sums.MemberPensionSum#</th>
 							<th align="right">#rep.sums.LottoSum#</th>
+							<th align="right">#rep.sums.AdjustmentSum#</th>
 							<th align="right">#rep.sums.gross#</th>
 							<th align="right">#rep.sums.hours#</th>
 							<th align="right">#rep.sums.workhours#</th>
@@ -150,11 +140,11 @@
 					<cfset sums = {}>
 					<tr>
 						<th align="left">Week Ending</th>
-						<td colspan="7">#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
+						<td colspan="10">#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
 					</tr>
 					<tr>
 						<th align="left">Week No</th>
-						<td colspan="7">#item.weekNo#</td>
+						<td colspan="10">#item.weekNo#</td>
 					</tr>
 					<tr>
 						<th align="left">Employee</th>

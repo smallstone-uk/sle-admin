@@ -105,7 +105,8 @@
 					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HolSum,
 					(SELECT SUM(phEmployerContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS EmployerPensionSum,
 					(SELECT SUM(phMemberContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS MemberPensionSum,
-					(SELECT SUM(phLotterySubs) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS LottoSum
+					(SELECT SUM(phLotterySubs) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS LottoSum,
+					(SELECT SUM(phAdjustment) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS AdjustmentSum
 				FROM tblPayHeader
 				INNER JOIN tblEmployee ON empID = phEmployee
 				WHERE phEmployee = #val(emp)#
@@ -127,6 +128,7 @@
 				<cfset loc.item.EmployerPension = phEmployerContribution>
 				<cfset loc.item.MemberPension = phMemberContribution>
 				<cfset loc.item.Lotto = phLotterySubs>
+				<cfset loc.item.Adjustment = phAdjustment>
 				<cfset loc.item.Hours = phTotalHours>
 				<cfset loc.item.WorkHours = phWorkHours>
 				<cfset loc.item.HolHours = phHolHours>
@@ -141,6 +143,7 @@
 			<cfset loc.subResult.Sums.EmployerPensionSum = loc.headers.EmployerPensionSum>
 			<cfset loc.subResult.Sums.MemberPensionSum = loc.headers.MemberPensionSum>
 			<cfset loc.subResult.Sums.LottoSum = loc.headers.LottoSum>
+			<cfset loc.subResult.Sums.AdjustmentSum = loc.headers.AdjustmentSum>
 			<cfset loc.subResult.Sums.Hours = loc.headers.HoursSum>
 			<cfset loc.subResult.Sums.WorkHours = loc.headers.WorkSum>
 			<cfset loc.subResult.Sums.HolHours = loc.headers.HolSum>

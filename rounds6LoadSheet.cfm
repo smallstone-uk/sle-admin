@@ -280,7 +280,7 @@
 		</cfloop>
 		<cfset ArraySort(pubArray,"text","asc")>
 		<div class="summary" style="page-break-before:always;">
-			<table border="1" class="tableList" width="700" style="font-size: 20px;">
+			<table border="1" class="tableList" width="700" style="font-size: 18px;">
 				<tr>
 					<th colspan="8" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
 				</tr>
@@ -295,7 +295,7 @@
 				<cfloop array="#pubArray#" index="pub">
 					<cfset pubID = ListLast(pub,"_")>
 					<tr>
-						<td height="40">#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
+						<td height="30">#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
 						<cfloop array="#drops.rounds#" index="round">
 							<cfset rndPub = "#round.roundID#-#pubID#">
 							<cfif StructKeyExists(round.totalQty,rndPub)>
@@ -333,7 +333,7 @@
 			</table>
 			<h3>
 				<br />
-				<strong>Drivers:</strong> If any round is short, please make a note in the shortages column.<br /><br />
+				<strong>Drivers:</strong> If any round is short, please make a note in the shortages column.<br />
 				<strong>Shop Staff:</strong> Please claim for any round shortages as well.
 			</h3>
 		</div>

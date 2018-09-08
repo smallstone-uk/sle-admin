@@ -135,12 +135,16 @@
 		<li>Enter the quantities received from the Smiths delivery note (E).</li>
 		<li>Add A+B+C+D then subtract column E and enter the result in the Difference column.</li>
 		<li>Negative differences indicate a shortage to be claimed from Smiths.</li>
-		<li>Positive differences indicate an excess to be ignored.</li>
+		<li>Positive differences indicate missed deliveries and can be ignored.</li>
 		<li>Enter the quantities claimed from Smiths.</li>
 	</ol>
 	
-	<p class="msg">Missing newspaper claims must be reported to Smiths by 9:00am.<br />
-	Please call Smiths on <strong>0845 125 2750</strong> quoting our box number <strong>212956</strong></p>
+	<p class="msg">
+		Missing newspaper claims must be reported to Smiths by 9:00am or claimed online by 10:00am.<br />
+		Please call Smiths on <strong>03451 255 070</strong> quoting our box number <strong>212956</strong><br />
+		Magazines claims to be made by noon same day.<br />
+		Missing credits by Tuesday noon.<br />
+	</p>
 	<table>
 		<tr>
 			<td width="140">Call Reference : </td>
@@ -153,8 +157,3 @@
 	</table>
 </div>
 </cfoutput>
-
-<!---
-Magazines claims by noon same day.
-Missing credits by Tuesday noon.
---->

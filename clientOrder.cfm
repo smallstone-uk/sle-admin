@@ -372,7 +372,7 @@
 							<span class="no-print" style="float:left;margin:0 5px 0 0;">(#order.orderID#)</span>
 							<h3 style="float: left;margin: 0;font-size: 13px; text-transform:capitalize;">
 								<cfif len("#order.HouseNumber##order.HouseName##order.Street##order.Town##order.Postcode#")>
-									#order.HouseNumber# #order.HouseName# #order.Street# #order.Town# #order.City# #order.Postcode#
+									#order.Contact# #order.HouseNumber# #order.HouseName# #order.Street# #order.Town# #order.City# #order.Postcode#
 								<cfelse>
 									Order Details need updating
 								</cfif>

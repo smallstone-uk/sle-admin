@@ -1581,6 +1581,7 @@
 				<cfset item.orderID=QOrders.ordID>
 				<cfset item.orderDate=LSDateFormat(QOrders.ordDate,"dd-mmm-yyyy")>
 				<cfset item.Type=QOrders.ordType>
+				<cfset item.Contact=QOrders.ordContact>
 				<cfset item.DeliveryCode=QOrders.ordDeliveryCode>
 				<cfset item.HouseName=QOrders.ordHouseName>
 				<cfset item.HouseNumber=QOrders.ordHouseNumber>

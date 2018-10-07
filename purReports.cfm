@@ -664,19 +664,27 @@
 									<cfset trans=pur.TranList(parms)>
 									<table border="1" class="tableList" width="500">
 										<tr>
-											<td colspan="6">#trans.QResult#</td>
+											<td colspan="7">#trans.QResult#</td>
 										</tr>
 										<cfloop array="#trans.tranArray#" index="item">
 											<cfset item.datasource=parms.datasource>
 											<cfset data=pur.ValidateTransRecord(parms,item)>
-											<tr>
-												<td>#data.tran.trnID#</td>
-												<td>#LSDateFormat(data.tran.trnDate,"dd-mmm-yyyy")#</td>
-												<td>#data.tran.trnType#</td>
-												<td>#data.tran.trnMethod#</td>
-												<td>#data.tran.trnAmnt1#</td>
-												<td>Missing Items: 
-													<cfif ArrayLen(data.ItemsMissing) GT 0>
+											<cfif ArrayLen(data.ItemsMissing) GT 0>
+												<cfset count++>
+												<tr>
+													<cfif data.tran.accType eq "purch">
+														<td><a href="tranMain2.cfm?acc=#data.tran.accID#&tran=#data.tran.trnID#" target="fixpurch">#data.tran.trnID#</a></td>
+													<cfelseif data.tran.accType eq "sales">
+														<td><a href="salesMain3.cfm?acc=#data.tran.accID#&tran=#data.tran.trnID#" target="fixsales">#data.tran.trnID#</a></td>
+													<cfelse>
+														<td>#data.tran.trnID#</td>
+													</cfif>
+													<td>#data.tran.accName#</td>
+													<td>#LSDateFormat(data.tran.trnDate,"dd-mmm-yyyy")#</td>
+													<td>#data.tran.trnType#</td>
+													<td>#data.tran.trnMethod#</td>
+													<td>#data.tran.trnAmnt1#</td>
+													<td>Missing Items: 
 														<table>
 															<cfloop array="#data.ItemsMissing#" index="item">
 															<tr>
@@ -685,12 +693,13 @@
 															</tr>
 															</cfloop>
 														</table>
-													<cfelse>
-														None.											
-													</cfif>
-												</td>
-											</tr>
+													</td>
+												</tr>
+											</cfif>
 										</cfloop>
+										<tr>
+											<td colspan="7">#count# errors.</td>
+										</tr>
 									</table>
 								</cfcase>
 								

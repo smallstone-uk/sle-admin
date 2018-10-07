@@ -660,7 +660,8 @@
 								</cfcase>
 								
 								<cfcase value="7">
-									<cfset count=0>
+									<cfset errSale = 0>
+									<cfset errOther = 0>
 									<cfset trans=pur.TranList(parms)>
 									<table border="1" class="tableList" width="500">
 										<tr>
@@ -670,13 +671,15 @@
 											<cfset item.datasource=parms.datasource>
 											<cfset data=pur.ValidateTransRecord(parms,item)>
 											<cfif ArrayLen(data.ItemsMissing) GT 0>
-												<cfset count++>
 												<tr>
 													<cfif data.tran.accType eq "purch">
+														<cfset errOther++>
 														<td><a href="tranMain2.cfm?acc=#data.tran.accID#&tran=#data.tran.trnID#" target="fixpurch">#data.tran.trnID#</a></td>
 													<cfelseif data.tran.accType eq "sales">
+														<cfset errSale++>
 														<td><a href="salesMain3.cfm?acc=#data.tran.accID#&tran=#data.tran.trnID#" target="fixsales">#data.tran.trnID#</a></td>
 													<cfelse>
+														<cfset errOther++>
 														<td>#data.tran.trnID#</td>
 													</cfif>
 													<td>#data.tran.accName#</td>
@@ -698,7 +701,7 @@
 											</cfif>
 										</cfloop>
 										<tr>
-											<td colspan="7">#count# errors.</td>
+											<td colspan="7">#errSale# sales errors. #errOther# other errors.</td>
 										</tr>
 									</table>
 								</cfcase>

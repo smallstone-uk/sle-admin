@@ -7,6 +7,8 @@
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.form=form>
+<cfset parm.form.source="product">
+<cfset parm.form.productID=0>
 
 <cfif form.step is 1>
 	<cfset lookup=prod.SendBarcode(parm)>
@@ -16,30 +18,21 @@
 <cfelseif form.step is 2>
 	<cfset lookup=pstock.CheckProductOnOrder(parm)>
 	<cfoutput>
-		<!---<script type="text/javascript">
-			$(document).ready(function() { 
-				$("##barcode").barcode('#lookup.Barcode#', '#lookup.BarcodeType#');
-			});
-		</script>--->
 		<cfif NOT len(lookup.error)>
-			<h2 style="font-size:54px;line-height: 60px;">#lookup.title# #lookup.unitsize#</h2>
-			<h1>&pound;#DecimalFormat(lookup.RRP)# <cfif lookup.pm>PM</cfif></h1>
-			<!---<div class="clear" style="padding:10px 0;"></div>
-			<div id="barcode" style="display: inline-block;">#lookup.barcode#</div>--->
+			<h2 style="font-size:40px;line-height: 60px;">#lookup.title# #lookup.unitsize#</h2>
+			<h1 style="font-size:40px;">&pound;#DecimalFormat(lookup.RRP)# <cfif lookup.pm>PM</cfif></h1>
 			<div class="clear"></div>
 			<cfif lookup.received is lookup.boxes><img src="images/tick.png" width="64" /><cfelse><img src="images/warning.png" width="64" /></cfif>
-			<p style="font-size:44px;">Booked In</p>
+			<p style="font-size:30px;">Booked In</p>
 			<cfif lookup.received lt lookup.boxes>
 				<h3>Number of Packs Remaining: #lookup.boxes-lookup.received#</h3>
 			<cfelse>
-				<h3 style="font-size:34px;">Number of Packs: #lookup.received#/#lookup.boxes#</h3>
+				<h3 style="font-size:30px;">Number of Packs: #lookup.received#/#lookup.boxes#</h3>
 			</cfif>
 			<h3>Total Products: #lookup.qtytotal#</h3>
 		<cfelse>
-			<h2 style="font-size:54px;line-height: 60px;">#lookup.error#</h2>
-			<h1 style="font-size:48px;">&pound;#DecimalFormat(lookup.RRP)#</h1>
-			<!---<div class="clear" style="padding:10px 0;"></div>
-			<div id="barcode" style="display: inline-block;">#lookup.barcode#</div>--->
+			<h2 style="font-size:40px;line-height: 60px;">#lookup.error#</h2>
+			<h1 style="font-size:40px;">&pound;#DecimalFormat(lookup.RRP)#</h1>
 			<div class="clear" style="padding:10px 0;"></div>
 			<div id="img">#lookup.img#</div>
 			#lookup.msg#
@@ -71,7 +64,6 @@
 				<a href="##" id="no" class="button red" style="float:none;display:inline-block;">No, cancel scan</a>
 				<div id="subSelect" style="display:none;">
 					<div style="display:inline-block;padding:20px 0;text-align:left;">
-						<!---<p>Please select the product that '#lookup.error#' is replacing.</p>--->
 						<input type="hidden" class="subProdID" value="#lookup.prodID#" />
 						<select name="ProdonOrder" class="subProd">
 							<cfset ref=0>

@@ -10,6 +10,9 @@
 		<cfset loc.result.msg = "">
 		<cfset loc.result.msgs = []>
 		<cftry>
+		<cfdump var="#args#" label="args" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
 				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>
 				<cfquery name="loc.QBarcode" datasource="#args.datasource#">
@@ -475,7 +478,7 @@
 			<cfset loc.profit = loc.sellprice - loc.tradeGross>
 			<cfset loc.POR = (loc.profit / loc.sellprice) * 100>
 			
-			<cfquery name="loc.QStockItem" datasource="#args.datasource#">
+			<cfquery name="loc.QStockItem" datasource="#args.datasource#" result="loc.QStockItemResult">
 				UPDATE tblStockItem a
 				INNER JOIN tblStockOrder b ON (a.siOrder = b.soID)
 				SET 
@@ -495,7 +498,6 @@
 				WHERE siID = #args.form.siID#
 			</cfquery>
 			<cfset loc.result.barcode = args.form.barcode>
-			<!---<cfset loc.result.productID = args.form.prodID>--->
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

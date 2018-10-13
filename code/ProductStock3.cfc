@@ -195,6 +195,7 @@
 		
 	<cffunction name="CheckProductOnOrder" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc={}>		
 		<cfset var result={}>
 		<cfset var parm={}>
 		<cfset var QStockItem="">
@@ -202,6 +203,7 @@
 		<cfset var QStockItem2="">
 		<cfset result.error="">
 		
+<!---
 		<cfquery name="QStockItem" datasource="#args.datasource#">
 			SELECT *
 			FROM tblStockItem,tblStockOrder,tblProducts
@@ -212,6 +214,26 @@
 			AND soStatus='open'
 			LIMIT 1;
 		</cfquery>
+--->
+		<cfquery name="loc.QProduct" datasource="#args.datasource#">
+			SELECT 	prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
+					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+					soRef,soStatus
+			FROM tblProducts
+			LEFT JOIN tblStockItem ON prodID = siProduct
+			INNER JOIN tblStockOrder ON soID = siOrder
+			AND tblStockItem.siID = (
+				SELECT MAX( siID )
+				FROM tblStockItem
+				WHERE prodID = siProduct
+				AND siStatus NOT IN ("returned,inactive") 
+				AND siStatus = 'open'
+				AND soStatus = 'open')
+			WHERE siProduct=#val(args.form.id)#
+			LIMIT 1;
+		</cfquery>
+
 		<cfset result.barcode=args.form.barcode>
 		<cfif len(result.barcode) is 8>
 			<cfset result.BarcodeType="ean8">
@@ -220,6 +242,28 @@
 		<cfelse>
 			<cfset result.BarcodeType="upc">
 		</cfif>
+		
+		<cfif loc.QProduct.recordcount is 1>
+			<cfset result.ID=loc.QProduct.siID>
+			<cfset result.prodID=loc.QProduct.prodID>
+			<cfset result.Title=loc.QProduct.prodTitle>
+			<cfset result.PM=loc.QProduct.prodPriceMarked>
+			<cfset result.OrderRef=loc.QProduct.soRef>
+			<cfset result.boxes=loc.QProduct.siQtyPacks>
+			<cfset result.received=loc.QProduct.siReceived+1>
+			<cfset result.UnitSize=loc.QProduct.siUnitSize>
+			<cfset result.RRP=loc.QProduct.siOurPrice>
+			<cfset result.qtytotal=loc.QProduct.siQtyItems+loc.QProduct.siPackQty>
+			<cfset parm={}>
+			<cfset parm.datasource=args.datasource>
+			<cfset parm.id=result.ID>
+			<cfset parm.due=result.boxes>
+			<cfset parm.received=loc.QProduct.siReceived>
+			<cfset parm.qtytotal=loc.QProduct.siQtyItems>
+			<cfset parm.packqty=loc.QProduct.siPackQty>
+			<cfset bookin=BookInProductStock(parm)> <!---!!!!!!! uncomment to book stock in --->
+<!---		</cfif>
+		
 		<cfif QStockItem.recordcount is 1>
 			<cfset result.ID=QStockItem.siID>
 			<cfset result.prodID=QStockItem.siProduct>
@@ -238,7 +282,8 @@
 			<cfset parm.received=QStockItem.siReceived>
 			<cfset parm.qtytotal=QStockItem.siQtyItems>
 			<cfset parm.packqty=QStockItem.prodPackQty>
-			<cfset bookin=BookInProductStock(parm)>
+--->
+			<!---<cfset bookin=BookInProductStock(parm)> !!!!!!! uncomment to book stock in --->
 		<cfelse>
 			<cfquery name="QProduct" datasource="#args.datasource#">
 				SELECT *
@@ -246,7 +291,24 @@
 				WHERE prodID=#val(args.form.id)#
 				LIMIT 1;
 			</cfquery>
-			<cfquery name="QStockItem2" datasource="#args.datasource#">
+				<cfquery name="loc.QProduct" datasource="#args.datasource#">
+					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
+							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+							soRef
+					FROM tblProducts
+					LEFT JOIN tblStockItem ON prodID = siProduct
+					INNER JOIN tblStockOrder ON soID = siOrder
+					AND tblStockItem.siID = (
+						SELECT MAX( siID )
+						FROM tblStockItem
+						WHERE prodID = siProduct
+						AND siStatus NOT IN ("returned,inactive") 
+						AND soStatus='open')
+					WHERE siProduct=#val(args.form.id)#
+					LIMIT 1;
+				</cfquery>
+<!---			<cfquery name="QStockItem2" datasource="#args.datasource#">
 				SELECT *
 				FROM tblStockItem,tblStockOrder,tblProducts
 				WHERE (siProduct=#val(args.form.id)# OR siSubs=#val(args.form.id)#)
@@ -256,11 +318,12 @@
 				AND soStatus='open'
 				LIMIT 1;
 			</cfquery>
-			<cfset result.error="#QProduct.prodTitle# #QProduct.prodUnitSize#">
+--->
+			<cfset result.error="#loc.QProduct.prodTitle# #loc.QProduct.siUnitSize#">
 			<cfset result.prodID=args.form.id>
-			<cfset result.RRP=QStockItem2.siOurPrice>
-			<cfif QStockItem2.siStatus is "closed">
-				<cfset result.msg="<h3 style='font-size:44px;'>Already Booked In</h3><h3 style='font-size:34px;'>Number of Packs: #QStockItem2.siReceived#/#QStockItem2.siQtyPacks#</h3><h3>Total Products: #QStockItem2.siQtyItems#</h3>">
+			<cfset result.RRP=loc.QProduct.siOurPrice>
+			<cfif loc.QProduct.siStatus is "closed">
+				<cfset result.msg="<h3 style='font-size:44px;'>Already Booked In</h3><h3 style='font-size:34px;'>Number of Packs: #loc.QProduct.siReceived#/#loc.QProduct.siQtyPacks#</h3><h3>Total Products: #loc.QProduct.siQtyItems#</h3> (#loc.QProduct.siID#)">
 				<cfset result.img='<img src="images/tick.png" width="128" />'>
 				<cfset result.sub=false>
 			<cfelse>
@@ -345,6 +408,9 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
 		<cfset var QStockItem="">
+		<cfset var QStockItems="">
+		<cfset var QGetOrder="">
+		<cfset var QOrderUpdate="">
 		<cfset var received=0>
 		
 		<cfif val(args.received) lt val(args.due)>
@@ -366,7 +432,29 @@
 				WHERE siID=#val(args.ID)#
 			</cfquery>
 		</cfif>
-		
+		<!--- check if order items left --->
+		<cfquery name="QGetOrder" datasource="#args.datasource#">
+			SELECT soID
+			FROM tblStockOrder
+			INNER JOIN tblStockItem ON siOrder=soID
+			WHERE siID=#val(args.ID)#
+		</cfquery>
+		<cfquery name="QStockItems" datasource="#args.datasource#">
+			SELECT *
+			FROM tblStockItem
+			INNER JOIN tblStockOrder ON soID=siOrder
+			WHERE soID=#val(QGetOrder.soID)#
+			AND siStatus='open'
+			AND soStatus='open'
+		</cfquery>
+		<cfif QStockItems.recordcount IS 0>
+			<!--- mark order closed --->
+			<cfquery name="QOrderUpdate" datasource="#args.datasource#">
+				UPDATE tblStockOrder
+				SET soStatus = 'closed'
+				WHERE soID = #QGetOrder.soID#
+			</cfquery>
+		</cfif>
 		<cfreturn result>
 	</cffunction>
 

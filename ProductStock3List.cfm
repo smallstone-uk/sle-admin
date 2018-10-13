@@ -20,6 +20,10 @@
 				$('#controls').hide();
 			};
 		});
+		$('a').click(function () {
+			this.blur(); // or $(this).blur();
+			  //...  
+		});
 		$('.item').click(function(e) {
 			var show=false;
 			$('.item').each(function() {
@@ -59,7 +63,7 @@
 						</cfif>
 						<tr>
 							<td><input type="checkbox" name="selectitem" class="item selectitem#i.orderref#" value="#i.ID#" /></td>
-							<td><!---#i.prodID# - ---><b>#i.title#</b> #i.UnitSize# - &pound;#DecimalFormat(i.RRP)#</td>
+							<td><b>#i.title#</b> #i.UnitSize# - &pound;#DecimalFormat(i.RRP)#</td>
 							<td><a href="stockItems.cfm?ref=#i.prodID#" target="_blank"><img src="images/icons/info.jpg" width="25" /></a></td>
 							<td align="center">#i.boxes#</td>
 						</tr>

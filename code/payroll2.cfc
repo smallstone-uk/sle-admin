@@ -526,31 +526,32 @@
 				AND phDate = '#args.form.weekending#'
 			</cfquery>
 			<cfset loc.result.header = (loc.header.recordcount is 0) ? {} : QueryToStruct(loc.header)>
-
-			<cfquery name="loc.ytd" datasource="#args.datasource#">
+			<cfset loc.WeekStartDate = loc.control.ctlWeekNoStartDate>
+			<cfset loc.HolStartDate = loc.control.ctlHolidayStart>
+			<cfquery name="loc.ytd" datasource="#args.datasource#" result="loc.result.Qytd">
 				SELECT Count(phID) as recs,
 					(SELECT SUM(phGross) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlWeekNoStartDate#' AND '#args.form.weekending#') AS GrossSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.WeekStartDate#' AND '#args.form.weekending#') AS GrossSum,
 					(SELECT SUM(phPAYE) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlWeekNoStartDate#' AND '#args.form.weekending#') AS PAYESum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.WeekStartDate#' AND '#args.form.weekending#') AS PAYESum,
 					(SELECT SUM(phNI) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlWeekNoStartDate#' AND '#args.form.weekending#') AS NISum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.WeekStartDate#' AND '#args.form.weekending#') AS NISum,
 					(SELECT SUM(phNP) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlWeekNoStartDate#' AND '#args.form.weekending#') AS NPSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.WeekStartDate#' AND '#args.form.weekending#') AS NPSum,
 					(SELECT SUM(phTotalHours) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS HoursSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS HoursSum,
 					(SELECT SUM(phWorkHours) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS WorkSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS WorkSum,
 					(SELECT AVG(phWorkHours) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS WorkAvg,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS WorkAvg,
 					(SELECT SUM(phHolHours) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS HolSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS HolSum,
 					(SELECT SUM(phMemberContribution) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS PensionSum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS PensionSum,
 					(SELECT SUM(phLotterySubs) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS LotterySum,
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS LotterySum,
 					(SELECT SUM(phAdjustment) FROM tblPayHeader
-						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#') AS AdjustmentSum
+						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#') AS AdjustmentSum
 				FROM tblPayHeader
 				WHERE phEmployee = #val(args.form.employee)#
 				AND phDate BETWEEN '#loc.control.ctlHolidayStart#' AND '#args.form.weekending#'
@@ -566,6 +567,8 @@
 				<cfset loc.result.totals.accrued = val(loc.result.totals.WorkSum) * 0.1207>
 				<cfset loc.result.totals.remain = val(loc.result.totals.accrued) - val(loc.result.totals.HolSum)>
 			</cfif>
+			<cfdump var="#loc.result#" label="result" expand="yes" format="html"
+				output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 			<cfif !StructIsEmpty(loc.result.header)>
 				<cfloop query="loc.depts">

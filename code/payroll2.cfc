@@ -530,7 +530,7 @@
 			<cfset loc.result.header = (loc.header.recordcount is 0) ? {} : QueryToStruct(loc.header)>
 			<cfset loc.WeekStartDate = LSDateFormat(loc.control.ctlWeekNoStartDate,"yyyy-mm-dd")>
 			<cfset loc.HolStartDate = LSDateFormat(loc.control.ctlHolidayStart,"yyyy-mm-dd")>
-			<cfquery name="loc.ytd" datasource="#args.datasource#" result="loc.result.Qytd">
+			<cfquery name="loc.ytd" datasource="#args.datasource#">
 				SELECT Count(phID) as recs,
 					(SELECT SUM(phGross) FROM tblPayHeader
 						WHERE phEmployee = #val(args.form.employee)# AND phDate BETWEEN '#loc.WeekStartDate#' AND '#args.form.weekending#') AS GrossSum,
@@ -569,8 +569,6 @@
 				<cfset loc.result.totals.accrued = val(loc.result.totals.WorkSum) * 0.1207>
 				<cfset loc.result.totals.remain = val(loc.result.totals.accrued) - val(loc.result.totals.HolSum)>
 			</cfif>
-			<cfdump var="#loc.result#" label="result" expand="yes" format="html"
-				output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 			<cfif !StructIsEmpty(loc.result.header)>
 				<cfloop query="loc.depts">

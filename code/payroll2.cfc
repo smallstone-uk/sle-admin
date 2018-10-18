@@ -526,8 +526,8 @@
 				AND phDate = '#args.form.weekending#'
 			</cfquery>
 			<cfset loc.result.header = (loc.header.recordcount is 0) ? {} : QueryToStruct(loc.header)>
-			<cfset loc.WeekStartDate = loc.control.ctlWeekNoStartDate>
-			<cfset loc.HolStartDate = loc.control.ctlHolidayStart>
+			<cfset loc.WeekStartDate = LSDateFormat(loc.control.ctlWeekNoStartDate,"yyyy-mm-dd")>
+			<cfset loc.HolStartDate = LSDateFormat(loc.control.ctlHolidayStart,"yyyy-mm-dd")>
 			<cfquery name="loc.ytd" datasource="#args.datasource#" result="loc.result.Qytd">
 				SELECT Count(phID) as recs,
 					(SELECT SUM(phGross) FROM tblPayHeader

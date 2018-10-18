@@ -21,7 +21,7 @@
 <cfset maxheight=900>
 <cfset header=100>
 <cfset row=20>
-<cfdump var="#Report#" label="Report" expand="false">
+
 <cfif parm.form.sort eq "employee">
 	<cfoutput>
 		<cfsavecontent variable="sReport">

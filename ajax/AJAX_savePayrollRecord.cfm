@@ -13,7 +13,6 @@
 	<cfset parm.form.np = np>
 	<cfset parm.form.totalHours = totalHours>
 	<cfset SavePayrollRecord = pr.SavePayrollRecord(parm)>
-	<cfdump var="#SavePayrollRecord#" label="SavePayrollRecord" expand="no">
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
 </cfcatch>

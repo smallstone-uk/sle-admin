@@ -109,7 +109,7 @@
 									<tr>
 										<th width="150">(Week #record.totals.recs#)</th>
 										<th width="80">This Period</th>
-										<th width="80">YTD</th>
+										<th width="80">This Year</th>
 									</tr>
 									<tr>
 										<th align="left">Work Hours</th>
@@ -139,7 +139,7 @@
 								<table class="tableList pr2_gross_totals" border="1">
 									<tr>
 										<th width="150"></th>
-										<th width="80">YTD</th>
+										<th width="80">This Year</th>
 										<th width="80">This Period</th>
 									</tr>
 									<tr>
@@ -187,7 +187,7 @@
 								<table class="tableList pr2_gross_totals" border="1">
 									<tr>
 										<th width="150"></th>
-										<th width="80">YTD</th>
+										<th width="80">This Year</th>
 										<th width="80">This Period</th>
 									</tr>
 									<tr>

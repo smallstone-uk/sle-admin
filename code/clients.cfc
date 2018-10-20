@@ -39,17 +39,19 @@
 					AND trnType='inv'
 					AND trnDate='#DateFormat(loc.QControl.ctlNextInvDate,"yyyy-mm-dd")#'
 				</cfquery>
-				<cfset loc.msg={}>
-				<cfset loc.msg.name="#cltTitle# #cltName#">
-				<cfset loc.msg.subject=loc.QEmail.mailSubject>
-				<cfset loc.msg.text=loc.QEmail.mailText>
-				<cfset loc.msg.email=cltEMail>
-				<!---<cfset loc.msg.email="steven@shortlanesendstore.co.uk">--->
-				<cfset loc.msg.cltRef=cltRef>
-				<cfset loc.msg.trnRef=loc.QLatestTran.trnRef>
-				<cfset loc.msg.url="#application.site.url_invoices##loc.result.folderName#/inv-#loc.QLatestTran.trnRef#.pdf">
-				<cfset loc.msg.attach="#application.site.dir_invoices##loc.result.folderName#/inv-#loc.QLatestTran.trnRef#.pdf">
-				<cfset ArrayAppend(loc.result.msgs,loc.msg)>
+				<cfloop query="loc.QLatestTran">
+					<cfset loc.msg={}>
+					<cfset loc.msg.name="#loc.QClients.cltTitle# #loc.QClients.cltName#">
+					<cfset loc.msg.subject=loc.QEmail.mailSubject>
+					<cfset loc.msg.text=loc.QEmail.mailText>
+					<cfset loc.msg.email=loc.QClients.cltEMail>
+					<cfset loc.msg.email="steven@shortlanesendstore.co.uk">		<!--- test only --->
+					<cfset loc.msg.cltRef=loc.QClients.cltRef>
+					<cfset loc.msg.trnRef=trnRef>
+					<cfset loc.msg.url="#application.site.url_invoices##loc.result.folderName#/inv-#trnRef#.pdf">
+					<cfset loc.msg.attach="#application.site.dir_invoices##loc.result.folderName#/inv-#trnRef#.pdf">
+					<cfset ArrayAppend(loc.result.msgs,loc.msg)>
+				</cfloop>
 			</cfloop>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="EmailLatestInvoice" expand="yes" format="html" 

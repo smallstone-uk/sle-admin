@@ -45,7 +45,7 @@
 					<cfset loc.msg.subject=loc.QEmail.mailSubject>
 					<cfset loc.msg.text=loc.QEmail.mailText>
 					<cfset loc.msg.email=loc.QClients.cltEMail>
-					<cfset loc.msg.email="steven@shortlanesendstore.co.uk">		<!--- test only --->
+				<!--- 	<cfset loc.msg.email="steven@shortlanesendstore.co.uk">		test only --->
 					<cfset loc.msg.cltRef=loc.QClients.cltRef>
 					<cfset loc.msg.trnRef=trnRef>
 					<cfset loc.msg.url="#application.site.url_invoices##loc.result.folderName#/inv-#trnRef#.pdf">

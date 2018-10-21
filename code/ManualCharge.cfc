@@ -48,40 +48,32 @@
 		<cfreturn result>
 	</cffunction>
 
-	<cffunction name="LoadCustomOrders" access="public" returntype="array">
+	<cffunction name="LoadCustomOrders" access="public" returntype="array" hint="Loads the list displayed on the screen">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result=ArrayNew(1)>
 		<cfset var QOrder="">
 		
 		<cfquery name="QOrder" datasource="#args.datasource#">
-			SELECT ordID,ordHouseName,ordHouseNumber, cltID,cltName,cltCompanyName
-			FROM tblOrder,tblClients
+			SELECT ordID,ordHouseName,ordHouseNumber,cltID,cltName,cltCompanyName,riOrder,riRoundID
+			FROM tblOrder
+			INNER JOIN tblClients ON ordClientID=cltID
+			INNER JOIN tblrounditems ON ordID=riOrderID
 			WHERE ordType='Custom'
-			AND ordClientID=cltID
-			<cfif StructKeyExists(args,"AllowReturns")>AND ordAllowReturns=1</cfif>
+			AND riDay='mon'
 			AND ordActive
-			ORDER BY cltCompanyName, cltName
+			<cfif StructKeyExists(args,"AllowReturns")>AND ordAllowReturns=1</cfif>
+			ORDER BY riRoundID,riOrder
 		</cfquery>
 		<cfloop query="QOrder">
 			<cfset item={}>
 			<cfset item.ID=ordID>
 			<cfset item.ClientID=cltID>
-			<cfif NOT len(cltName)>
-				<cfif len(ordHouseName) AND len(ordHouseNumber)>
-					<cfset item.ClientName="#ordHouseName# #ordHouseNumber#">
-				<cfelse>
-					<cfset item.ClientName="#ordHouseName##ordHouseNumber#">
-				</cfif>
-			<cfelse>
-				<cfif len(cltName) AND len(cltCompanyName)>
-					<cfset item.ClientName="#cltCompanyName# - #cltName# ">
-				<cfelse>
-					<cfset item.ClientName="#cltCompanyName##cltName#">
-				</cfif>
+			<cfset item.ClientName = "#ordHouseName# #ordHouseNumber#">
+			<cfif len(cltCompanyName) AND ordHouseName neq cltCompanyName>
+				<cfset item.ClientName = "#item.ClientName# - #cltCompanyName#">
 			</cfif>
 			<cfset ArrayAppend(result,item)>
 		</cfloop>
-
 		<cfreturn result>
 	</cffunction>
 

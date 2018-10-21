@@ -91,7 +91,8 @@
 									</td>
 									<td valign="top">
 										<cfloop array="#clients#" index="i">
-											<label><input type="checkbox" name="dispatchTicked" value="#i.ClientID#" class="checkbox dispatchtick" checked="checked" />&nbsp;#i.ClientName#</label><br>
+											<label><input type="checkbox" name="dispatchTicked" value="#i.ID#" class="checkbox dispatchtick" checked="checked" />
+											&nbsp;#i.ClientName#</label><br>
 										</cfloop>
 									</td>
 									<td valign="top">

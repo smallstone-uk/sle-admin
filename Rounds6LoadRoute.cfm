@@ -352,7 +352,7 @@
 				<cfloop list="#form.dispatchTicked#" delimiters="," index="dis">
 					<div class="clear" style="page-break-before:always;"></div>
 					<cfset parm.Date=LSDateFormat(parm.form.roundDate,"yyyy-mm-dd")>
-					<cfset parm.clientID=dis>
+					<cfset parm.ID=dis>
 					<cfset Load=rounds.LoadDispatchNote(parm)>
 					
 					<cfif NOT ArrayLen(Load.list) AND dis is 6391 OR dis is 2291><cfelse>

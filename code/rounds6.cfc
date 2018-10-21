@@ -765,19 +765,44 @@
 		<cfset var QPapers="">
 		<cfset var QMags="">
 
-<cftry>
+		<cftry>
 		<cfif StructKeyExists(args.form,"dispatchTicked")>
 			<cfquery name="QDispatch" datasource="#args.datasource#">
 				SELECT cltName,cltCompanyName,cltDelHouseNumber, tblOrder.*
-				FROM tblOrder,tblClients
-				WHERE ordClientID IN (#args.form.dispatchTicked#)
-				AND cltID=ordClientID
-				AND ordActive=1
+				FROM tblOrder
+				INNER JOIN tblClients ON ordClientID=cltID
+				INNER JOIN tblrounditems ON ordID=riOrderID
+				WHERE ordID IN (#args.form.dispatchTicked#)
+				AND ordType='Custom'
+				AND riDay='mon'
+				AND ordActive
+				ORDER BY riRoundID,riOrder
 			</cfquery>
 			<cfloop query="QDispatch">
 				<cfset dis={}>
 				<cfif QDispatch.ordClientID is 6391><cfset dis.Type="Detail"><cfelse><cfset dis.Type="Plain"></cfif>
 				<cfif NOT len(cltCompanyName)><cfset dis.Name=cltName><cfelse><cfset dis.Name=cltCompanyName></cfif>
+				<cfset dis.Name = "#ordHouseName# - #ordHouseNumber#">
+				<cfif ordHouseName neq cltCompanyName>
+					<cfset dis.Name = "#dis.Name# - #cltCompanyName#">
+				</cfif>
+<!---
+			<cfset dis.Name="---5 #ordHouseName# #cltCompanyName#">
+
+			<cfif NOT len(cltName)>
+				<cfif len(ordHouseName) AND len(ordHouseNumber)>
+					<cfset dis.Name="---1 #ordHouseName# #ordHouseNumber#">
+				<cfelse>
+					<cfset dis.Name="---2 #ordHouseName##ordHouseNumber#">
+				</cfif>
+			<cfelse>
+				<cfif len(cltName) AND len(cltCompanyName)>
+					<cfset dis.Name="---3 #ordHouseName# #cltCompanyName# - #cltName# ">
+				<cfelse>
+					<cfset dis.Name="---4 #ordHouseName# #cltCompanyName##cltName#">
+				</cfif>
+			</cfif>
+--->
 				<cfset dis.cltDelHouseNumber=cltDelHouseNumber>
 				<cfset dis.ordContact=ordContact>
 				<cfset dis.ordSignDesp=ordSignDesp>
@@ -864,11 +889,11 @@
 				<cfset ArrayAppend(result,dis)>
 			</cfloop>
 		</cfif>
-<cfcatch type="any">
-	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
-		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-</cfcatch>
-</cftry>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
 		
 		<cfreturn result>
 	</cffunction>

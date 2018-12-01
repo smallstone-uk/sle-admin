@@ -4,9 +4,9 @@
 	.ticket {width:33%;height:142px; max-height:142px;float:left;color: #000; border:solid 1px #ffffff; margin:0px;}
 	
 	.ticket .ticket-inner {border:solid 1px #ffffff;height:132px; background-color:#fff; overflow:hidden; margin:3px;}
-	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#0070DF;}
-	.ticket .ticket-inner .info {margin:5px 0 0 0;font-size:18px; color:#0070DF}
-	.ticket .ticket-inner .code {float: left;width: 65px;font-size:11px; color:#0070DF; margin-top:35px;}
+	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#000;}
+	.ticket .ticket-inner .info {margin:5px 0 0 0;font-size:18px; color:#000}
+	.ticket .ticket-inner .code {float: left;width: 65px;font-size:11px; color:#000; margin-top:35px;}
 	.ticket .ticket-inner .price {font-size: 45px; text-align:right; float:right; width:160px; right;margin: 0px 0 0 0;padding: 0 20px 20px 0;color:#000000}
 	.ticket .ticket-inner .date {width: 65px;font-size: 10px; color:#000000}
 /*	.ticket .ticket-inner .price {z-index:99;width: 205px;height: 20px;font-size: 50px;text-align: right;margin: 51px 0 0 0;
@@ -15,8 +15,8 @@
 	.ticket.deal {height:134px;color: #000;background:#ffffff;}
 	.ticket.deal .ticket-inner {border:dotted 1px #ffffff;}
 	.ticket.deal .ticket-inner .title {font-size: 14px;width: 100%;}
-	.ticket.deal .ticket-inner .info {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 12px;text-align: left; color:#0070DF}
-	.ticket.deal .ticket-inner .price {font-size: 35px;line-height: 30px;padding:0;text-align: center;height: auto;margin:10px 0;width: 100%;position: relative; color:#0070DF;}
+	.ticket.deal .ticket-inner .info {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 12px;text-align: left; color:#000}
+	.ticket.deal .ticket-inner .price {font-size: 35px;line-height: 30px;padding:0;text-align: center;height: auto;margin:10px 0;width: 100%;position: relative; color:#000;}
 	.ticket.deal .ticket-inner .price .oldprice {font-size: 12px; text-decoration:line-through;line-height: 14px;}
 	.ticket.deal .ticket-inner .dates {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 11px;text-align: right;}
 	@page  

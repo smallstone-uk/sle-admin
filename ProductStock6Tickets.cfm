@@ -4,9 +4,9 @@
 	.ticket {width:33%;height:141px; max-height:141px;float:left;color: #000; border:solid 1px #fff; margin:0px;}
 	
 	.ticket .ticket-left {border:solid 1px #fff;height:132px; background-color:#fff; overflow:hidden; margin-left:0px;}
-	.ticket .ticket-left .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#0070DF; font-size:22px;}
-	.ticket .ticket-left .info {width: 100%; float:left; margin:5px 0 0 0;font-size:18px; color:#0070DF;}
-	.ticket .ticket-left .code {width: 100%; float: left;font-size:11px; color:#0070DF; margin-top:16px;}
+	.ticket .ticket-left .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#000000; font-size:22px;}
+	.ticket .ticket-left .info {width: 100%; float:left; margin:5px 0 0 0;font-size:18px; color:#000000;}
+	.ticket .ticket-left .code {width: 100%; float: left;font-size:11px; color:#000000; margin-top:16px;}
 	.ticket .ticket-left .date {width: 100%; font-size: 10px;color:#000000;}
 	.ticket .ticket-left .infobox {width:49%; float:left; color:#000000;}
 	.ticket .ticket-left .pricebox {width:49%; float:right; color:#000000;}
@@ -14,9 +14,9 @@
 	.ticket .ticket-left .price {font-size: 36px; text-align:right; right;padding: 0 20px 0 0;color:#000000;}
 
 	.ticket .ticket-inner {border:solid 1px #fff;height:132px; background-color:#fff; overflow:hidden; margin-left:15px;}
-	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#0070DF; font-size:22px;}
-	.ticket .ticket-inner .info {width: 100%; float:left; margin:5px 0 0 0;font-size:18px; color:#0070DF;}
-	.ticket .ticket-inner .code {width: 100%; float: left;font-size:11px; color:#0070DF; margin-top:16px;}
+	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; color:#000000; font-size:22px;}
+	.ticket .ticket-inner .info {width: 100%; float:left; margin:5px 0 0 0;font-size:18px; color:#000000;}
+	.ticket .ticket-inner .code {width: 100%; float: left;font-size:11px; color:#000000; margin-top:16px;}
 	.ticket .ticket-inner .date {width: 100%; font-size: 10px;color:#000000;}
 	.ticket .ticket-inner .infobox {width:49%; float:left; color:#000000;}
 	.ticket .ticket-inner .pricebox {width:49%; float:right; color:#000000;}
@@ -26,8 +26,8 @@
 	.ticket.deal {height:134px;color: #000;background:#ffffff;}
 	.ticket.deal .ticket-inner {border:dotted 1px #ffffff;}
 	.ticket.deal .ticket-inner .title {font-size: 14px;width: 100%;}
-	.ticket.deal .ticket-inner .info {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 12px;text-align: left; color:#0070DF}
-	.ticket.deal .ticket-inner .price {font-size: 36px;line-height: 30px;padding:0;text-align: center;height: auto;margin:10px 0;width: 100%;position: relative; color:#0070DF;}
+	.ticket.deal .ticket-inner .info {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 12px;text-align: left; color:#000000}
+	.ticket.deal .ticket-inner .price {font-size: 36px;line-height: 30px;padding:0;text-align: center;height: auto;margin:10px 0;width: 100%;position: relative; color:#000000;}
 	.ticket.deal .ticket-inner .price .oldprice {font-size: 12px; text-decoration:line-through;line-height: 14px;}
 	.ticket.deal .ticket-inner .dates {position: absolute;z-index:99;width: 205px;margin: 100px 0 0 0;height: 20px;font-size: 11px;text-align: right;}<br />
 	

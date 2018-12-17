@@ -76,8 +76,8 @@
 								username="#application.siteclient.cltMailAccount#"
 								password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
 								subject="#msg.subject# - #application.siteclient.cltCompanyName#">
-								<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 								<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>
+								<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 								<cfmailparam type="application/pdf" disposition="attachment" file="#msg.attach#"></cfmailparam>
 							</cfmail>
 							<cffile action="append" addnewline="yes" 

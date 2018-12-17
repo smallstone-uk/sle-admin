@@ -1033,6 +1033,12 @@
 				username="steven@shortlanesendstore.co.uk" 
 				password="kcc150297"
 				subject="#args.subject# - Shortlanesend Store">
+				<cfmailpart type="plain">
+					Hello #args.name#,
+					#args.subject#
+					#args.text#
+					If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+				</cfmailpart>
 				<cfmailpart type="html">
 					#content#
 				</cfmailpart>

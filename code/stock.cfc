@@ -218,7 +218,7 @@
 		<cfset loc.result={}>
 		<cfquery name="loc.result.StockItems" datasource="#args.datasource#">
 			SELECT pcatGroup,pcatTitle,prodID,prodCatID,prodRef,prodTitle,prodLastBought,prodValidTo,prodUnitSize,prodPriceMarked,prodOurPrice,prodPOR,
-				(SELECT siOurPrice FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS ourPrice
+				(SELECT siOurPrice FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS ourStockPrice
 			FROM tblProducts,tblProductCats
 			WHERE prodCatID=pcatID
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
@@ -255,7 +255,7 @@
 			</cfloop>
 			<cfset loc.status = Removechars(loc.status,1,1)>
 		</cfif>
-		<cfquery name="loc.result.StockItems" datasource="#args.datasource#">
+		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsresult">
 			SELECT *
 			FROM tblProducts
 			JOIN tblProductCats ON prodCatID=pcatID
@@ -267,7 +267,7 @@
 				WHERE prodID = siProduct
 				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#)</cfif> )
 			WHERE prodCatID=pcatID
-			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND prodSuppID IN (#args.form.srchSupplier#) AND prodSuppID=accID</cfif>
+			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#) AND prodSuppID=accID</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>

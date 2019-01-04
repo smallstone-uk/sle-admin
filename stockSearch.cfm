@@ -306,6 +306,7 @@
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
+												<cfset ourPrice = (ISNULL(siOurPrice) OR siOurPrice eq "") ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
 													<tr class="searchrow" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
@@ -319,7 +320,7 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#prodUnitSize#</td>
-													<td>&pound;#siOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#prodPackQty#</td>
 													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
 												</tr>
@@ -331,7 +332,7 @@
 									</cfif>
 								</cfcase>
 								<cfcase value="2">
-									<cfset stocklist=stock.StockSearch(parm)>
+									<cfset stocklist=stock.StockSearch(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=10>
 										<cfoutput>
@@ -351,6 +352,7 @@
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
+												<cfset ourPrice = (ISNULL(siOurPrice) OR siOurPrice eq "") ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
 													<tr>
 														<td colspan="#colspan#" style="background-color:##eeeeee"><strong>#pCatTitle#</strong></td>
@@ -366,7 +368,7 @@
 													<td>&pound;#prodPackPrice#</td>
 													<td>#prodPackQty#</td>
 													<td>&pound;#prodUnitTrade#</td>
-													<td>&pound;#prodOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>
@@ -377,7 +379,7 @@
 									</cfif>
 								</cfcase>
 								<cfcase value="3">
-									<cfset stocklist=stock.StockPriceList(parm)>
+									<cfset stocklist=stock.StockPriceList(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=7>
 										<cfoutput>
@@ -395,6 +397,7 @@
 													</tr>
 												<cfset category=0>
 												<cfloop query="stocklist.stockItems">
+													<cfset ourPrice = (ISNULL(siOurPrice) OR ourStockPrice eq "") ? prodOurPrice : ourStockPrice>
 													<cfif prodCatID neq category>
 														<tr class="searchrow" data-title="">
 															<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
@@ -421,7 +424,7 @@
 								</cfcase>
 								<cfcase value="4">
 									<cfset stocklist=stock.StockTakeList(parm)>
-									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
+									<cfdump var="#stocklist#" label="stocklist" expand="no">
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=7>
 										<cfoutput>

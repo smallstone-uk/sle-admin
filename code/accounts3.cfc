@@ -1929,7 +1929,7 @@
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
 			SELECT nomID,nomCode,nomGroup,nomTitle
 			FROM tblNominal
-			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV')
+			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
 			ORDER BY nomOrder
 		</cfquery>
 		<cfloop query="loc.QNomPayAccounts">
@@ -1971,76 +1971,79 @@
 				<cfif StructKeyExists(args.form,"type")>AND trnType='#args.form.type#'</cfif>
 				LIMIT 1;
 			</cfquery>
-			<cfset result.tran=QueryToArrayOfStruct(QTran)>
-			<cfset result.NetAmount=abs(QTran.trnAmnt1)>
-			<cfset result.VatAmount=abs(QTran.trnAmnt2)>
-			<cfquery name="QNomItems" datasource="#args.datasource#">
-				SELECT *
-				FROM tblNomItems,tblNominal
-				WHERE niTranID=#val(args.tranID)#
-				AND niNomID=nomID
-				AND nomType='sales'
-				ORDER BY niID asc
-			</cfquery>
-			<cfif QNomItems.recordcount gt 0>
-				<cfset tranTotal=0>
-				<cfset vatTotal=0>
-				<cfloop query="QNomItems">
-					<cfset item={}>
-					<cfset item.niID=niID>
-					<cfset item.niNomID=niNomID>
-					<cfset item.nomCode=nomCode>
-					<cfset item.nomTitle=nomTitle>
-					<cfset item.nomVATRate=StructFind(application.site.vat,nomVATCode)*100>
-					<cfset item.nomType=nomType>
-					<cfset item.niTranID=niTranID>
-					<cfif args.form.accType IS "sales" OR (StructKeyExists(args.form,"type") AND (args.form.type IS "crn"))>
-						<cfset item.niAmount=-niAmount>
+			<cfif QTran.recordcount eq 1>
+				<cfset result.tran=QueryToArrayOfStruct(QTran)>
+				<cfset result.NetAmount=abs(QTran.trnAmnt1)>
+				<cfset result.VatAmount=abs(QTran.trnAmnt2)>
+				<cfquery name="QNomItems" datasource="#args.datasource#">
+					SELECT *
+					FROM tblNomItems,tblNominal
+					WHERE niTranID=#val(args.tranID)#
+					AND niNomID=nomID
+					AND nomType='sales'
+					ORDER BY niID asc
+				</cfquery>
+				<cfif QNomItems.recordcount gt 0>
+					<cfset tranTotal=0>
+					<cfset vatTotal=0>
+					<cfloop query="QNomItems">
+						<cfset item={}>
+						<cfset item.niID=niID>
+						<cfset item.niNomID=niNomID>
+						<cfset item.nomCode=nomCode>
+						<cfset item.nomTitle=nomTitle>
+						<cfset item.nomVATRate=StructFind(application.site.vat,nomVATCode)*100>
+						<cfset item.nomType=nomType>
+						<cfset item.niTranID=niTranID>
+						<cfif args.form.accType IS "sales" OR (StructKeyExists(args.form,"type") AND (args.form.type IS "crn"))>
+							<cfset item.niAmount=-niAmount>
+						<cfelse>
+							<cfset item.niAmount=niAmount>
+						</cfif>
+		
+						<cfset vatRate=StructFind(application.site.vat,nomVATCode)>
+						<cfset item.vat=round(item.niAmount*vatRate*100)/100>
+						<cfset tranTotal=tranTotal+item.niAmount>
+						<cfset vatTotal=vatTotal+item.vat>
+						<cfset ArrayAppend(result.items,item)>
+					</cfloop>
+					<cfset result.error=0>
+					<cfset result.mode=2>
+				</cfif>
+				<cfset loc.payAccts = LoadPayAccounts(args)>
+				<cfloop array="#loc.payAccts.payItems#" index="loc.pay">
+					<cfquery name="loc.QNomPayItem" datasource="#args.datasource#">
+						SELECT niID,niAmount
+						FROM tblNomItems
+						WHERE niTranID=#val(args.tranID)#
+						AND niNomID=#loc.pay.nomID#
+						AND niLinkID=0
+					</cfquery>
+					<cfif loc.QNomPayItem.recordcount gt 0>
+						<cfif loc.pay.nomGroup eq 'R3'><cfset result.payTotal += loc.QNomPayItem.niAmount></cfif>
+						<cfset loc.amount = loc.QNomPayItem.niAmount>
+						<cfset loc.itemID = loc.QNomPayItem.niID>
 					<cfelse>
-						<cfset item.niAmount=niAmount>
+						<cfset loc.amount = 0>
+						<cfset loc.itemID = -loc.pay.nomID>	<!--- placeholder for later --->
 					</cfif>
-	
-					<cfset vatRate=StructFind(application.site.vat,nomVATCode)>
-					<cfset item.vat=round(item.niAmount*vatRate*100)/100>
-					<cfset tranTotal=tranTotal+item.niAmount>
-					<cfset vatTotal=vatTotal+item.vat>
-					<cfset ArrayAppend(result.items,item)>
+					<cfset ArrayAppend(result.payItems,{
+						"nomID" = loc.pay.nomID,
+						"nomCode" = loc.pay.nomCode,
+						"nomGroup" = loc.pay.nomGroup,
+						"nomTitle" = loc.pay.nomTitle,
+						"niID" = loc.itemID,
+						"niAmount" = loc.amount
+					})>
 				</cfloop>
 				<cfset result.error=0>
-				<cfset result.mode=2>
+				<cfset result.mode=1>
+				<cfset result.payItemCount = ArrayLen(result.payItems)>
+				<cfset result.GrandTotal=tranTotal>
+				<cfset result.GrandVatTotal=vatTotal>
+			<cfelse>
+				<cfset result.error=1>
 			</cfif>
-			<cfset loc.payAccts = LoadPayAccounts(args)>
-			<cfloop array="#loc.payAccts.payItems#" index="loc.pay">
-				<cfquery name="loc.QNomPayItem" datasource="#args.datasource#">
-					SELECT niID,niAmount
-					FROM tblNomItems
-					WHERE niTranID=#val(args.tranID)#
-					AND niNomID=#loc.pay.nomID#
-					AND niLinkID=0
-				</cfquery>
-				<cfif loc.QNomPayItem.recordcount gt 0>
-					<cfif loc.pay.nomGroup eq 'R3'><cfset result.payTotal += loc.QNomPayItem.niAmount></cfif>
-					<cfset loc.amount = loc.QNomPayItem.niAmount>
-					<cfset loc.itemID = loc.QNomPayItem.niID>
-				<cfelse>
-					<cfset loc.amount = 0>
-					<cfset loc.itemID = -loc.pay.nomID>	<!--- placeholder for later --->
-				</cfif>
-				<cfset ArrayAppend(result.payItems,{
-					"nomID" = loc.pay.nomID,
-					"nomCode" = loc.pay.nomCode,
-					"nomGroup" = loc.pay.nomGroup,
-					"nomTitle" = loc.pay.nomTitle,
-					"niID" = loc.itemID,
-					"niAmount" = loc.amount
-				})>
-			</cfloop>
-			<cfset result.error=0>
-			<cfset result.mode=1>
-			<cfset result.payItemCount = ArrayLen(result.payItems)>
-			<cfset result.GrandTotal=tranTotal>
-			<cfset result.GrandVatTotal=vatTotal>
-				
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.html">

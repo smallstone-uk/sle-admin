@@ -18,7 +18,7 @@
 			<cfquery name="QClients" datasource="#args.datasource#">
 				SELECT *
 				FROM tblClients,tblOrder,tblDelCharges,tblStreets2
-				WHERE cltAccountType <> 'N'
+				WHERE cltAccountType NOT IN ('N','H')
 				AND ordActive=1
 				AND cltID=ordClientID
 				AND cltDelCode=delCode

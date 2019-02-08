@@ -179,7 +179,7 @@
 										<select name="srchReport" class="srchReport" data-placeholder="Select...">
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Retail Price List</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Trade Price List</option>
-											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>Latest Price List</option>
+											<!---<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>Latest Price List</option>--->
 											<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>Stock Take Report</option>
 										</select>
 									</td>
@@ -334,7 +334,7 @@
 								<cfcase value="2">
 									<cfset stocklist=stock.StockSearch(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfif stocklist.recCount GT 0>
-										<cfset colspan=10>
+										<cfset colspan=11>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
 											<table width="100%" class="tableList" border="1">
@@ -348,17 +348,21 @@
 													<th>Pack Qty</th>
 													<th>Unit Trade</th>
 													<th>Our Price</th>
+													<th>POR%</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
+												<cfset profit = ourPrice - siUnitTrade>
+												<cfset POR = int((profit / ourPrice) * 100)>
 												<cfif prodCatID neq category>
 													<tr>
 														<td colspan="#colspan#" style="background-color:##eeeeee"><strong>#pCatTitle#</strong></td>
 													</tr>
 													<cfset category=prodCatID>
 												</cfif>
+												
 												<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
 													<td><input type="checkbox" name="selectitem" class="selectitem" value="#prodID#" checked="checked"></td>
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
@@ -369,6 +373,7 @@
 													<td>#siPackQty#</td>
 													<td>&pound;#siUnitTrade#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td>#POR#%</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>
@@ -378,6 +383,7 @@
 										No records found.
 									</cfif>
 								</cfcase>
+<!---
 								<cfcase value="3">
 									<cfset stocklist=stock.StockPriceList(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfif stocklist.recCount GT 0>
@@ -422,6 +428,7 @@
 										No records found.
 									</cfif>
 								</cfcase>
+--->
 								<cfcase value="4">
 									<cfset stocklist=stock.StockTakeList(parm)>
 									<cfdump var="#stocklist#" label="stocklist" expand="no">

@@ -306,7 +306,7 @@
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
-												<cfset ourPrice = (ISNULL(siOurPrice) OR val(siOurPrice) eq 0) ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = ISNULL(siOurPrice) OR (val(siOurPrice) eq 0) ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
 													<tr class="searchrow" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>

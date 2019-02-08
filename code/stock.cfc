@@ -244,6 +244,17 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+<!---
+SELECT * FROM tblProducts 
+JOIN tblProductCats ON prodCatID=pcatID 
+LEFT JOIN tblStockItem ON prodID = siProduct 
+JOIN tblstockorder ON siOrder=soID
+JOIN tblaccount ON soAccountID=accID 
+AND tblStockItem.siID = ( SELECT MAX( siID ) FROM tblStockItem WHERE prodID = siProduct ) 
+WHERE prodCatID=pcatID 
+AND accID IN (802) 
+ORDER BY pcatTitle ASC,prodTitle ASC
+--->
 	<cffunction name="StockSearch" access="public" returntype="struct" hint="search for product records">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
@@ -259,15 +270,16 @@
 			SELECT *
 			FROM tblProducts
 			JOIN tblProductCats ON prodCatID=pcatID
-			<cfif StructKeyExists(args.form,"srchSupplier")>JOIN tblAccount ON prodSuppID=accID</cfif>
 			LEFT JOIN tblStockItem ON prodID = siProduct
+			JOIN tblstockorder ON siOrder=soID
+			<cfif StructKeyExists(args.form,"srchSupplier")>JOIN tblAccount ON soAccountID=accID</cfif>
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
 				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#)</cfif> )
 			WHERE prodCatID=pcatID
-			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#) AND prodSuppID=accID</cfif>
+			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
@@ -276,6 +288,7 @@
 			<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
 			ORDER BY pcatTitle ASC,prodTitle ASC
 		</cfquery>
+
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
 		<cfreturn loc.result>
 	</cffunction>

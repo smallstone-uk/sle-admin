@@ -288,7 +288,7 @@
 							</script>
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
-									<cfset stocklist=stock.StockSearch(parm)><cfdump var="#stocklist#" label="stocklist" expand="false">
+									<cfset stocklist=stock.StockSearch(parm)>
 									<cfset colspan=7>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
@@ -321,7 +321,7 @@
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
-													<td>#siPackQty# (#siOurPrice#)</td>
+													<td>#siPackQty#</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>
@@ -352,7 +352,7 @@
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
-												<cfset ourPrice = (ISNULL(siOurPrice) OR val(siOurPrice) eq 0) ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
 													<tr>
 														<td colspan="#colspan#" style="background-color:##eeeeee"><strong>#pCatTitle#</strong></td>
@@ -364,12 +364,12 @@
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
-													<td>#prodUnitSize#</td>
-													<td>&pound;#prodPackPrice#</td>
-													<td>#prodPackQty#</td>
-													<td>&pound;#prodUnitTrade#</td>
+													<td>#siUnitSize#</td>
+													<td>&pound;#siWSP#</td>
+													<td>#siPackQty#</td>
+													<td>&pound;#siUnitTrade#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
-													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
+													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>
 											</table>
@@ -397,7 +397,7 @@
 													</tr>
 												<cfset category=0>
 												<cfloop query="stocklist.stockItems">
-													<cfset ourPrice = (ISNULL(siOurPrice) OR val(siOurPrice) eq 0) ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 													<cfif prodCatID neq category>
 														<tr class="searchrow" data-title="">
 															<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>

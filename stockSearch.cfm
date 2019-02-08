@@ -289,7 +289,7 @@
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
-									<cfset colspan=7>
+									<cfset colspan=8>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -302,6 +302,7 @@
 													<th>Unit Size</th>
 													<th>Our Price</th>
 													<th>Pack Qty</th>
+													<th>Status</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
@@ -322,6 +323,7 @@
 													<td>#siUnitSize#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#siPackQty#</td>
+													<td>#siStatus#</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>

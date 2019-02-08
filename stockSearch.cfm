@@ -288,7 +288,7 @@
 							</script>
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
-									<cfset stocklist=stock.StockSearch(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
+									<cfset stocklist=stock.StockSearch(parm)><cfdump var="#stocklist#" label="stocklist" expand="false">
 									<cfset colspan=7>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>

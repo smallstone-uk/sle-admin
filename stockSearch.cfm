@@ -288,7 +288,7 @@
 							</script>
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
-									<cfset stocklist=stock.StockSearch(parm)>
+									<cfset stocklist=stock.StockSearch(parm)><cfdump var="#stocklist#" label="stocklist" expand="false">
 									<cfset colspan=7>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
@@ -322,7 +322,7 @@
 													<td>#prodUnitSize#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#prodPackQty#</td>
-													<td>#LSDateFormat(prodLastBought,"ddd dd-mmm yy")#</td>
+													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>
 											</table>

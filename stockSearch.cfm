@@ -306,7 +306,7 @@
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
-												<cfset ourPrice = ISNULL(siOurPrice) OR (val(siOurPrice) eq 0) ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
 													<tr class="searchrow" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
@@ -319,9 +319,9 @@
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
-													<td>#prodUnitSize#</td>
+													<td>#siUnitSize#</td>
 													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
-													<td>#prodPackQty#</td>
+													<td>#siPackQty# (#siOurPrice#)</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>
 											</cfloop>

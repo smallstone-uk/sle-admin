@@ -321,7 +321,7 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
-													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td class="ourPrice">&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
@@ -374,7 +374,7 @@
 													<td>&pound;#siWSP#</td>
 													<td>#siPackQty#</td>
 													<td>&pound;#siUnitTrade#</td>
-													<td>&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td class="ourPrice">&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
 													<td>#POR#%</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>

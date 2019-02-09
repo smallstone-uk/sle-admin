@@ -490,6 +490,7 @@
 					siRRP = #args.form.siRRP#,
 					siUnitSize = '#args.form.siUnitSize#',
 					siWSP = #args.form.siWSP#,
+					siUnitTrade = #args.form.siWSP / args.form.siPackQty#,
 					siExpires = <cfif len(args.form.siExpires)>'#LSDateFormat(args.form.siExpires,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					siStatus = '#args.form.siStatus#',
 					siPOR = #loc.POR#,

@@ -60,7 +60,7 @@
 						<cfset loc.rec.style = "fuschia">
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
 						<cfset loc.result.items[loc.lastItem].style = "blue">
-						<cfdump var="#loc.result.items[loc.lastItem]#" label="#prodTitle# #loc.lastItem#" expand="false">
+						<!---<cfdump var="#loc.result.items[loc.lastItem]#" label="#prodTitle# #loc.lastItem#" expand="false">--->
 					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
@@ -133,7 +133,7 @@
 					<cfif loc.prev.edStarts gte loc.rec.edStarts AND loc.prev.edEnds lte loc.rec.edEnds>
 						<cfset loc.rec.style = "red">
 						<cfset loc.result.items[loc.lastItem].style = "red">
-						<cfdump var="#loc.prev#" label="#prodTitle#" expand="false">
+						<!---<cfdump var="#loc.prev#" label="#prodTitle#" expand="false">--->
 					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
@@ -234,7 +234,7 @@
 			</cfif>
 			<!---</cfloop>--->
 			<cfif ListFind("current,future,past,all",parm.range,",")> 
-				<cfset result = LoadDealData(parm)><cfdump var="#result#" label="result" expand="false">
+				<cfset result = LoadDealData(parm)><!---<cfdump var="#result#" label="result" expand="false">--->
 				<h1>#parm.range#</h1>
 				<table class="tableList" border="1">
 					<tr>

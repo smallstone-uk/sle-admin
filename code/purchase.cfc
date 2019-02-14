@@ -43,7 +43,7 @@
 			<cfif len(StructFind(args.form,"srchLedger"))>AND accType="#args.form.srchLedger#"</cfif>
 			<cfif len(StructFind(args.form,"srchGroup"))>AND accGroup=#val(args.form.srchGroup)#</cfif>
 			<cfif len(StructFind(args.form,"srchPayType"))>AND accPayType=#val(args.form.srchPayType)#</cfif>
-			ORDER BY accName
+			ORDER BY accCode
 		</cfquery>
 		<cfif loc.QSuppliers.recordcount GT 0>
 			<cfloop query="loc.QSuppliers">
@@ -262,7 +262,6 @@
 				<cfset StructInsert(loc.ledger.zgrand,"total",{"gross" = 0, "net" = 0, "VAT" = 0, "trans" = trans, "rate" = "Total", "prop" = 1})>
 			</cfif>
 		</cfloop>
-		
 		<cfquery name="loc.QPurTrans" datasource="#args.datasource#">
 			SELECT nomClass,nomVATCode, vatRate, SUM(niAmount) AS net, round(SUM(niAmount)*vatRate/100,2) AS vatAmnt, 
 				year(trnDate) as DA, month(trnDate) As DB, count(*) AS trans
@@ -299,6 +298,7 @@
 				<cfset loc.rec.VAT += vatAmnt>
 				<cfset loc.rec.trans += trans>
 			</cfif>
+		<cfdump var="#loc#" label="loc" expand="false">
 			
 			<cfif NOT StructKeyExists(loc.ledger.zgrand,"total")>
 				<cfset StructInsert(loc.ledger.zgrand,"total",{"gross" = net + vatAmnt, "net" = net, "VAT" = vatAmnt, "trans" = trans, "rate" = "Total", "prop" = 1})>

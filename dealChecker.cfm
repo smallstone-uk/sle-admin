@@ -13,11 +13,11 @@
 		
 		<cftry>
 			<cfif args.range eq "current">
-				<cfset loc.dateRange = " AND edStarts <= Now() AND edEnds > Now()">
+				<cfset loc.dateRange = " AND edStarts <= DATE(Now()) AND edEnds > DATE(Now())">
 			<cfelseif args.range eq "future">
-				<cfset loc.dateRange = " AND edStarts > Now()">
+				<cfset loc.dateRange = " AND edStarts > DATE(Now())">
 			<cfelseif args.range eq "past">
-				<cfset loc.dateRange = " AND edEnds < Now()">
+				<cfset loc.dateRange = " AND edEnds < DATE(Now())">
 			<cfelseif args.range eq "all">
 				<cfset loc.dateRange = "">
 			</cfif>

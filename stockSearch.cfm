@@ -321,7 +321,7 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
-													<td class="ourPrice">&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
@@ -334,18 +334,19 @@
 									</cfif>
 								</cfcase>
 								<cfcase value="2">
-									<cfset stocklist=stock.StockSearch(parm)><!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
+									<cfset stocklist=stock.StockSearch(parm)>
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=11>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
 											<table width="100%" class="tableList" border="1">
 												<tr>
-													<th width="10"><input type="checkbox" class="selectAll" value="1" checked="checked" style="width:20px; height:20px;" /></th>
+													<th width="11"><input type="checkbox" class="selectAll" value="1" checked="checked" style="width:20px; height:20px;" /></th>
 													<th>ID</th>
 													<th>Reference</th>
 													<th>Title</th>
 													<th>Unit Size</th>
+													<th>VAT Rate</th>
 													<th>WSP</th>
 													<th>Pack Qty</th>
 													<th>Unit Trade</th>
@@ -356,8 +357,16 @@
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
-												<cfset profit = ourPrice - siUnitTrade>
-												<cfset POR = int((profit / ourPrice) * 100)>
+												<!---<cfset profit = ourPrice - siUnitTrade>
+												<cfset POR = int((profit / ourPrice) * 100)>--->
+
+													<cfset unitVAT = val(siUnitTrade) * (prodVATRate / 100)>
+													<cfset unitGross = val(siUnitTrade) + unitVAT>
+													<cfset profit = ourPrice - unitGross>
+													<cfset POR = int((profit / ourPrice) * 100)>
+
+
+
 												<cfif prodCatID neq category>
 													<tr>
 														<td colspan="#colspan#" style="background-color:##eeeeee"><strong>#pCatTitle#</strong></td>
@@ -371,10 +380,11 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
+													<td align="right">#prodVATRate#%</td>
 													<td>&pound;#siWSP#</td>
-													<td>#siPackQty#</td>
-													<td>&pound;#siUnitTrade#</td>
-													<td class="ourPrice">&pound;#ourPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+													<td align="center">#siPackQty#</td>
+													<td align="right">&pound;#DecimalFormat(unitGross)#</td>
+													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#POR#%</td>
 													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
 												</tr>

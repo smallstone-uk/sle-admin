@@ -271,7 +271,7 @@ ORDER BY pcatTitle ASC,prodTitle ASC
 			FROM tblProducts
 			JOIN tblProductCats ON prodCatID=pcatID
 			LEFT JOIN tblStockItem ON prodID = siProduct
-			JOIN tblstockorder ON siOrder=soID
+			LEFT JOIN tblstockorder ON siOrder=soID
 			<cfif StructKeyExists(args.form,"srchSupplier")>JOIN tblAccount ON soAccountID=accID</cfif>
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )

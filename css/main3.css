@@ -529,3 +529,4 @@ input.selectitem {
     label:hover {background: none;}
     label:active {box-shadow: none;}
 }
+.tiny {font-size:9px}

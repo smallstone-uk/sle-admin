@@ -140,7 +140,8 @@
 					</tr>
 					<tr><td>Reference</td>
 						<td>
-							<span style="float:right"><a href="stockItems.cfm?ref=#lookup.product.prodID#" target="_blank" title="See previous orders">#lookup.product.prodID#</a></span>
+							<span style="float:right">
+								<a href="stockItems.cfm?ref=#lookup.product.prodID#" target="_blank" title="See previous orders">#lookup.product.prodID#</a></span>
 						</td>
 					</tr>
 					<tr><td>Description</td><td>#lookup.product.prodRecordTitle#</td></tr>

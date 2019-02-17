@@ -299,6 +299,7 @@
 					prodCatID,
 					prodPriceMarked,
 					prodMinPrice,
+					prodOurPrice,
 					prodVATRate,
 					prodEposCatID
 				) VALUES (
@@ -307,38 +308,41 @@
 					#val(args.form.prodCatID)#,
 					#int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					#val(args.form.prodMinPrice)#,
+					#val(args.form.prodOurPrice)#,
 					#args.form.prodVATRate#,
 					#val(args.form.prodEposCatID)#
 				)
 			</cfquery>
 			<cfset loc.result.productID = loc.QAddProductResult.generatedkey>
 			<cfset loc.result.barcode = Trim(args.form.barcode)>
-			<cfquery name="loc.QBarcode" datasource="#args.datasource#" result="loc.result.QBarcodeResult">
-				SELECT *
-				FROM tblBarcodes
-				WHERE barCode LIKE '%#loc.result.barcode#%'
-				AND barType = 'product'
-				LIMIT 1;
-			</cfquery>
-			<cfif loc.QBarcode.recordcount eq 1>
-				<cfquery name="loc.QUpdateBarcode" datasource="#args.datasource#" result="loc.result.QBarcodeResult">
-					UPDATE tblBarcodes
-					SET barProdID = #loc.result.productID#
-					WHERE barID = #loc.QBarcode.barID#
+			<cfif len(loc.result.barcode)>
+				<cfquery name="loc.QBarcode" datasource="#args.datasource#" result="loc.result.QBarcodeResult">
+					SELECT *
+					FROM tblBarcodes
+					WHERE barCode LIKE '%#loc.result.barcode#%'
+					AND barType = 'product'
+					LIMIT 1;
 				</cfquery>
-			<cfelse>
-				<cfquery name="loc.QAddBarCode" datasource="#args.datasource#" result="loc.QAddBarcodeResult">
-					INSERT INTO tblBarcodes (
-						barCode,
-						barType,
-						barProdID
-					) VALUES (
-						'#NumberFormat(loc.result.barcode,"0000000000000")#',
-						'product',
-						#loc.result.productID#
-					)
-				</cfquery>
-				<cfset loc.result.BarcodeID = loc.QAddBarcodeResult.generatedkey>
+				<cfif loc.QBarcode.recordcount eq 1>
+					<cfquery name="loc.QUpdateBarcode" datasource="#args.datasource#" result="loc.result.QBarcodeResult">
+						UPDATE tblBarcodes
+						SET barProdID = #loc.result.productID#
+						WHERE barID = #loc.QBarcode.barID#
+					</cfquery>
+				<cfelse>
+					<cfquery name="loc.QAddBarCode" datasource="#args.datasource#" result="loc.QAddBarcodeResult">
+						INSERT INTO tblBarcodes (
+							barCode,
+							barType,
+							barProdID
+						) VALUES (
+							'#NumberFormat(loc.result.barcode,"0000000000000")#',
+							'product',
+							#loc.result.productID#
+						)
+					</cfquery>
+					<cfset loc.result.BarcodeID = loc.QAddBarcodeResult.generatedkey>
+				</cfif>
 			</cfif>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

@@ -195,7 +195,6 @@
 		<cfset result.firstMonth=val(loNum)>
 		<cfset result.lastMonth=val(hiNum)>
 		<cfreturn result>
-		<cfdump var="#result#" label="result" expand="no">
 	</cffunction>
 
 	<cffunction name="ApportionSales" access="private" returntype="void">
@@ -298,7 +297,6 @@
 				<cfset loc.rec.VAT += vatAmnt>
 				<cfset loc.rec.trans += trans>
 			</cfif>
-		<cfdump var="#loc#" label="loc" expand="false">
 			
 			<cfif NOT StructKeyExists(loc.ledger.zgrand,"total")>
 				<cfset StructInsert(loc.ledger.zgrand,"total",{"gross" = net + vatAmnt, "net" = net, "VAT" = vatAmnt, "trans" = trans, "rate" = "Total", "prop" = 1})>

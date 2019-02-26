@@ -777,6 +777,7 @@
 				SELECT pgID,pgTitle,pgTarget, Count(pcatID) AS Categories
 				FROM tblProductGroups
 				LEFT JOIN tblProductCats ON pcatGroup=pgID
+				WHERE pgType != 'epos'
 				GROUP BY pgID
 				ORDER BY pgTitle
 			</cfquery>

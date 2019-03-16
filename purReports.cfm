@@ -1700,19 +1700,21 @@
 										<cfset errorCount = 0>
 										<table class="tableList" border="1">
 											<tr>
-												<td width="150">Name</td>
-												<td>ID</td>
-												<td width="80">Date</td>
+												<th colspan="12">#trans.QTrans.accName#</th>
+											</tr>
+											<tr>
+												<td align="right" class="noPrint">ID</td>
+												<td align="right">Date</td>
 												<td>Type</td>
 												<td>Method</td>
 												<td>Reference</td>
 												<td>Description</td>
-												<td>Amount1</td>
-												<td>Amount2</td>
-												<td>Total</td>
+												<td align="right">Amount1</td>
+												<td align="right">Amount2</td>
+												<td align="right">Total</td>
 												<td>Allocated</td>
 												<td>AllocID</td>
-												<td></td>
+												<td align="right">Balance</td>
 											</tr>
 											<cfloop query="trans.QTrans">
 												<cfif allocID gt -1 AND allocID neq trnAllocID>
@@ -1737,9 +1739,8 @@
 													<cfset allocBal = 0>
 												</cfif>
 												<tr>
-													<td>#accName#</td>
-													<td align="right">#trnID#</td>
-													<td align="right">#LSDateFormat(trnDate,'dd-mmm-yyyy')#</td>
+													<td align="right" class="noPrint">#trnID#</td>
+													<td align="right" nowrap>#LSDateFormat(trnDate,'dd-mmm-yy')#</td>
 													<td>#trnType#</td>
 													<td>#trnMethod#</td>
 													<td>#trnRef#</td>
@@ -1753,7 +1754,7 @@
 												</tr>
 											</cfloop>
 											<tr>
-												<td height="30" colspan="11"></td>
+												<td height="30" colspan="10"></td>
 												<td class="#class#" align="right">#allocID#</td>
 												<td class="#class#" align="center">#allocBal#</td>
 											</tr>

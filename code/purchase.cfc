@@ -521,6 +521,7 @@
 			
 			<cfif val(args.form.srchAccount) gt 0>AND trnAccountID=<cfqueryparam cfsqltype="cf_sql_integer" value="#args.form.srchAccount#"></cfif>
 			<cfif len(args.form.srchLedger) gt 0>AND trnLedger=<cfqueryparam cfsqltype="cf_sql_varchar" value="#args.form.srchLedger#"></cfif>
+			<cfif len(args.form.srchParmNum) gt 0>AND trnAllocID=<cfqueryparam cfsqltype="cf_sql_integer" value="#args.form.srchParmNum#"></cfif>
 				<cfif len(args.form.srchRange)>
 					<cfif Left(args.form.srchRange,2) eq 'FY'>
 						<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>

@@ -59,6 +59,7 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchMin" default="">
+<cfparam name="srchParmNum" default="">
 <cfparam name="srchSort" default="">
 <cfparam name="srchDept" default="">
 <cfparam name="srchLedger" default="">
@@ -144,6 +145,10 @@
 									<td><input type="text" name="srchMin" value="#srchMin#" size="5" value="0" /></td>
 								</tr>
 								<tr>
+									<td><b>Numeric Parameter</b></td>
+									<td><input type="text" name="srchParmNum" value="#srchParmNum#" size="5" value="0" /></td>
+								</tr>
+								<tr>
 									<td><b>Ledger</b></td>
 									<td>
 										<select name="srchLedger">
@@ -222,7 +227,7 @@
 									<cfset trans=pur.TranList(parms)>
 									<cfset accountID=0>
 									<cfset tranCountTotal = 0>
-									<table border="1" class="tableList" width="100%">
+									<table border="1" class="tableList" width="98%">
 										<cfloop array="#trans.tranArray#" index="tran">
 											<cfif accountID neq tran.accID>
 												<cfif accountID gt 0>

@@ -27,7 +27,11 @@
 		</cfquery>
 		<cfif QTrans.recordcount gt 0>
 			<cfset dateStr = QTrans.trnDate[1]>dateStr = #dateStr#<br />
-			<cfset firstDate = CreateDate(ListFirst(dateStr,"-"),Mid(dateStr,6,2),ListLast(dateStr,"-"))>firstDate = #firstDate#<br />
+			<cfif Find("{",dateStr)>
+				<cfset firstDate = dateStr>
+			<cfelse>
+				<cfset firstDate = CreateDate(ListFirst(dateStr,"-"),Mid(dateStr,6,2),ListLast(dateStr,"-"))>firstDate = #firstDate#<br />
+			</cfif>
 			<cfquery name="QPaymentUpdate" datasource="#application.site.datasource1#">
 				UPDATE tblPayHeader
 				SET phMethod='bacs'

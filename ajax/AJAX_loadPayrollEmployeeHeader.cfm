@@ -5,7 +5,7 @@
 <cfset parm.url = application.site.normal>
 <cfset parm.form = form>
 <cfset record = pr2.LoadPayrollRecord(parm)>
-<cfdump var="#record#" label="record" expand="false">
+
 <cfoutput>
 	<script>
 		$(document).ready(function(e) {

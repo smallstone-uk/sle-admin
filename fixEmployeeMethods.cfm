@@ -24,15 +24,22 @@
 			WHERE trnType = 'nom' 
 			AND niNomID=#nomID#
 			ORDER BY trnDate
-		</cfquery>
+		</cfquery><cfdump var="#QTrans#" label="" expand="false">
 		<cfif QTrans.recordcount gt 0>
 			<cfset dateStr = QTrans.trnDate[1]>dateStr = #dateStr#<br />
 			<cfif Find("{",dateStr)>
 				<cfset firstDate = dateStr>
 			<cfelse>
-				<cfset firstDate = CreateDate(ListFirst(dateStr,"-"),Mid(dateStr,6,2),ListLast(dateStr,"-"))>firstDate = #firstDate#<br />
+				<cfset firstDate = CreateDate(ListFirst(dateStr,"-"),Mid(dateStr,6,2),ListLast(dateStr,"-"))>
 			</cfif>
-			<cfquery name="QPaymentUpdate" datasource="#application.site.datasource1#">
+			firstDate = #firstDate#<br />
+			<cfquery name="QPaymentUpdate1" datasource="#application.site.datasource1#">
+				UPDATE tblPayHeader
+				SET phMethod='cash'
+				WHERE phDate < #firstDate#
+				AND phEmployee = #employeeID#
+			</cfquery>
+			<cfquery name="QPaymentUpdate2" datasource="#application.site.datasource1#">
 				UPDATE tblPayHeader
 				SET phMethod='bacs'
 				WHERE phDate >= #firstDate#

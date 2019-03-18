@@ -24,7 +24,7 @@
 			WHERE trnType = 'nom' 
 			AND niNomID=#nomID#
 			ORDER BY trnDate
-		</cfquery><cfdump var="#QTrans#" label="" expand="false">
+		</cfquery>
 		<cfif QTrans.recordcount gt 0>
 			<cfset dateStr = QTrans.trnDate[1]>dateStr = #dateStr#<br />
 			<cfif Find("{",dateStr)>

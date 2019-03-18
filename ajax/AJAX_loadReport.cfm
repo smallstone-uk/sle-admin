@@ -173,7 +173,7 @@
 						<tr>
 							<td>#i.empFirstName# #i.empLastName#</td>
 							<td align="center">#i.empTaxCode#</td>
-							<td align="center">#i.empMethod#</td>
+							<td align="center">#i.phMethod#</td>
 							<td align="right">#DecimalFormat(i.phNP)#</td>
 							<td align="right">#DecimalFormat(i.phPAYE)#</td>
 							<td align="right">#DecimalFormat(i.phNI)#</td>
@@ -182,8 +182,9 @@
 							<td align="right">#DecimalFormat(i.phLotterySubs)#</td>
 							<td align="right">#DecimalFormat(i.phGross)#</td>
 							<td align="right">#DecimalFormat(i.phTotalHours)#</td>
+							<td>#i.phMethod#</td>
 						</tr>
-						<cfif i.empMethod eq 'cash'>
+						<cfif i.phMethod eq 'cash'>
 							<cfset cashTotal += i.phNP>
 						<cfelse>
 							<cfset bacsTotal += i.phNP>
@@ -201,6 +202,7 @@
 						<td align="right"><strong>#DecimalFormat(sums.LottoSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.grossSum)#</strong></td>
 						<td align="right"><strong>#DecimalFormat(sums.hoursSum)#</strong></td>
+						<td></td>
 					</tr>
 				</cfloop>
 			</table>

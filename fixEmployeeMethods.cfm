@@ -4,49 +4,54 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Fix Employee Payment Methods</title>
 </head>
-
-<cfset employeeID = 2>
-<cfsetting requesttimeout="900">
-<cfquery name="QEmployee" datasource="#application.site.datasource1#">
-	SELECT *
-	FROM tblEmployee
-	WHERE empID=#employeeID#
-</cfquery>
-<cfdump var="#QEmployee#" label="QEmployee" expand="false">
-<cfset nomID = QEmployee.empNomID>
-<cfquery name="QTrans" datasource="#application.site.datasource1#">
-	SELECT trnID,trnDate,trnDesc, niAmount, niNomID
-	FROM tblTrans 
-	INNER JOIN tblNomItems ON trnID=niTranID
-	WHERE trnType = 'nom' 
-	AND niNomID=#nomID#
-	ORDER BY trnDate
-</cfquery>
-<cfset dates = {}>
-<cfloop query="QTrans">
-	<cfif NOT StructKeyExists(dates,trnDate)>
-		<cfset StructInsert(dates,trnDate,niAmount)>
-	</cfif>
-</cfloop>
-<cfdump var="#dates#" label="dates" expand="false">
-<cfquery name="QPayments" datasource="#application.site.datasource1#">
-	SELECT *
-	FROM tblPayHeader
-	WHERE phEmployee=#employeeID#
-</cfquery>
-<cfdump var="#QPayments#" label="QPayments" expand="false">
 <body>
+<h1>Fix Employee Payment Methods</h1>
 <cfoutput>
-	<table width="300">
-	<cfloop query="QPayments">
-		<tr>
-			<td>#phID#</td>
-			<td align="right">#LSDateFormat(phDate,"ddd dd-mmm-yyyy")#</td>
-			<td>#phMethod#</td>
-			<td align="right">#phNP#</td>
-		</tr>
-	</cfloop>
-	</table>
+	<cfparam name="employeeID" default="2">
+	<cfsetting requesttimeout="900">
+	<cfquery name="QEmployee" datasource="#application.site.datasource1#">
+		SELECT *
+		FROM tblEmployee
+		WHERE empID=#val(employeeID)#
+	</cfquery>
+	<cfif val(QEmployee.empID) gt 0>
+		<h2>#QEmployee.empFirstName# #QEmployee.empLastName#</h2>
+		<cfset nomID = QEmployee.empNomID>
+		<cfquery name="QTrans" datasource="#application.site.datasource1#">
+			SELECT trnID,trnDate,trnDesc, niAmount, niNomID
+			FROM tblTrans 
+			INNER JOIN tblNomItems ON trnID=niTranID
+			WHERE trnType = 'nom' 
+			AND niNomID=#nomID#
+			ORDER BY trnDate
+		</cfquery>
+		<cfif QTrans.recordcount gt 0>
+			<cfset firstDate = QTrans.trnDate[1]>firstDate = #firstDate#
+			<cfquery name="QPaymentUpdate" datasource="#application.site.datasource1#">
+				UPDATE tblPayHeader
+				SET phMethod='bacs'
+				WHERE phDate >= '#firstDate#'
+				AND phEmployee = #employeeID#
+			</cfquery>
+			<cfquery name="QPayments" datasource="#application.site.datasource1#">
+				SELECT *
+				FROM tblPayHeader
+				WHERE phEmployee=#employeeID#
+			</cfquery>
+			<table width="300">
+			<cfloop query="QPayments">
+				<tr>
+					<td>#phID#</td>
+					<td align="right">#LSDateFormat(phDate,"ddd dd-mmm-yyyy")#</td>
+					<td>#phMethod#</td>
+					<td align="right">#phNP#</td>
+				</tr>
+			</cfloop>
+			</table>
+		</cfif>
+	<cfelse>
+		#employeeID# Not Found.
+	</cfif>
 </cfoutput>
 </body>
 </html>

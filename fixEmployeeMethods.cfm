@@ -26,11 +26,12 @@
 			ORDER BY trnDate
 		</cfquery>
 		<cfif QTrans.recordcount gt 0>
-			<cfset firstDate = QTrans.trnDate[1]>firstDate = #firstDate#
+			<cfset dateStr = QTrans.trnDate[1]>dateStr = #dateStr#<br />
+			<cfset firstDate = CreateDate(ListFirst(dateStr,"-"),Mid(dateStr,6,2),ListLast(dateStr,"-"))>firstDate = #firstDate#<br />
 			<cfquery name="QPaymentUpdate" datasource="#application.site.datasource1#">
 				UPDATE tblPayHeader
 				SET phMethod='bacs'
-				WHERE phDate >= '#firstDate#'
+				WHERE phDate >= #firstDate#
 				AND phEmployee = #employeeID#
 			</cfquery>
 			<cfquery name="QPayments" datasource="#application.site.datasource1#">

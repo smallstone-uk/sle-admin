@@ -1349,6 +1349,7 @@
 			<cfelse>
 				WHERE 1
 			</cfif>
+			AND accStatus='active'
 			ORDER BY accType,accName
 		</cfquery>
 		<cfset result.accounts=QueryToArrayOfStruct(QAccounts)>
@@ -1927,7 +1928,7 @@
 		<cfset loc.result = {}>
 		<cfset loc.result.payItems = []>
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
-			SELECT nomID,nomCode,nomGroup,nomTitle
+			SELECT nomID,nomCode,nomGroup,nomTitle,nomOrder
 			FROM tblNominal
 			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
 			ORDER BY nomOrder

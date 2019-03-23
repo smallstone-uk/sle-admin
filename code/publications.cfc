@@ -145,9 +145,9 @@
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
 			<cfif StructKeyExists(args.form,"urn") AND len(args.form.urn)>AND psURN LIKE '%#args.form.urn#%'</cfif>
-			ORDER by pubTitle asc, psIssue asc, psDate asc, psType , psID ASC
+			ORDER by pubTitle asc, psIssue asc, psDate asc, psType, psID ASC
 		</cfquery>
-
+<cfdump var="#QPubStock#" label="QPubStock" expand="false">
 		<cfloop query="QPubStock">
 			<cfset item={}>
 			<cfset item.ID=psID>
@@ -252,7 +252,7 @@
 				</cfif>
 			</cfif>
 		</cfloop>
-		<cfset result.list = ArrayOfStructSort(result.list,"numeric","asc","ID")>
+		<!---<cfset result.list = ArrayOfStructSort(result.list,"numeric","asc","ID")>--->
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="BuildReport" expand="yes" format="html" 

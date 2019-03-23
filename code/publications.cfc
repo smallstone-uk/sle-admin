@@ -147,7 +147,7 @@
 			<cfif StructKeyExists(args.form,"urn") AND len(args.form.urn)>AND psURN LIKE '%#args.form.urn#%'</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType, psID ASC
 		</cfquery>
-<cfdump var="#QPubStock#" label="QPubStock" expand="false">
+
 		<cfloop query="QPubStock">
 			<cfset item={}>
 			<cfset item.ID=psID>

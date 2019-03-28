@@ -341,7 +341,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
 			<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
-			ORDER BY prodCatID,prodTitle  ASC
+			ORDER BY pcatTitle,prodTitle  ASC
 		</cfquery>
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
 		<!---<cfdump var="#loc.result.StockItems#" label="StockItems" expand="false">--->

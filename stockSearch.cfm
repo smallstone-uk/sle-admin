@@ -289,7 +289,7 @@
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
-									<cfset colspan=8>
+									<cfset colspan=9>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -336,7 +336,7 @@
 								<cfcase value="2">
 									<cfset stocklist=stock.StockSearch(parm)>
 									<cfif stocklist.recCount GT 0>
-										<cfset colspan=11>
+										<cfset colspan=12>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
 											<table width="100%" class="tableList" border="1">

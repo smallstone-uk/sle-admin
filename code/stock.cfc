@@ -302,13 +302,50 @@ ORDER BY prodCatID,prodTitle  ASC
 			ORDER BY pcatTitle ASC,prodTitle ASC
 		</cfquery>
 <cfdump var="#loc.result.StockItems#" label="StockSearch" expand="yes" format="html" 
-	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+	output="#application.site.dir_logs#epos/err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
 		<cfreturn loc.result>
 	</cffunction>
---->	
+--->
+
 	<cffunction name="StockSearch" access="public" returntype="struct" hint="search for product records">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc={}>
+		<cfset loc.result={}>
+		<cfset loc.status = "">
+		<cfif StructKeyExists(args.form,"srchStatus")>
+			<cfloop list="#args.form.srchStatus#" index="loc.item" delimiters=",">
+				<cfset loc.status = "#loc.status#,'#loc.item#'">
+			</cfloop>
+			<cfset loc.status = Removechars(loc.status,1,1)>
+		</cfif>
+		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsresult">
+			SELECT *
+			FROM tblProducts
+			LEFT JOIN tblStockItem ON prodID = siProduct
+			AND tblStockItem.siID = (
+				SELECT MAX( siID )
+				FROM tblStockItem
+				WHERE prodID = siProduct
+				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#</cfif>
+				)
+			INNER JOIN tblProductCats ON prodCatID=pcatID
+			INNER JOIN tblstockorder ON siOrder=soID
+			INNER JOIN tblAccount ON soAccountID=accID
+			WHERE 1
+			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
+			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>
+			<cfif len(args.form.srchDateTo) GT 0>AND (soDate IS null OR soDate <= '#args.form.srchDateTo#')</cfif>
+			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
+			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
+			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
+		</cfquery>
+		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
+		<cfreturn loc.result>
+	</cffunction>
+
+<!---	<cffunction name="StockSearch" access="public" returntype="struct" hint="search for product records">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset loc.result={}>
@@ -324,7 +361,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			FROM tblproducts a
 			INNER JOIN tblProductCats ON prodCatID=pcatID
 			INNER JOIN (
-				SELECT b.*,c.soDate, MAX(siID)
+				SELECT b.*,c.soID,c.soDate, MAX(siID)
 				<cfif StructKeyExists(args.form,"srchSupplier")>,d.accName</cfif>
 				FROM tblstockitem b
 				INNER JOIN tblstockorder c ON soID=siOrder
@@ -344,10 +381,10 @@ ORDER BY prodCatID,prodTitle  ASC
 			ORDER BY pcatTitle,prodTitle  ASC
 		</cfquery>
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
-		<!---<cfdump var="#loc.result.StockItems#" label="StockItems" expand="false">--->
+		<cfdump var="#loc.result.StockItems#" label="StockItems" expand="false">
 		<cfreturn loc.result>
 	</cffunction>
-	
+--->	
 	<cffunction name="AddProductBarcode" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>

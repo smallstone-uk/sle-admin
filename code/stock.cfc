@@ -328,7 +328,7 @@ ORDER BY prodCatID,prodTitle  ASC
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
-				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#</cfif>
+				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#)</cfif>
 				)
 			INNER JOIN tblProductCats ON prodCatID=pcatID
 			INNER JOIN tblstockorder ON siOrder=soID

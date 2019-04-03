@@ -467,6 +467,7 @@
 			WHERE nomID=#acct.ID#
 			AND niTranID=trnID
 			AND niNomID=nomID
+			AND niAmount=#tran.dr-tran.cr#
 			AND trnDate='#tran.date#'
 			AND trnRef='#tran.type#'
 			AND trnDesc='#tran.description#'

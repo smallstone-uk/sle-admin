@@ -68,10 +68,12 @@
 		<tr>
 			<td>#prodTitle#</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
-				<cfset mnthVal = QSales.salesItems[mnth][currentrow]>
+				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
+				<cfset mnthPurch = 0>
+				<cfif !StructIsEmpty(purRec)><cfset mnthPurch = StructFind(purRec,mnth)></cfif>
 				<td width="30" align="right">
-					<span class="sale"><cfif mnthVal gt 0>#mnthVal#<cfelse>&nbsp;</cfif><br /></span>
-					<span class="purch"><cfif !StructIsEmpty(purRec)>#StructFind(purRec,mnth)#<cfelse>&nbsp;</cfif></span>
+					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
+					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
 				</td>
 			</cfloop>
 			<td width="50" align="right">

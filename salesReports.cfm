@@ -5,8 +5,8 @@
 <title>Stock Sales &amp; Purchase</title>
 <link rel="stylesheet" type="text/css" href="css/main3.css"/>
 <style>
-	.sale {color:#FF00FF;}
-	.purch {color:#0000FF}
+	.sale {color:#FF00FF; line-height:16px;}
+	.purch {color:#0000FF; line-height:16px;}
 	.group {font-size:24px; font-weight:bold}
 </style>
 </head>
@@ -60,63 +60,23 @@
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
+
 		<cfset purRec = {}>
 		<cfif StructKeyExists(Purch.stock,prodID)>
 			<cfset purRec = StructFind(Purch.stock,prodID)>
 		</cfif>
 		<tr>
 			<td>#prodTitle#</td>
-			<td width="30" align="right">
-				<cfif jan gt 0><span class="sale"><span class="sale">#jan#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.jan gt 0><span class="purch">#purRec.jan#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif feb gt 0><span class="sale">#feb#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.feb gt 0><span class="purch">#purRec.feb#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif mar gt 0><span class="sale">#mar#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.mar gt 0><span class="purch">#purRec.mar#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif apr gt 0><span class="sale">#apr#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.apr gt 0><span class="purch">#purRec.apr#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif may gt 0><span class="sale">#may#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.may gt 0><span class="purch">#purRec.may#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif jun gt 0><span class="sale">#jun#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.jun gt 0><span class="purch">#purRec.jun#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif jul gt 0><span class="sale">#jul#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.jul gt 0><span class="purch">#purRec.jul#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif aug gt 0><span class="sale">#aug#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.aug gt 0><span class="purch">#purRec.aug#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif sep gt 0><span class="sale">#sep#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.sep gt 0><span class="purch">#purRec.sep#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif oct gt 0><span class="sale">#oct#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.oct gt 0><span class="purch">#purRec.oct#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif nov gt 0><span class="sale">#nov#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.nov gt 0><span class="purch">#purRec.nov#</span></cfif>
-			</td>
-			<td width="30" align="right">
-				<cfif dec gt 0><span class="sale">#dec#<br /></span></cfif>
-				<cfif !StructIsEmpty(purRec) AND purRec.dec gt 0><span class="purch">#purRec.dec#</span></cfif>
-			</td>
+			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
+				<cfset mnthVal = QSales.salesItems[mnth][currentrow]>
+				<td width="30" align="right">
+					<span class="sale"><cfif mnthVal gt 0>#mnthVal#<cfelse>&nbsp;</cfif><br /></span>
+					<span class="purch"><cfif !StructIsEmpty(purRec)>#StructFind(purRec,mnth)#<cfelse>&nbsp;</cfif></span>
+				</td>
+			</cfloop>
 			<td width="50" align="right">
 				<span class="sale">#total#<br /></span>
-				<cfif !StructIsEmpty(purRec)><span class="purch">#purRec.total#</span></cfif>
+				<span class="purch"><cfif !StructIsEmpty(purRec)>#purRec.total#<cfelse>&nbsp;</cfif></span>
 			</td>
 			<td width="50" align="right">
 				<cfif !StructIsEmpty(purRec)>#purRec.total - total#</cfif>

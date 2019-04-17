@@ -60,7 +60,6 @@
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
 			GROUP BY pgTitle, pcatTitle, prodTitle
 			ORDER BY pgTitle, pcatTitle, prodTitle
-			LIMIT 50
 		</cfquery>
 		<cfreturn loc>
 	</cffunction>
@@ -109,7 +108,6 @@
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
 			GROUP BY pgTitle, pcatTitle, prodTitle
 			ORDER BY pgTitle, pcatTitle, prodTitle
-			LIMIT 50
 		</cfquery>
 		<cfset loc.stock = {}>
 		<cfloop query="loc.purchItems">

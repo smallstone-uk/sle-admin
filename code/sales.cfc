@@ -81,7 +81,7 @@
 			<cfset loc.GroupTitle = "">
 		</cfif>
 		
-		<cfquery name="loc.purchItems" datasource="#args.datasource#">
+		<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.purchItemsResult">
 			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle, 
 			SUM(CASE WHEN MONTH(so.soDate)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(so.soDate)=2 THEN siQtyItems ELSE 0 END) AS "feb",
@@ -103,6 +103,7 @@
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
 			WHERE YEAR(so.soDate) = #val(loc.rptYear)#
 			AND pgType != 'epos'
+			AND siStatus = 'closed'
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>

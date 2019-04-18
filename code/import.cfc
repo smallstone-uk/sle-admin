@@ -185,7 +185,7 @@
 			<cfelse>
 				<cfquery name="loc.QAddCategory" datasource="#application.site.datasource1#" result="loc.QAddCategoryResult">
 					INSERT INTO tblProductCats (pCatTitle) 
-					VALUES ('#loc.newCat#')
+					VALUES ('#Trim(loc.newCat)#')
 				</cfquery>
 				<cfset loc.categoryID=loc.QAddCategoryResult.generatedKey>
 				<cfset loc.result.action="#loc.result.action#cat added<br>">
@@ -316,14 +316,13 @@
 					AND siProduct=#loc.productID#
 					LIMIT 1;
 				</cfquery>
-				<cfset loc.qtyItems = args.packQty * loc.result.ordQty>
+				<!---<cfset loc.qtyItems = args.packQty * loc.result.ordQty> REMOVED - this is updated when stock is booked in 18/04/19 --->
 				<cfif loc.stockItemExists.recordcount eq 1>
 					<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
 						UPDATE tblStockItem
 						SET 
 							siPackQty=#args.packQty#,
 							siQtyPacks=#loc.result.ordQty#,
-							siQtyItems=#loc.qtyItems#,
 							siWSP=#loc.result.WSP#,
 							siUnitTrade=#loc.result.unitTrade#,
 							siRRP=#loc.result.RRP#,
@@ -337,9 +336,9 @@
 					<cfset loc.result.action="#loc.result.action#stock item updated<br>">
 				<cfelse>
 					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
-						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
+						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef) 
 						VALUES (#args.stockOrderID#,#loc.productID#,#loc.result.ordQty#,#loc.result.WSP#,#loc.result.unitTrade#,
-							#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#',#loc.qtyItems#)
+							#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#')
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>

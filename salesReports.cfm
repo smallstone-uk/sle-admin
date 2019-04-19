@@ -8,6 +8,9 @@
 	.sale {color:#FF00FF; line-height:16px;}
 	.purch {color:#0000FF; line-height:16px;}
 	.group {font-size:24px; font-weight:bold}
+@media print {
+    .no-print {display: none !important;}
+}
 </style>
 </head>
 
@@ -28,7 +31,7 @@
 <!---<cfdump var="#Purch#" label="Purch" expand="false">--->
 <body>
 <cfoutput>
-	<div>
+	<div class="no-print">
 		<form method="post" enctype="multipart/form-data">
 			Report Date:
 			<select name="group" id="group">

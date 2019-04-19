@@ -24,12 +24,26 @@
 <cfset QSales = sales.stockSalesByMonth(parms)>
 <!---<cfdump var="#QSales#" label="QSales" expand="false">--->
 <cfset Purch = sales.stockPurchByMonth(parms)>
+<cfset groups = sales.LoadGroups(parms)>
 <!---<cfdump var="#Purch#" label="Purch" expand="false">--->
 <body>
 <cfoutput>
+	<div>
+		<form method="post" enctype="multipart/form-data">
+			Report Date:
+			<select name="group" id="group">
+				<option value="">Select group...</option>
+				<cfloop query="groups.ProductGroups">
+				<option value="#pgID#" <cfif parms.grpID eq pgID> selected</cfif>>#pgTitle#</option>
+				</cfloop>
+			</select>
+			<input type="submit" name="btnGo" value="Go">
+		</form>
+	</div>
 	<table class="tableList" border="1">
 		<tr>
 			<th>Stock Report</th>
+			<th>Size</th>
 			<th width="30" align="right">Jan</th>
 			<th width="30" align="right">Feb</th>
 			<th width="30" align="right">Mar</th>
@@ -50,13 +64,13 @@
 	<cfloop query="QSales.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
-				<th colspan="15"><span class="group">#pgTitle#</span></th>
+				<th colspan="16"><span class="group">#pgTitle#</span></th>
 			</tr>
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
 			<tr>
-				<th colspan="15">#pcatTitle#</th>
+				<th colspan="16">#pcatTitle#</th>
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
@@ -66,7 +80,9 @@
 			<cfset purRec = StructFind(Purch.stock,prodID)>
 		</cfif>
 		<tr>
-			<td>#prodTitle#</td>
+			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a>
+			&pound;<cfif !StructIsEmpty(purRec)>#purRec.siOurPrice#<cfelse>&nbsp;</cfif></td>
+			<td><cfif !StructIsEmpty(purRec)>#purRec.siUnitSize#<cfelse>&nbsp;</cfif></td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>

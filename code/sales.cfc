@@ -82,7 +82,7 @@
 		</cfif>
 		
 		<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.purchItemsResult">
-			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle, 
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle, siUnitSize,siOurPrice,
 			SUM(CASE WHEN MONTH(so.soDate)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(so.soDate)=2 THEN siQtyItems ELSE 0 END) AS "feb",
 			SUM(CASE WHEN MONTH(so.soDate)=3 THEN siQtyItems ELSE 0 END) AS "mar",
@@ -115,6 +115,26 @@
 			<cfset StructInsert(loc.stock,prodID,QueryRowToStruct(loc.purchItems,currentrow))>
 		</cfloop>
 		<cfreturn loc>
+	</cffunction>
+	
+	<cffunction name="LoadGroups" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.result.ProductGroups" datasource="#args.datasource#" result="loc.QQueryResult">
+				SELECT *
+				FROM tblproductgroups
+				WHERE pgType='sale'
+				ORDER BY pgTitle
+			</cfquery>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
 	</cffunction>
 	
 </cfcomponent>

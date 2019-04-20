@@ -8,9 +8,9 @@
 	.sale {color:#FF00FF; line-height:16px;}
 	.purch {color:#0000FF; line-height:16px;}
 	.group {font-size:24px; font-weight:bold}
-@media print {
-    .no-print {display: none !important;}
-}
+	@media print {
+		.no-print {display: none !important;}
+	}
 </style>
 </head>
 
@@ -28,7 +28,7 @@
 <!---<cfdump var="#QSales#" label="QSales" expand="false">--->
 <cfset Purch = sales.stockPurchByMonth(parms)>
 <cfset groups = sales.LoadGroups(parms)>
-<cfdump var="#Purch#" label="Purch" expand="false">
+<!---<cfdump var="#Purch#" label="Purch" expand="false">--->
 <body>
 <cfoutput>
 	<div class="no-print">

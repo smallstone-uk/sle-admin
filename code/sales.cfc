@@ -104,7 +104,6 @@
 			WHERE YEAR(so.soDate) = #val(loc.rptYear)#
 			AND pgType != 'epos'
 			AND siStatus = 'closed'
-			AND prodID IN (64192,63242)
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>

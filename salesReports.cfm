@@ -87,7 +87,7 @@
 			<td>
 				<cfif !StructIsEmpty(purRec)>
 					#purRec.siUnitSize#<br />
-					&pound;#purRec.siOurPrice#
+					&pound;#purRec.siOurPrice# <span class="tiny">#GetToken(" |PM",val(purRec.prodPriceMarked)+1,"|")#</span>
 				<cfelse>&nbsp;<br />&nbsp;</cfif>
 			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">

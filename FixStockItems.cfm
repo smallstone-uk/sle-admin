@@ -12,8 +12,15 @@
 <h1>Stock Item Cleanup</h1>
 <p>Repairs zero pack quantities. Recalculates QtyItems</p>
 <cftry>
+	<cfquery name="QStockItems1" datasource="#application.site.datasource1#">
+		SELECT *
+		FROM tblStockItem
+		WHERE siPackQty = 0
+		AND siQtyItems > 0
+		AND siQtyPacks > 0
+	</cfquery>
 	<cfif doUpdate>
-		<!--- Fix packQty if zero only if items and qtypack gt zero --->
+		<!--- Fix packQty if zero, only if items and qtypack gt zero  --->
 		<cfquery name="QFixStockItems1" datasource="#application.site.datasource1#">
 			UPDATE tblStockItem
 			SET siPackQty = siQtyItems / siQtyPacks
@@ -21,6 +28,14 @@
 			AND siQtyItems > 0
 			AND siQtyPacks > 0
 		</cfquery>
+	</cfif>
+	<cfquery name="QStockItems2" datasource="#application.site.datasource1#">
+		SELECT *
+		FROM tblStockItem
+		WHERE siPackQty = 0
+		AND siStatus='closed'
+	</cfquery>
+	<cfif doUpdate>
 		<!--- copy missing data for remaining items where packqty still zero --->
 		<cfquery name="QFixStockItems2" datasource="#application.site.datasource1#">
 			UPDATE tblStockItem
@@ -32,17 +47,45 @@
 			WHERE siPackQty = 0
 			AND siStatus='closed'
 		</cfquery>
+	</cfif>
+	<cfquery name="QStockItems3" datasource="#application.site.datasource1#">
+		SELECT *
+		FROM tblStockItem
+		WHERE siQtyItems != siPackQty * siQtyPacks
+		AND siStatus='closed'		
+	</cfquery>
+	<cfif doUpdate>
+		<!--- Correct qtyItem calculation --->
 		<cfquery name="QFixStockItems3" datasource="#application.site.datasource1#">
 			UPDATE tblStockItem
 			SET siQtyItems = siPackQty * siQtyPacks
-			WHERE siStatus='closed'
+			WHERE siQtyItems != siPackQty * siQtyPacks
+			AND siStatus='closed'		
 		</cfquery>
 	</cfif>
-	<cfquery name="QStockItems" datasource="#application.site.datasource1#">
+	<cfquery name="QStockItems4" datasource="#application.site.datasource1#">
 		SELECT *
 		FROM tblStockItem
-		INNER JOIN tblproducts ON prodID=siProduct
-		WHERE siStatus='closed'
+		WHERE siStatus='outofstock'
+		AND siQtyItems != 0
+	</cfquery>
+	<cfif doUpdate>
+		<!--- Clear qtyItem if item out of stock --->
+		<cfquery name="QFixStockItems4" datasource="#application.site.datasource1#">
+			UPDATE tblStockItem
+			SET siQtyItems = 0
+			WHERE siStatus='outofstock'
+			AND siQtyItems != 0
+		</cfquery>
+	</cfif>
+	<cfquery name="QStockItems" dbtype="query">
+		SELECT * FROM QStockItems1
+		UNION
+		SELECT * FROM QStockItems2
+		UNION
+		SELECT * FROM QStockItems3
+		UNION
+		SELECT * FROM QStockItems4
 	</cfquery>
 	<cfoutput>
 		<table>

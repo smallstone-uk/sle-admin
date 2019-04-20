@@ -28,7 +28,7 @@
 <!---<cfdump var="#QSales#" label="QSales" expand="false">--->
 <cfset Purch = sales.stockPurchByMonth(parms)>
 <cfset groups = sales.LoadGroups(parms)>
-<!---<cfdump var="#Purch#" label="Purch" expand="false">--->
+<cfdump var="#Purch#" label="Purch" expand="false">
 <body>
 <cfoutput>
 	<div class="no-print">

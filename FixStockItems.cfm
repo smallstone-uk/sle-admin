@@ -13,8 +13,9 @@
 <p>Repairs zero pack quantities. Recalculates QtyItems</p>
 <cftry>
 	<cfquery name="QStockItems1" datasource="#application.site.datasource1#">
-		SELECT *
+		SELECT tblStockItem.*, prodTitle, 'siPackQty is zero 1st pass' AS err
 		FROM tblStockItem
+		INNER JOIN tblProducts ON prodID=siProduct
 		WHERE siPackQty = 0
 		AND siQtyItems > 0
 		AND siQtyPacks > 0
@@ -30,8 +31,9 @@
 		</cfquery>
 	</cfif>
 	<cfquery name="QStockItems2" datasource="#application.site.datasource1#">
-		SELECT *
+		SELECT tblStockItem.*, prodTitle, 'siPackQty is zero 2nd pass' AS err
 		FROM tblStockItem
+		INNER JOIN tblProducts ON prodID=siProduct
 		WHERE siPackQty = 0
 		AND siStatus='closed'
 	</cfquery>
@@ -49,8 +51,9 @@
 		</cfquery>
 	</cfif>
 	<cfquery name="QStockItems3" datasource="#application.site.datasource1#">
-		SELECT *
+		SELECT tblStockItem.*, prodTitle, 'siQtyItems is incorrect' AS err
 		FROM tblStockItem
+		INNER JOIN tblProducts ON prodID=siProduct
 		WHERE siQtyItems != siPackQty * siQtyPacks
 		AND siStatus='closed'		
 	</cfquery>
@@ -64,8 +67,9 @@
 		</cfquery>
 	</cfif>
 	<cfquery name="QStockItems4" datasource="#application.site.datasource1#">
-		SELECT *
+		SELECT tblStockItem.*, prodTitle, 'siQtyItems not zero if out of stock' AS err
 		FROM tblStockItem
+		INNER JOIN tblProducts ON prodID=siProduct
 		WHERE siStatus='outofstock'
 		AND siQtyItems != 0
 	</cfquery>
@@ -100,6 +104,8 @@
 				<td>siQtyItems</td>
 				<td>siUnitTrade</td>
 				<td>siOurPrice</td>
+				<td>siStatus</td>
+				<td>error</td>
 			</tr>
 			<cfloop query="QStockItems">
 				<tr>
@@ -113,6 +119,8 @@
 					<td align="center">#siQtyItems#</td>
 					<td align="right">#siUnitTrade#</td>
 					<td align="right">#siOurPrice#</td>
+					<td align="right">#siStatus#</td>
+					<td align="right">#err#</td>
 				</tr>
 			</cfloop>
 		</table>

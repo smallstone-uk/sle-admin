@@ -28,7 +28,7 @@
 <!---<cfdump var="#QSales#" label="QSales" expand="false">--->
 <cfset Purch = sales.stockPurchByMonth(parms)>
 <cfset groups = sales.LoadGroups(parms)>
-<!---<cfdump var="#Purch#" label="Purch" expand="false">--->
+<cfdump var="#Purch#" label="Purch" expand="false">
 <body>
 <cfoutput>
 	<div class="no-print">
@@ -83,9 +83,13 @@
 			<cfset purRec = StructFind(Purch.stock,prodID)>
 		</cfif>
 		<tr>
-			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a>
-			&pound;<cfif !StructIsEmpty(purRec)>#purRec.siOurPrice#<cfelse>&nbsp;</cfif></td>
-			<td><cfif !StructIsEmpty(purRec)>#purRec.siUnitSize#<cfelse>&nbsp;</cfif></td>
+			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
+			<td>
+				<cfif !StructIsEmpty(purRec)>
+					#purRec.siUnitSize#<br />
+					&pound;#purRec.siOurPrice#
+				<cfelse>&nbsp;<br />&nbsp;</cfif>
+			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>

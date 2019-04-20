@@ -58,7 +58,7 @@
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
-			GROUP BY pgTitle, pcatTitle, prodTitle
+			GROUP BY pgTitle, pcatTitle, prodID
 			ORDER BY pgTitle, pcatTitle, prodTitle
 		</cfquery>
 		<cfreturn loc>
@@ -82,7 +82,7 @@
 		</cfif>
 		
 		<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.purchItemsResult">
-			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle, siUnitSize,siOurPrice,
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodRef,prodTitle, siUnitSize,siOurPrice,
 			SUM(CASE WHEN MONTH(so.soDate)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(so.soDate)=2 THEN siQtyItems ELSE 0 END) AS "feb",
 			SUM(CASE WHEN MONTH(so.soDate)=3 THEN siQtyItems ELSE 0 END) AS "mar",
@@ -108,8 +108,7 @@
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
-			GROUP BY pgTitle, pcatTitle, prodTitle
-			ORDER BY pgTitle, pcatTitle, prodTitle
+			GROUP BY pgTitle, pcatTitle, prodID
 		</cfquery>
 		<cfset loc.stock = {}>
 		<cfloop query="loc.purchItems">

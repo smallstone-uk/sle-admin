@@ -47,7 +47,7 @@
 		<tr>
 			<th>Stock Report</th>
 			<th>Size</th>
-			<th>Open<br />Stock</th>
+			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
 			<th width="30" align="right">Feb</th>
 			<th width="30" align="right">Mar</th>
@@ -60,8 +60,8 @@
 			<th width="30" align="right">Oct</th>
 			<th width="30" align="right">Nov</th>
 			<th width="30" align="right">Dec</th>
-			<th width="50" align="right">Total</th>
-			<th width="50" align="right">Close<br />Stock</th>
+			<th width="30" align="right">Total</th>
+			<th width="30" align="right">Close<br />Stock</th>
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
@@ -80,12 +80,13 @@
 		</cfif>
 		<cfif StructKeyExists(Purch.stock,prodID)>
 			<cfset purRec = StructFind(Purch.stock,prodID)>
-			<cfset purRec.total += purRec.prodStockLevel>
+			<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear><cfset purRec.total += purRec.prodStockLevel></cfif>
 		<cfelse>
 			<cfset purRec = {}>
 			<cfset purRec.siUnitSize = "">
 			<cfset purRec.siOurPrice = "">
 			<cfset purRec.prodPriceMarked = 0>
+			<cfset purRec.prodCountDate = theYear>
 			<cfset purRec.prodStockLevel = 0>
 			<cfset purRec.siOurPrice = "">
 			<cfset purRec.total = 0>
@@ -99,7 +100,9 @@
 				#purRec.siUnitSize#<br />
 				&pound;#purRec.siOurPrice# <span class="tiny">#GetToken(" |PM",val(purRec.prodPriceMarked)+1,"|")#</span>
 			</td>
-			<td align="center">#purRec.prodStockLevel#</td>
+			<td align="center">
+				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>
+			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>

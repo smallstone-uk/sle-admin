@@ -47,6 +47,7 @@
 		<tr>
 			<th>Stock Report</th>
 			<th>Size</th>
+			<th>Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
 			<th width="30" align="right">Feb</th>
 			<th width="30" align="right">Mar</th>
@@ -60,40 +61,49 @@
 			<th width="30" align="right">Nov</th>
 			<th width="30" align="right">Dec</th>
 			<th width="50" align="right">Total</th>
-			<th width="50" align="right">Stock</th>
+			<th width="50" align="right">Close<br />Stock</th>
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
 	<cfloop query="QSales.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
-				<th colspan="16"><span class="group">#pgTitle#</span></th>
+				<th colspan="17"><span class="group">#pgTitle#</span></th>
 			</tr>
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
 			<tr>
-				<th colspan="16">#pcatTitle#</th>
+				<th colspan="17">#pcatTitle#</th>
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
-
-		<cfset purRec = {}>
 		<cfif StructKeyExists(Purch.stock,prodID)>
 			<cfset purRec = StructFind(Purch.stock,prodID)>
+			<cfset purRec.total += purRec.prodStockLevel>
+		<cfelse>
+			<cfset purRec = {}>
+			<cfset purRec.siUnitSize = "">
+			<cfset purRec.siOurPrice = "">
+			<cfset purRec.prodPriceMarked = 0>
+			<cfset purRec.prodStockLevel = 0>
+			<cfset purRec.siOurPrice = "">
+			<cfset purRec.total = 0>
+			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
+				<cfset StructInsert(purRec,mnth,0)>
+			</cfloop>
 		</cfif>
 		<tr>
 			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
-			<td>
-				<cfif !StructIsEmpty(purRec)>
-					#purRec.siUnitSize#<br />
-					&pound;#purRec.siOurPrice# <span class="tiny">#GetToken(" |PM",val(purRec.prodPriceMarked)+1,"|")#</span>
-				<cfelse>&nbsp;<br />&nbsp;</cfif>
+			<td align="center">
+				#purRec.siUnitSize#<br />
+				&pound;#purRec.siOurPrice# <span class="tiny">#GetToken(" |PM",val(purRec.prodPriceMarked)+1,"|")#</span>
 			</td>
+			<td align="center">#purRec.prodStockLevel#</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>
-				<cfif !StructIsEmpty(purRec)><cfset mnthPurch = StructFind(purRec,mnth)></cfif>
+				<cfset mnthPurch = StructFind(purRec,mnth)>
 				<td width="30" align="right">
 					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
 					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
@@ -101,11 +111,9 @@
 			</cfloop>
 			<td width="50" align="right">
 				<span class="sale">#total#<br /></span>
-				<span class="purch"><cfif !StructIsEmpty(purRec)>#purRec.total#<cfelse>&nbsp;</cfif></span>
+				<span class="purch">#purRec.total#</span>
 			</td>
-			<td width="50" align="right">
-				<cfif !StructIsEmpty(purRec)>#purRec.total - total#</cfif>
-			</td>
+			<td width="50" align="right">#purRec.total - total#</td>
 		</tr>
 	</cfloop>
 	</table>

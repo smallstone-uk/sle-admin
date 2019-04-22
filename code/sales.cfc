@@ -82,7 +82,7 @@
 		</cfif>
 		
 		<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.purchItemsResult">
-			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodRef,prodTitle,prodPriceMarked, siUnitSize,siOurPrice,
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodRef,prodTitle,prodPriceMarked,prodCountDate,prodStockLevel, siUnitSize,siOurPrice,
 			SUM(CASE WHEN MONTH(so.soDate)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(so.soDate)=2 THEN siQtyItems ELSE 0 END) AS "feb",
 			SUM(CASE WHEN MONTH(so.soDate)=3 THEN siQtyItems ELSE 0 END) AS "mar",

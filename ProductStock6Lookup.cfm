@@ -14,6 +14,7 @@
 				$('##bcode').html("#lookup.barcode#");
 				$('##productID').html("#lookup.productID#");
 			</cfoutput>
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, maxDate: new Date, minDate: new Date(2012, 1 - 1, 1)});
 			
 			checkProduct = function() {
 				$('span.err').remove();
@@ -148,11 +149,13 @@
 					<tr><td>Display As</td><td>#lookup.product.prodTitle#</td></tr>
 					<tr><td>Group</td><td>#lookup.groupTitle#</td></tr>
 					<tr><td>Category</td><td>#lookup.catTitle#</td></tr>
-					<tr><td>Minimum Price</td><td>#lookup.product.prodMinPrice#</td></tr>
+					<tr><td>Minimum Price</td><td>&pound;#lookup.product.prodMinPrice#</td></tr>
 					<tr><td>Our Price</td><td>#lookup.product.prodOurPrice#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
+					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
+					<tr><td>Stock Level</td><td>#lookup.product.prodStockLevel#</td></tr>
 				</table>
 				<table class="showTable" border="1">
 					<tr>
@@ -211,12 +214,14 @@
 							</select>
 						</td></tr>
 						<tr><td>Category</td><td><div id="category"></div></td></tr>
-						<tr><td>Price Marked</td><td>
-							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> /></td></tr>
 						<tr><td>Minimum Price</td><td>
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
 						<tr><td>Our Price</td><td>
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
+						<tr><td>Discountable</td><td>
+							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> /></td></tr>
+						<tr><td>Price Marked</td><td>
+							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> /></td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -228,6 +233,12 @@
 								</select>
 							</td>
 						</tr>
+						<tr>
+							<td>Stock Check Date</td>
+							<td><input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" /></td>
+						</tr>
+						<tr><td>Stock Level</td><td>
+							<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" /></td></tr>
 						<tr>
 							<td>EPOS Category</td>
 							<td>

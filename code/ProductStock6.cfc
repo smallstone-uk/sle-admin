@@ -9,10 +9,8 @@
 		<cfset loc.result.barcode = "">
 		<cfset loc.result.msg = "">
 		<cfset loc.result.msgs = []>
+		
 		<cftry>
-		<cfdump var="#args#" label="args" expand="yes" format="html" 
-	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
 			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
 				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>
 				<cfquery name="loc.QBarcode" datasource="#args.datasource#">
@@ -87,7 +85,7 @@
 						<cfset loc.rec.prodRecordTitle = prodRecordTitle>
 						<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
 						<cfset loc.rec.prodTitle = prodTitle>
-						<cfset loc.rec.prodCountDate = prodCountDate>
+						<cfset loc.rec.prodCountDate = LSDateFormat(prodCountDate,"dd-mmm-yyyy")>
 						<cfset loc.rec.prodStockLevel = prodStockLevel + int(prodStockLevel eq 0)>	<!--- add 1 if zero --->
 						<cfset loc.rec.prodCatID = prodCatID>
 						<cfset loc.rec.prodEposCatID = prodEposCatID>
@@ -364,6 +362,8 @@
 					prodPriceMarked = #int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					prodMinPrice = #val(args.form.prodMinPrice)#,
 					prodOurPrice = #val(args.form.prodOurPrice)#,
+					prodCountDate = '#args.form.prodCountDate#',
+					prodStockLevel = #val(args.form.prodStockLevel)#,
 					prodVATRate = #args.form.prodVATRate#,
 					prodEposCatID = #val(args.form.prodEposCatID)#
 				WHERE prodID = #val(args.form.prodID)#
@@ -662,7 +662,7 @@
 --->
 		<cftry>
 			<cfquery name="loc.QProduct" datasource="#args.datasource#">
-				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodMinPrice, pcatID,pgID,pcatTitle,pgTitle,pgTarget
+				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodMinPrice,prodCountDate,prodStockLevel, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 				FROM tblProducts
 				INNER JOIN tblStockItem ON siProduct = prodID
 				INNER JOIN tblProductCats ON prodCatID = pcatID
@@ -678,7 +678,8 @@
 					<cfset loc.rec.prodVATRate=prodVATRate>
 					<cfset loc.rec.PriceMarked=GetToken(" |PM",val(prodPriceMarked)+1,"|")>
 					<cfset loc.rec.prodMinPrice=prodMinPrice>
-
+					<cfset loc.rec.prodCountDate=prodCountDate>
+					<cfset loc.rec.prodStockLevel=prodStockLevel>
 					<cfset loc.rec.catID=pcatID>
 					<cfset loc.rec.catTitle=pcatTitle>
 					<cfset loc.rec.groupID=pgID>

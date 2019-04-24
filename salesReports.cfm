@@ -83,13 +83,10 @@
 			<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear><cfset purRec.total += purRec.prodStockLevel></cfif>
 		<cfelse>
 			<cfset purRec = {}>
-			<cfset purRec.siUnitSize = "">
-			<cfset purRec.siOurPrice = "">
 			<cfset purRec.prodPriceMarked = 0>
-			<cfset purRec.prodCountDate = theYear>
-			<cfset purRec.prodStockLevel = 0>
-			<cfset purRec.siOurPrice = "">
-			<cfset purRec.total = 0>
+			<cfset purRec.prodCountDate = CreateDate(theYear,1,1)>
+			<cfset purRec.prodStockLevel = prodStockLevel>
+			<cfset purRec.total = prodStockLevel>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset StructInsert(purRec,mnth,0)>
 			</cfloop>
@@ -97,8 +94,8 @@
 		<tr>
 			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
 			<td align="center">
-				#purRec.siUnitSize#<br />
-				&pound;#purRec.siOurPrice# <span class="tiny">#GetToken(" |PM",val(purRec.prodPriceMarked)+1,"|")#</span>
+				#siUnitSize#<br />
+				&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
 			</td>
 			<td align="center">
 				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>

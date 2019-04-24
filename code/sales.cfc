@@ -35,7 +35,7 @@
 		</cfif>
 		
 		<cfquery name="loc.salesItems" datasource="#args.datasource#">
-			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle,
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle,prodCountDate,prodStockLevel,prodPriceMarked,
 			SUM(CASE WHEN MONTH(st.eiTimestamp)=1 THEN eiQty ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(st.eiTimestamp)=2 THEN eiQty ELSE 0 END) AS "feb",
 			SUM(CASE WHEN MONTH(st.eiTimestamp)=3 THEN eiQty ELSE 0 END) AS "mar",
@@ -61,6 +61,24 @@
 			GROUP BY pgTitle, pcatTitle, prodID
 			ORDER BY pgTitle, pcatTitle, prodTitle
 		</cfquery>
+		<cfset QueryAddColumn(loc.salesItems,"siUnitSize",[])>
+		<cfset QueryAddColumn(loc.salesItems,"siOurPrice",[])>
+		<cfloop query="loc.salesItems">
+			<cfset loc.prodID = prodID>
+			<cfquery name="loc.stockItem" datasource="#args.datasource#">
+				SELECT siID,siUnitSize,siOurPrice
+				FROM tblProducts
+				LEFT JOIN tblStockItem ON prodID = siProduct
+				AND tblStockItem.siID = (
+					SELECT MAX( siID )
+					FROM tblStockItem
+					WHERE prodID = siProduct
+					AND siStatus IN ("closed","promo") )
+				WHERE prodID=#val(loc.prodID)#
+			</cfquery>
+			<cfset QuerySetCell(loc.salesItems,"siUnitSize",loc.stockItem.siUnitSize,currentrow)>
+			<cfset QuerySetCell(loc.salesItems,"siOurPrice",loc.stockItem.siOurPrice,currentrow)>
+		</cfloop>
 		<cfreturn loc>
 	</cffunction>
 
@@ -82,7 +100,7 @@
 		</cfif>
 		
 		<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.purchItemsResult">
-			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodRef,prodTitle,prodPriceMarked,prodCountDate,prodStockLevel, siUnitSize,siOurPrice,
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodRef,prodTitle,prodPriceMarked,prodCountDate,prodStockLevel,
 			SUM(CASE WHEN MONTH(so.soDate)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 			SUM(CASE WHEN MONTH(so.soDate)=2 THEN siQtyItems ELSE 0 END) AS "feb",
 			SUM(CASE WHEN MONTH(so.soDate)=3 THEN siQtyItems ELSE 0 END) AS "mar",

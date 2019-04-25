@@ -73,10 +73,12 @@
 				<span class="FCPDIContent">
 					<form name="StockForm" id="StockForm" class="field" method="post" enctype="multipart/form-data">
 						<input type="hidden" name="siID" value="#siID#" />
+						<input type="hidden" name="siReceived" value="#siReceived#" />
+						<input type="hidden" name="siBookedIn" value="#siBookedIn#" />
 						<input type="hidden" name="prodID" id="prodID" value="#form.id#" />
 						<input type="hidden" name="barcode" id="barcode" value="#parm.barcode#" />
 						<input type="hidden" name="vatRate" value="#record.product.prodVATRate#" />
-						<input type="text" size="5" name="prodMinPrice" id="prodMinPrice" value="#record.product.prodMinPrice#" />
+						<input type="hidden" size="5" name="prodMinPrice" id="prodMinPrice" value="#record.product.prodMinPrice#" />
 						<table border="1" class="tableList3">
 							<tr>
 								<td>Supplier</td>
@@ -140,7 +142,7 @@
 								<td>POR</td><td><input type="text" name="POR" id="POR" disabled="disabled" size="10" value="" /></td>
 							</tr>
 						</table>
-						<span class="FCPDIControls">
+						<span class="FCPDIControls">#siID#
 							<input type="submit" name="btnSubmit" id="btnSubmit" value="Save Changes" class="NAFSubmit" style="float:right;margin-right:10px;" />
 							<input type="button" name="cancel" value="Cancel" class="button_white" style="float:right;" onclick="javascript:$.closeDialog();" />
 						</span>

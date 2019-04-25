@@ -474,7 +474,15 @@
 		<cftry>
 			<cfset loc.result = {}>
 			<cfset loc.args = args>
-			<cfset loc.qtyItems = args.form.siPackQty * args.form.siQtyPacks>
+			<cfif args.form.siStatus eq 'closed'>
+				<cfset loc.qtyItems = args.form.siPackQty * args.form.siQtyPacks>
+				<cfset loc.received = args.form.siReceived>
+				<cfset loc.bookedIn = args.form.siBookedIn>
+			<cfelse>
+				<cfset loc.qtyItems = 0>
+				<cfset loc.received = 0>
+				<cfset loc.bookedIn = "">
+			</cfif>
 			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
 			<cfset loc.tradeGross = loc.tradeNet * (1 + (args.form.vatRate / 100))>
 			<cfif StructKeyExists(args.form,"siOurPrice")>
@@ -498,6 +506,8 @@
 					siUnitTrade = #args.form.siWSP / args.form.siPackQty#,
 					siExpires = <cfif len(args.form.siExpires)>'#LSDateFormat(args.form.siExpires,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					siStatus = '#args.form.siStatus#',
+					siReceived = #loc.received#,
+					siBookedIn = <cfif len(loc.bookedIn)>'#LSDateFormat(loc.bookedIn,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					siPOR = #loc.POR#,
 					soDate = '#LSDateFormat(args.form.soDate,"yyyy-mm-dd")#',
 					soAccountID = #args.form.accID#

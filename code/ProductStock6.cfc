@@ -66,7 +66,7 @@
 						SELECT MAX( siID )
 						FROM tblStockItem
 						WHERE prodID = siProduct
-						AND siStatus NOT IN ("returned,inactive") )
+						AND siStatus NOT IN ("returned","inactive") )
 					WHERE prodID=#val(loc.result.productID)#
 					LIMIT 1;
 				</cfquery>
@@ -86,7 +86,7 @@
 						<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
 						<cfset loc.rec.prodTitle = prodTitle>
 						<cfset loc.rec.prodCountDate = LSDateFormat(prodCountDate,"dd-mmm-yyyy")>
-						<cfset loc.rec.prodStockLevel = prodStockLevel + int(prodStockLevel eq 0)>	<!--- add 1 if zero --->
+						<cfset loc.rec.prodStockLevel = prodStockLevel> <!--- + int(prodStockLevel eq 0)	add 1 if zero --->
 						<cfset loc.rec.prodCatID = prodCatID>
 						<cfset loc.rec.prodEposCatID = prodEposCatID>
 						<cfset loc.rec.prodPriceMarked = prodPriceMarked>
@@ -232,7 +232,7 @@
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
-				AND siStatus NOT IN ("returned,inactive")  )
+				AND siStatus NOT IN ("returned","inactive")  )
 			LEFT JOIN tblBarcodes ON prodID = barProdID
 			AND tblBarcodes.barID = (
 				SELECT MAX(barID)
@@ -353,6 +353,7 @@
 	<cffunction name="AmendProduct" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
+		<cfset loc.resultStr = "An error occurred updating the record.">
 		<cftry>
 			<cfquery name="loc.QUpdate" datasource="#args.datasource#">
 				UPDATE tblProducts
@@ -362,7 +363,7 @@
 					prodPriceMarked = #int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					prodMinPrice = #val(args.form.prodMinPrice)#,
 					prodOurPrice = #val(args.form.prodOurPrice)#,
-					prodCountDate = '#args.form.prodCountDate#',
+					prodCountDate = <cfif len(args.form.prodCountDate)>'#LSDateFormat(args.form.prodCountDate,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					prodStockLevel = #val(args.form.prodStockLevel)#,
 					prodVATRate = #args.form.prodVATRate#,
 					prodEposCatID = #val(args.form.prodEposCatID)#
@@ -1002,7 +1003,7 @@
 					SELECT MAX( siID )
 						FROM tblStockItem
 						WHERE prodID = siProduct
-						AND siStatus NOT IN ("returned,inactive") )
+						AND siStatus NOT IN ("returned","inactive") )
 					WHERE prodID IN (#loc.result.stocklist#)
 				</cfquery>
 				<cfset loc.result.stockItems = loc.QProductList>

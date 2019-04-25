@@ -227,7 +227,7 @@
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
-				AND siStatus NOT IN ("returned,inactive") 
+				AND siStatus NOT IN ("returned","inactive") 
 				AND siStatus = 'open'
 				AND soStatus = 'open')
 			WHERE siProduct=#val(args.form.id)#
@@ -303,7 +303,7 @@
 						SELECT MAX( siID )
 						FROM tblStockItem
 						WHERE prodID = siProduct
-						AND siStatus NOT IN ("returned,inactive") 
+						AND siStatus NOT IN ("returned","inactive") 
 						AND soStatus='open')
 					WHERE siProduct=#val(args.form.id)#
 					LIMIT 1;

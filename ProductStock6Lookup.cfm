@@ -155,7 +155,7 @@
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
 					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
-					<tr><td>Stock Level</td><td>#lookup.product.prodStockLevel#</td></tr>
+					<tr><td>Stock Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
 				</table>
 				<table class="showTable" border="1">
 					<tr>
@@ -237,7 +237,7 @@
 							<td>Stock Check Date</td>
 							<td><input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" /></td>
 						</tr>
-						<tr><td>Stock Level</td><td>
+						<tr><td>Stock Check Level</td><td>
 							<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" /></td></tr>
 						<tr>
 							<td>EPOS Category</td>

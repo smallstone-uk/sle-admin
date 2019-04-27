@@ -18,6 +18,7 @@
 	ORDER BY mmdd ASC
 </cfquery>
 
+<cfoutput>
 <table class="tableList" width="500" border="1">
 	<tr>
 		<th>Name</th>
@@ -25,14 +26,18 @@
 		<th>Age</th>
 		<th>Start Date</th>
 	</tr>
-	<cfoutput query="QBirthdays">
+	<cfloop query="QBirthdays">
 	<tr>
 		<td>#empFirstName# #empLastName#</td>
 		<td>#Birthday#</td>
 		<td align="center">#Age#</td>
 		<td>#DateFormat(empStart,'dd-mmm-yyyy')#</td>
 	</tr>
-	</cfoutput>
+	</cfloop>
+	<tr>
+		<th colspan="4">#QBirthdays.recordCount# current employees as at: #DateFormat(Now(),'dd-mmm-yyyy')#</th>
+	</tr>
 </table>
+</cfoutput>
 </body>
 </html>

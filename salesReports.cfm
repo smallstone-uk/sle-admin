@@ -56,10 +56,14 @@
 <cfset parms.catID=category>
 <cfset parms.rptYear=theYear>
 <cfset QSales = sales.stockSalesByMonth(parms)>
-<!---<cfdump var="#QSales#" label="QSales" expand="false">--->
 <cfset Purch = sales.stockPurchByMonth(parms)>
 <cfset groups = sales.LoadGroups(parms)>
-<!---<cfdump var="#Purch#" label="Purch" expand="false">--->
+<cfset nonMovers = sales.stockNonMovers(parms)>
+<!---
+<cfdump var="#QSales#" label="QSales" expand="false">
+<cfdump var="#Purch#" label="Purch" expand="false">
+<cfdump var="#nonMovers#" label="nonMovers" expand="false">
+--->
 <body>
 <cfoutput>
 	<div class="no-print">
@@ -76,7 +80,7 @@
 	</div>
 	<table class="tableList" border="1">
 		<tr>
-			<th>Stock Report</th>
+			<th>Stock Movement Report</th>
 			<th>Size</th>
 			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
@@ -147,6 +151,33 @@
 			<td width="50" align="right" class="stkTotal">#purRec.total - total#</td>
 		</tr>
 	</cfloop>
+	</table>
+	
+	<table class="tableList" border="1">
+		<tr>
+			<th colspan="6"><span class="group">Non-Movers</span></th>
+		</tr>
+		<tr>
+			<th>Category</th>
+			<th>Product</th>
+			<th>Size</th>
+			<th>Purchased</th>
+			<th>Stock Level</th>
+			<th>Date Counted</th>
+		</tr>
+		<cfloop query="nonMovers.productList">
+			<tr>
+				<td>#pcatTitle#</td>
+				<td>#prodTitle#</td>
+				<td align="center">
+					#siUnitSize#<br />
+					&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
+				</td>
+				<td align="right">#LSDateFormat(soDate,'dd-mmm-yyyy')#</td>
+				<td align="center" class="openstock disable-select" data-id="#prodID#">#prodStockLevel#</td>
+				<td align="right">#LSDateFormat(prodCountDate,'dd-mmm-yyyy')#</td>
+			</tr>
+		</cfloop>
 	</table>
 </cfoutput>
 </body>

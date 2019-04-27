@@ -17,6 +17,34 @@
 		<cfreturn StructCopy(qStruct)>
 	</cffunction>
 
+	<cffunction name="stockNonMovers" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.args = args>
+		<cfif NOT StructKeyExists(args,"rptYear")><cfset loc.rptYear = Year(Now())>
+			<cfelse><cfset loc.rptYear = args.rptYear></cfif>
+		<cfquery name="loc.productList" datasource="#args.datasource#">
+			SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle,prodCountDate,prodStockLevel,prodPriceMarked, soDate, SUM(siQtyItems) AS Items, siUnitSize,siOurPrice
+			FROM tblProducts
+			INNER JOIN tblStockItem ON siProduct=prodID
+			INNER JOIN tblStockOrder ON siOrder=soID
+			INNER JOIN tblProductCats ON pcatID=prodCatID
+			INNER JOIN tblProductGroups ON pcatGroup=pgID
+			LEFT JOIN tblepos_items ON eiProdID=prodID
+			WHERE eiID IS NULL
+			AND YEAR(soDate) = #val(loc.rptYear)#
+			AND siStatus='closed'
+			AND pgType != 'epos'
+			AND siStatus = 'closed'
+			AND prodStatus = 'active'
+			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
+			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
+			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
+			GROUP BY pgTitle, pcatTitle, prodID
+		</cfquery>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="stockSalesByMonth" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -50,9 +78,9 @@
 			SUM(CASE WHEN MONTH(st.eiTimestamp)=12 THEN eiQty ELSE 0 END) AS "dec",
 			SUM(eiQty) AS "total"
 			FROM tblproducts
-			INNER JOIN tblepos_items AS st ON eiProdID=prodID
 			INNER JOIN tblProductCats ON pcatID=prodCatID
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
+			LEFT JOIN tblepos_items AS st ON eiProdID=prodID
 			WHERE YEAR(st.eiTimestamp) = #val(loc.rptYear)#
 			AND pgType != 'epos'
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>

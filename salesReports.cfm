@@ -168,7 +168,7 @@
 		<cfloop query="nonMovers.productList">
 			<tr>
 				<td>#pcatTitle#</td>
-				<td>#prodTitle#</td>
+				<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
 				<td align="center">
 					#siUnitSize#<br />
 					&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>

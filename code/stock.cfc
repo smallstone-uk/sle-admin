@@ -8,6 +8,16 @@
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>
+	<cffunction name="SaveProductStock" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+				UPDATE tblProducts
+				SET prodStockLevel = #val(args.stockLevel)#,
+					prodCountDate = #Now()#
+				WHERE prodID=#val(args.product)#
+		</cfquery>
+	</cffunction>
 	<cffunction name="LoadStockListFromArray" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

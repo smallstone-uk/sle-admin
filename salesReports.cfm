@@ -1,17 +1,48 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Stock Sales &amp; Purchase</title>
-<link rel="stylesheet" type="text/css" href="css/main3.css"/>
-<style>
-	.sale {color:#FF00FF; line-height:16px;}
-	.purch {color:#0000FF; line-height:16px;}
-	.group {font-size:24px; font-weight:bold}
-	@media print {
-		.no-print {display: none !important;}
-	}
-</style>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Stock Sales &amp; Purchase</title>
+	<link rel="stylesheet" type="text/css" href="css/main3.css"/>
+	<style>
+		.sale {color:#FF00FF; line-height:16px;}
+		.purch {color:#0000FF; line-height:16px;}
+		.group {font-size:24px; font-weight:bold}
+		@media print {
+			.no-print {display: none !important;}
+		}
+	</style>
+	<script src="scripts/jquery-1.11.1.min.js"></script>
+	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var isEditingOpenStock = false;
+			$('.openstock').click(function(event) {
+				if (!isEditingOpenStock) {
+					var value = $(this).html().trim();
+					var prodID = $(this).attr("data-id");
+					var htmlStr = "<input type='text' size='3' value='" + value + "' class='openstock_input' data-id='" + prodID + "'>";
+					$(this).html(htmlStr);
+					$(this).find('.openstock_input').focus();
+				}
+				isEditingOpenStock = true;
+			});
+			$(document).on("blur", ".openstock_input", function(event) {
+				var value = $(this).val();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this).parent('.openstock');
+				$.ajax({
+					type: "POST",
+					url: "saveProductStockLevel.cfm",
+					data: {"stockLevel": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						isEditingOpenStock = false;
+					}
+				});
+			});
+		});
+	</script>
 </head>
 
 <cfsetting requesttimeout="900">
@@ -97,14 +128,14 @@
 				#siUnitSize#<br />
 				&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
 			</td>
-			<td align="center">
+			<td align="center" class="openstock disable-select" data-id="#prodID#">
 				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>
 			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>
 				<cfset mnthPurch = StructFind(purRec,mnth)>
-				<td width="30" align="right">
+				<td width="30" align="right" class="mnthStk">
 					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
 					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
 				</td>
@@ -113,7 +144,7 @@
 				<span class="sale">#total#<br /></span>
 				<span class="purch">#purRec.total#</span>
 			</td>
-			<td width="50" align="right">#purRec.total - total#</td>
+			<td width="50" align="right" class="stkTotal">#purRec.total - total#</td>
 		</tr>
 	</cfloop>
 	</table>

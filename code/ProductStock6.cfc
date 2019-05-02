@@ -59,7 +59,7 @@
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
 							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
-							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
+							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
 					AND tblStockItem.siID = (
@@ -109,7 +109,7 @@
 						<cfset loc.stockItem.siOurPrice = siOurPrice>
 						<cfset loc.stockItem.siPOR = siPOR>
 						<cfset loc.stockItem.siReceived = siReceived>
-						<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn)>
+						<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn,"yyyy-mm-dd")>
 						<cfset loc.stockItem.siExpires = siExpires>
 						<cfset loc.stockItem.siStatus = siStatus>						 	 	 	 	 	 	 	 	 	 	 	 	 
 					</cfloop>
@@ -223,7 +223,7 @@
 		<cfquery name="loc.stockItems" datasource="#args.datasource#" result="loc.stockResult">
 			SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
 					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,
-					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
 					barcode,soDate
 			FROM tblProducts
 			LEFT JOIN tblStockItem ON prodID = siProduct
@@ -268,7 +268,7 @@
 				WHERE barProdID = #val(args.prodID)#
 			</cfquery>
 			<cfquery name="loc.result.QOrders" datasource="#args.datasource#">
-				SELECT siID,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+				SELECT siID,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
 					soID,soRef,soDate,soStatus
 				FROM tblStockItem
 				INNER JOIN tblStockOrder ON siOrder = soID
@@ -418,7 +418,7 @@
 			<cfif loc.result.items neq 0>
 				<cfquery name="loc.QAddStockItem" datasource="#args.datasource#">
 					INSERT INTO tblStockItem (
-						siOrder,siProduct,siRef,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siUnitSize,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
+						siOrder,siProduct,siRef,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siUnitSize,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus
 					) VALUES (
 						#loc.orderID#,
 						#args.form.productID#,
@@ -486,10 +486,10 @@
 			<cfdump var="#loc#" label="" expand="yes" format="html" 
 	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
-			<cfif IsDate(loc.bookedIn)>
+<!---			<cfif IsDate(loc.bookedIn)>
 				<cfset loc.bookedIn = LSDateFormat(loc.bookedIn,"yyyy-mm-dd")>
 			</cfif>
-			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
+--->			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
 			<cfset loc.tradeGross = loc.tradeNet * (1 + (args.form.vatRate / 100))>
 			<cfif StructKeyExists(args.form,"siOurPrice")>
 				<cfset loc.sellprice = args.form.siOurPrice>
@@ -1008,7 +1008,7 @@
 				<cfquery name="loc.QProductList" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodPOR,prodCountDate,prodStockLevel,prodLastBought,
 							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,
-							siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+							siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
 							accID,accName,
 							soDate
 					FROM tblProducts

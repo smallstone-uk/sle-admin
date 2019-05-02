@@ -483,6 +483,9 @@
 				<cfset loc.received = 0>
 				<cfset loc.bookedIn = "">
 			</cfif>
+			<cfdump var="#loc#" label="" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
 			<cfif IsDate(loc.bookedIn)>
 				<cfset loc.bookedIn = LSDateFormat(loc.bookedIn,"yyyy-mm-dd")>
 			</cfif>

@@ -59,7 +59,7 @@
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
 							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
-							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus
+							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn) AS siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
 					AND tblStockItem.siID = (
@@ -223,7 +223,7 @@
 		<cfquery name="loc.stockItems" datasource="#args.datasource#" result="loc.stockResult">
 			SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
 					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,
-					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
+					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn) AS siBookedIn,siExpires,siStatus,
 					barcode,soDate
 			FROM tblProducts
 			LEFT JOIN tblStockItem ON prodID = siProduct
@@ -268,7 +268,7 @@
 				WHERE barProdID = #val(args.prodID)#
 			</cfquery>
 			<cfquery name="loc.result.QOrders" datasource="#args.datasource#">
-				SELECT siID,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
+				SELECT siID,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn) AS siBookedIn,siExpires,siStatus,
 					soID,soRef,soDate,soStatus
 				FROM tblStockItem
 				INNER JOIN tblStockOrder ON siOrder = soID
@@ -418,7 +418,7 @@
 			<cfif loc.result.items neq 0>
 				<cfquery name="loc.QAddStockItem" datasource="#args.datasource#">
 					INSERT INTO tblStockItem (
-						siOrder,siProduct,siRef,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siUnitSize,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus
+						siOrder,siProduct,siRef,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siUnitSize,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn) AS siBookedIn,siExpires,siStatus
 					) VALUES (
 						#loc.orderID#,
 						#args.form.productID#,
@@ -1008,7 +1008,7 @@
 				<cfquery name="loc.QProductList" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodPOR,prodCountDate,prodStockLevel,prodLastBought,
 							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,
-							siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn),siExpires,siStatus,
+							siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,DATE(siBookedIn) AS siBookedIn,siExpires,siStatus,
 							accID,accName,
 							soDate
 					FROM tblProducts

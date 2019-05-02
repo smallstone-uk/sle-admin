@@ -483,6 +483,9 @@
 				<cfset loc.received = 0>
 				<cfset loc.bookedIn = "">
 			</cfif>
+			<cfif IsDate(loc.bookedIn)>
+				<cfset loc.bookedIn = LSDateFormat(loc.bookedIn,"yyyy-mm-dd")>
+			</cfif>
 			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
 			<cfset loc.tradeGross = loc.tradeNet * (1 + (args.form.vatRate / 100))>
 			<cfif StructKeyExists(args.form,"siOurPrice")>
@@ -507,7 +510,7 @@
 					siExpires = <cfif len(args.form.siExpires)>'#LSDateFormat(args.form.siExpires,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					siStatus = '#args.form.siStatus#',
 					siReceived = #loc.received#,
-					siBookedIn = <cfif len(loc.bookedIn)>'#LSDateFormat(loc.bookedIn,"yyyy-mm-dd")#',<cfelse>null,</cfif>
+					siBookedIn = <cfif len(loc.bookedIn)>'#loc.bookedIn#',<cfelse>null,</cfif>
 					siPOR = #loc.POR#,
 					soDate = '#LSDateFormat(args.form.soDate,"yyyy-mm-dd")#',
 					soAccountID = #args.form.accID#

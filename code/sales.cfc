@@ -101,7 +101,7 @@
 					SELECT MAX( siID )
 					FROM tblStockItem
 					WHERE prodID = siProduct
-					AND siStatus IN ("closed","promo") )
+					AND siStatus = "closed" )
 				WHERE prodID=#val(loc.prodID)#
 			</cfquery>
 			<cfset QuerySetCell(loc.salesItems,"siUnitSize",loc.stockItem.siUnitSize,currentrow)>

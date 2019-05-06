@@ -141,8 +141,8 @@
 				<cfset mnthPurch = 0>
 				<cfset mnthPurch = StructFind(purRec,mnth)>
 				<td width="30" align="right" class="mnthStk">
-					<span><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
-					<span><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
+					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
+					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
 				</td>
 			</cfloop>
 			<td width="50" align="right">
@@ -153,33 +153,34 @@
 		</tr>
 	</cfloop>
 	</table>
-	
-	<table class="tableList" border="1">
-		<tr>
-			<th colspan="6"><span class="group">Non-Movers</span></th>
-		</tr>
-		<tr>
-			<th>Category</th>
-			<th>Product</th>
-			<th>Size</th>
-			<th>Purchased</th>
-			<th>Stock Level</th>
-			<th>Date Counted</th>
-		</tr>
-		<cfloop query="nonMovers.productList">
+	<cfif nonMovers.productList.recordcount gt 0>
+		<table class="tableList" border="1">
 			<tr>
-				<td>#pcatTitle#</td>
-				<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
-				<td align="center">
-					#siUnitSize#<br />
-					&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
-				</td>
-				<td align="right">#LSDateFormat(soDate,'dd-mmm-yyyy')#</td>
-				<td align="center" class="openstock disable-select" data-id="#prodID#">#prodStockLevel#</td>
-				<td align="right">#LSDateFormat(prodCountDate,'dd-mmm-yyyy')#</td>
+				<th colspan="6"><span class="group">Non-Movers</span></th>
 			</tr>
-		</cfloop>
-	</table>
+			<tr>
+				<th>Category</th>
+				<th>Product</th>
+				<th>Size</th>
+				<th>Purchased</th>
+				<th>Stock Level</th>
+				<th>Date Counted</th>
+			</tr>
+			<cfloop query="nonMovers.productList">
+				<tr>
+					<td>#pcatTitle#</td>
+					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
+					<td align="center">
+						#siUnitSize#<br />
+						&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
+					</td>
+					<td align="right">#LSDateFormat(soDate,'dd-mmm-yyyy')#</td>
+					<td align="center" class="openstock disable-select" data-id="#prodID#">#prodStockLevel#</td>
+					<td align="right">#LSDateFormat(prodCountDate,'dd-mmm-yyyy')#</td>
+				</tr>
+			</cfloop>
+		</table>
+	</cfif>
 </cfoutput>
 </body>
 </html>

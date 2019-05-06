@@ -68,7 +68,7 @@
 <cfoutput>
 	<div class="no-print">
 		<form method="post" enctype="multipart/form-data">
-			Report Date:
+			Product Group:
 			<select name="group" id="group">
 				<option value="">Select group...</option>
 				<cfloop query="groups.ProductGroups">
@@ -80,7 +80,7 @@
 	</div>
 	<table class="tableList" border="1">
 		<tr>
-			<th>Stock Movement Report</th>
+			<th>Stock Movement Report #LSDateFormat(now(),"dd-mmm-yyyy")#</th>
 			<th>Size</th>
 			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>

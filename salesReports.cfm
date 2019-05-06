@@ -11,6 +11,7 @@
 		@media print {
 			.no-print {display: none !important;}
 		}
+		.product-line {page-break-inside:avoid;}
 	</style>
 	<script src="scripts/jquery-1.11.1.min.js"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
@@ -72,7 +73,7 @@
 			<select name="group" id="group">
 				<option value="">Select group...</option>
 				<cfloop query="groups.ProductGroups">
-				<option value="#pgID#" <cfif parms.grpID eq pgID> selected</cfif>>#pgTitle#</option>
+				<option value="#pgID#"<cfif parms.grpID eq pgID> selected</cfif>>#pgTitle#</option>
 				</cfloop>
 			</select>
 			<input type="submit" name="btnGo" value="Go">
@@ -80,7 +81,7 @@
 	</div>
 	<table class="tableList" border="1">
 		<tr>
-			<th>Stock Movement Report #LSDateFormat(now(),"dd-mmm-yyyy")#</th>
+			<th>Stock Movement Report <br />#LSDateFormat(now(),"dd-mmm-yyyy")#</th>
 			<th>Size</th>
 			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
@@ -126,7 +127,7 @@
 				<cfset StructInsert(purRec,mnth,0)>
 			</cfloop>
 		</cfif>
-		<tr>
+		<tr class="product-line">
 			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
 			<td align="center">
 				#siUnitSize#<br />
@@ -140,8 +141,8 @@
 				<cfset mnthPurch = 0>
 				<cfset mnthPurch = StructFind(purRec,mnth)>
 				<td width="30" align="right" class="mnthStk">
-					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
-					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
+					<span><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
+					<span><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
 				</td>
 			</cfloop>
 			<td width="50" align="right">

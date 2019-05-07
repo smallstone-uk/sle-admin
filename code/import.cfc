@@ -280,10 +280,11 @@
 					</cfif>
 				</cfif>
 				
-				<!--- barcode record (remove leading zeroes --->
+				<!--- barcode record (remove leading zeroes) --->
 				<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
 					<cfset args.barcode = mid(args.barcode,3,13)>
 				</cfif>
+				<cfset args.barcode = NumberFormat(trim(args.barcode),"0000000000000")>
 				<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
 					SELECT barID
 					FROM tblBarcodes
@@ -295,14 +296,14 @@
 					<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
 						UPDATE tblBarcodes
 						SET barProdID=#loc.productID#,
-							barcode='#trim(args.barcode)#'
+							barcode='#args.barcode#'
 						WHERE barID=#loc.barcodeExists.barID#
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
 				<cfelse>
 					<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
 						INSERT INTO tblBarcodes (barCode,barType,barProdID) 
-						VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.productID#)
+						VALUES ('#args.barcode#','product',#loc.productID#)
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#barcode added<br>">
 				</cfif>

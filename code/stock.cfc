@@ -324,11 +324,18 @@ ORDER BY prodCatID,prodTitle  ASC
 		<cfset var loc={}>
 		<cfset loc.result={}>
 		<cfset loc.status = "">
+		<cfset loc.ProdStatus = "">
 		<cfif StructKeyExists(args.form,"srchStatus")>
 			<cfloop list="#args.form.srchStatus#" index="loc.item" delimiters=",">
 				<cfset loc.status = "#loc.status#,'#loc.item#'">
 			</cfloop>
 			<cfset loc.status = Removechars(loc.status,1,1)>
+		</cfif>
+		<cfif StructKeyExists(args.form,"srchProdStatus")>
+			<cfloop list="#args.form.srchProdStatus#" index="loc.item" delimiters=",">
+				<cfset loc.ProdStatus = "#loc.ProdStatus#,'#loc.item#'">
+			</cfloop>
+			<cfset loc.ProdStatus = Removechars(loc.ProdStatus,1,1)>
 		</cfif>
 		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsresult">
 			SELECT *
@@ -345,6 +352,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			INNER JOIN tblAccount ON soAccountID=accID
 			WHERE 1
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
+			<cfif len(args.form.srchProdStatus) GT 0>AND prodStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
 			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>
 			<cfif len(args.form.srchDateTo) GT 0>AND (soDate IS null OR soDate <= '#args.form.srchDateTo#')</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>

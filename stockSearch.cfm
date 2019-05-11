@@ -158,7 +158,9 @@
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchStockDate" default="">
 <cfparam name="srchStatus" default="">
+<cfparam name="srchProdStatus" default="">
 <cfset statusTitles = "open,closed,outofstock,promo,returned,inactive">
+<cfset prodStatusTitles = "active,inactive,donotbuy">
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -205,7 +207,17 @@
 									</td>
 								</tr>
 								<tr>
-									<td><b>Status</b></td>
+									<td><b>Product Status</b></td>
+									<td>
+										<select name="srchProdStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop list="#prodStatusTitles#" index="i" delimiters=",">
+												<option value="#i#"<cfif ListFind(srchProdStatus,i)> selected="selected"</cfif>>#i#</option>
+											</cfloop>
+										</select>									
+									</td>
+								</tr>
+								<tr>
+									<td><b>Stock Status</b></td>
 									<td>
 										<select name="srchStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
 											<cfloop list="#statusTitles#" index="i" delimiters=",">

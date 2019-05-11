@@ -81,8 +81,10 @@
 	</div>
 	<table class="tableList" border="1">
 		<tr>
+			<th>Product<br />Code</th>
 			<th>Stock Movement Report <br />#LSDateFormat(now(),"dd-mmm-yyyy")#</th>
 			<th>Size</th>
+			<th>Status</th>
 			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
 			<th width="30" align="right">Feb</th>
@@ -104,13 +106,13 @@
 	<cfloop query="QSales.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
-				<th colspan="17"><span class="group">#pgTitle#</span></th>
+				<th colspan="19"><span class="group">#pgTitle#</span></th>
 			</tr>
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
 			<tr>
-				<th colspan="17">#pcatTitle#</th>
+				<th colspan="19">#pcatTitle#</th>
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
@@ -128,11 +130,13 @@
 			</cfloop>
 		</cfif>
 		<tr class="product-line">
-			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
+			<td>#prodID#</td>
+			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
 			<td align="center">
 				#siUnitSize#<br />
 				&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
 			</td>
+			<td>#prodStatus#</td>
 			<td align="center" class="openstock disable-select" data-id="#prodID#">
 				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>
 			</td>
@@ -160,6 +164,7 @@
 			</tr>
 			<tr>
 				<th>Category</th>
+				<th>Product<br />Code</th>
 				<th>Product</th>
 				<th>Size</th>
 				<th>Purchased</th>
@@ -169,7 +174,8 @@
 			<cfloop query="nonMovers.productList">
 				<tr>
 					<td>#pcatTitle#</td>
-					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle# (#prodID#)</a></td>
+					<td>#prodID#</td>
+					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
 					<td align="center">
 						#siUnitSize#<br />
 						&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>

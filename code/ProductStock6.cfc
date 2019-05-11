@@ -58,7 +58,7 @@
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
-							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
@@ -95,6 +95,7 @@
 						<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
 						<cfset loc.rec.prodMinPrice = prodMinPrice>
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
+						<cfset loc.rec.prodStatus = prodStatus>
 						
 						<cfset loc.stockItem = {}>
 						<cfset loc.stockItem.siID = siID>
@@ -366,7 +367,8 @@
 					prodCountDate = <cfif len(args.form.prodCountDate)>'#LSDateFormat(args.form.prodCountDate,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					prodStockLevel = #val(args.form.prodStockLevel)#,
 					prodVATRate = #args.form.prodVATRate#,
-					prodEposCatID = #val(args.form.prodEposCatID)#
+					prodEposCatID = #val(args.form.prodEposCatID)#,
+					prodStatus = '#args.form.prodStatus#'
 				WHERE prodID = #val(args.form.prodID)#
 			</cfquery>
 			<cfset loc.resultStr = "Product Updated.">

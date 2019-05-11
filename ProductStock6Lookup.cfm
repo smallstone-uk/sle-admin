@@ -156,6 +156,7 @@
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
 					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
 					<tr><td>Stock Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
+					<tr><td>Status</td><td>#lookup.product.prodStatus#</td></tr>
 				</table>
 				<table class="showTable" border="1">
 					<tr>
@@ -251,6 +252,16 @@
 											</cfloop>
 										</optgroup>
 									</cfloop>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>Status</td>
+							<td>
+								<select name="prodStatus">
+									<option value="active"<cfif lookup.product.prodStatus is 'active'>selected="true"</cfif>>Active</option>
+									<option value="inactive"<cfif lookup.product.prodStatus is 'inactive'>selected="true"</cfif>>Inactive</option>
+									<option value="donotbuy"<cfif lookup.product.prodStatus is 'donotbuy'>selected="true"</cfif>>Do Not Buy</option>
 								</select>
 							</td>
 						</tr>

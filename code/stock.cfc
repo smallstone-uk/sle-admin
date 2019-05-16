@@ -352,10 +352,10 @@ ORDER BY prodCatID,prodTitle  ASC
 			INNER JOIN tblAccount ON soAccountID=accID
 			WHERE 1
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
-			<cfif len(args.form.srchProdStatus) GT 0>AND prodStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
 			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>
 			<cfif len(args.form.srchDateTo) GT 0>AND (soDate IS null OR soDate <= '#args.form.srchDateTo#')</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
+			<cfif StructKeyExists(args.form,"srchProdStatus")>AND prodStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
 		</cfquery>

@@ -338,7 +338,7 @@
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
-													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
+													<td><cfif StructKeyExists(stocklist.stockItems,'soDate')>#LSDateFormat(soDate,"ddd dd-mmm yy")#</cfif></td>
 												</tr>
 											</cfloop>
 											</table>

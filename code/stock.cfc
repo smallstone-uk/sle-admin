@@ -340,16 +340,16 @@ ORDER BY prodCatID,prodTitle  ASC
 		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsresult">
 			SELECT *
 			FROM tblProducts
-			LEFT JOIN tblStockItem ON prodID = siProduct
+			INNER JOIN tblProductCats ON prodCatID=pcatID
+			LEFT JOIN tblStockItem ON siProduct = prodID
+			<cfif len(args.form.srchDateFrom) GT 0>LEFT JOIN tblstockorder ON siOrder = soID</cfif>
+			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>LEFT JOIN tblAccount ON soAccountID = accID</cfif>
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
 				<cfif StructKeyExists(args.form,"srchStatus")>AND siStatus IN (#PreserveSingleQuotes(loc.status)#)</cfif>
 				)
-			INNER JOIN tblProductCats ON prodCatID=pcatID
-			INNER JOIN tblstockorder ON siOrder=soID
-			INNER JOIN tblAccount ON soAccountID=accID
 			WHERE 1
 			<cfif len(args.form.srchProdStr) GT 0>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
 			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>

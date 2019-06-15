@@ -72,9 +72,6 @@
 		<cfset rndLoss = 0>
 		<cfset totalLoss = 0>
 		<cfloop query="QDeliveries">
-			<cfset loss = diQty * diPrice + diCharge>
-			<cfset rndLoss += loss>
-			<cfset totalLoss += loss>
 			<cfif rnd gt 0 AND rnd neq rndID>
 				<tr>
 					<th colspan="11" align="right">Round Loss</th>
@@ -82,6 +79,10 @@
 				</tr>
 				<cfset rndLoss = 0>
 			</cfif>
+			<cfset rnd = rndID>
+			<cfset loss = (diQty * diPrice) + diCharge>
+			<cfset rndLoss += loss>
+			<cfset totalLoss += loss>
 			<tr>
 				<td>#cltTitle# #cltName#</td>
 				<td>#ordHouseNumber# #ordHouseName#</td>
@@ -96,7 +97,6 @@
 				<td align="right">#diCharge#</td>
 				<td align="right">#DecimalFormat(loss)#</td>
 			</tr>
-			<cfset rnd = rndID>
 		</cfloop>
 			<tr>
 				<th colspan="11" align="right">Round Loss</th>

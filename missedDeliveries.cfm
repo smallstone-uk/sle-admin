@@ -35,7 +35,7 @@
 
 <cfoutput>
 <body>
-	<table>
+	<table class="noPrint">
 		<tr>
 			<td>
 				<form method="post">
@@ -48,6 +48,12 @@
 	</table>
 	</table>
 	<table class="tableList" border="1">
+		<tr>
+			<th colspan="2">Missed Deliveries</th>
+			<th colspan="3">From: #DateFormat(dateFrom,'dd mmm yyyy')#</th>
+			<th colspan="3">To: #DateFormat(dateTo,'dd mmm yyyy')#</th>
+			<th colspan="4"></th>
+		</tr>
 		<tr>
 			<th>Customer Name</th>
 			<th>Address</th>

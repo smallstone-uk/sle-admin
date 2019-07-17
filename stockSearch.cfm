@@ -28,6 +28,7 @@
 			$(".srchCategory").chosen({width: "300px"});
 			$(".srchSupplier").chosen({width: "300px"});
 			$(".srchStatus").chosen({width: "300px"});
+			$(".srchReorder").chosen({width: "300px"});
 			$('#selectAll').click(function(e) {
 				if(this.checked) {
 					$('.selectitem').prop({checked: true});
@@ -159,8 +160,10 @@
 <cfparam name="srchStockDate" default="">
 <cfparam name="srchStatus" default="">
 <cfparam name="srchProdStatus" default="">
+<cfparam name="srchReorder" default="">
 <cfset statusTitles = "open,closed,outofstock,promo,returned,inactive">
 <cfset prodStatusTitles = "active,inactive,donotbuy">
+<cfset reOrderTitles = "None,Monday,Thursday,Every">
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -222,6 +225,16 @@
 										<select name="srchStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
 											<cfloop list="#statusTitles#" index="i" delimiters=",">
 												<option value="#i#"<cfif ListFind(srchStatus,i)> selected="selected"</cfif>>#i#</option>
+											</cfloop>
+										</select>									
+									</td>
+								</tr>
+								<tr>
+									<td><b>Reorder Status</b></td>
+									<td>
+										<select name="srchReorder" class="srchReorder" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop list="#reOrderTitles#" index="i" delimiters=",">
+												<option value="#i#"<cfif ListFind(srchReorder,i)> selected="selected"</cfif>>#i#</option>
 											</cfloop>
 										</select>									
 									</td>
@@ -316,6 +329,7 @@
 													<th>Our Price</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>
+													<th>Reorder</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
@@ -338,6 +352,7 @@
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
+													<td>#prodReorder#</td>
 													<td><cfif StructKeyExists(stocklist.stockItems,'soDate')>#LSDateFormat(soDate,"ddd dd-mmm yy")#</cfif></td>
 												</tr>
 											</cfloop>
@@ -350,7 +365,7 @@
 								<cfcase value="2">
 									<cfset stocklist=stock.StockSearch(parm)>
 									<cfif stocklist.recCount GT 0>
-										<cfset colspan=12>
+										<cfset colspan=13>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
 											<table width="100%" class="tableList" border="1">
@@ -366,6 +381,7 @@
 													<th>Unit Trade</th>
 													<th>Our Price</th>
 													<th>POR%</th>
+													<th>Reorder</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
@@ -400,7 +416,8 @@
 													<td align="right">&pound;#DecimalFormat(unitGross)#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#POR#%</td>
-													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
+													<td>#prodReorder#</td>
+													<td><cfif StructKeyExists(stocklist.stockItems,'soDate')>#LSDateFormat(soDate,"ddd dd-mmm yy")#</cfif></td>
 												</tr>
 											</cfloop>
 											</table>

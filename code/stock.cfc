@@ -325,6 +325,7 @@ ORDER BY prodCatID,prodTitle  ASC
 		<cfset loc.result={}>
 		<cfset loc.status = "">
 		<cfset loc.ProdStatus = "">
+		<cfset loc.Reorder = "">
 		<cfif StructKeyExists(args.form,"srchStatus")>
 			<cfloop list="#args.form.srchStatus#" index="loc.item" delimiters=",">
 				<cfset loc.status = "#loc.status#,'#loc.item#'">
@@ -337,14 +338,25 @@ ORDER BY prodCatID,prodTitle  ASC
 			</cfloop>
 			<cfset loc.ProdStatus = Removechars(loc.ProdStatus,1,1)>
 		</cfif>
+		<cfif StructKeyExists(args.form,"srchReorder")>
+			<cfloop list="#args.form.srchReorder#" index="loc.item" delimiters=",">
+				<cfset loc.Reorder = "#loc.Reorder#,'#loc.item#'">
+			</cfloop>
+			<cfset loc.Reorder = Removechars(loc.Reorder,1,1)>
+		</cfif>
 		<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsresult">
 			SELECT *
 			FROM tblProducts
 			INNER JOIN tblProductCats ON prodCatID=pcatID
 			LEFT JOIN tblStockItem ON siProduct = prodID
-			<cfif len(args.form.srchDateFrom) GT 0>LEFT JOIN tblstockorder ON siOrder = soID</cfif>
+			
+			<cfif len(args.form.srchDateFrom) GT 0 || (StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0)>
+				LEFT JOIN tblstockorder ON siOrder = soID
+				LEFT JOIN tblAccount ON soAccountID = accID
+			</cfif>
+<!---			<cfif len(args.form.srchDateFrom) GT 0>LEFT JOIN tblstockorder ON siOrder = soID</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>LEFT JOIN tblAccount ON soAccountID = accID</cfif>
-			AND tblStockItem.siID = (
+--->			AND tblStockItem.siID = (
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
@@ -355,7 +367,8 @@ ORDER BY prodCatID,prodTitle  ASC
 			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>
 			<cfif len(args.form.srchDateTo) GT 0>AND (soDate IS null OR soDate <= '#args.form.srchDateTo#')</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
-			<cfif StructKeyExists(args.form,"srchProdStatus")>AND prodStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
+			<cfif StructKeyExists(args.form,"srchProdStatus")>AND ProdStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
+			<cfif StructKeyExists(args.form,"srchReorder")>AND prodReorder IN (#PreserveSingleQuotes(loc.Reorder)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
 		</cfquery>

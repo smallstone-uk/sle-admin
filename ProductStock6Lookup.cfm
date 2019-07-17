@@ -157,6 +157,7 @@
 					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
 					<tr><td>Stock Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
 					<tr><td>Status</td><td>#lookup.product.prodStatus#</td></tr>
+					<tr><td>Reorder</td><td>#lookup.product.prodReorder#</td></tr>
 				</table>
 				<table class="showTable" border="1">
 					<tr>
@@ -262,6 +263,17 @@
 									<option value="active"<cfif lookup.product.prodStatus is 'active'>selected="true"</cfif>>Active</option>
 									<option value="inactive"<cfif lookup.product.prodStatus is 'inactive'>selected="true"</cfif>>Inactive</option>
 									<option value="donotbuy"<cfif lookup.product.prodStatus is 'donotbuy'>selected="true"</cfif>>Do Not Buy</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>Reorder</td>
+							<td>
+								<select name="prodReorder">
+									<option value="None"<cfif lookup.product.prodReorder is 'None'>selected="true"</cfif>>None</option>
+									<option value="Monday"<cfif lookup.product.prodReorder is 'Monday'>selected="true"</cfif>>Monday</option>
+									<option value="Thursday"<cfif lookup.product.prodReorder is 'Thursday'>selected="true"</cfif>>Thursday</option>
+									<option value="Every"<cfif lookup.product.prodReorder is 'Every'>selected="true"</cfif>>Every Order</option>
 								</select>
 							</td>
 						</tr>

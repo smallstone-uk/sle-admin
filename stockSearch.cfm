@@ -281,6 +281,7 @@
 					<span><div id="loading"></div></span>
 					<form method="post" id="listForm">
 						<div class="module listcontrols">
+							<a href="exportBarcodes.cfm" target="_blank" id="btnExport" class="button">Export Barcodes</a>
 							<a href="##" id="btnPrintLabels" class="button">Print Labels</a>
 							<a href="##" id="btnShowList" class="button">Show List</a>
 							<a href="##" id="btnSaveList" class="button">Update List</a>

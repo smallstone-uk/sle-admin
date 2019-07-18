@@ -17,7 +17,7 @@
 </cfif>
 
 <cfquery name="QBarcodes" datasource="#parm.datasource#">
-	SELECT barcode,prodTitle, prodUnitSize,prodReorder
+	SELECT barcode,prodID,prodRef,prodTitle, prodUnitSize,prodReorder
 	FROM tblProducts
 	INNER JOIN tblBarcodes ON barProdID=prodID
 	AND barType = 'product'
@@ -26,27 +26,36 @@
 <cfif FileExists(parm.outFile)>
 	<cffile action="delete" file="#parm.outFile#">
 </cfif>
-<cfoutput>
-	<b>Data exported to #parm.outFile#</b>
-	<table width="500" class="tableList" border="1">
-		<tr>
-			<th>Barcode</th>
-			<th>Product Title</th>
-			<th>Size</th>
-			<th>Reorder</th>
-		</tr>
-	<cfloop query="QBarcodes">
-		<cffile action="append" file="#parm.outFile#" 
-			output="#DateFormat(NOW(),'mm/dd/yy')#,#TimeFormat(NOW(),'HH:mm:ss')#,OB,#barcode#" addnewline="yes">
-		<tr>
-			<td>#barcode#</td>
-			<td>#prodTitle#</td>
-			<td>#prodUnitSize#</td>
-			<td>#prodReorder#</td>
-		</tr>
-	</cfloop>
-	</table>
-</cfoutput>
+<h1>Export Barcodes</h1>
+<cfif QBarcodes.recordcount gt 0>
+	<cfoutput>
+		<b>Data exported to #parm.outFile#</b><hr />
+		<table width="700" class="tableList" border="1">
+			<tr>
+				<th>Barcode</th>
+				<th>Product ID</th>
+				<th>Product Ref</th>
+				<th>Product Title</th>
+				<th>Size</th>
+				<th>Reorder</th>
+			</tr>
+		<cfloop query="QBarcodes">
+			<cffile action="append" file="#parm.outFile#" 
+				output="#DateFormat(NOW(),'mm/dd/yy')#,#TimeFormat(NOW(),'HH:mm:ss')#,OB,#barcode#" addnewline="yes">
+			<tr>
+				<td>#barcode#</td>
+				<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
+				<td>#prodRef#</td>
+				<td>#prodTitle#</td>
+				<td>#prodUnitSize#</td>
+				<td>#prodReorder#</td>
+			</tr>
+		</cfloop>
+		</table>
+	</cfoutput>
+<cfelse>
+	No records found to export.
+</cfif>
 <body>
 </body>
 </html>

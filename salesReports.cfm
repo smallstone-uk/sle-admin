@@ -8,6 +8,9 @@
 		.sale {color:#FF00FF; line-height:16px;}
 		.purch {color:#0000FF; line-height:16px;}
 		.group {font-size:24px; font-weight:bold}
+		.priceErr {background:#FC0}
+		.stkErr {font-size:16px; font-weight:bold; background:#FC0}
+		.stkOK {font-size:16px; font-weight:bold}
 		@media print {
 			.no-print {display: none !important;}
 		}
@@ -82,7 +85,7 @@
 	<table class="tableList" border="1">
 		<tr>
 			<th>Product<br />Code</th>
-			<th>Stock Movement Report <br />#LSDateFormat(now(),"dd-mmm-yyyy")#</th>
+			<th>Stock Movement Report <br />#LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
 			<th>Size</th>
 			<th>Status</th>
 			<th width="30">Open<br />Stock</th>
@@ -99,20 +102,22 @@
 			<th width="30" align="right">Nov</th>
 			<th width="30" align="right">Dec</th>
 			<th width="30" align="right">Total</th>
-			<th width="30" align="right">Close<br />Stock</th>
+			<th width="30" align="center">Close<br />Stock</th>
+			<th width="30" align="right">Shop</th>
+			<th width="30" align="right">Store</th>
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
 	<cfloop query="QSales.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
-				<th colspan="19"><span class="group">#pgTitle#</span></th>
+				<th colspan="21"><span class="group">#pgTitle#</span></th>
 			</tr>
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
 			<tr>
-				<th colspan="19">#pcatTitle#</th>
+				<th colspan="21">#pcatTitle#</th>
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
@@ -132,9 +137,18 @@
 		<tr class="product-line">
 			<td>#prodID#</td>
 			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
-			<td align="center">
-				#siUnitSize#<br />
-				&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
+			<cfif val(siOurPrice) eq 0>
+				<cfset class = "priceErr">
+			<cfelse>
+				<cfset class = "">
+			</cfif>
+			<td align="center" class="#class#">
+				<cfif val(siOurPrice) eq 0>
+					&pound; missing
+				<cfelse>
+					#siUnitSize#<br />
+					&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
+				</cfif>
 			</td>
 			<td>#prodStatus#</td>
 			<td align="center" class="openstock disable-select" data-id="#prodID#">
@@ -153,7 +167,13 @@
 				<span class="sale">#total#<br /></span>
 				<span class="purch">#purRec.total#</span>
 			</td>
-			<td width="50" align="right" class="stkTotal">#purRec.total - total#</td>
+			<cfset stockTotal = purRec.total - total>
+			<cfif stockTotal lt 0>
+				<cfset class = "stkErr">
+			<cfelse><cfset class = "stkOK"></cfif>
+			<td width="50" align="center" class="#class#">#stockTotal#</td>
+			<td></td>
+			<td></td>
 		</tr>
 	</cfloop>
 	</table>

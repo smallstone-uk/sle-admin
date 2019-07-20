@@ -181,7 +181,7 @@
 	<cfif nonMovers.productList.recordcount gt 0>
 		<table class="tableList" border="1">
 			<tr>
-				<th colspan="6"><span class="group">Non-Movers</span></th>
+				<th colspan="7"><span class="group">Non-Movers</span></th>
 			</tr>
 			<tr>
 				<th>Category</th>
@@ -214,7 +214,7 @@
 				<table>
 					<tr><th colspan="2">Negative opening stock is caused by:-</th></tr>
 					<tr><td>1</td><td>Stock not sold through till, e.g taken for Bunnery or home.</td></tr>
-					<tr><td>2</td><td>Incorrect product assign with received stock.</td></tr>
+					<tr><td>2</td><td>Incorrect product assigned with the received stock.</td></tr>
 					<tr><td>3</td><td>Theft.</td></tr>
 					<tr><td class="stkErr"></td><td>Errors are marked in yellow.</td></tr>
 				</table>

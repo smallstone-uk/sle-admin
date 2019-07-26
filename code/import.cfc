@@ -32,16 +32,18 @@
 							StructInsert(loc.fields,"barcode",loc.image.attr("alt")); // store barcode text
 							loc.headText=ReReplace(loc.head.text(),"\(\d+\)","","all"); // remove counter and brackets
 							loc.headText=Replace(loc.headText,"(Ret.)","","one"); // remove "(Ret.)"
+							if (FindNoCase('RosÃ©',loc.headText,1)) { // odd e on rose word
+								loc.headText=Replace(loc.headText,'RosÃ©',"Rose","all"); // replace it with an e
+							//	WriteOutput(loc.headText);
+							}
+
 							StructInsert(loc.fields,"category",loc.headText); // store header text
 							for (loc.cell in loc.cells)	{ // loop cells
 								loc.count++;
 								loc.fld=loc.cell.text();	// get text in field
-							//	WriteOutput(loc.count & ":" & fld&"<br>");
+								// WriteOutput(loc.count & ":" & loc.fld&"<br>");
 								if (FindNoCase(chr(194),loc.fld,1)) { // odd character
 									loc.fld=Replace(loc.fld,chr(194),"","all"); // remove it
-								}
-								if (FindNoCase('Ã©',loc.fld,1)) { // odd e on rose word
-									loc.fld=Replace(loc.fld,'Ã©',"e","all"); // replace it with an e
 								}
 								if (loc.count eq 3) { // description
 									loc.pm=ReFind("PM\d{0,4}",loc.fld) gt 0;	// contains price mark e.g. PM159

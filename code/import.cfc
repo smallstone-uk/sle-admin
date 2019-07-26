@@ -40,6 +40,9 @@
 								if (FindNoCase(chr(194),loc.fld,1)) { // odd character
 									loc.fld=Replace(loc.fld,chr(194),"","all"); // remove it
 								}
+								if (FindNoCase('Ã©',loc.fld,1)) { // odd e on rose word
+									loc.fld=Replace(loc.fld,'Ã©',"e","all"); // replace it with an e
+								}
 								if (loc.count eq 3) { // description
 									loc.pm=ReFind("PM\d{0,4}",loc.fld) gt 0;	// contains price mark e.g. PM159
 									StructInsert(loc.fields,"PM",loc.pm);	// set the PM flag

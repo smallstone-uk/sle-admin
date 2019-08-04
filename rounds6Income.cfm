@@ -47,15 +47,15 @@
 					</form>
 				</cfoutput>
 				<cfif len(startDate)>
-					<!---<cfset startDate = CreateDate(2016,06,01)>--->
-					<!---<cfset interval = 12>--->
+					<cfset interval = val(interval)>
 					<cfset drivers = {}>
 					<cfset drivers.alec = {1=25,2=25,3=25,4=25,5=25,6=25,7=30}>
 					<cfset drivers.dave = {1=25,2=30,3=30,4=30,5=30,6=30,7=35}>
-					<cfset drivers.allan = {1=20,2=25,3=25,4=25,5=25,6=25,7=25}>
-					<cfset drivers.sle = {1=5,2=5,3=5,4=5,5=5,6=5,7=5}>
+					<cfset drivers.allan = {1=22,2=27,3=27,4=27,5=27,6=27,7=27}>
+					<cfset drivers.sle = {1=3,2=3,3=3,4=3,5=3,6=3,7=3}>
 					<cfset mileage = {}>
 					<cfset mileage.dave = {miles=17, mpg=27,mph=17}>
+					<cfset mileage.allan = {miles=21, mpg=28,mph=19}>
 					<cfquery name="QData" datasource="#application.site.datasource1#">
 						SELECT rndID,rndTitle, Sum( diQty ) AS qty, sum((diPrice * diQty) - (diPriceTrade * diQty)) AS profit, 
 							sum( diCharge ) AS charge, count(diID) AS recCount, dayofweek( diDate ) AS dayNum
@@ -84,6 +84,8 @@
 						<cfset totch = 0>
 						<cfset grandtotpr = 0>
 						<cfset grandtotch = 0>
+						<cfset grandtotPay = 0>
+						<cfset grandtotprofit = 0>
 						<cfset day1pr = 0>
 						<cfset day2pr = 0>
 						<cfset day3pr = 0>
@@ -117,14 +119,20 @@
 									<th colspan="2">Thu</th>
 									<th colspan="2">Fri</th>
 									<th colspan="2">Sat</th>
-									<th colspan="2">Total</th>
+									<th colspan="3">Total</th>
+									<th>Delivery</th>
+									<th colspan="2">Round</th>
 								</tr>
 								<tr>
 									<th></th>
 									<cfloop from="1" to="8" index="i">
 										<th>profit</th>
-										<th>Charge</th>
+										<th>charge</th>
 									</cfloop>
+									<th>Total</th>
+									<th>Cost</th>
+									<th>Profit</th>
+									<th>%</th>
 								</tr>
 								<tr>	<!--- open first row --->
 									<td>#rndTitle#</td>
@@ -188,6 +196,19 @@
 								<cfset roundch = DecimalFormat(totch)>
 								<td align="right">#roundpr#</td>
 								<td align="right">#roundch#</td>
+								<td align="right">#roundpr + roundch#</td>
+								<cfif StructKeyExists(drivers,rndTitle)>
+									<cfset driver = StructFind(drivers,rndTitle)>
+									<cfset totalPay = driver.1 + driver.2 + driver.3 + driver.4 + driver.5 + driver.6 + driver.7>
+								<cfelse>
+									<cfset totalPay = 0>
+								</cfif>
+								<cfset grandtotPay += totalPay>
+								<cfset weekProfit = totpr + totch - totalPay>
+								<cfset grandtotprofit += weekProfit>
+								<td align="right">#DecimalFormat(totalPay)#</td>
+								<td align="right">#DecimalFormat(weekProfit)#</td>
+								<td align="right">#DecimalFormat((weekProfit / (roundpr + roundch))*100)#%</td>
 							</cfif>
 						</cfloop>
 						</tr>
@@ -212,9 +233,13 @@
 							<th>#DecimalFormat(day7ch)#</th>
 							<th>#DecimalFormat(grandtotpr)#</th>
 							<th>#DecimalFormat(grandtotch)#</th>
+							<th>#DecimalFormat(grandtotpr + grandtotch)#</th>
+							<th>#DecimalFormat(grandtotPay)#</th>
+							<th>#DecimalFormat(grandtotprofit)#</th>
+							<th>#DecimalFormat((grandtotprofit / (grandtotpr + grandtotch)) * 100)#%</th>
 						</tr>
 						<tr>
-							<td>Total Income</td>
+							<td>Total Net Income</td>
 							<td colspan="2" align="right">#DecimalFormat(day1pr + day1ch)#</td>
 							<td colspan="2" align="right">#DecimalFormat(day2pr + day2ch)#</td>
 							<td colspan="2" align="right">#DecimalFormat(day3pr + day3ch)#</td>
@@ -223,12 +248,21 @@
 							<td colspan="2" align="right">#DecimalFormat(day6pr + day6ch)#</td>
 							<td colspan="2" align="right">#DecimalFormat(day7pr + day7ch)#</td>
 							<td colspan="2" align="right">#DecimalFormat(grandTotal)#</td>
+							<td colspan="4"></td>
 						</tr>
 						<tr>
-							<td colspan="17">&nbsp;</td>
+							<td colspan="21">&nbsp;</td>
 						</tr>
 						<tr>
-							<td>Costs</td>
+							<th>Costs</td>
+							<th colspan="2">Sun</th>
+							<th colspan="2">Mon</th>
+							<th colspan="2">Tue</th>
+							<th colspan="2">Wed</th>
+							<th colspan="2">Thu</th>
+							<th colspan="2">Fri</th>
+							<th colspan="2">Sat</th>
+							<th colspan="2">Total</th>
 						</tr>
 						<cfset total1 = 0>
 						<cfloop collection="#drivers#" item="key">
@@ -274,7 +308,7 @@
 							<cfset profit7 = day7pr + day7ch - total7>
 							<cfset tprofit = grandTotal - gtotalPay>
 							<tr>
-								<td>Net Profit</td>
+								<td>Profit by Day</td>
 								<td colspan="2" align="right">#DecimalFormat(profit1)#</td>
 								<td colspan="2" align="right">#DecimalFormat(profit2)#</td>
 								<td colspan="2" align="right">#DecimalFormat(profit3)#</td>
@@ -316,11 +350,12 @@
 									<cfif roundID gt 0 AND rndID neq roundID>
 										<cfif StructKeyExists(drivers,roundTitle)>
 											<cfset driver = StructFind(drivers,roundTitle)>
-											<cfset totalPay = driver.1 + driver.2 + driver.3 + driver.4 + driver.5 + driver.6 + driver.7>
+											<cfset weeklyPay = driver.1 + driver.2 + driver.3 + driver.4 + driver.5 + driver.6 + driver.7>
+											<cfset totalPay = weeklyPay * interval>
 										<cfelse><cfset totalPay = 0></cfif>
 										<cfset roundProfit = totCharge + (totRetail - totTrade)>
 										<tr>
-											<th>#roundTitle# Totals (#totalPay#)</th>
+											<th>#roundTitle# Totals (#DecimalFormat(totalPay)#)</th>
 											<th colspan="3"></th>
 											<th>#totQty#</th>
 											<th></th>

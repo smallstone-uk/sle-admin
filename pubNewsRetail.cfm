@@ -44,6 +44,7 @@
 	</cfif>
 	<cfset rec.title=pubRoundTitle>
 	<cfset rec.type=pubType>
+	<cfset rec.arrival=pubArrival>
 	<cfif pubArrival LT 6>
 		<cfset rec.price1=pubPrice>
 	<cfelseif pubArrival EQ 6>
@@ -63,31 +64,40 @@
 <cfoutput>
 <table class="tableList" border="1">
 	<tr>
-		<th colspan="4">Newspaper Price List &nbsp; #DateFormat(now(),"dd-mmm-yy")#</th>
+		<th colspan="5">#application.company.companyname#</th>
+	</tr>
+	<tr>
+		<th colspan="5">#application.company.telephone#</th>
+	</tr>
+	<tr>
+		<th colspan="5">Newspaper Price List &nbsp; as at #DateFormat(now(),"dd-mmm-yy")#</th>
 	</tr>
 	<tr>
 		<th width="260">Title</th>
+		<th></th>
 		<th align="right" width="60">Weekday</th>
 		<th align="right" width="60">Saturday</th>
 		<th align="right" width="60">Sunday</th>
 	</tr>
 	<tr>
-		<td colspan="4" height="30" align="center">DAILY PAPERS</td>
+		<td colspan="5" height="30" align="center">DAILY PAPERS</td>
 	</tr>
 	<cfloop array="#pubList#" index="item">
 	<tr>
 		<td>#item.title#</td>
+		<td></td>
 		<td align="right">#item.price1#</td>
 		<td align="right">#item.price2#</td>
 		<td align="right">#item.price3#</td>
 	</tr>
 	</cfloop>
 	<tr>
-		<td colspan="4" height="30" align="center">WEEKLY PAPERS</td>
+		<td colspan="5" height="30" align="center">WEEKLY PAPERS</td>
 	</tr>
 	<cfloop array="#weeklyList#" index="item">
 	<tr>
 		<td>#item.title#</td>
+		<td>#GetToken("Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday",item.arrival,",")#</td>
 		<td align="right">#item.price1#</td>
 		<td align="right">#item.price2#</td>
 		<td align="right">#item.price3#</td>

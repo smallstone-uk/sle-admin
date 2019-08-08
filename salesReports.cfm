@@ -93,23 +93,23 @@
 			<th>Product<br />Code</th>
 			<th>Description</th>
 			<th>Size</th>
-			<th width="30">Open<br />Stock</th>
-			<th width="30" align="right">Jan</th>
-			<th width="30" align="right">Feb</th>
-			<th width="30" align="right">Mar</th>
-			<th width="30" align="right">Apr</th>
-			<th width="30" align="right">May</th>
-			<th width="30" align="right">Jun</th>
-			<th width="30" align="right">Jul</th>
-			<th width="30" align="right">Aug</th>
-			<th width="30" align="right">Sep</th>
-			<th width="30" align="right">Oct</th>
-			<th width="30" align="right">Nov</th>
-			<th width="30" align="right">Dec</th>
-			<th width="30" align="right">Total</th>
-			<th width="30" align="center">Close<br />Stock</th>
-			<th width="30" align="right">Shop</th>
-			<th width="30" align="right">Store</th>
+			<th width="26">Open<br />Stock</th>
+			<th width="26" align="right">Jan</th>
+			<th width="26" align="right">Feb</th>
+			<th width="26" align="right">Mar</th>
+			<th width="26" align="right">Apr</th>
+			<th width="26" align="right">May</th>
+			<th width="26" align="right">Jun</th>
+			<th width="26" align="right">Jul</th>
+			<th width="26" align="right">Aug</th>
+			<th width="26" align="right">Sep</th>
+			<th width="26" align="right">Oct</th>
+			<th width="26" align="right">Nov</th>
+			<th width="26" align="right">Dec</th>
+			<th width="26" align="right">Total</th>
+			<th width="26" align="center">Close<br />Stock</th>
+			<th width="26" align="right">Shop</th>
+			<th width="26" align="right">Store</th>
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
@@ -162,7 +162,7 @@
 				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>
 				<cfset mnthPurch = StructFind(purRec,mnth)>
-				<td width="30" align="right" class="mnthStk">
+				<td width="26" align="right" class="mnthStk">
 					<span class="sale"><cfif mnthSale gt 0>#mnthSale#<cfelse>&nbsp;</cfif><br /></span>
 					<span class="purch"><cfif mnthPurch gt 0>#mnthPurch#<cfelse>&nbsp;</cfif></span>
 				</td>

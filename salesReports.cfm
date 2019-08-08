@@ -12,6 +12,7 @@
 		.stkErr {font-size:16px; font-weight:bold; background:#FC0}
 		.stkOK {font-size:16px; font-weight:bold}
 		.footnote {font-size:11px}
+		.tiny {font-size:9px}
 		@media print {
 			.no-print {display: none !important;}
 		}
@@ -85,10 +86,13 @@
 	</div>
 	<table class="tableList" border="1">
 		<tr>
+			<th colspan="4">Stock Movement Report</th>
+			<th colspan="17" align="right">as at: #LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
+		</tr>
+		<tr>
 			<th>Product<br />Code</th>
-			<th>Stock Movement Report <br />#LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
+			<th>Description</th>
 			<th>Size</th>
-			<th>Status</th>
 			<th width="30">Open<br />Stock</th>
 			<th width="30" align="right">Jan</th>
 			<th width="30" align="right">Feb</th>
@@ -136,7 +140,7 @@
 			</cfloop>
 		</cfif>
 		<tr class="product-line">
-			<td>#prodID#</td>
+			<td>#prodID#<br /><span class="tiny">#prodStatus#</span></td>
 			<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
 			<cfif val(siOurPrice) eq 0>
 				<cfset class = "priceErr">
@@ -151,7 +155,6 @@
 					&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
 				</cfif>
 			</td>
-			<td>#prodStatus#</td>
 			<td align="center" class="openstock disable-select" data-id="#prodID#">
 				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>
 			</td>

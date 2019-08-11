@@ -371,6 +371,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			<cfif StructKeyExists(args.form,"srchReorder")>AND prodReorder IN (#PreserveSingleQuotes(loc.Reorder)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
+			ORDER BY pcatTitle, prodTitle
 		</cfquery>
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>
 		<cfreturn loc.result>

@@ -76,6 +76,7 @@
 										<option value=""></option>
 										<option value="Morning">Morning</option>
 										<option value="Saturday">Saturday</option>
+										<option value="Weekend">Weekend</option>
 										<option value="Sunday">Sunday</option>
 										<option value="Weekly">Weekly</option>
 										<option value="Fortnightly">Fortnightly</option>

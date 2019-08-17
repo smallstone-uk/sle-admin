@@ -29,7 +29,7 @@
 	<cfif dayNo LT 6>
 		AND (pubType = 'weekly' AND pubArrival=#val(dayNo)# OR pubType = 'morning')
 	<cfelseif dayNo eq 6>
-		AND pubType='saturday'
+		AND (pubType='saturday' OR pubType = 'weekend')
 	<cfelseif dayNo eq 7>
 		AND pubType='sunday'
 	</cfif>

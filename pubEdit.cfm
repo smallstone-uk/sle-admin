@@ -204,7 +204,7 @@
 											<td><label style="color:##666;"><input type="checkbox" name="pubSun" value="0" disabled="disabled"><br><strong>Sun</strong></label></td>
 										</tr>
 									</table>
-								<cfelseif (load.type is "saturday" OR load.type is "weekend">
+								<cfelseif (load.type is "saturday" OR load.type is "weekend")>
 									<table>
 										<tr>
 											<td><label style="color:##666;"><input type="checkbox" name="pubMon" value="0" disabled="disabled"><br><strong>Mon</strong></label></td>

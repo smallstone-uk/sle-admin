@@ -288,7 +288,7 @@
 		<cfquery name="QClient" datasource="#args.datasource#">
 			SELECT *
 			FROM tblClients
-			WHERE cltRef=#args.clientRef#
+			WHERE cltRef=#val(args.clientRef)#
 		</cfquery>
 		<cfset result.ID=QClient.cltID>
 		
@@ -306,7 +306,7 @@
 			<cfquery name="QClient" datasource="#args.datasource#">
 				UPDATE tblClients
 				SET cltChaseDate='#LSDateFormat(args.Date,"yyyy-mm-dd")#',
-					<cfif args.level is 4>cltAccountType='N',</cfif>
+					<cfif args.level is 6>cltAccountType='N',</cfif>
 					cltChase=#val(args.level)#
 				WHERE cltID=#args.clientID#
 			</cfquery>
@@ -317,9 +317,9 @@
 			<cfset actParms.class="updated">
 			<cfset actParms.clientID=args.clientID>
 			<cfset actParms.pubID=0>
-			<cfif args.level is 4>
+			<cfif args.level is 6>
 				<cfset actParms.Text=args.text&" letter was sent. Account now closed.">
-			<cfelseif args.level is 3>
+			<cfelseif args.level is 4>
 				<cfset actParms.Text=args.text&" letter was sent. <b>Stop all deliveries from #LSDateFormat(DateAdd("d",7,args.Date),"DD/MM/YYYY")# if no payment is received.</b>">
 			<cfelse>
 				<cfset actParms.Text=args.text&" letter was sent.">

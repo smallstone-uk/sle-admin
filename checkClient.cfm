@@ -1,4 +1,17 @@
 <!--- AJAX call - check client do not show debug data at all --->
+	
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#selectAll').click(function(e) {   
+			if(this.checked) {
+				$('input.trans').each(function() {this.checked = true;});
+			} else {
+				$('input.trans').each(function() {this.checked = false;});
+			}
+		});
+	});
+</script>
+
 <cftry>
 	<cfset callback=1> <!--- force exit of onrequestend.cfm --->
 	<cfset tabWidth="100%">
@@ -162,7 +175,7 @@
 									<cfelse>
 										<td class="centre">
 											<input type="hidden" name="amnt#currentrow#" value="#trnAmnt1#" />
-											<input type="checkbox" name="tick#currentrow#" id="tick#currentrow#" onClick="checkTotal('payForm');" 
+											<input type="checkbox" name="tick#currentrow#" id="tick#currentrow#" class="trans" onClick="checkTotal('payForm');" 
 												value="#trnID#"<cfif trnAlloc> checked="checked"</cfif> />
 										</td>
 										<td class="centre">#trnPaidin#</td>
@@ -193,7 +206,7 @@
 										<input type="hidden" name="tranCount" id="tranCount" value="#QTrans.recordcount#" />
 										<input type="hidden" name="clientID" value="#QClient.cltID#" />
 									</td>
-									<td align="center"><input type="checkbox" name="selectAll" onClick="javascript:checkall('payForm',toggle)" title="Select All" /></td>
+									<td align="center"><input type="checkbox" name="selectAll" id="selectAll" title="Select All" /></td>
 									<td></td>
 								</tr>
 							</cfif>

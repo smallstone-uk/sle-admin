@@ -46,7 +46,7 @@
 			if (response.indexOf('Reference') == -1) {
 				var msg=$.trim($("#clientResult").text());
 			//	alert(msg);
-				$('#clientRef').focus();
+			//	$('#clientRef').focus(); let cursor go elsewhere
 				$('#pay').fadeOut();
 			} else {
 			//	$('#trnRef').focus();
@@ -93,14 +93,15 @@
 		}
 		return 0;
 	}
-	function checkall(formname,thestate)	{
-		var maxLines=document.getElementById('tranCount').value;
-		for (var c=1;c<=maxLines;c++)	{
-			document.getElementById("tick"+c).checked=thestate;
-		}
-		toggle=!toggle;	
-		checkTotal(formname);
-	}
+//	function checkall(formname,thestate)	{
+//		var maxLines=document.getElementById('tranCount').value;
+//		for (var c=1;c<=maxLines;c++)	{
+//			document.getElementById("tick"+c).checked=thestate;
+//		}
+//		toggle=!toggle;	
+//		
+//		checkTotal(formname);
+//	}
 	function checkForm(form)	{
 	//	if (!checkField(form.payAmnt1,"Amount received")) {return false;}
 		if (!checkDateFormat(form.trnDate.value))	{
@@ -215,6 +216,7 @@
 			});
 			e.preventDefault();
 		});
+		
 		$('.orderOverlayClose').click(function(e) {
 			$("#orderOverlay").fadeOut();
 			$("#orderOverlay-ui").fadeOut();

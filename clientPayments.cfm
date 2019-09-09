@@ -102,6 +102,7 @@
 //		
 //		checkTotal(formname);
 //	}
+
 	function checkForm(form)	{
 	//	if (!checkField(form.payAmnt1,"Amount received")) {return false;}
 		if (!checkDateFormat(form.trnDate.value))	{

@@ -1930,7 +1930,7 @@
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
 			SELECT nomID,nomCode,nomGroup,nomTitle,nomOrder
 			FROM tblNominal
-			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
+			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV','W2')
 			ORDER BY nomOrder
 		</cfquery>
 		<cfloop query="loc.QNomPayAccounts">

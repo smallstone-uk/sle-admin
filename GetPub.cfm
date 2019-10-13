@@ -132,7 +132,7 @@
 					<cfset keys=ListSort(StructKeyList(application.site.VAT,","),"text","asc",",")>
 					<cfloop list="#keys#" index="key">
 						<cfset vat=StructFind(application.site.VAT,key)>
-						<option value="#vat#"<cfif pub.Vat eq key> selected="selected"</cfif>>#DecimalFormat(vat*100)#</option>
+						<option value="#vat#"<cfif pub.PWVat eq vat> selected="selected"</cfif>>#DecimalFormat(vat*100)#</option>
 					</cfloop>
 				</select>
 			</cfif>

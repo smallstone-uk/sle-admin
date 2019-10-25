@@ -595,7 +595,7 @@
 				INNER JOIN tblStreets2 ON stID = cltStreetCode
 				WHERE tblPublication.pubID=#val(args.pubID)#
 				AND tblOrderItem.oiStatus="active"
-				AND tblClients.cltAccountType NOT IN ('N','H')
+				<!---AND tblClients.cltAccountType NOT IN ('N','H')--->
 				AND ordActive
 				ORDER BY pubTitle, cltRef;
 			</cfquery>

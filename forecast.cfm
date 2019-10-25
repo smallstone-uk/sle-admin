@@ -75,7 +75,7 @@
 <cfset parm.limit=0>
 <cfset parm.date=LSDateFormat(Now(),"yyyy-mm-dd")>
 <cfset forecast=cast.ForecastOrders(parm)>
-
+<!---<cfdump var="#forecast#" label="forecast" expand="false">--->
 <cfoutput>
 <body>
 	<div id="total"></div>

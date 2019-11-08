@@ -1658,7 +1658,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
-		<cfset loc.rec={}>
+		<cfset loc.rec = {}>
 		<cfset loc.result.codes = {}>
 		<cftry>
 			<cfquery name="loc.result.QNominal" datasource="#args.datasource#">
@@ -1930,7 +1930,7 @@
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
 			SELECT nomID,nomCode,nomGroup,nomTitle,nomOrder
 			FROM tblNominal
-			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV','W2')
+			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
 			ORDER BY nomOrder
 		</cfquery>
 		<cfloop query="loc.QNomPayAccounts">

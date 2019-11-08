@@ -189,7 +189,7 @@
 				var payNum=Number(payString,10);
 				var w2Num=Number(w2String,10);
 				var checktotal=netNum-totNum;
-				var paytotal=netNum-payNum+w2Num;
+				var paytotal=netNum-payNum;
 				console.log(paytotal);
 
 				var cashString=$('#CASH').val();

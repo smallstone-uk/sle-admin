@@ -105,7 +105,7 @@
 					<td></td>
 					<td></td>
 					<td align="center">#item.Qty#</th>
-					<td><a href="javascript:void(0)" data-id="#item.id#">#item.Title#</a></th>
+					<td><a href="javascript:void(0)" data-id="#item.id#" class="showClients">#item.Title#</a></th>
 				</tr>
 			</cfif>
 		</table>

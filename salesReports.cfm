@@ -53,7 +53,7 @@
 
 <cfsetting requesttimeout="900">
 <cfparam name="theYear" default="#Year(now())#">
-<cfparam name="group" default="31">
+<cfparam name="group" default="151">
 <cfparam name="category" default="0">
 <cfobject component="code/sales" name="sales">
 <cfset parms={}>
@@ -113,6 +113,7 @@
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
+	<cfset groupTotal = 0>
 	<cfloop query="QSales.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
@@ -121,6 +122,15 @@
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
+			<cfif groupTotal gt 0>
+				<tr>
+					<td colspan="17" align="right">Category Total</td>
+					<td align="center"><strong>#groupTotal#</strong></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<cfset groupTotal = 0>
+			</cfif>
 			<tr>
 				<th colspan="21">#pcatTitle#</th>
 			</tr>
@@ -172,6 +182,7 @@
 				<span class="purch">#purRec.total#</span>
 			</td>
 			<cfset stockTotal = purRec.total - total>
+			<cfset groupTotal += stockTotal>
 			<cfif stockTotal lt 0>
 				<cfset class = "stkErr">
 			<cfelse><cfset class = "stkOK"></cfif>
@@ -180,6 +191,15 @@
 			<td></td>
 		</tr>
 	</cfloop>
+	<cfif groupTotal gt 0>
+		<tr>
+			<td colspan="17" align="right">Category Total</td>
+			<td align="center"><strong>#groupTotal#</strong></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<cfset groupTotal = 0>
+	</cfif>
 	</table>
 	<cfif nonMovers.productList.recordcount gt 0>
 		<table class="tableList" border="1">

@@ -231,28 +231,30 @@
 			</cfloop>
 		</table>
 	</cfif>
-	<table class="footnote">
-		<tr>
-			<td>
-				<table>
-					<tr><th colspan="2">Negative opening stock is caused by:-</th></tr>
-					<tr><td>1</td><td>Stock not sold through till, e.g taken for Bunnery or home.</td></tr>
-					<tr><td>2</td><td>Incorrect product assigned with the received stock.</td></tr>
-					<tr><td>3</td><td>Theft.</td></tr>
-					<tr><td class="stkErr"></td><td>Errors are marked in yellow.</td></tr>
-				</table>
-			</td>
-			<td>
-				<table>
-					<tr><th colspan="2">Negative closing stock is caused by:-</th></tr>
-					<tr><td>1</td><td>Product received but not booked in.</td></tr>
-					<tr><td>2</td><td>Wrong product booked in.</td></tr>
-					<tr><td>3</td><td>Opening stock figure not declared.</td></tr>
-					<tr><td>&nbsp;</td><td></td></tr>
-				</table>
-			</td>
-		</tr>
-	</table>
+	<div class="no-print">
+		<table class="footnote">
+			<tr>
+				<td>
+					<table>
+						<tr><th colspan="2">Negative opening stock is caused by:-</th></tr>
+						<tr><td>1</td><td>Stock not sold through till, e.g taken for Bunnery or home.</td></tr>
+						<tr><td>2</td><td>Incorrect product assigned with the received stock.</td></tr>
+						<tr><td>3</td><td>Theft.</td></tr>
+						<tr><td class="stkErr"></td><td>Errors are marked in yellow.</td></tr>
+					</table>
+				</td>
+				<td>
+					<table>
+						<tr><th colspan="2">Negative closing stock is caused by:-</th></tr>
+						<tr><td>1</td><td>Product received but not booked in.</td></tr>
+						<tr><td>2</td><td>Wrong product booked in.</td></tr>
+						<tr><td>3</td><td>Opening stock figure not declared.</td></tr>
+						<tr><td>&nbsp;</td><td></td></tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
 </cfoutput>
 </body>
 </html>

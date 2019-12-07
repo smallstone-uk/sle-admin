@@ -29,6 +29,7 @@
 	<cfobject component="code/payroll" name="pr">
 	<cfset parm = {}>
 	<cfset parm.database = application.site.datasource1>
+	<cfset parm.active = true>
 	<cfset LoadEmployees = pr.LoadEmployees(parm)>
 
 	<cfoutput>

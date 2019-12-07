@@ -439,8 +439,13 @@
 		<cfquery name="loc.employees" datasource="#args.database#">
 			SELECT *
 			FROM tblEmployee
-			WHERE empStatus='active'
-			ORDER BY empFirstName ASC
+			WHERE 1
+			<cfif args.active>
+				AND empStatus='active'
+				ORDER BY empFirstName ASC
+			<cfelse>
+				ORDER BY empStatus ASC, empFirstName ASC
+			</cfif>
 		</cfquery>
 		
 		<cfloop query="loc.employees">

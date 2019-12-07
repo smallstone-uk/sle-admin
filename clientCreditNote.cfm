@@ -69,6 +69,7 @@
 					<option value="wrong">Wrong Delivery</option>
 					<option value="unwanted">Unwanted Delivery</option>
 					<option value="On Holiday">Holiday</option>
+					<option value="admin">Admin Error</option>
 				</select>
 			</td>
 		</tr>

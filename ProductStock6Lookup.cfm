@@ -7,7 +7,7 @@
 	<cfset parm.datasource=application.site.datasource1>
 	<cfset parm.form=form>
 	<cfset lookup=pstock.FindProduct(parm)>
-<cfdump var="#lookup#" label="lookup" expand="false">
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 			<cfoutput>

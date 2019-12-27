@@ -7,7 +7,7 @@
 	<cfset parm.datasource=application.site.datasource1>
 	<cfset parm.form=form>
 	<cfset lookup=pstock.FindProduct(parm)>
-
+<cfdump var="#lookup#" label="lookup" expand="false">
 	<script type="text/javascript">
 		$(document).ready(function() {
 			<cfoutput>
@@ -135,7 +135,7 @@
 				<div class="clear"></div>
 			</div>
 			<div id="product">
-				<table class="showTable" border="1" width="500">
+				<table class="showTable" border="1">
 					<tr>
 						<th colspan="2">Product Details</th>
 					</tr>
@@ -155,7 +155,7 @@
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
 					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
-					<tr><td>Stock Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
+					<tr><td>Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
 					<tr><td>Status</td><td>#lookup.product.prodStatus#</td></tr>
 					<tr><td>Reorder</td><td>#lookup.product.prodReorder#</td></tr>
 				</table>
@@ -177,6 +177,25 @@
 						<tr><td colspan="2">No stock records found.</td></tr>
 					</cfif>
 				</table>
+				<cfif StructKeyExists(lookup,"Deals")>
+					<table class="showTable" border="1">
+						<tr>
+							<th colspan="2">Deals</th>
+						</tr>
+						<cfloop array="#lookup.deals#" index="dealItem">
+							<tr><td>Retail Club</td><td>#dealItem.ercTitle#</td></tr>
+							<tr><td>Title</td><td>#dealItem.edTitle#</td></tr>
+							<tr><td>Type</td><td>#dealItem.edType#</td></tr>
+							<tr><td>Starts</td><td>#LSDateFormat(dealItem.edStarts,"dd-mmm-yy")#</td></tr>
+							<tr><td>Ends</td><td>#LSDateFormat(dealItem.edEnds,"dd-mmm-yy")#</td></tr>
+							<tr><td>Qty</td><td>#dealItem.edQty#</td></tr>
+							<tr><td>Status</td><td>#dealItem.edStatus#</td></tr>
+							<tr><td>Deal Type</td><td>#dealItem.edDealType#</td></tr>
+							<tr><td>Amount</td><td>#dealItem.edAmount#</td></tr>
+							<tr><td colspan="2">&nbsp;</td></tr>
+						</cfloop>
+					</table>
+				</cfif>
 				<table class="showTable" border="1">
 					<tr><th colspan="2">Barcodes</th></tr>
 					<cfloop query="lookup.otherbarcodes">

@@ -91,7 +91,6 @@
 						<cfset loc.rec.prodEposCatID = prodEposCatID>
 						<cfset loc.rec.prodPriceMarked = prodPriceMarked>
 						<cfset loc.rec.prodVATRate = prodVATRate>
-						<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
 						<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
 						<cfset loc.rec.prodMinPrice = prodMinPrice>
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
@@ -137,6 +136,32 @@
 						WHERE barProdID = #val(loc.result.productID)#
 						AND barType = 'product'
 					</cfquery>
+					<cfquery name="loc.result.QDeals" datasource="#args.datasource#">
+						SELECT ercTitle, edTitle,edType,edStarts,edEnds,edQty,edStatus,edDealType,edAmount
+						FROM tblepos_dealitems
+						INNER JOIN tblepos_deals ON edID = ediParent
+						INNER JOIN tblepos_retailclubs ON ercID = edRetailClub
+						WHERE ediProduct = #val(loc.result.productID)#
+						AND edStarts <= NOW()
+						AND edEnds >= NOW()
+						ORDER BY ediID DESC
+					</cfquery>
+					<cfif loc.result.QDeals.recordcount gt 0>
+						<cfset loc.result.deals = []>
+						<cfloop query="loc.result.QDeals">
+							<cfset loc.deal = {}>
+							<cfset loc.deal.ercTitle = ercTitle>
+							<cfset loc.deal.edTitle = edTitle>
+							<cfset loc.deal.edType = edType>
+							<cfset loc.deal.edStarts = edStarts>
+							<cfset loc.deal.edEnds = edEnds>
+							<cfset loc.deal.edQty = edQty>
+							<cfset loc.deal.edStatus = edStatus>
+							<cfset loc.deal.edDealType = edDealType>
+							<cfset loc.deal.edAmount = edAmount>
+							<cfset ArrayAppend(loc.result.deals,loc.deal)>
+						</cfloop>
+					</cfif>
 					<cfquery name="loc.CategoryGroup" datasource="#args.datasource#">
 						SELECT pcatID,pgID,pcatTitle,pgTitle,pgTarget
 						FROM tblProductCats
@@ -155,6 +180,7 @@
 			<cfquery name="loc.result.groups" datasource="#args.datasource#">
 				SELECT *
 				FROM tblProductGroups
+				WHERE pgType = 'sale'
 				ORDER BY pgTitle
 			</cfquery>
 			<cfset ArrayAppend(loc.result.msgs,loc.result.msg)>
@@ -356,6 +382,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.resultStr = "An error occurred updating the record.">
+		<cfdump var="#args#" label="AmendProduct" expand="false">
 		<cftry>
 			<cfquery name="loc.QUpdate" datasource="#args.datasource#">
 				UPDATE tblProducts
@@ -369,6 +396,7 @@
 					prodStockLevel = #val(args.form.prodStockLevel)#,
 					prodVATRate = #args.form.prodVATRate#,
 					prodEposCatID = #val(args.form.prodEposCatID)#,
+					prodStaffDiscount = '#StructKeyExists(args.form,"prodStaffDiscount")#',
 					prodStatus = '#args.form.prodStatus#',
 					prodReorder = '#args.form.prodReorder#'
 				WHERE prodID = #val(args.form.prodID)#

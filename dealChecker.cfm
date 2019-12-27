@@ -91,11 +91,11 @@
 		<cftry>
 			<cfset loc.today = CreateDate(year(now()),month(now()),day(now()))>
 			<cfif args.range eq "currentx">
-				<cfset loc.dateRange = " AND edStarts <= loc.today AND edEnds >= loc.today">
+				<cfset loc.dateRange = " AND edStarts <= DATE(Now()) AND edEnds >= DATE(Now())">
 			<cfelseif args.range eq "futurex">
-				<cfset loc.dateRange = " AND edStarts > loc.today">
+				<cfset loc.dateRange = " AND edStarts > DATE(Now())">
 			<cfelseif args.range eq "pastx">
-				<cfset loc.dateRange = " AND edEnds < loc.today">
+				<cfset loc.dateRange = " AND edEnds < DATE(Now())">
 			<cfelseif args.range eq "allx">
 				<cfset loc.dateRange = "">
 			</cfif>
@@ -219,7 +219,7 @@
 						<tr bgcolor="#item.style#">
 							<td>#recCount#</td>
 							<td>#item.ediID#</td>
-							<td>#item.prodID#</td>
+							<td><a href="productStock6.cfm?product=#item.prodID#" target="checkDeal">#item.prodID#</a></td>
 							<td>#item.prodRef#</td>
 							<td>#item.edDealType#</td>
 							<td>#item.edQty#</td>
@@ -268,7 +268,7 @@
 							<td>#item.ercID#</td>
 							<td>#item.ercTitle#</td>
 							<td>#item.ediID#</td>
-							<td>#item.prodID#</td>
+							<td><a href="productStock6.cfm?product=#item.prodID#" target="checkDeal">#item.prodID#</a></td>
 							<td>#item.prodRef#</td>
 							<td>#item.edDealType#</td>
 							<td>#item.edQty#</td>

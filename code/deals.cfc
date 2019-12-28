@@ -106,6 +106,16 @@
 			</cfcase>
 		</cfswitch>
 
+		<cfquery name="loc.getClubIndex" datasource="#GetDatasource()#">
+			SELECT ercIndex FROM tblepos_retailclubs WHERE ercID=#val(args.header.ed_retailclub)#
+		</cfquery>
+		<cfset loc.dealIndex = loc.getClubIndex.ercIndex + 1>
+		<cfquery name="loc.putClubIndex" datasource="#GetDatasource()#">
+			UPDATE tblepos_retailclubs
+			SET  ercIndex = #loc.dealIndex#
+			WHERE ercID=#val(args.header.ed_retailclub)#
+		</cfquery>
+		
 		<cfquery name="loc.addHeader" datasource="#GetDatasource()#" result="loc.addHeader_result">
 			INSERT INTO tblEPOS_Deals (
 				edTitle,
@@ -116,7 +126,8 @@
 				edAmount,
 				edQty,
 				edStatus,
-				edRetailClub
+				edRetailClub,
+				edIndex
 			) VALUES (
 				'#args.header.ed_title#',
 				'#args.header.ed_starts#',
@@ -126,7 +137,8 @@
 				#val(args.header.ed_amount)#,
 				#val(args.header.ed_quantity)#,
 				'#args.header.ed_active#',
-				#val(args.header.ed_retailclub)#
+				#val(args.header.ed_retailclub)#,
+				#val(loc.dealIndex)#
 			)
 		</cfquery>
 
@@ -256,7 +268,6 @@
 					OR csDateRestrict = 'No'	)
 			LIMIT 1;
 		</cfquery>
-		
 		<cfif loc.samples.recordcount is 1>
 			<cfset loc.result.id = val(loc.samples.csItemID)>
 			<cfset loc.result.type = loc.samples.csItemType>

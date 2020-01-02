@@ -32,7 +32,7 @@
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
 			LEFT JOIN tblepos_items ON eiProdID=prodID
 			WHERE eiID IS NULL
-			AND YEAR(soDate) = #val(loc.rptYear)#
+			AND soDate >= DATE_ADD(NOW(), INTERVAL '-365' DAY)
 			AND siStatus='closed'
 			AND pgType != 'epos'
 			AND siStatus = 'closed'
@@ -81,7 +81,8 @@
 			INNER JOIN tblProductCats ON pcatID=prodCatID
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
 			LEFT JOIN tblepos_items AS st ON eiProdID=prodID
-			WHERE YEAR(st.eiTimestamp) = #val(loc.rptYear)#
+			WHERE st.eiTimestamp >= DATE_ADD(NOW(), INTERVAL '-365' DAY)
+
 			AND pgType != 'epos'
 			AND prodStatus != 'inactive'
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
@@ -148,7 +149,7 @@
 			INNER JOIN tblStockOrder AS so ON siOrder=soID
 			INNER JOIN tblProductCats ON pcatID=prodCatID
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
-			WHERE YEAR(so.soDate) = #val(loc.rptYear)#
+			WHERE so.soDate >= DATE_ADD(NOW(), INTERVAL '-365' DAY)
 			AND pgType != 'epos'
 			AND siStatus = 'closed'
 			AND prodStatus != 'inactive'

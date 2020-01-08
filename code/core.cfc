@@ -936,7 +936,9 @@
 			<cfif StructKeyExists(args,"pubID")>AND pubID IN (#args.pubID#)</cfif>
 			AND vchPubID=pubID
 			AND vchStatus='in'
-			<cfif StructKeyExists(args,"fromDate")>AND vchStop >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'</cfif>	<!--- 28/9/14 ignore vouchers expired before this invoice run --->
+			<cfif StructKeyExists(args,"pubID")>AND pubID IN (#args.pubID#)</cfif>
+			<cfif StructKeyExists(args,"showCurrent")>AND vchStop >= '#LSDateFormat(Now(),"yyyy-mm-dd")#'</cfif>	
+			<!--- 28/9/14 ignore vouchers expired before this invoice run --->
 			ORDER BY vchPubID asc, vchStop desc
 		</cfquery>
 		<cfloop query="QVouchers">

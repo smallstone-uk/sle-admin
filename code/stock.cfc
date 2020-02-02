@@ -14,7 +14,7 @@
 		<cfquery name="loc.save" datasource="#args.datasource#">
 				UPDATE tblProducts
 				SET prodStockLevel = #val(args.stockLevel)#,
-					prodCountDate = #Now()#
+					prodCountDate = '2018-10-28'	<!--- day before first date EPOS till was used --->
 				WHERE prodID=#val(args.product)#
 		</cfquery>
 	</cffunction>

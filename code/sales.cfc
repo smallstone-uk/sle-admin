@@ -45,6 +45,25 @@
 		<cfreturn loc>
 	</cffunction>
 
+	<cffunction name="stockSalesBFwd" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.QSalesBFwd" datasource="#args.datasource#">
+			SELECT eiProdID, SUM(eiQty ) AS Qty, SUM(eiNet) AS Net
+			FROM tblepos_items
+			WHERE eiClass = 'sale'
+			AND DATE(eiTimestamp) < '#args.srchDateFrom#'
+			GROUP BY eiProdID
+		</cfquery>
+		<cfset loc.SalesBFWDs = {}>
+		<cfif loc.QSalesBFwd.recordcount gt 0>
+			<cfloop query="loc.QSalesBFwd">
+				<cfset StructInsert(loc.SalesBFWDs,eiProdID,{"Qty" = Qty,"Net" = Net})>
+			</cfloop>
+		</cfif>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="stockSalesByMonth" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -81,16 +100,19 @@
 			INNER JOIN tblProductCats ON pcatID=prodCatID
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
 			LEFT JOIN tblepos_items AS st ON eiProdID=prodID
-			WHERE st.eiTimestamp >= DATE_ADD(NOW(), INTERVAL '-365' DAY)
-
+			WHERE st.eiTimestamp BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
+			<!---WHERE st.eiTimestamp >= DATE_ADD(NOW(), INTERVAL '-365' DAY)--->
+			
 			AND pgType != 'epos'
 			AND prodStatus != 'inactive'
+			AND st.eiClass = 'sale'
 			<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 			<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 			<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
 			GROUP BY pgTitle, pcatTitle, prodID
 			ORDER BY pgTitle, pcatTitle, prodTitle
 		</cfquery>
+		<cfset QueryAddColumn(loc.salesItems,"BFwd","integer",[])>
 		<cfset QueryAddColumn(loc.salesItems,"siUnitSize",[])>
 		<cfset QueryAddColumn(loc.salesItems,"siOurPrice",[])>
 		<cfloop query="loc.salesItems">
@@ -106,9 +128,37 @@
 					AND siStatus = "closed" )
 				WHERE prodID=#val(loc.prodID)#
 			</cfquery>
+			<cfquery name="loc.QSalesBFwd" datasource="#args.datasource#">
+				SELECT eiProdID, SUM(eiQty ) AS Qty, SUM(eiNet) AS Net
+				FROM tblepos_items
+				WHERE eiProdID=#val(loc.prodID)#
+				AND DATE(eiTimestamp) < '#args.srchDateFrom#'
+				GROUP BY eiProdID
+			</cfquery>
+			<cfset QuerySetCell(loc.salesItems,"BFwd",loc.QSalesBFwd.Qty,currentrow)>
 			<cfset QuerySetCell(loc.salesItems,"siUnitSize",loc.stockItem.siUnitSize,currentrow)>
 			<cfset QuerySetCell(loc.salesItems,"siOurPrice",loc.stockItem.siOurPrice,currentrow)>
 		</cfloop>
+		<cfreturn loc>
+	</cffunction>
+
+	<cffunction name="stockPurchBFwd" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.QPurchBFwd" datasource="#args.datasource#">
+			SELECT siProduct, SUM(siQtyItems ) AS Qty, SUM(siWSP) AS WSP
+			FROM tblstockitem
+			WHERE 1
+			AND DATE(siBookedIn) < '#args.srchDateFrom#'
+			AND DATE(siBookedIn) > '2018-10-29'	<!--- start date of EPOS till --->
+			GROUP BY siProduct
+		</cfquery>
+		<cfset loc.PurchBFWDs = {}>
+		<cfif loc.QPurchBFwd.recordcount gt 0>
+			<cfloop query="loc.QPurchBFwd">
+				<cfset StructInsert(loc.PurchBFWDs,siProduct,{"Qty" = Qty,"WSP" = WSP})>
+			</cfloop>
+		</cfif>
 		<cfreturn loc>
 	</cffunction>
 
@@ -149,7 +199,9 @@
 			INNER JOIN tblStockOrder AS so ON siOrder=soID
 			INNER JOIN tblProductCats ON pcatID=prodCatID
 			INNER JOIN tblProductGroups ON pcatGroup=pgID
-			WHERE so.soDate >= DATE_ADD(NOW(), INTERVAL '-365' DAY)
+			WHERE so.soDate BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
+			AND DATE(siBookedIn) > '2018-10-29'	<!--- start date of EPOS till --->
+			<!---WHERE so.soDate >= DATE_ADD(NOW(), INTERVAL '-365' DAY)--->
 			AND pgType != 'epos'
 			AND siStatus = 'closed'
 			AND prodStatus != 'inactive'
@@ -159,7 +211,18 @@
 			GROUP BY pgTitle, pcatTitle, prodID
 		</cfquery>
 		<cfset loc.stock = {}>
+		<cfset QueryAddColumn(loc.purchItems,"BFwd","integer",[])>
 		<cfloop query="loc.purchItems">
+			<cfset loc.productID = prodID>
+			<cfquery name="loc.QPurchBFwd" datasource="#args.datasource#">
+				SELECT siProduct, SUM(siQtyItems ) AS Qty, SUM(siWSP) AS WSP
+				FROM tblstockitem
+				WHERE siProduct = #loc.productID#
+				AND DATE(siBookedIn) < '#args.srchDateFrom#'
+				AND DATE(siBookedIn) > '2018-10-29'	<!--- start date of EPOS till --->
+				GROUP BY siProduct
+			</cfquery>
+			<cfset QuerySetCell(loc.purchItems,"BFwd",loc.QPurchBFwd.Qty,currentrow)>
 			<cfset StructInsert(loc.stock,prodID,QueryRowToStruct(loc.purchItems,currentrow))>
 		</cfloop>
 		<cfreturn loc>

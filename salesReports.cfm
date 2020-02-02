@@ -3,7 +3,9 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Stock Sales &amp; Purchase</title>
-	<link rel="stylesheet" type="text/css" href="css/main3.css"/>
+	<link rel="stylesheet" type="text/css" href="css/main3.css" />
+	<link rel="stylesheet" type="text/css" href="css/chosen.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.3.custom.min.css">
 	<style>
 		.sale {color:#FF00FF; line-height:16px;}
 		.purch {color:#0000FF; line-height:16px;}
@@ -20,6 +22,7 @@
 	</style>
 	<script src="scripts/jquery-1.11.1.min.js"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			var isEditingOpenStock = false;
@@ -47,43 +50,78 @@
 					}
 				});
 			});
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 		});
 	</script>
 </head>
 
 <cfsetting requesttimeout="900">
 <cfparam name="theYear" default="#Year(now())#">
-<cfparam name="group" default="151">
+<cfparam name="group" default="0">	<!--- was 151--->
 <cfparam name="category" default="0">
+<cfparam name="srchDateFrom" default="">
+<cfparam name="srchDateTo" default="">
 <cfobject component="code/sales" name="sales">
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
 <cfset parms.grpID=group>
 <cfset parms.catID=category>
 <cfset parms.rptYear=theYear>
-<cfset QSales = sales.stockSalesByMonth(parms)>
-<cfset Purch = sales.stockPurchByMonth(parms)>
+<cfset parms.srchDateFrom = srchDateFrom>
+<cfset parms.srchDateTo = srchDateTo>
 <cfset groups = sales.LoadGroups(parms)>
-<cfset nonMovers = sales.stockNonMovers(parms)>
+<cfif group neq 0>
+	<!---<cfset SalesBFwd = sales.stockSalesBFwd(parms)>--->
+	<cfset SalesData = sales.stockSalesByMonth(parms)>
+	<!---<cfset PurchBFwd = sales.stockPurchBFwd(parms)>--->
+	<cfset PurchData = sales.stockPurchByMonth(parms)>
+	<cfset nonMovers = sales.stockNonMovers(parms)>
 <!---
-<cfdump var="#QSales#" label="QSales" expand="false">
-<cfdump var="#Purch#" label="Purch" expand="false">
-<cfdump var="#nonMovers#" label="nonMovers" expand="false">
+	<cfdump var="#SalesData#" label="SalesData" expand="false">
+	<cfdump var="#PurchData#" label="PurchData" expand="false">
+	<cfdump var="#form#" label="form" expand="false">
+	<cfdump var="#SalesBFwd#" label="SalesBFwd" expand="false">
+	<cfdump var="#PurchBFwd#" label="PurchBFwd" expand="false">
+	<cfdump var="#nonMovers#" label="nonMovers" expand="false">
 --->
+</cfif>
+
 <body>
 <cfoutput>
 	<div class="no-print">
 		<form method="post" enctype="multipart/form-data">
-			Product Group:
-			<select name="group" id="group">
-				<option value="">Select group...</option>
-				<cfloop query="groups.ProductGroups">
-				<option value="#pgID#"<cfif parms.grpID eq pgID> selected</cfif>>#pgTitle#</option>
-				</cfloop>
-			</select>
-			<input type="submit" name="btnGo" value="Go">
+		<div class="module no-print">
+			<table border="0">
+				<tr>
+					<td><b>Product Group:</b></td>
+					<td>
+						<select name="group" id="group">
+							<option value="">Select group...</option>
+							<cfloop query="groups.ProductGroups">
+							<option value="#pgID#"<cfif parms.grpID eq pgID> selected</cfif>>#pgTitle#</option>
+							</cfloop>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><b>Date From</b></td>
+					<td>
+						<input type="text" name="srchDateFrom" value="#srchDateFrom#" class="datepicker" />
+					</td>
+				</tr>
+				<tr>
+					<td><b>Date To</b></td>
+					<td>
+						<input type="text" name="srchDateTo" value="#srchDateTo#" class="datepicker" />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" name="btnGo" value="Go"></td>
+				</tr>
+			</table>			
 		</form>
 	</div>
+<cfif group neq 0>
 	<table class="tableList" border="1">
 		<tr>
 			<th colspan="4">Stock Movement Report</th>
@@ -94,6 +132,7 @@
 			<th>Description</th>
 			<th>Size</th>
 			<th width="26">Open<br />Stock</th>
+			<th width="26">S /<br />P</th>
 			<th width="26" align="right">Jan</th>
 			<th width="26" align="right">Feb</th>
 			<th width="26" align="right">Mar</th>
@@ -114,7 +153,7 @@
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
 	<cfset groupTotal = 0>
-	<cfloop query="QSales.salesItems">
+	<cfloop query="SalesData.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
 				<th colspan="21"><span class="group">#pgTitle#</span></th>
@@ -136,14 +175,15 @@
 			</tr>
 			<cfset categoryID = pcatID>
 		</cfif>
-		<cfif StructKeyExists(Purch.stock,prodID)>
-			<cfset purRec = StructFind(Purch.stock,prodID)>
+		<cfif StructKeyExists(PurchData.stock,prodID)>
+			<cfset purRec = StructFind(PurchData.stock,prodID)>
 			<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear><cfset purRec.total += purRec.prodStockLevel></cfif>
 		<cfelse>
 			<cfset purRec = {}>
 			<cfset purRec.prodPriceMarked = 0>
 			<cfset purRec.prodCountDate = CreateDate(theYear,1,1)>
 			<cfset purRec.prodStockLevel = prodStockLevel>
+			<cfset purRec.BFwd = 0>
 			<cfset purRec.total = prodStockLevel>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset StructInsert(purRec,mnth,0)>
@@ -166,10 +206,16 @@
 				</cfif>
 			</td>
 			<td align="center" class="openstock disable-select" data-id="#prodID#">
-				<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>
+				#prodStockLevel#
+			</td>
+			<td align="center">
+				<!---<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>--->
+				<cfset openStock = purRec.prodStockLevel>
+				<!---<cfset openStock = val(purRec.BFwd) - val(SalesData.salesItems.BFwd)>--->
+				#val(purRec.BFwd)# <br /> #val(SalesData.salesItems.BFwd)#
 			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
-				<cfset mnthSale = QSales.salesItems[mnth][currentrow]>
+				<cfset mnthSale = SalesData.salesItems[mnth][currentrow]>
 				<cfset mnthPurch = 0>
 				<cfset mnthPurch = StructFind(purRec,mnth)>
 				<td width="26" align="right" class="mnthStk">
@@ -181,7 +227,7 @@
 				<span class="sale">#total#<br /></span>
 				<span class="purch">#purRec.total#</span>
 			</td>
-			<cfset stockTotal = purRec.total - total>
+			<cfset stockTotal = purRec.total - total + openStock>
 			<cfset groupTotal += stockTotal>
 			<cfif stockTotal lt 0>
 				<cfset class = "stkErr">
@@ -255,6 +301,7 @@
 			</tr>
 		</table>
 	</div>
+</cfif>
 </cfoutput>
 </body>
 </html>

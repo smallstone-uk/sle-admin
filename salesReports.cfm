@@ -118,7 +118,8 @@
 				<tr>
 					<td colspan="2"><input type="submit" name="btnGo" value="Go"></td>
 				</tr>
-			</table>			
+			</table>
+		</div>			
 		</form>
 	</div>
 <cfif group neq 0>
@@ -163,7 +164,7 @@
 		<cfif categoryID neq pcatID>
 			<cfif groupTotal gt 0>
 				<tr>
-					<td colspan="17" align="right">Category Total</td>
+					<td colspan="18" align="right">Category Total</td>
 					<td align="center"><strong>#groupTotal#</strong></td>
 					<td></td>
 					<td></td>
@@ -239,7 +240,7 @@
 	</cfloop>
 	<cfif groupTotal gt 0>
 		<tr>
-			<td colspan="17" align="right">Category Total</td>
+			<td colspan="18" align="right">Category Total</td>
 			<td align="center"><strong>#groupTotal#</strong></td>
 			<td></td>
 			<td></td>

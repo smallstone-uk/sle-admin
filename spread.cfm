@@ -261,7 +261,7 @@
 					</cfif>
 					<cfif loc.inRange AND loc.inFilter>
 						<cfswitch expression="#rec.TYPE#">
-							<cfcase value="FPI|BGC|BP|DEP|COR|SO" delimiters="|">
+							<cfcase value="FPI|BGC|BP|DEP|DEPQ|SO" delimiters="|">
 								<cfif Find("CARDNET",rec.description)>	<!--- Card Receipts --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 									<cfset rec.description=ListDeleteAt(rec.description,2," ")>
@@ -284,6 +284,9 @@
 								<cfelse>
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								</cfif>
+							</cfcase>
+							<cfcase value="COR" delimiters="|">
+								<cfset loc.accountRef=ExtractRef(refs.customers,rec)>
 							</cfcase>
 							<cfcase value="FPO|DD|DEB|PAY|DC|CHG" delimiters="|">
 								<cfif Find("LOAN",rec.description)> <!--- bank loan --->
@@ -352,6 +355,8 @@
 			AND trnDate='#tran.date#'
 			AND trnLedger='sales'
 			AND trnType='pay'
+			AND trnRef='#tran.type#'
+			AND trnAmnt1 = #loc.trnTotalNum#
 		<!--- 	AND trnDesc='#tran.description#'	added to fix a/c 217 2 payments on same day --->
 		</cfquery>
 		<cfif loc.QCheckExists.recordcount IS 0>
@@ -467,7 +472,6 @@
 			WHERE nomID=#acct.ID#
 			AND niTranID=trnID
 			AND niNomID=nomID
-			AND niAmount=#tran.dr-tran.cr#
 			AND trnDate='#tran.date#'
 			AND trnRef='#tran.type#'
 			AND trnDesc='#tran.description#'

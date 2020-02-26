@@ -346,7 +346,7 @@
 		<cfset loc.result="checkClientTran">
 		<cfset loc.trnTotalNum=tran.cr-tran.dr>
 		<cfset loc.tranType="pay">
-		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
+		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#" result="loc.QCheckExistsResult">
 			SELECT *
 			FROM tblTrans,tblAccount
 			WHERE trnAccountID=accID
@@ -356,8 +356,8 @@
 			AND trnLedger='sales'
 			AND trnType='pay'
 			AND trnRef='#tran.type#'
-			AND trnAmnt1 = #loc.trnTotalNum#
-		<!--- 	AND trnDesc='#tran.description#'	added to fix a/c 217 2 payments on same day --->
+			AND trnAmnt1 = #-loc.trnTotalNum#
+			AND trnDesc LIKE '#tran.description#%'
 		</cfquery>
 		<cfif loc.QCheckExists.recordcount IS 0>
 			<cfset loc.parm.database=application.site.datasource1>
@@ -372,7 +372,7 @@
 			<cfset loc.parm.header.accNomAcct=acct.NomAcct>
 			<cfset loc.parm.header.tranType=loc.tranType>
 			<cfset loc.parm.header.trnType=loc.tranType>
-			<cfset loc.parm.header.trnAmnt1=abs(loc.trnTotalNum)>
+			<cfset loc.parm.header.trnAmnt1=loc.trnTotalNum>
 			<cfset loc.parm.header.trnAmnt2=0>
 			<cfset loc.parm.header.trnRef=tran.type>
 			<cfset loc.parm.header.trnMethod="ib">

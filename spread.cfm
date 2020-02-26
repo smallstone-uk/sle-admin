@@ -344,7 +344,7 @@
 		<cfargument name="tran" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset loc.result="checkClientTran">
-		<cfset loc.trnTotalNum=tran.cr-tran.dr>
+		<cfset loc.trnTotalNum=tran.dr-tran.cr>
 		<cfset loc.tranType="pay">
 		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#" result="loc.QCheckExistsResult">
 			SELECT *
@@ -356,7 +356,7 @@
 			AND trnLedger='sales'
 			AND trnType='pay'
 			AND trnRef='#tran.type#'
-			AND trnAmnt1 = #-loc.trnTotalNum#
+			AND trnAmnt1 = #loc.trnTotalNum#
 			AND trnDesc LIKE '#tran.description#%'
 		</cfquery>
 		<cfif loc.QCheckExists.recordcount IS 0>
@@ -385,7 +385,7 @@
 				<!---<cfdump var="#loc.paymentRecord#" label="paymentRecord" expand="no">--->
 				<cfset loc.result='<span class="insert">Created: #loc.paymentRecord.tranID#</span>'>
 			<cfelse>
-				<!---<cfdump var="#loc#" label="INSERT" expand="false">--->
+				<cfdump var="#loc#" label="INSERT" expand="false">
 				<cfset insertCount++>
 				<cfset loc.result='<span class="insert">to be inserted</span>'>
 			</cfif>

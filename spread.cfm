@@ -372,7 +372,7 @@
 			<cfset loc.parm.header.accNomAcct=acct.NomAcct>
 			<cfset loc.parm.header.tranType=loc.tranType>
 			<cfset loc.parm.header.trnType=loc.tranType>
-			<cfset loc.parm.header.trnAmnt1=loc.trnTotalNum>
+			<cfset loc.parm.header.trnAmnt1=-loc.trnTotalNum>	<!--- invert to save tran --->
 			<cfset loc.parm.header.trnAmnt2=0>
 			<cfset loc.parm.header.trnRef=tran.type>
 			<cfset loc.parm.header.trnMethod="ib">
@@ -385,7 +385,7 @@
 				<!---<cfdump var="#loc.paymentRecord#" label="paymentRecord" expand="no">--->
 				<cfset loc.result='<span class="insert">Created: #loc.paymentRecord.tranID#</span>'>
 			<cfelse>
-				<cfdump var="#loc#" label="INSERT" expand="false">
+				<!---<cfdump var="#loc#" label="INSERT" expand="false">--->
 				<cfset insertCount++>
 				<cfset loc.result='<span class="insert">to be inserted</span>'>
 			</cfif>

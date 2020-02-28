@@ -71,9 +71,7 @@
 <cfset parms.srchDateTo = srchDateTo>
 <cfset groups = sales.LoadGroups(parms)>
 <cfif group neq 0>
-	<!---<cfset SalesBFwd = sales.stockSalesBFwd(parms)>--->
 	<cfset SalesData = sales.stockSalesByMonth(parms)>
-	<!---<cfset PurchBFwd = sales.stockPurchBFwd(parms)>--->
 	<cfset PurchData = sales.stockPurchByMonth(parms)>
 	<cfset nonMovers = sales.stockNonMovers(parms)>
 <!---
@@ -122,6 +120,144 @@
 		</div>			
 		</form>
 	</div>
+
+	<cfif group neq 0>
+		<cfset products = sales.selectProducts(parms)>
+		<!---<cfdump var="#products#" label="products" expand="false">--->
+		<table class="tableList" border="1">
+			<tr>
+				<th colspan="4">Stock Movement Report</th>
+				<th colspan="19" align="left">as at: #LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
+			</tr>
+			<tr>
+				<th>Product<br />Code</th>
+				<th>Description</th>
+				<th>Size</th>
+				<th width="26">Open<br />Stock</th>
+				<th width="26">S<br />P</th>
+				<th width="26">BFwd</th>
+				<th width="26" align="right">Jan</th>
+				<th width="26" align="right">Feb</th>
+				<th width="26" align="right">Mar</th>
+				<th width="26" align="right">Apr</th>
+				<th width="26" align="right">May</th>
+				<th width="26" align="right">Jun</th>
+				<th width="26" align="right">Jul</th>
+				<th width="26" align="right">Aug</th>
+				<th width="26" align="right">Sep</th>
+				<th width="26" align="right">Oct</th>
+				<th width="26" align="right">Nov</th>
+				<th width="26" align="right">Dec</th>
+				<th width="26" align="right">Year<br />Total</th>
+				<th width="26" align="center">Overall<br />Total</th>
+				<th width="26" align="center">Close<br />Stock</th>
+				<th width="26" align="right">Shop</th>
+				<th width="26" align="right">Store</th>
+			</tr>
+			<cfset categoryID = 0>
+			<cfset groupID = 0>
+			<cfset groupTotal = 0>
+			<cfloop query="products.productList">
+				<cfif groupID neq pgID>
+					<tr>
+						<th colspan="23"><span class="group">#pgTitle#</span></th>
+					</tr>
+					<cfset groupID = pgID>
+				</cfif>
+				<cfif categoryID neq pcatID>
+					<cfif groupTotal neq 0>
+						<tr>
+							<td colspan="20" align="right">Category Total</td>
+							<td align="right"><strong>#groupTotal#</strong></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<cfset groupTotal = 0>
+					</cfif>
+					<tr>
+						<th colspan="23">#pcatTitle#</th>
+					</tr>
+					<cfset categoryID = pcatID>
+				</cfif>
+				<tr class="product-line">
+					<td>#prodID#<br /><span class="tiny">#prodStatus#</span></td>
+					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
+					<cfif val(siOurPrice) eq 0>
+						<cfset class = "priceErr">
+					<cfelse>
+						<cfset class = "">
+					</cfif>
+					<td align="center" class="#class#">
+						<cfif val(siOurPrice) eq 0>
+							&pound; missing
+						<cfelse>
+							#siUnitSize#<br />
+							&pound;#siOurPrice# <span class="tiny">#GetToken(" |PM",val(prodPriceMarked)+1,"|")#</span>
+						</cfif>
+					</td>
+					<td align="center" class="openstock disable-select" data-id="#prodID#">#prodStockLevel#</td>
+					<cfset sData = {}>
+					<cfset pData = {}>
+					<cfif StructKeyExists(products.SalesData,prodID)>
+						<cfset sData = StructFind(products.SalesData,prodID)>
+					</cfif>
+					<cfif StructKeyExists(products.PurchData,prodID)>
+						<cfset pData = StructFind(products.PurchData,prodID)>
+					</cfif>
+					<td width="50" align="right">
+						<span class="sale">#val(sData.BFwd)#</span><br /><span class="purch">#val(pData.BFwd)#</span>
+					</td>
+					<cfset openStock = prodStockLevel + val(pData.BFwd) - val(sData.BFwd)>
+					<td>#openStock#</td>
+					<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
+						<td width="26" align="right" class="mnthStk">
+							<cfset sMnth = 0>
+							<cfif StructKeyExists(sData,mnth)>
+								<cfset sMnth = StructFind(sData,mnth)>
+							</cfif>
+							<cfset pMnth = 0>
+							<cfif StructKeyExists(pData,mnth)>
+								<cfset pMnth = StructFind(pData,mnth)>
+							</cfif>
+							<span class="sale"><cfif sMnth gt 0>#sMnth#<cfelse>&nbsp;</cfif><br /></span>
+							<span class="purch"><cfif pMnth gt 0>#pMnth#<cfelse>&nbsp;</cfif></span>
+						</td>
+					</cfloop>
+					<td width="50" align="right">
+						<span class="sale">#sData.total#<br /></span>
+						<span class="purch">#pData.total#</span>
+					</td>
+					<td width="50" align="right">
+						<span class="sale">#val(sData.BFwd) + sData.total#<br /></span>
+						<span class="purch">#prodStockLevel + val(pData.BFwd) + pData.total#</span>
+					</td>
+					<cfset closeStock = openStock + val(pData.total) - val(sData.total)>
+					<cfset groupTotal += closeStock>
+					<cfif closeStock lt 0>
+						<cfset class = "stkErr">
+					<cfelse><cfset class = "stkOK"></cfif>
+					<td width="50" align="right" class="#class#">#closeStock#</td>
+					<td></td>
+					<td></td>
+				</tr>
+			</cfloop>
+			<cfif groupTotal neq 0>
+				<tr>
+					<td colspan="20" align="right">Category Total</td>
+					<td align="right"><strong>#groupTotal#</strong></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</cfif>
+		</table>
+	</cfif>	
+	
+	
+<!---	
+	
+	
+	<h1> old version </h1>
+	
 <cfif group neq 0>
 	<table class="tableList" border="1">
 		<tr>
@@ -178,7 +314,7 @@
 		</cfif>
 		<cfif StructKeyExists(PurchData.stock,prodID)>
 			<cfset purRec = StructFind(PurchData.stock,prodID)>
-			<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear><cfset purRec.total += purRec.prodStockLevel></cfif>
+			<!---<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>---><cfset purRec.total += purRec.prodStockLevel><!---</cfif>--->
 		<cfelse>
 			<cfset purRec = {}>
 			<cfset purRec.prodPriceMarked = 0>
@@ -213,7 +349,7 @@
 				<!---<cfif IsDate(purRec.prodCountDate) AND Year(purRec.prodCountDate) eq theYear>#purRec.prodStockLevel#</cfif>--->
 				<cfset openStock = purRec.prodStockLevel>
 				<!---<cfset openStock = val(purRec.BFwd) - val(SalesData.salesItems.BFwd)>--->
-				#val(purRec.BFwd)# <br /> #val(SalesData.salesItems.BFwd)#
+				<span class="sale">#val(SalesData.salesItems.BFwd)#</span> <br /> <span class="purch">#val(purRec.BFwd)#</span>
 			</td>
 			<cfloop list="jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec" index="mnth">
 				<cfset mnthSale = SalesData.salesItems[mnth][currentrow]>
@@ -278,6 +414,8 @@
 			</cfloop>
 		</table>
 	</cfif>
+</cfif>
+--->
 	<div class="no-print">
 		<table class="footnote">
 			<tr>
@@ -302,7 +440,7 @@
 			</tr>
 		</table>
 	</div>
-</cfif>
+
 </cfoutput>
 </body>
 </html>

@@ -121,7 +121,6 @@
 						<cfset parms.datasource=application.site.datasource1>
 						<cfset parms.search=search>
 						<cfset customers=cust.ClientSearch(parms)>
-						<cfdump var="#customers#" label="customers" expand="false">
 						<cfset session.clientSearch.sql=customers.sql>
 						<cfset session.clientSearch.rowMax=customers.rowMax>
 						<div id="customer-search">

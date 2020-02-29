@@ -50,14 +50,14 @@
 					}
 				});
 			});
-			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2018, 10 - 1, 29)});
 		});
 	</script>
 </head>
 
 <cfsetting requesttimeout="900">
 <cfparam name="theYear" default="#Year(now())#">
-<cfparam name="group" default="0">	<!--- was 151--->
+<cfparam name="group" default="0">
 <cfparam name="category" default="0">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
@@ -70,19 +70,6 @@
 <cfset parms.srchDateFrom = srchDateFrom>
 <cfset parms.srchDateTo = srchDateTo>
 <cfset groups = sales.LoadGroups(parms)>
-<cfif group neq 0>
-	<cfset SalesData = sales.stockSalesByMonth(parms)>
-	<cfset PurchData = sales.stockPurchByMonth(parms)>
-	<cfset nonMovers = sales.stockNonMovers(parms)>
-<!---
-	<cfdump var="#SalesData#" label="SalesData" expand="false">
-	<cfdump var="#PurchData#" label="PurchData" expand="false">
-	<cfdump var="#form#" label="form" expand="false">
-	<cfdump var="#SalesBFwd#" label="SalesBFwd" expand="false">
-	<cfdump var="#PurchBFwd#" label="PurchBFwd" expand="false">
-	<cfdump var="#nonMovers#" label="nonMovers" expand="false">
---->
-</cfif>
 
 <body>
 <cfoutput>
@@ -123,7 +110,7 @@
 
 	<cfif group neq 0>
 		<cfset products = sales.selectProducts(parms)>
-		<cfdump var="#products#" label="products" expand="false">
+		<!---<cfdump var="#products#" label="products" expand="false">--->
 		<table class="tableList" border="1">
 			<tr>
 				<th colspan="4">Stock Movement Report</th>
@@ -156,7 +143,7 @@
 			</tr>
 			<cfset categoryID = 0>
 			<cfset groupID = 0>
-			<cfset groupTotal = 0>
+			<cfset categoryTotal = 0>
 			<cfloop query="products.productList">
 				<cfif groupID neq pgID>
 					<tr>
@@ -165,14 +152,14 @@
 					<cfset groupID = pgID>
 				</cfif>
 				<cfif categoryID neq pcatID>
-					<cfif groupTotal neq 0>
+					<cfif categoryTotal neq 0>
 						<tr>
 							<td colspan="20" align="right">Category Total</td>
-							<td align="right"><strong>#groupTotal#</strong></td>
+							<td align="right"><strong>#categoryTotal#</strong></td>
 							<td></td>
 							<td></td>
 						</tr>
-						<cfset groupTotal = 0>
+						<cfset categoryTotal = 0>
 					</cfif>
 					<tr>
 						<th colspan="23">#pcatTitle#</th>
@@ -232,7 +219,7 @@
 						<span class="purch">#prodStockLevel + val(pData.BFwd) + pData.total#</span>
 					</td>
 					<cfset closeStock = openStock + val(pData.total) - val(sData.total)>
-					<cfset groupTotal += closeStock>
+					<cfset categoryTotal += closeStock>
 					<cfif closeStock lt 0>
 						<cfset class = "stkErr">
 					<cfelse><cfset class = "stkOK"></cfif>
@@ -241,10 +228,10 @@
 					<td></td>
 				</tr>
 			</cfloop>
-			<cfif groupTotal neq 0>
+			<cfif categoryTotal neq 0>
 				<tr>
 					<td colspan="20" align="right">Category Total</td>
-					<td align="right"><strong>#groupTotal#</strong></td>
+					<td align="right"><strong>#categoryTotal#</strong></td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -313,7 +300,7 @@
 		</tr>
 	<cfset categoryID = 0>
 	<cfset groupID = 0>
-	<cfset groupTotal = 0>
+	<cfset categoryTotal = 0>
 	<cfloop query="SalesData.salesItems">
 		<cfif groupID neq pgID>
 			<tr>
@@ -322,14 +309,14 @@
 			<cfset groupID = pgID>
 		</cfif>
 		<cfif categoryID neq pcatID>
-			<cfif groupTotal gt 0>
+			<cfif categoryTotal gt 0>
 				<tr>
 					<td colspan="18" align="right">Category Total</td>
-					<td align="center"><strong>#groupTotal#</strong></td>
+					<td align="center"><strong>#categoryTotal#</strong></td>
 					<td></td>
 					<td></td>
 				</tr>
-				<cfset groupTotal = 0>
+				<cfset categoryTotal = 0>
 			</cfif>
 			<tr>
 				<th colspan="21">#pcatTitle#</th>
@@ -389,7 +376,7 @@
 				<span class="purch">#purRec.total#</span>
 			</td>
 			<cfset stockTotal = purRec.total - total + openStock>
-			<cfset groupTotal += stockTotal>
+			<cfset categoryTotal += stockTotal>
 			<cfif stockTotal lt 0>
 				<cfset class = "stkErr">
 			<cfelse><cfset class = "stkOK"></cfif>
@@ -398,14 +385,14 @@
 			<td></td>
 		</tr>
 	</cfloop>
-	<cfif groupTotal gt 0>
+	<cfif categoryTotal gt 0>
 		<tr>
 			<td colspan="18" align="right">Category Total</td>
-			<td align="center"><strong>#groupTotal#</strong></td>
+			<td align="center"><strong>#categoryTotal#</strong></td>
 			<td></td>
 			<td></td>
 		</tr>
-		<cfset groupTotal = 0>
+		<cfset categoryTotal = 0>
 	</cfif>
 	</table>
 	<cfif nonMovers.productList.recordcount gt 0>

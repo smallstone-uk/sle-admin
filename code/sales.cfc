@@ -103,7 +103,7 @@
 					INNER JOIN tblStockOrder AS so ON siOrder = soID
 					WHERE prodID = #loc.productID#
 					AND siBookedIn BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
-					AND siStatus != 'promo'
+					AND siStatus = 'closed'
 					GROUP BY prodID
 				</cfquery>
 				<cfif loc.purchItems.recordCount gt 0>
@@ -123,6 +123,7 @@
 					WHERE siProduct = #loc.productID#
 					AND DATE(siBookedIn) < '#args.srchDateFrom#'
 					AND DATE(siBookedIn) > '2018-10-28'	<!--- start date of EPOS till --->
+					AND siStatus = 'closed'
 					GROUP BY siProduct
 				</cfquery>
 				<cfset loc.purchBFWD = val(loc.QPurchBFwd.Qty)>

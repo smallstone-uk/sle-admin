@@ -121,7 +121,7 @@
 					FROM tblproducts
 					INNER JOIN tblepos_items AS st ON eiProdID=prodID
 					WHERE prodID = #loc.productID#
-					AND st.eiTimestamp BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
+					AND DATE(st.eiTimestamp) BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
 					GROUP BY prodID
 				</cfquery>
 				<cfif loc.salesItems.recordCount gt 0>

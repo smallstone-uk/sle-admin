@@ -138,12 +138,15 @@
 				<th width="26" align="right">Year<br />Total</th>
 				<th width="26" align="center">Overall<br />Total</th>
 				<th width="26" align="center">Close<br />Stock</th>
+				<th width="26" align="right">Retail<br />Value</th>
 				<th width="26" align="right">Shop</th>
 				<th width="26" align="right">Store</th>
 			</tr>
 			<cfset categoryID = 0>
 			<cfset groupID = 0>
 			<cfset categoryTotal = 0>
+			<cfset retailTotal = 0>
+			<cfset retailGrandTotal = 0>
 			<cfloop query="products.productList">
 				<cfif groupID neq pgID>
 					<tr>
@@ -156,10 +159,13 @@
 						<tr>
 							<td colspan="20" align="right">Category Total</td>
 							<td align="right"><strong>#categoryTotal#</strong></td>
+							<td align="right"><strong>#DecimalFormat(retailTotal)#</strong></td>
 							<td></td>
 							<td></td>
 						</tr>
+						<cfset retailGrandTotal += retailTotal>
 						<cfset categoryTotal = 0>
+						<cfset retailTotal = 0>
 					</cfif>
 					<tr>
 						<th colspan="23">#pcatTitle#</th>
@@ -224,6 +230,9 @@
 						<cfset class = "stkErr">
 					<cfelse><cfset class = "stkOK"></cfif>
 					<td width="50" align="right" class="#class#">#closeStock#</td>
+					<cfset retailValue = closeStock * siOurPrice>
+					<cfset retailTotal += retailValue>
+					<td align="right">#DecimalFormat(retailValue)#</td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -232,10 +241,18 @@
 				<tr>
 					<td colspan="20" align="right">Category Total</td>
 					<td align="right"><strong>#categoryTotal#</strong></td>
+					<td align="right"><strong>#DecimalFormat(retailTotal)#</strong></td>
 					<td></td>
 					<td></td>
 				</tr>
 			</cfif>
+			<tr>
+				<td colspan="20" align="right">Grand Total</td>
+				<td align="right"></td>
+				<td align="right"><strong>#DecimalFormat(retailGrandTotal)#</strong></td>
+				<td></td>
+				<td></td>
+			</tr>
 		</table>
 		<div class="no-print">
 			<table class="footnote">

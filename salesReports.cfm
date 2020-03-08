@@ -101,6 +101,12 @@
 					</td>
 				</tr>
 				<tr>
+					<td><b>Show Query</b></td>
+					<td>
+						<input type="checkbox" name="srchShowQuery" />
+					</td>
+				</tr>
+				<tr>
 					<td colspan="2"><input type="submit" name="btnGo" value="Go"></td>
 				</tr>
 			</table>
@@ -112,9 +118,14 @@
 		<cfset products = sales.selectProducts(parms)>
 		<!---<cfdump var="#products#" label="products" expand="false">--->
 		<table class="tableList" border="1">
+			<cfif StructKeyExists(form,"srchShowQuery")>
+				<tr>
+					<td colspan="25">#ParagraphFormat(products.productListResult.sql)#</td>
+				</tr>
+			</cfif>
 			<tr>
 				<th colspan="4">Stock Movement Report</th>
-				<th colspan="19" align="left">as at: #LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
+				<th colspan="21" align="left">as at: #LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
 			</tr>
 			<tr>
 				<th>Product<br />Code</th>
@@ -139,6 +150,7 @@
 				<th width="26" align="center">Overall<br />Total</th>
 				<th width="26" align="center">Close<br />Stock</th>
 				<th width="26" align="right">Retail<br />Value</th>
+				<th width="26" align="right">Gross<br />Trade</th>
 				<th width="26" align="right">Shop</th>
 				<th width="26" align="right">Store</th>
 			</tr>
@@ -147,10 +159,12 @@
 			<cfset categoryTotal = 0>
 			<cfset retailTotal = 0>
 			<cfset retailGrandTotal = 0>
+			<cfset tradeTotal = 0>
+			<cfset tradeGrandTotal = 0>
 			<cfloop query="products.productList">
 				<cfif groupID neq pgID>
 					<tr>
-						<th colspan="23"><span class="group">#pgTitle#</span></th>
+						<th colspan="25"><span class="group">#pgTitle#</span></th>
 					</tr>
 					<cfset groupID = pgID>
 				</cfif>
@@ -160,15 +174,20 @@
 							<td colspan="20" align="right">Category Total</td>
 							<td align="right"><strong>#categoryTotal#</strong></td>
 							<td align="right"><strong>#DecimalFormat(retailTotal)#</strong></td>
-							<td></td>
-							<td></td>
+							<td align="right"><strong>#DecimalFormat(tradeTotal)#</strong></td>
+							<cfset profit = retailTotal - tradeTotal>
+							<cfset POR = (profit / retailTotal) * 100>
+							<td align="right"><strong>#DecimalFormat(profit)#</strong></td>
+							<td align="right"><strong>#DecimalFormat(POR)#%</strong></td>
 						</tr>
 						<cfset retailGrandTotal += retailTotal>
+						<cfset tradeGrandTotal += tradeTotal>
 						<cfset categoryTotal = 0>
 						<cfset retailTotal = 0>
+						<cfset tradeTotal = 0>
 					</cfif>
 					<tr>
-						<th colspan="23">#pcatTitle#</th>
+						<th colspan="25">#pcatTitle#</th>
 					</tr>
 					<cfset categoryID = pcatID>
 				</cfif>
@@ -233,6 +252,9 @@
 					<cfset retailValue = closeStock * siOurPrice>
 					<cfset retailTotal += retailValue>
 					<td align="right">#DecimalFormat(retailValue)#</td>
+					<cfset tradeValue = closeStock * (siUnitTrade * (1 + (prodVATRate /100)))>
+					<cfset tradeTotal += tradeValue>
+					<td align="right">#DecimalFormat(tradeValue)#</td>
 					<td></td>
 					<td></td>
 				</tr>
@@ -242,16 +264,22 @@
 					<td colspan="20" align="right">Category Total</td>
 					<td align="right"><strong>#categoryTotal#</strong></td>
 					<td align="right"><strong>#DecimalFormat(retailTotal)#</strong></td>
-					<td></td>
-					<td></td>
+					<td align="right"><strong>#DecimalFormat(tradeTotal)#</strong></td>
+					<cfset profit = retailTotal - tradeTotal>
+					<cfset POR = (profit / retailTotal) * 100>
+					<td align="right"><strong>#DecimalFormat(profit)#</strong></td>
+					<td align="right"><strong>#DecimalFormat(POR)#%</strong></td>
 				</tr>
 			</cfif>
 			<tr>
 				<td colspan="20" align="right">Grand Total</td>
 				<td align="right"></td>
 				<td align="right"><strong>#DecimalFormat(retailGrandTotal)#</strong></td>
-				<td></td>
-				<td></td>
+				<td align="right"><strong>#DecimalFormat(tradeGrandTotal)#</strong></td>
+				<cfset profit = retailGrandTotal - tradeGrandTotal>
+				<cfset POR = (profit / retailGrandTotal) * 100>
+				<td align="right"><strong>#DecimalFormat(profit)#</strong></td>
+				<td align="right"><strong>#DecimalFormat(POR)#%</strong></td>
 			</tr>
 		</table>
 		<div class="no-print">

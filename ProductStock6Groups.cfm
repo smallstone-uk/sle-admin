@@ -56,6 +56,7 @@
 					<th>Groups</th>
 					<th>Target</th>
 					<th>Categories</th>
+					<th>Live</th>
 				</tr>
 				<cfloop query="records.groups">
 					<tr>
@@ -71,6 +72,7 @@
 						<td><a href="##" data-group=#pgID# class="groupItem">#pgTitle#</a></td>
 						<td align="right">#pgTarget#%</td>
 						<td align="center"><cfif Categories neq 0>#Categories#</cfif></td>
+						<td align="center">#pgShow#</td>
 					</tr>
 				</cfloop>
 			</table>

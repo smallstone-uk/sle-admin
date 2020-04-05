@@ -38,7 +38,7 @@
 					</tr>
 					<tr>
 						<td align="right">Target</td>
-						<td><input type="text" name="pgTarget" size="5" value="#record.group.pgTarget#" />%</td>
+						<td><input type="text" name="pgTarget" size="5" value="#record.group.pgTarget#" /> %</td>
 					</tr>
 					<tr>
 						<td align="right">Type</td>
@@ -48,6 +48,13 @@
 								<option value="shop"<cfif record.group.pgType eq "shop"> selected="selected"</cfif>>Shop</option>
 							</select>
 						</td>
+					</tr>
+					<tr>
+						<td align="right">Live Web Site</td>
+						<td>
+							<input type="radio" id="shown" name="pgShow" value="1" <cfif record.group.pgShow eq 1>checked</cfif> ><label for="shown">Shown</label>
+							<input type="radio" id="hidden" name="pgShow" value="0" <cfif record.group.pgShow eq 0>checked</cfif> ><label for="hidden">Hidden</label>
+						 </td>
 					</tr>
 				</table>
 			</span>

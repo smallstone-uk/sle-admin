@@ -48,6 +48,13 @@
 								</select>
 							</td>
 						</tr>
+						<tr>
+							<td align="right">Visible</td>
+							<td>
+								<input type="radio" name="pcatShow" value="1"<cfif record.category.pcatShow eq 1> checked="checked"</cfif> />Show on Live Site<br />
+								<input type="radio" name="pcatShow" value="0"<cfif record.category.pcatShow eq 0> checked="checked"</cfif> />Hide on Live Site<br />								
+							</td>
+						</tr>
 					</table>
 				</span>
 			</div>

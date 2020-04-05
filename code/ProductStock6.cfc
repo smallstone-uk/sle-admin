@@ -805,7 +805,8 @@
 				UPDATE tblProductGroups
 				SET 
 					pgTitle = '#args.form.pgTitle#',
-					pgTarget = #args.form.pgTarget#
+					pgTarget = #args.form.pgTarget#,
+					pgShow = #args.form.pgShow#
 				WHERE pgID = #args.form.pgID#
 			</cfquery>
 			<cfset loc.result.msg = "Group saved">
@@ -824,7 +825,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QGroups" datasource="#args.datasource#">
-				SELECT pgID,pgTitle,pgTarget, Count(pcatID) AS Categories
+				SELECT pgID,pgTitle,pgTarget,pgShow, Count(pcatID) AS Categories
 				FROM tblProductGroups
 				LEFT JOIN tblProductCats ON pcatGroup=pgID
 				WHERE pgType != 'epos'
@@ -890,7 +891,8 @@
 				UPDATE tblProductCats
 				SET 
 					pcatTitle = '#args.form.pcatTitle#',
-					pcatGroup = #args.form.pcatGroup#
+					pcatGroup = #args.form.pcatGroup#,
+					pcatShow = #val(args.form.pcatShow)#
 				WHERE pcatID = #args.form.pcatID#
 			</cfquery>
 			<cfset loc.result.msg = "Category saved">

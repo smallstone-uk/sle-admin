@@ -53,6 +53,7 @@
 					<cfset drivers.dave = {1=25,2=30,3=30,4=30,5=30,6=30,7=35}>
 					<cfset drivers.allan = {1=22,2=27,3=27,4=27,5=27,6=27,7=27}>
 					<cfset drivers.sle = {1=3,2=3,3=3,4=3,5=3,6=3,7=3}>
+					<cfset drivers.laura = {1=10,2=10,3=10,4=10,5=10,6=10,7=10}>
 					<cfset mileage = {}>
 					<cfset mileage.dave = {miles=17, mpg=27,mph=17}>
 					<cfset mileage.allan = {miles=21, mpg=28,mph=19}>

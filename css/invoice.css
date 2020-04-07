@@ -28,7 +28,8 @@ th, td {padding:2px 4px;}
 .amount {text-align:right;padding:2px;}
 .credit {text-align:right;padding:2px;color:#ff0000;}
 .accNum {font-size:12px;}
-.amountTotal {text-align:right;padding:2px;font-weight:bold;}
+.totalInfo {font-weight:bold;font-size: 12px;}
+.amountTotal {text-align:right;padding:2px;font-weight:bold;font-size: 18px;}
 .amountTotal-box {text-align:right;padding:2px;font-weight:bold;font-size: 18px;}
 .centre {text-align:center;text-transform: uppercase;}
 .ref {font-size:12px;font-weight:bold;color:#00C;}

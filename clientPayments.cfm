@@ -315,17 +315,20 @@
 												<td>
 													<select name="trnMethod" id="trnMethod">
 														<option value="">Select...</option>
-														<option value="cash">Cash in Shop</option>
-														<option value="coll">Cash Collected</option>
-														<option value="chqs">Cheque in Shop</option>
-														<option value="chq">Cheque</option>
-														<option value="card">Card Payment</option>
-														<option value="dv">Discount Voucher</option>
-														<option value="cdv">Collected Voucher</option>
-														<option value="ib">Internet Banking</option>
+														<option value="cash" title="cash taken via shop till">Cash in Shop</option>
+														<option value="chqs" title="cheque taken via the shop">Cheque in Shop</option>
+														<option value="card" title="chip & pin card transaction">Card in Shop</option>
 														<option disabled>-----------------</option>
-														<option value="cp">Council Payments</option>
-														<option value="na">Not Applicable</option>
+														<option value="coll" title="money collected by drivers">Cash Collected</option>
+														<option value="chq" title="cheque collected or posted">Cheque</option>
+														<option value="phone" title="card payment taken over the phone">Card by Phone</option>
+														<option value="ib" title="direct payment from customer">Internet Banking</option>
+														<option disabled>-----------------</option>
+														<option value="dv" title="money off vouchers">Discount Voucher</option>
+														<option value="cdv" title="don't know">Collected Voucher</option>
+														<option disabled>-----------------</option>
+														<option value="cp" title="for cornwall council payments only">Council Payments</option>
+														<option value="na" title="for journals only">Not Applicable</option>
 														<!---<option value="qs">Paid via Quickstop</option>--->
 													</select><br>
 												</td>

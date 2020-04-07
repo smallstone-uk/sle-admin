@@ -93,7 +93,6 @@
 									<cfif len(cltAddr2)><cfset ln++><tr><td valign="top">#cltAddr2#</td></tr></cfif>
 									<cfif len(cltTown)><cfset ln++><tr><td valign="top">#cltTown#</td></tr></cfif>
 									<cfif len(cltCity)><cfset ln++><tr><td valign="top">#cltCity#</td></tr></cfif>
-									<cfif len(cltCounty)><cfset ln++><tr><td valign="top">#cltCounty#</td></tr></cfif>
 									<cfif len(cltPostcode)><cfset ln++><tr><td valign="top">#cltPostcode#</td></tr></cfif>
 									<cfloop from="#ln+1#" to="9" index="i">
 										<tr><td>&nbsp;</td></tr>
@@ -120,8 +119,8 @@
 								<th>Date</th>
 								<th>Type</th>
 								<th>Method</th>
-								<th align="right">DR</th>
-								<th align="right">CR</th>
+								<th align="right">Debits<br />(invoices)</th>
+								<th align="right">Credits<br />(payments)</th>
 								<th align="right">Balance</th>
 								<th>Allocated</th>
 								<cfif NOT print>
@@ -160,7 +159,7 @@
 											</cfcase>
 										</cfswitch>
 									</td>
-									<td class="centre">#trnMethod#</td>
+									<td class="centre"><cfif trnMethod  eq "sv">VOUCHERS<cfelse>#trnMethod#</cfif></td>
 									<cfif trnAmnt1 gt 0>
 										<cfset totalDebit=totalDebit+trnAmnt1>
 										<td width="80" align="right">&pound;#DecimalFormat(trnAmnt1)#</td>
@@ -185,8 +184,11 @@
 							</cfloop>
 							<cfif print>
 								<tr>
-									<td colspan="3">SV=Subscription voucher</td>
-									<td height="40" colspan="3" class="amountTotal"><cfif balance lt 0>Account in credit<cfelse>Account Balance</cfif></td>
+									<td colspan="4" class="totalInfo">
+										The balance includes any enclosed invoices
+									</td>
+									<td height="40" colspan="2" class="amountTotal">
+										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
 									<td></td>
 								</tr>

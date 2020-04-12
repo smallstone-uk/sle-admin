@@ -1,4 +1,13 @@
 <cfcomponent displayname="stock" extends="code/core">
+	<cffunction name="SaveProductStatus" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblProducts
+			SET prodStatus = '#args.newStatus#'
+			WHERE prodID = #val(args.product)#
+		</cfquery>
+	</cffunction>
 	<cffunction name="SaveProductTitle" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -367,7 +376,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			<cfif len(args.form.srchDateFrom) GT 0>AND soDate >= '#args.form.srchDateFrom#'</cfif>
 			<cfif len(args.form.srchDateTo) GT 0>AND (soDate IS null OR soDate <= '#args.form.srchDateTo#')</cfif>
 			<cfif len(args.form.srchCatStr) GT 0>AND pcatTitle LIKE '%#args.form.srchCatStr#%'</cfif>
-			<cfif StructKeyExists(args.form,"srchProdStatus")>AND ProdStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
+			<cfif StructKeyExists(args.form,"srchProdStatus")>AND prodStatus IN (#PreserveSingleQuotes(loc.ProdStatus)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchReorder")>AND prodReorder IN (#PreserveSingleQuotes(loc.Reorder)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>

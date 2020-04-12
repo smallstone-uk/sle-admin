@@ -135,6 +135,21 @@
 					}
 				});
 			});
+			$('.sod_status').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductStatus.cfm",
+					data: {"status": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
 		});
 	</script>
 	<style type="text/css">
@@ -348,13 +363,17 @@
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
-													<td>#prodStatus#</td>
+													<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
 													<td>#siUnitSize#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>#prodReorder#</td>
-													<td><cfif StructKeyExists(stocklist.stockItems,'soDate')>#LSDateFormat(soDate,"ddd dd-mmm yy")#</cfif></td>
+													<td>
+														<cfif StructKeyExists(stocklist.stockItems,'soDate')>
+															#LSDateFormat(soDate,"ddd dd-mmm yy")# <span class="tiny">ordered</span>
+														<cfelse>#DateFormat(prodLastBought,"dd-mmm-yyyy")#</cfif>
+													</td>
 												</tr>
 											</cfloop>
 											</table>
@@ -388,6 +407,7 @@
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = val(ourPrice) eq 0 ? 0.01 : ourPrice>
 												<!---<cfset profit = ourPrice - siUnitTrade>
 												<cfset POR = int((profit / ourPrice) * 100)>--->
 

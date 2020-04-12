@@ -320,6 +320,7 @@
 		<cftry>
 			<cfquery name="loc.QAddProduct" datasource="#args.datasource#" result="loc.QAddProductResult">
 				INSERT INTO tblProducts (
+					prodRef,
 					prodRecordTitle,
 					prodTitle,
 					prodCatID,
@@ -329,6 +330,7 @@
 					prodVATRate,
 					prodEposCatID
 				) VALUES (
+					'#args.form.prodRef#',
 					'#args.form.prodRecordTitle#',
 					'#args.form.prodTitle#',
 					#val(args.form.prodCatID)#,
@@ -382,12 +384,12 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.resultStr = "An error occurred updating the record.">
-		<cfdump var="#args#" label="AmendProduct" expand="false">
 		<cftry>
 			<cfquery name="loc.QUpdate" datasource="#args.datasource#">
 				UPDATE tblProducts
-				SET prodRecordTitle= '#args.form.prodRecordTitle#',
-					prodTitle= '#args.form.prodTitle#',
+				SET prodRef = '#args.form.prodRef#',
+					prodRecordTitle = '#args.form.prodRecordTitle#',
+					prodTitle = '#args.form.prodTitle#',
 					prodCatID = #val(args.form.prodCatID)#,
 					prodPriceMarked = #int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					prodMinPrice = #val(args.form.prodMinPrice)#,

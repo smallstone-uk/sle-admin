@@ -36,7 +36,12 @@
 				}
 				var vatrate = parseFloat($('#prodVATRate option:selected').val());
 				if (isNaN(vatrate)) {
-					$('#prodVATRate').after('<div class="err">Please select the VAT rate.</div>');
+					$('#prodVATRate').after('<span class="err">Please select the VAT rate.</span>');
+					sendIt = false;
+				}
+				var group = $('#productGroup').val();
+				if (group.length == 0) {
+					$('#productGroup').after('<span class="err">Please select a group.</span>');
 					sendIt = false;
 				}
 				return sendIt;
@@ -66,9 +71,16 @@
 				if (checkProduct()) {
 					AmendProduct('#ProductForm','#result');
 					var bcode = $('#barcode').val();
-					setTimeout(function(){	// wait for db to update
-						LookupBarcode("product",bcode,0,"#productdiv");
-					},1000); ;
+					if (len(bcode)) {
+						setTimeout(function(){	// wait for db to update
+							LookupBarcode("product",bcode,0,"#productdiv");
+						},1000);
+					} else {
+						var prodID = $('#productID').val();
+						setTimeout(function(){	// wait for db to update
+							LookupBarcode("product","",prodID,"#productdiv");
+						},1000); ;
+					}
 				};
 				e.preventDefault();			
 			});
@@ -140,7 +152,7 @@
 						<th colspan="2">Product Details</th>
 					</tr>
 					<tr><td>Reference</td>
-						<td>
+						<td>#lookup.product.prodRef#
 							<span style="float:right">
 								<a href="stockItems.cfm?ref=#lookup.product.prodID#" target="_blank" title="See previous orders">#lookup.product.prodID#</a></span>
 						</td>
@@ -150,14 +162,12 @@
 					<tr><td>Group</td><td>#lookup.groupTitle#</td></tr>
 					<tr><td>Category</td><td>#lookup.catTitle#</td></tr>
 					<tr><td>Minimum Price</td><td>&pound;#lookup.product.prodMinPrice#</td></tr>
-					<tr><td>Our Price</td><td>#lookup.product.prodOurPrice#</td></tr>
+					<tr><td>Our Price</td><td>&pound;#lookup.product.prodOurPrice#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
-					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate#</td></tr>
-					<tr><td>Check Level</td><td>#lookup.product.prodStockLevel#</td></tr>
-					<tr><td>Status</td><td>#lookup.product.prodStatus#</td></tr>
-					<tr><td>Reorder</td><td>#lookup.product.prodReorder#</td></tr>
+					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate# &nbsp; Check Level #lookup.product.prodStockLevel#</td></tr>
+					<tr><td>Status</td><td>#lookup.product.prodStatus# &nbsp; Reorder #lookup.product.prodReorder#</td></tr>
 				</table>
 				<table class="showTable" border="1">
 					<tr>
@@ -165,7 +175,7 @@
 					</tr>
 					<tr><td>Supplied By</td><td>#lookup.supplier#</td></tr>
 					<cfif val(lookup.stockItem.siID) gt 0>
-						<tr><td>Product Ref</td><td>#lookup.stockItem.siRef#</td></tr>
+						<tr><td>Stock Ref</td><td>#lookup.stockItem.siRef#</td></tr>
 						<tr><td>Unit Size</td><td>#lookup.stockItem.siUnitSize#</td></tr>
 						<tr><td>Booked In</td><td>#lookup.stockItem.siBookedIn#</td></tr>
 						<tr><td>Pack Qty</td><td>#lookup.stockItem.siPackQty#</td></tr>
@@ -222,6 +232,8 @@
 					<input type="hidden" name="prodID" id="prodID" value="#lookup.product.prodID#" />
 					<input type="hidden" name="catID" id="catID" value="#lookup.catID#" />
 					<table border="1" class="tableList3">
+						<tr><td>Reference</td><td>
+							<input type="text" name="prodRef" id="prodRef" class="field" size="15" value="#lookup.product.prodRef#" /></td></tr>
 						<tr><td>Description</td><td>
 							<input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="40" value="#lookup.product.prodRecordTitle#" /></td></tr>
 						<tr><td>Display As</td><td>
@@ -239,10 +251,12 @@
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
 						<tr><td>Our Price</td><td>
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
-						<tr><td>Discountable</td><td>
-							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> /></td></tr>
-						<tr><td>Price Marked</td><td>
-							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> /></td></tr>
+						<tr><td>Options</td><td>
+							Discountable 
+							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />
+							Price Marked
+							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> />
+						</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -256,10 +270,11 @@
 						</tr>
 						<tr>
 							<td>Stock Check Date</td>
-							<td><input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" /></td>
-						</tr>
-						<tr><td>Stock Check Level</td><td>
-							<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" /></td></tr>
+							<td>
+								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />
+								Stock Check Level
+								<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" />
+						</td></tr>
 						<tr>
 							<td>EPOS Category</td>
 							<td>
@@ -283,11 +298,7 @@
 									<option value="inactive"<cfif lookup.product.prodStatus is 'inactive'>selected="true"</cfif>>Inactive</option>
 									<option value="donotbuy"<cfif lookup.product.prodStatus is 'donotbuy'>selected="true"</cfif>>Do Not Buy</option>
 								</select>
-							</td>
-						</tr>
-						<tr>
-							<td>Reorder</td>
-							<td>
+								Reorder
 								<select name="prodReorder">
 									<option value="None"<cfif lookup.product.prodReorder is 'None'>selected="true"</cfif>>None</option>
 									<option value="Monday"<cfif lookup.product.prodReorder is 'Monday'>selected="true"</cfif>>Monday</option>
@@ -309,6 +320,7 @@
 					<input type="hidden" name="prodID" id="prodID" value="0" />
 					<input type="hidden" name="catID" id="catID" value="1" />
 					<table border="1" class="tableList3">
+						<tr><td>Reference</td><td><input type="text" name="prodRef" id="prodRef" class="field" size="15" value="" /></td></tr>
 						<tr><td>Description</td><td><input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Display As</td><td><input type="text" name="prodTitle" id="prodTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Group</td><td>
@@ -320,6 +332,8 @@
 							</select>
 						</td></tr>
 						<tr><td>Category</td><td><div id="category"></div></td></tr>
+						<tr><td>Discountable </td><td>
+							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount" /></td></tr>
 						<tr><td>Price Marked</td><td>
 							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked" /></td></tr>
 						</td></tr>

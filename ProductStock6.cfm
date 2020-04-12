@@ -34,13 +34,13 @@
 		#AddProductForm {display:none;}
 		#AddStockForm {display:none;}
 		#AmendProductForm {display:none;}
-		.btn {float:left;}
 		#groupList {overflow:auto; float:left; height:400px; width:350px; margin-right:10px}
 		#catList {overflow:auto; float:left; height:400px; width:300px; margin-right:10px}
 		#prodList {overflow:auto; float:left; height:400px; width:350px}
 		#product {min-width:500px;}
 		.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
 		#newProduct {float:right}
+		.lookup {float:left}
 	</style>
 	
 	<script src="common/scripts/common.js" type="text/javascript"></script>
@@ -150,7 +150,7 @@
 				<div class="title">
 					<form method="post">
 						Manual Entry: <input name="barcodefld" id="barcodefld" type="text" size="15" maxlength="15" />
-						<input type="submit" name="manual" id="manual" class="btn" value="Look up" />
+						<input type="button" name="manual" id="manual" class="lookup" value="Look-up" />
 					</form>
 					<div style="clear:both"></div>
 					<button id="newProduct">New Product</button>

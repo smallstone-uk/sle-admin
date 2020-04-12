@@ -34,7 +34,6 @@
 				SET prodStatus = 'inactive'
 				WHERE prodID = #val(args.productID)#
 			</cfquery>
-			<cfset loc.result.QQuery = loc.QQuery>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

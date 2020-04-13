@@ -149,8 +149,8 @@
 			<div id="content-inner">
 				<div class="title">
 					<form method="post">
-						Manual Entry: <input name="barcodefld" id="barcodefld" type="text" size="15" maxlength="15" />
-						<input type="button" name="manual" id="manual" class="lookup" value="Look-up" />
+						<span class="lookup">Manual Entry: </span><input name="barcodefld" id="barcodefld" class="lookup" type="text" size="15" maxlength="20" />
+						<input type="button" name="manual" id="manual" class="lookup" style="float:left" value="Look-up" />
 					</form>
 					<div style="clear:both"></div>
 					<button id="newProduct">New Product</button>

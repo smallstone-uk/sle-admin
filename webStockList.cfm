@@ -65,7 +65,7 @@
 				<cfset unitClass = "">
 				<cfset priceClass="">
 				<cfset dateClass="">
-				<cfif len(prodRef) lt 6>
+				<cfif len(prodRef) lt 5>
 					<cfset refClass = "red">
 				</cfif>
 				<cfif len(prodUnitSize) eq 0>
@@ -94,7 +94,7 @@
 			</cfloop>
 			<tr>
 				<td colspan="3">#QProducts.recordcount# records.</td>
-				<td colspan="6">#errorCount# with errors.</td>
+				<td colspan="6">#errorCount# with errors. <cfif QProducts.recordcount gt 0> &nbsp; (#(errorCount / QProducts.recordcount)*100#%)</cfif></td>
 		</table>
 	</cfoutput>
 	

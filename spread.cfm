@@ -62,8 +62,10 @@
 	<cffunction name="ExtractRef" access="public" returntype="numeric">
 		<cfargument name="keyStruct" type="struct" required="yes">
 		<cfargument name="args" type="struct" required="yes">
+
 		<cfset var loc={}>
 		<cfset loc.result=0>
+		<cfset loc.desc = args.description>	<!--- debug --->
 		<cfset loc.re="((?:(?![0-9]{5,}|(\d\d[A-Z]{3}\d\d)|(\d\d-\d\d-\d\d)).)*)">
 		<cfset loc.words=ReFindNoCase(loc.re,args.description,1,true)>
 		<cfif ArrayLen(loc.words.pos) AND loc.words.len[1] GT 0>
@@ -261,6 +263,10 @@
 					</cfif>
 					<cfif loc.inRange AND loc.inFilter>
 						<cfswitch expression="#rec.TYPE#">
+							<cfcase value="FPIO" delimiters="|">	<!--- shop online payments --->
+								<cfset rec.description="FPIO #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
 							<cfcase value="FPI|BGC|BP|DEP|DEPQ|SO" delimiters="|">
 								<cfif Find("CARDNET",rec.description)>	<!--- Card Receipts --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>

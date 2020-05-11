@@ -163,6 +163,7 @@
 					<tr><td>Category</td><td>#lookup.catTitle#</td></tr>
 					<tr><td>Minimum Price</td><td>&pound;#lookup.product.prodMinPrice#</td></tr>
 					<tr><td>Our Price</td><td>&pound;#lookup.product.prodOurPrice#</td></tr>
+					<tr><td>Price Description</td><td>#lookup.product.prodUnitSize#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
@@ -251,6 +252,8 @@
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
 						<tr><td>Our Price</td><td>
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
+						<tr><td>Price Description</td><td>
+							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="#lookup.product.prodUnitSize#" /></td></tr>
 						<tr><td>Options</td><td>
 							Discountable 
 							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />

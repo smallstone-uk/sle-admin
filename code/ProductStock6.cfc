@@ -58,7 +58,7 @@
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
-							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
@@ -96,6 +96,7 @@
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
 						<cfset loc.rec.prodStatus = prodStatus>
 						<cfset loc.rec.prodReorder = prodReorder>
+						<cfset loc.rec.prodUnitSize = prodUnitSize>
 						
 						<cfset loc.stockItem = {}>
 						<cfset loc.stockItem.siID = siID>
@@ -400,6 +401,7 @@
 					prodEposCatID = #val(args.form.prodEposCatID)#,
 					prodStaffDiscount = '#StructKeyExists(args.form,"prodStaffDiscount")#',
 					prodStatus = '#args.form.prodStatus#',
+					prodUnitSize = '#args.form.prodUnitSize#',
 					prodReorder = '#args.form.prodReorder#'
 				WHERE prodID = #val(args.form.prodID)#
 			</cfquery>

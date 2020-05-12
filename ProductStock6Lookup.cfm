@@ -69,14 +69,14 @@
 			})
 			$('#btnSaveProduct').click(function(e) {
 				if (checkProduct()) {
-					AmendProduct('#ProductForm','#result');
 					var bcode = $('#barcode').val();
-					if (len(bcode)) {
+					var prodID = $('#cheesella').val();
+					AmendProduct('#ProductForm','#result');
+					if (bcode) {
 						setTimeout(function(){	// wait for db to update
 							LookupBarcode("product",bcode,0,"#productdiv");
 						},1000);
 					} else {
-						var prodID = $('#productID').val();
 						setTimeout(function(){	// wait for db to update
 							LookupBarcode("product","",prodID,"#productdiv");
 						},1000); ;
@@ -123,7 +123,7 @@
 			$('.deleteItem').click(function(e) {
 				var barID = $(this).attr("data-id");
 				var bcode = $('#barcode').val();
-				console.log(barID);
+				// console.log(barID);
 				DeleteBarcode(barID,bcode,'#result');
 				var prodID = $('#prodID').val();
 				setTimeout(function(){	// wait for db to update
@@ -219,7 +219,7 @@
 					<tr>
 						<td colspan="2">
 							<form name="addcode" method="post" id="barcodeForm">
-								<input type="hidden" name="prodID" id="prodID" value="#lookup.product.prodID#" />
+								<input type="hidden" name="prodID" id="prodID2" value="#lookup.product.prodID#" />
 								<input type="text" name="newCode" id="newCode" size="14" maxlength="13" placeholder="new barcode" /><br />
 								<input type="submit" name="btnAdd" value="Add" />
 							</form>
@@ -231,6 +231,7 @@
 				<form name="ProductForm" id="ProductForm" method="post" enctype="multipart/form-data">
 					<input type="hidden" name="barcode" id="barcode" value="#lookup.barcode#" />
 					<input type="hidden" name="prodID" id="prodID" value="#lookup.product.prodID#" />
+					<input type="hidden" name="proddy" id="cheesella" value="#lookup.product.prodID#" />
 					<input type="hidden" name="catID" id="catID" value="#lookup.catID#" />
 					<table border="1" class="tableList3">
 						<tr><td>Reference</td><td>
@@ -274,7 +275,8 @@
 						<tr>
 							<td>Stock Check Date</td>
 							<td>
-								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />
+								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" 
+									value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />
 								Stock Check Level
 								<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" />
 						</td></tr>
@@ -286,7 +288,8 @@
 									<cfloop array="#new App.EPOSCat().getParents()#" index="eposCat">
 										<optgroup label="#eposCat.epcTitle#">
 											<cfloop array="#eposCat.getChildren()#" index="eposCatChild">
-												<option value="#eposCatChild.epcID#" <cfif lookup.product.prodEposCatID is eposCatChild.epcID>selected="true"</cfif>>#eposCatChild.epcTitle#</option>
+												<option value="#eposCatChild.epcID#" 
+													<cfif lookup.product.prodEposCatID is eposCatChild.epcID>selected="true"</cfif>>#eposCatChild.epcTitle#</option>
 											</cfloop>
 										</optgroup>
 									</cfloop>

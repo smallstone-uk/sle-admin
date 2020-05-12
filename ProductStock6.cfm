@@ -156,8 +156,8 @@
 					<button id="newProduct">New Product</button>
 				</div>
 				<div id="content-header">
-					<div id="bcode">bcode</div>
-					<div id="productID">productID</div>
+					<div id="bcode"></div>
+					<div id="productID"></div>
 					<div style="clear:both"></div>
 				</div>
 				<div id="tabs">

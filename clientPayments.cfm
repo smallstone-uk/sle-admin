@@ -323,6 +323,7 @@
 														<option value="chq" title="cheque collected or posted">Cheque</option>
 														<option value="phone" title="card payment taken over the phone">Card by Phone</option>
 														<option value="ib" title="direct payment from customer">Internet Banking</option>
+														<option value="acct" title="money held on account in till">Shop Credit Account</option>
 														<option disabled>-----------------</option>
 														<option value="dv" title="money off vouchers">Discount Voucher</option>
 														<option value="cdv" title="don't know">Collected Voucher</option>

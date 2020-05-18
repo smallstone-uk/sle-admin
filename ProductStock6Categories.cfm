@@ -81,6 +81,7 @@
 					<th></th>
 					<th>#data.categories.pgTitle#</th>
 					<th align="right">Products</th>
+					<th>Live</th>
 				</tr>
 				<cfloop query="data.categories">
 					<tr>
@@ -95,6 +96,7 @@
 						</td>
 						<td><a href="##" data-category=#pcatID# class="categoryItem">#pcatTitle#</a></td>
 						<td align="right">#products#</td>
+						<td align="center">#pcatShow#</td>
 					</tr>
 				</cfloop>
 			</table>

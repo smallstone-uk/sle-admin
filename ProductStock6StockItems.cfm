@@ -86,10 +86,9 @@
 				$('#POR').val(por + "%");
 			});
 			$('.deleteItem').click(function(e) {
-				console.log($(this).data("id"));
-				var barcode = $('#barcode').val();
+				var productID = $('#productID2').html();
 				if (confirm('Delete this stock item record?')) {
-					DeleteStockItem($(this).data("id"),barcode,'#stockdiv');
+					DeleteStockItem($(this).data("id"),productID,'#stockdiv');
 				} else {
 					alert('Deletion cancelled');
 				}
@@ -106,7 +105,7 @@
 			<table width="400" class="showTable">
 				<tr>
 					<th align="left">#records.product.prodTitle#</th>
-					<th></th>
+					<th><div id="productID2">#records.product.prodID#</div></th>
 					<th></th>
 				</tr>
 			</table>

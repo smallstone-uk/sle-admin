@@ -36,6 +36,10 @@
 						<td align="right">Title</td>
 						<td><input type="text" name="pcatTitle" size="25" /></td>
 					</tr>
+					<tr>
+						<td align="right">Description</td>
+						<td><textarea class="textBox" name="pcatDescription" cols="40" rows="6" id="pcatDescription"></textarea></td>
+					</tr>
 				</table>
 			</span>
 		</div>

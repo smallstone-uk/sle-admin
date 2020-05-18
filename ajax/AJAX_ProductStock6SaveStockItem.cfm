@@ -6,7 +6,7 @@
 	<cfset parm.form = form>
 	<cfset record = pstock.SaveStockItem(parm)>
 	<cfoutput>
-		#record.barcode#
+		#record.prodID#
 	</cfoutput>
 
 <cfcatch type="any">

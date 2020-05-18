@@ -234,7 +234,7 @@
 					<input type="hidden" name="proddy" id="cheesella" value="#lookup.product.prodID#" />
 					<input type="hidden" name="catID" id="catID" value="#lookup.catID#" />
 					<table border="1" class="tableList3">
-						<tr><td>Reference</td><td>
+						<tr><td width="150">Reference</td><td>
 							<input type="text" name="prodRef" id="prodRef" class="field" size="15" value="#lookup.product.prodRef#" /></td></tr>
 						<tr><td>Description</td><td>
 							<input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="40" value="#lookup.product.prodRecordTitle#" /></td></tr>
@@ -255,7 +255,7 @@
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
 						<tr><td>Price Description</td><td>
 							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="#lookup.product.prodUnitSize#" /></td></tr>
-						<tr><td>Options</td><td>
+						<tr><td height="33">Options</td><td>
 							Discountable 
 							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />
 							Price Marked
@@ -272,14 +272,6 @@
 								</select>
 							</td>
 						</tr>
-						<tr>
-							<td>Stock Check Date</td>
-							<td>
-								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" 
-									value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />
-								Stock Check Level
-								<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" />
-						</td></tr>
 						<tr>
 							<td>EPOS Category</td>
 							<td>
@@ -304,7 +296,7 @@
 									<option value="inactive"<cfif lookup.product.prodStatus is 'inactive'>selected="true"</cfif>>Inactive</option>
 									<option value="donotbuy"<cfif lookup.product.prodStatus is 'donotbuy'>selected="true"</cfif>>Do Not Buy</option>
 								</select>
-								Reorder
+								&nbsp; &nbsp; Reorder
 								<select name="prodReorder">
 									<option value="None"<cfif lookup.product.prodReorder is 'None'>selected="true"</cfif>>None</option>
 									<option value="Monday"<cfif lookup.product.prodReorder is 'Monday'>selected="true"</cfif>>Monday</option>
@@ -313,6 +305,14 @@
 								</select>
 							</td>
 						</tr>
+						<tr>
+							<td>Stock Check Date</td>
+							<td>
+								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" 
+									value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />
+								Stock Check Level
+								<input type="text" name="prodStockLevel" id="prodStockLevel" class="field" size="10" value="#lookup.product.prodStockLevel#" />
+						</td></tr>
 						<tr><td colspan="2"><input type="submit" name="btnSaveProduct" id="btnSaveProduct" class="field" value="Save Changes" /></td></tr>
 					</table>
 				</form>
@@ -326,7 +326,7 @@
 					<input type="hidden" name="prodID" id="prodID" value="0" />
 					<input type="hidden" name="catID" id="catID" value="1" />
 					<table border="1" class="tableList3">
-						<tr><td>Reference</td><td><input type="text" name="prodRef" id="prodRef" class="field" size="15" value="" /></td></tr>
+						<tr><td width="150">Reference</td><td><input type="text" name="prodRef" id="prodRef" class="field" size="15" value="" /></td></tr>
 						<tr><td>Description</td><td><input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Display As</td><td><input type="text" name="prodTitle" id="prodTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Group</td><td>
@@ -337,16 +337,19 @@
 								</cfloop>
 							</select>
 						</td></tr>
-						<tr><td>Category</td><td><div id="category"></div></td></tr>
-						<tr><td>Discountable </td><td>
-							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount" /></td></tr>
-						<tr><td>Price Marked</td><td>
-							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked" /></td></tr>
-						</td></tr>
+						<tr><td height="33">Category</td><td><div id="category"></div></td></tr>
 						<tr><td>Minimum Price</td><td>
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" /></td></tr>
 						<tr><td>Our Price</td><td>
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" /> (if no stock records)</td></tr>
+						<tr><td>Price Description</td><td>
+							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="" /></td></tr>
+						<tr><td height="33">Options</td><td>
+							Discountable 
+							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount" />
+							Price Marked
+							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked" />
+						</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -373,8 +376,25 @@
 								</select>
 							</td>
 						</tr>
+						<tr>
+							<td>Status</td>
+							<td>
+								<select name="prodStatus">
+									<option value="active">Active</option>
+									<option value="inactive">Inactive</option>
+									<option value="donotbuy">Do Not Buy</option>
+								</select>
+								&nbsp; &nbsp; Reorder
+								<select name="prodReorder">
+									<option value="None">None</option>
+									<option value="Monday">Monday</option>
+									<option value="Thursday">Thursday</option>
+									<option value="Every">Every Order</option>
+								</select>
+							</td>
+						</tr>
 						<tr><td colspan="2">
-							<input type="submit" name="btnAddProduct" id="btnAddProduct" class="field" value="Save Product" />
+							<input type="submit" name="btnAddProduct" id="btnAddProduct" class="field" value="Save New Product" />
 						</td></tr>
 					</table>
 				</form>

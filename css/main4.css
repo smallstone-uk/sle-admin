@@ -183,7 +183,7 @@ button:disabled:active {
     background: #FFF;
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    z-index: 9999999;
+    z-index: 9999;
     border-radius: 3px;
 }
 #FCPopupDim {
@@ -193,7 +193,6 @@ button:disabled:active {
     background: rgba(255, 255, 255, 0.75);
     width: 100%;
     height: 100%;
-    z-index: 999999;
 }
 .FCPopupDialogInner {
     float: left;
@@ -252,7 +251,7 @@ input[type="button"]:focus, input[type="submit"]:focus, button:focus, .button:fo
     background: #32518A;
     width: 0;
     transition: width ease-in .2s;
-    z-index:9999999999;
+    z-index: 999999;
 }
 #FCPopupDialogInner {
     padding:20px;
@@ -334,7 +333,7 @@ h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 999999;
+    z-index: 9999999;
     background: rgba(255, 255, 255, 0.75);
 }
 

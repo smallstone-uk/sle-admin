@@ -489,6 +489,7 @@
 				</cfif>	
 				<cfset loc.result.msg = "Stock item added.">
 				<cfset loc.result.barcode = args.form.barcode>
+				<cfset loc.result.prodID = args.form.productID>
 			<cfelse>
 				<cfset loc.result.msg = "Stock quantity received was zero.">
 			</cfif>
@@ -556,6 +557,7 @@
 				WHERE siID = #args.form.siID#
 			</cfquery>
 			<cfset loc.result.barcode = args.form.barcode>
+			<cfset loc.result.prodID = args.form.prodID>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -644,7 +646,7 @@
 					WHERE prodID = #val(args.productID)#
 					LIMIT 1;
 				</cfquery>
-			<cfelse>
+			<cfelseif len(loc.barcode)>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 					FROM tblProducts
@@ -853,8 +855,8 @@
 		<cftry>
 			<cfquery name="loc.QAddCategory" datasource="#args.datasource#">
 				INSERT INTO tblProductCats 
-				(pcatGroup,pcatTitle) 
-				VALUES (#args.form.pcatGroup#,'#args.form.pcatTitle#')
+				(pcatGroup,pcatTitle,pcatDescription) 
+				VALUES (#args.form.pcatGroup#,'#args.form.pcatTitle#','#args.form.pcatDescription#')
 			</cfquery>
 
 		<cfcatch type="any">
@@ -896,7 +898,8 @@
 				SET 
 					pcatTitle = '#args.form.pcatTitle#',
 					pcatGroup = #args.form.pcatGroup#,
-					pcatShow = #val(args.form.pcatShow)#
+					pcatShow = #val(args.form.pcatShow)#,
+					pcatDescription = '#args.form.pcatDescription#'
 				WHERE pcatID = #args.form.pcatID#
 			</cfquery>
 			<cfset loc.result.msg = "Category saved">
@@ -940,7 +943,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QProducts" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT prodID,prodTitle,siUnitSize, siOurPrice, pcatID,pcatTitle
+				SELECT prodID,prodTitle,prodStatus,prodStaffDiscount, siUnitSize,siOurPrice, pcatID,pcatTitle
 				FROM tblProducts
 				INNER JOIN tblProductCats ON prodCatID = pcatID
 				LEFT JOIN tblStockItem ON prodID = siProduct

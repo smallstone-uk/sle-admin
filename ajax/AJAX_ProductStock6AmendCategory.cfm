@@ -17,6 +17,7 @@
 				<a href="javascript:void(0)" class="FCPDIClose" onclick="javascript:$.closeDialog();" title="Close popup"></a>
 			</span>
 			<div class="FCPopupDialogInner">
+				<script src="scripts/main.js"></script>
 				<script>
 					$(document).ready(function(e) {
 						$('##AmendCategory').submit(function(event) {
@@ -31,7 +32,6 @@
 							});
 							event.preventDefault();
 						});
-					//	$('##pcatDescription').attr("enabled", "true");
 //						$('##pcatDescription').keyup(function(event) {console.log(event);});
 					});
 				</script>
@@ -55,7 +55,7 @@
 							</tr>
 							<tr>
 								<td align="right">Description</td>
-								<td><textarea class="textBox" name="pcatDescription" cols="40" rows="6" id="pcatDescription"></textarea></td>
+								<td><textarea class="textBox" name="pcatDescription" cols="40" rows="6" id="pcatDescription">#record.category.pcatDescription#</textarea></td>
 							</tr>
 							<tr>
 								<td align="right">Visible</td>

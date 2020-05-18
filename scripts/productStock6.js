@@ -161,7 +161,7 @@ function AmendProduct(form,result) {
 }
 
 function LoadStockItems(bcode,productID,result) {
-	// console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " result " + result);
+//	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6StockItems.cfm',
@@ -254,7 +254,7 @@ function AddStock(form,result) {
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }
@@ -271,22 +271,22 @@ function SaveStock(form,result) {
 			$(result).html(data);
 			$.closeDialog();
 			$.messageBox("Stock Item Saved", "success");
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }
 
-function DeleteStockItem(stockitem,barcode,result) {
+function DeleteStockItem(stockitem,productID,result) {
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6DeleteStock.cfm',
-		data: {"stockitem" : stockitem, "barcode" : barcode},
+		data: {"stockitem" : stockitem, "productID" : productID},
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Deleting Stock Item...");
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }

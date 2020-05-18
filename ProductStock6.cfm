@@ -36,11 +36,12 @@
 		#AmendProductForm {display:none;}
 		#groupList {overflow:auto; float:left; height:400px; width:350px; margin-right:10px}
 		#catList {overflow:auto; float:left; height:400px; width:300px; margin-right:10px}
-		#prodList {overflow:auto; float:left; height:400px; width:350px}
+		#prodList {overflow:auto; float:left; height:400px; width:500px}
 		#product {min-width:500px;}
 		.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
 		#newProduct {float:right}
 		.lookup {float:left}
+		#textBox {line-height:1em; z-index:99999999}
 	</style>
 	
 	<script src="common/scripts/common.js" type="text/javascript"></script>
@@ -110,10 +111,15 @@
 				LoadStockItems(bcode,productID,'#stockdiv');
 				$('#stockTab').blur();
 			});
+<!---
 			$('#groupsTab').click(function() {
 				var	bcode = $('#bcode').html()
 				LoadGroups('#groupsdiv');
 				$('#groupsTab').blur();
+			});
+--->
+			$('#groupsBtn').click(function() {
+				window.open( 'ProductStock6GroupsMain.cfm' );
 			});
 			$('.price').blur(function(e) {
 				var retailPrice = $('#prodRRP').val();
@@ -154,6 +160,7 @@
 					</form>
 					<div style="clear:both"></div>
 					<button id="newProduct">New Product</button>
+					<button id="groupsBtn">Groups</button>
 				</div>
 				<div id="content-header">
 					<div id="bcode"></div>
@@ -164,7 +171,6 @@
 					<ul>
 						<li><a href="##productdiv" id="productTab">Product</a></li>
 						<li><a href="##stockdiv" id="stockTab">Stock</a></li>
-						<li><a href="##groupsdiv" id="groupsTab">Groups</a></li>
 					</ul>
 					<div id="productdiv"><div class="title">Scan product...</div></div>
 					<div id="stockdiv"></div>

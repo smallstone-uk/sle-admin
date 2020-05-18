@@ -75,7 +75,7 @@
 						<input type="hidden" name="siID" value="#siID#" />
 						<input type="hidden" name="siReceived" value="#siReceived#" />
 						<input type="hidden" name="siBookedIn" value="#siBookedIn#" />
-						<input type="hidden" name="prodID" id="prodID" value="#form.id#" />
+						<input type="hidden" name="prodID" id="prodID" value="#record.product.prodID#" />
 						<input type="hidden" name="barcode" id="barcode" value="#parm.barcode#" />
 						<input type="hidden" name="vatRate" value="#record.product.prodVATRate#" />
 						<input type="hidden" size="5" name="prodMinPrice" id="prodMinPrice" value="#record.product.prodMinPrice#" />

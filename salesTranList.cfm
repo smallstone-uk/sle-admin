@@ -48,7 +48,7 @@
 					<cfset total1=total1+item.trnAmnt1>
 					<cfset total2=total2+item.trnAmnt2>
 					<tr>
-						<td>#item.trnID#</td>
+						<td><a href="#application.site.normal#salesMain3.cfm?acc=1&tran=#item.trnID#" target="#item.trnID#">#item.trnID#</a></td>
 						<td align="right">#LSDateFormat(item.trnDate,"dd-mmm-yyyy")#</td>
 						<td align="center">#item.trnType#</td>
 						<td>#item.trnRef#</td>

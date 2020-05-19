@@ -11,6 +11,7 @@
 	<cfset saveStatus = stock.SaveProductDiscount(parm)>
 
 	<cfoutput>#parm.newDiscount#</cfoutput>
+	
 
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

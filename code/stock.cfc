@@ -1,4 +1,13 @@
 <cfcomponent displayname="stock" extends="code/core">
+	<cffunction name="SaveProductDiscount" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblProducts
+			SET prodStaffDiscount = '#args.newDiscount#'
+			WHERE prodID = #val(args.product)#
+		</cfquery>
+	</cffunction>
 	<cffunction name="SaveProductStatus" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

@@ -1922,6 +1922,7 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+<!--- COLL,CHQS nomTillBtn was 2 --->
 	<cffunction name="LoadPayAccounts" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -1930,7 +1931,9 @@
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
 			SELECT nomID,nomCode,nomGroup,nomTitle,nomOrder
 			FROM tblNominal
-			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
+			<!---WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV','SHOPPAY')--->
+			WHERE nomTillBtn=2
+			AND nomStatus=1
 			ORDER BY nomOrder
 		</cfquery>
 		<cfloop query="loc.QNomPayAccounts">

@@ -72,7 +72,7 @@
 					</cfif>
 						<cfif print><cfinclude template="busHeader.cfm"></cfif>
 						<cfif print>
-							<cfset tabWidth=630>
+							<cfset tabWidth=800>
 							<cfloop query="QClient">
 							<div style="float:left;width:310px;margin:20px 0 40px 50px;">
 								<cfset ln=0>
@@ -116,6 +116,7 @@
 							<tr>
 								<cfif NOT print><th>ID</th></cfif>
 								<th>Reference</th>
+								<th>Description</th>
 								<th>Date</th>
 								<th>Type</th>
 								<th>Method</th>
@@ -129,7 +130,7 @@
 							</tr>
 							<cfif bfwd neq 0>
 								<tr>
-									<td colspan="3"></td>
+									<td colspan="4"></td>
 									<td colspan="3" align="right"><strong>Brought Forward from #DateFormat(dateFrom,'dd-mmm-yyyy')#</strong></td>
 									<td align="right"><strong>#bfwd#</strong></td>
 								</tr>
@@ -142,6 +143,7 @@
 								<tr>
 									<cfif NOT print><td>#trnID#</td></cfif>
 									<td>#trnRef#</td>
+									<td>#trnDesc#</td>
 									<td>#DateFormat(trnDate,"dd-mmm-yyyy")#</td>
 									<td>
 										<cfswitch expression="#trnType#">

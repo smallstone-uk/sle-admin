@@ -188,10 +188,9 @@
 									<td colspan="3" class="totalInfo">
 										The balance includes any enclosed invoices
 									</td>
-									<td height="40" colspan="3" class="amountTotal">
+									<td height="40" colspan="4" class="amountTotal">
 										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
-									<td></td>
 									<td></td>
 								</tr>
 								<tr>
@@ -199,7 +198,7 @@
 										Please make payment to <strong>Shortlanesend Store.</strong><br />
 										Payment can also be made online using internet banking.<br />
 										Bank: Lloyds Bank plc. Sort Code: <strong>30-98-76</strong> Account: <strong>3534 5860</strong><br />
-										Please quote your account number <strong>"#QClient.cltRef#"</strong> with your payment.<br />
+										Please quote your account number <strong>"ACC #QClient.cltRef#"</strong> with your payment.<br />
 										If you have already paid this amount or believe there is an error on your account, please let us know.
 									</td>
 								</tr>

@@ -92,7 +92,6 @@
 									<cfif len(cltAddr1)><cfset ln++><tr><td valign="top">#cltAddr1#</td></tr></cfif>
 									<cfif len(cltAddr2)><cfset ln++><tr><td valign="top">#cltAddr2#</td></tr></cfif>
 									<cfif len(cltTown)><cfset ln++><tr><td valign="top">#cltTown#</td></tr></cfif>
-									<cfif len(cltCity)><cfset ln++><tr><td valign="top">#cltCity#</td></tr></cfif>
 									<cfif len(cltPostcode)><cfset ln++><tr><td valign="top">#cltPostcode#</td></tr></cfif>
 									<cfloop from="#ln+1#" to="9" index="i">
 										<tr><td>&nbsp;</td></tr>
@@ -116,8 +115,8 @@
 							<tr>
 								<cfif NOT print><th>ID</th></cfif>
 								<th>Reference</th>
-								<th>Description</th>
-								<th>Date</th>
+								<th width="200">Description</th>
+								<th width="100">Date</th>
 								<th>Type</th>
 								<th>Method</th>
 								<th align="right">Debits<br />(invoices)</th>
@@ -186,16 +185,17 @@
 							</cfloop>
 							<cfif print>
 								<tr>
-									<td colspan="4" class="totalInfo">
+									<td colspan="3" class="totalInfo">
 										The balance includes any enclosed invoices
 									</td>
-									<td height="40" colspan="2" class="amountTotal">
+									<td height="40" colspan="3" class="amountTotal">
 										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
 									<td></td>
+									<td></td>
 								</tr>
 								<tr>
-									<td height="40" colspan="8" style="padding:7px;">
+									<td height="40" colspan="9" style="padding:7px;">
 										Please make payment to <strong>Shortlanesend Store.</strong><br />
 										Payment can also be made online using internet banking.<br />
 										Bank: Lloyds Bank plc. Sort Code: <strong>30-98-76</strong> Account: <strong>3534 5860</strong><br />

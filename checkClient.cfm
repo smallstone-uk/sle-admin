@@ -115,7 +115,6 @@
 							<tr>
 								<cfif NOT print><th>ID</th></cfif>
 								<th>Reference</th>
-								<th width="200">Description</th>
 								<th width="100">Date</th>
 								<th>Type</th>
 								<th>Method</th>
@@ -142,8 +141,9 @@
 								<tr>
 									<cfif NOT print><td>#trnID#</td></cfif>
 									<td>#trnRef#</td>
-									<td>#trnDesc#</td>
-									<td>#DateFormat(trnDate,"dd-mmm-yyyy")#</td>
+									<td>#DateFormat(trnDate,"dd-mmm-yyyy")#
+										<cfif len(trnDesc)><br />#trnDesc#</cfif>
+									</td>
 									<td>
 										<cfswitch expression="#trnType#">
 											<cfcase value="inv">
@@ -188,13 +188,13 @@
 									<td colspan="3" class="totalInfo">
 										The balance includes any enclosed invoices
 									</td>
-									<td height="40" colspan="4" class="amountTotal">
+									<td height="40" colspan="3" class="amountTotal">
 										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
 									<td></td>
 								</tr>
 								<tr>
-									<td height="40" colspan="9" style="padding:7px;">
+									<td height="40" colspan="8" style="padding:7px;">
 										Please make payment to <strong>Shortlanesend Store.</strong><br />
 										Payment can also be made online using internet banking.<br />
 										Bank: Lloyds Bank plc. Sort Code: <strong>30-98-76</strong> Account: <strong>3534 5860</strong><br />

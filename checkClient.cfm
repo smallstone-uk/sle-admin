@@ -72,7 +72,7 @@
 					</cfif>
 						<cfif print><cfinclude template="busHeader.cfm"></cfif>
 						<cfif print>
-							<cfset tabWidth=800>
+							<cfset tabWidth=600>
 							<cfloop query="QClient">
 							<div style="float:left;width:310px;margin:20px 0 40px 50px;">
 								<cfset ln=0>
@@ -141,9 +141,7 @@
 								<tr>
 									<cfif NOT print><td>#trnID#</td></cfif>
 									<td>#trnRef#</td>
-									<td>#DateFormat(trnDate,"dd-mmm-yyyy")#
-										<cfif len(trnDesc)><br />#trnDesc#</cfif>
-									</td>
+									<td>#DateFormat(trnDate,"dd-mmm-yyyy")#</td>
 									<td>
 										<cfswitch expression="#trnType#">
 											<cfcase value="inv">
@@ -182,13 +180,20 @@
 										<td class="centre">#trnPaidin#</td>
 									</cfif>
 								</tr>
+								<cfif len(trnDesc)>
+									<tr>
+										<td></td>
+										<td colspan="3">#trnDesc#</td>
+										<td colspan="4"></td>
+									</tr>
+								</cfif>
 							</cfloop>
 							<cfif print>
 								<tr>
-									<td colspan="3" class="totalInfo">
-										The balance includes any enclosed invoices
+									<td colspan="4" class="totalInfo">
+										The balance includes all invoices up to date.
 									</td>
-									<td height="40" colspan="3" class="amountTotal">
+									<td height="40" colspan="2" class="amountTotal">
 										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
 									<td></td>

@@ -432,6 +432,24 @@
 		<cfreturn loc.result>
 	</cffunction>
 	
+	<cffunction name="TranRemittance" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+			
+		<cfquery name="loc.QTrans" datasource="#args.datasource#">
+			SELECT *
+			FROM tbltrans
+			WHERE trnAccountID = #args.accountID#
+			AND trnAllocID = #args.allocationID#	
+		</cfquery>
+		<cfquery name="loc.QSupplier" datasource="#args.datasource#">
+			SELECT *
+			FROM tblAccount
+			WHERE accID = #args.accountID#
+		</cfquery>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="TranList" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -440,7 +458,7 @@
 		<cfset var rec={}>
 		
 		<cftry>
-			<cfquery name="QTrans" datasource="#args.datasource#" result="loc.QTransResult">
+			<cfquery name="QTrans" datasource="#args.datasource#">
 				SELECT accID,accName,accType,accNomAcct,accPayAcc, trnID,trnLedger,trnRef,trnDesc,trnDate,trnAccountID,trnClientRef,trnType,trnMethod,trnAmnt1,trnAmnt2
 				FROM tblTrans,tblAccount
 				WHERE trnAccountID=accID

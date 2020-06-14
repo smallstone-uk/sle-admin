@@ -236,7 +236,11 @@
 							<td id="trnItem_Balance" class="#amountClass#">#DecimalFormat(totAmnt1 + totAmnt2)#</td>
 							<td id="trnItem_Alloc" align="center" class="noPrint">
 								<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
-									value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> /> #item.trnAllocID#</td>
+									value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
+									<cfif item.trnAllocID gt 0>
+										<a href="purchRemittance.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
+									</cfif>
+							</td>
 						</tr>
 					</cfloop>
 					<tr>

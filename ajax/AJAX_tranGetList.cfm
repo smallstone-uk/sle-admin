@@ -238,7 +238,7 @@
 								<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
 									value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
 									<cfif item.trnAllocID gt 0>
-										<a href="purchRemittance.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
+										<a href="purchRemittancePDF.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
 									</cfif>
 							</td>
 						</tr>

@@ -156,6 +156,8 @@
 		@page {size:portrait;margin:40px;}
 		.lowPOR {background-color:#FF8080;}
 		.pm {background-color: #D2E9FF;}
+		.catActive {color:#0000FF}
+		.catInactive {color:#FF0000}
 	</style>
 </head>
 
@@ -354,7 +356,10 @@
 												<cfif prodCatID neq category>
 													<tr class="searchrow" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
-														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong></th>
+														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong>
+															<cfif pcatShow><span class="catActive">Active</span>
+																<cfelse><span class="catInactive">Inactive</span></cfif>
+														</th>
 													</tr>
 													<cfset category=prodCatID>
 												</cfif>
@@ -495,7 +500,7 @@
 --->
 								<cfcase value="4">
 									<cfset stocklist=stock.StockTakeList(parm)>
-									<cfdump var="#stocklist#" label="stocklist" expand="no">
+									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=7>
 										<cfoutput>

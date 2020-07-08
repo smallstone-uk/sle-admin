@@ -180,7 +180,11 @@
 											<option value="cash">Cash</option>
 											<option value="chq">Cheque</option>
 											<option value="card">Card Payment</option>
+											<option disabled>-----------------</option>
+											<option value="coll">Cash Collected</option>
+											<option value="phone">Card by Phone</option>
 											<option value="ib">Internet Banking</option>
+											<option value="acct">Shop Credit Account</option>
 										</select>
 									</td>
 								</tr>

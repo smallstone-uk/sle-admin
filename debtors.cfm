@@ -210,8 +210,8 @@
 							<cfset totals[5]=totals[5]+item.balance0>
 						</cfif>
 						<tr>
-							<td>#item.ref#</td>
-							<td><a href="clientPayments.cfm?rec=#item.ref#" target="_blank" title="view statement">#item.name#</a></td>
+							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
+							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>
@@ -244,8 +244,8 @@
 							<cfset totals[5]=totals[5]+item.balance0>
 						</cfif>
 						<tr>
-							<td>#item.ref#</td>
-							<td><a href="clientPayments.cfm?rec=#item.ref#" target="_blank" title="view statement">#item.name#</a></td>
+							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
+							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>

@@ -17,6 +17,52 @@
 		<cfreturn StructCopy(qStruct)>
 	</cffunction>
 
+	<cffunction name="relatedSales" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.args = args>
+		<cfset loc.trans = {}>
+		<cftry>
+			<cfif StructKeyExists(args,"related") AND val(args.related) gt 0>
+				<cfquery name="loc.group" datasource="#args.datasource#">
+					SELECT pgTitle FROM tblproductgroups WHERE pgID=#val(args.related)#
+				</cfquery>
+				<cfset loc.GroupTitle = loc.group.pgTitle>
+			</cfif>
+			<cfquery name="loc.salesItems" datasource="#args.datasource#">
+				SELECT prodID,prodTitle, SUM(eiQty) AS rQty, SUM(eiNet + eiVAT) AS rGross, ehID,ehTimeStamp
+				FROM tblproducts
+				INNER JOIN tblProductCats ON pcatID = prodCatID
+				INNER JOIN tblepos_items AS st ON eiProdID = prodID
+				INNER JOIN tblepos_header AS eh ON eiParent = ehID
+				WHERE DATE(st.eiTimestamp) BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
+				<cfif StructKeyExists(args,"related") AND args.related gt 0>AND pcatGroup = #args.related#</cfif>
+				GROUP BY ehID
+			</cfquery>
+			<cfif loc.salesItems.recordCount neq 0>
+				<cfloop query="loc.salesItems">
+					<cfset loc.tranID = ehID>
+					<cfquery name="loc.salesTran" datasource="#args.datasource#">
+						SELECT SUM(eiQty) AS Qty, SUM(eiNet + eiVAT) AS Gross, ehID,ehTimeStamp,ehMode
+						FROM tblepos_items
+						INNER JOIN tblepos_header AS eh ON eiParent = ehID
+						WHERE ehID = #loc.tranID#
+						AND eiClass != 'pay'
+					</cfquery>
+					<cfset loc.rec = QueryRowToStruct(loc.salesTran,1)>
+					<cfset loc.rec.rQty = rQty>
+					<cfset loc.rec.rGross = rGross>
+					<cfset StructInsert(loc.trans,ehID,loc.rec)>
+				</cfloop>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="relatedSales" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="selectProducts" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -41,7 +87,7 @@
 				INNER JOIN tblProductCats ON pcatID = prodCatID
 				INNER JOIN tblProductGroups ON pcatGroup = pgID
 				WHERE pgType != 'epos'
-				AND prodStatus = 'active'
+				AND prodStatus != 'inactive'
 				AND siID IS NOT NULL
 				AND DATE(siBookedIn) > '2018-10-28'	<!--- start date of EPOS till --->
 				<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>

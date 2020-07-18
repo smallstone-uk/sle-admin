@@ -2,50 +2,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Transaction Reports</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link href="css/main3.css" rel="stylesheet" type="text/css">
-<link href="css/main4.css" rel="stylesheet" type="text/css">
-<link href="css/chosen.css" rel="stylesheet" type="text/css">
-<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="common/scripts/common.js"></script>
-<script src="scripts/jquery-1.9.1.js"></script>
-<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>
-<script src="scripts/jquery.hoverIntent.minified.js"></script>
-<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
-		$(".srchAccount, .srchTranType").chosen({width: "300px"});
-	});
-</script>
-<style type="text/css">
-	.header {font-size:16px; font-weight:bold;}
-	.amount {text-align:right}
-	.amountTotal {text-align:right; font-weight:bold;}
-	.tranList {	
-		font-family:Arial, Helvetica, sans-serif;
-		font-size:13px;
-		border-collapse:collapse;
-	}
-	.tranList th, .tranList td {
-		padding:2px 4px; 
-		border: solid 1px #ccc;
-		background-color:#fff;
-	}
-	.vatTable {
-		border-spacing: 0px;
-		border-collapse: collapse;
-		border: 1px solid #CCC;
-		font-size: 12px;
-	}
-	.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
-	.vatTable td {padding: 5px; border-color: #ccc;}
-	.err {background-color:#FF0000}
-	.ok {background-color:#00DF00}
-</style>
-
+	<title>Transaction Reports</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<link href="css/main3.css" rel="stylesheet" type="text/css">
+	<link href="css/main4.css" rel="stylesheet" type="text/css">
+	<link href="css/chosen.css" rel="stylesheet" type="text/css">
+	<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="common/scripts/common.js"></script>
+	<script src="scripts/jquery-1.9.1.js"></script>
+	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>
+	<script src="scripts/jquery.hoverIntent.minified.js"></script>
+	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
+			$(".srchAccount, .srchTranType").chosen({width: "300px"});
+		});
+	</script>
+	<style type="text/css">
+		.header {font-size:16px; font-weight:bold;}
+		.amount {text-align:right}
+		.amountTotal {text-align:right; font-weight:bold;}
+		.tranList {	
+			font-family:Arial, Helvetica, sans-serif;
+			font-size:13px;
+			border-collapse:collapse;
+		}
+		.tranList th, .tranList td {
+			padding:2px 4px; 
+			border: solid 1px #ccc;
+			background-color:#fff;
+		}
+		.vatTable {
+			border-spacing: 0px;
+			border-collapse: collapse;
+			border: 1px solid #CCC;
+			font-size: 12px;
+		}
+		.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
+		.vatTable td {padding: 5px; border-color: #ccc;}
+		.err {background-color:#FF0000}
+		.ok {background-color:#00DF00}
+	</style>
 </head>
 
 <cfobject component="code/purchase" name="pur">
@@ -607,7 +606,7 @@
 								</cfcase>
 								<cfcase value="5">
 									<cfset trans=pur.NomTranSummary(parms)>
-									<!---<cfdump var="#trans#" label="trans" expand="no">--->
+									<cfdump var="#trans#" label="trans" expand="no">
 									<table border="1" class="tableList">
 										<tr>
 											<th width="50">Ledger</th>

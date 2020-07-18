@@ -441,6 +441,7 @@
 			FROM tbltrans
 			WHERE trnAccountID = #args.accountID#
 			AND trnAllocID = #args.allocationID#	
+			ORDER BY trnDate ASC
 		</cfquery>
 		<cfquery name="loc.QSupplier" datasource="#args.datasource#">
 			SELECT *
@@ -490,7 +491,6 @@
 					ORDER BY #args.form.srchSort#
 				</cfif>
 			</cfquery>
-			<cfset result.QResult = loc.QTransResult.sql>
 			<cfset result.tranArray=[]>
 			<cfset result.totAmnt1=0>
 			<cfset result.totAmnt2=0>

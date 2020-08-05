@@ -546,7 +546,7 @@
 				AND pubGroup='magazine'
 				AND oiStatus='active'
 				AND ordActive=1
-				HAVING AccountType<>'N'
+				HAVING AccountType NOT IN ('H','N')
 			</cfquery>
 			<cfset loc.result.QOrderItems = loc.QOrderItems>
 			<cfset loc.result.rounds={}>

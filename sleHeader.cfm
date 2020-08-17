@@ -111,11 +111,11 @@
 					<ul>
 						<li><a href="salesMain3.cfm">Sales v3</a></li>
 						<li><a href="tranMain2.cfm">Supplier Transactions</a></li>
+						<li><a href="purReports.cfm">Transaction Reports</a></li>
+						<li class="spacer"></li>
 						<li><a href="nomTran.cfm">Nominal Ledger</a></li>
 						<li><a href="nomManager.cfm">Nominal Manager</a></li>
-						<li class="spacer"></li>
-						<li><a href="nomReports.cfm">Sales Graphs</a></li>
-						<li><a href="purReports.cfm">Transaction Reports</a></li>
+						<li><a href="nomReports.cfm">Nominal Graphs</a></li>
 						<li><a href="paymentBankSheet.cfm" target="_blank">Banking Sheet</a></li>
 						<li class="spacer"></li>
 						<li><a href="Payroll2.cfm">PayRoll</a></li>
@@ -126,8 +126,31 @@
 						<li><a href="weekly.cfm">Weekly Report</a></li>
 					</ul>
 				</li>
+				<li><a href="##" tabindex="-1">Reports</a>
+					<ul>
+						<li><a href="clientemail.cfm">Email Invoices</a></li>
+						<li><a href="spread.cfm">Import Bank Statement</a></li>
+						<li><a href="suppliers.cfm">Supplier Reports</a></li>
+						<li><a href="salesgraph.cfm">Sales Graphs</a></li>
+						<li class="spacer"></li>
+						<li><a href="bunperformance.cfm">Bunnery Performance</a></li>
+						<li><a href="salesreports.cfm">Stock Movement Report</a></li>
+						<li><a href="ProductStock6pricelist.cfm">Price List Generator</a></li>
+						<li><a href="exportbarcodes.cfm">Export Booker Re-Order Barcodes</a></li>
+						<li><a href="fixcats.cfm?doupdate=false">Product Category Clean-up</a></li>
+						<li class="spacer"></li>
+						<li><a href="rounds6income.cfm">Round Income</a></li>
+						<li><a href="misseddeliveries.cfm">Missed Deliveries</a></li>
+						<li><a href="pubSales.cfm">Publication Sales Analysis</a></li>
+						<li class="spacer"></li>
+						<li><a href="birthday.cfm">Staff Birthdays</a></li>
+						<li><a href="http://tweb.epos.co.uk/reportdaysheet.cfm" target="_blank">EPOS Day Report</a></li>
+						<li><a href="http://tweb.epos.co.uk/reportaccounts.cfm" target="_blank">EPOS Accounts</a></li>
+						<li class="spacer"></li>
+						<li><a href="logs.cfm" tabindex="-1">Logs</a></li>
+					</ul>
+				</li>
 				<li><a href="stockGetList.cfm" tabindex="-1">Stock List</a></li>
-				<li><a href="logs.cfm" tabindex="-1">Logs</a></li>
 			</ul>
 		</div>
 	</div>

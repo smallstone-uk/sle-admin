@@ -72,7 +72,9 @@
 				
 				<cfset item.ID=cltID>
 				<cfset item.ordID=ordID>
+				<cfset item.ordContact=ordContact>
 				<cfset item.Ref=cltRef>
+				<cfset item.cltShowBal=cltShowBal>
 				<cfset item.AccountType=cltAccountType>
 				<cfset item.PaymentType=cltPaymentType>
 				<cfset item.InvDeliver=cltInvDeliver>
@@ -162,24 +164,46 @@
 		<cfreturn result>
 	</cffunction>
 
-	<cffunction name="LoadBalance" access="public" returntype="struct">
+	<cffunction name="LoadStatement" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
-		<cfset var result={}>
-		<cfset var QTrans="">
-		
-		<cfset result.balance=0>
-		<cfquery name="QTrans" datasource="#application.site.datasource1#">
-			SELECT SUM(trnAmnt1) AS Total
-			FROM tblTrans
-			WHERE trnClientRef=#val(args.cltRef)#
-			AND trnRef <> #args.InvRef#
-			AND trnAlloc=0
-		</cfquery>
-		<cfif val(QTrans.Total) neq 0>
-			<cfset result.balance=QTrans.Total>
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.cltShowBal = args.cltShowBal>
+		<cfset loc.result.bfwd = 0>
+		<cfset loc.result.balance = 0>
+		<cfif args.cltShowBal>
+			<cfquery name="loc.QTrans" datasource="#args.datasource#">
+				SELECT trnID,trnRef,trnType,trnDate,trnAmnt1,trnAmnt2
+				FROM tblTrans
+				WHERE trnClientRef=#val(args.Ref)#
+				AND trnAlloc=0
+				AND trnDate < '#args.invDate#'
+				ORDER BY trnDate ASC, trnID ASC
+			</cfquery>
+			<cfif loc.QTrans.recordCount gt 0>
+				<cfset loc.lineCount = 0>
+				<cfset loc.result.trans = []>
+				<cfset loc.lastRec = loc.QTrans.recordCount - 5>
+				<cfloop query="loc.QTrans">
+					<cfif loc.lineCount lt loc.lastRec>
+						<cfset loc.result.bfwd += (trnAmnt1+trnAmnt2)>
+						<cfset loc.result.bfDate = trnDate>
+					<cfelse>
+						<cfset ArrayAppend(loc.result.trans,{
+							"trnID" = trnID,
+							"trnType" = trnType,
+							"trnDate" = trnDate,
+							"trnRef" = trnRef,
+							"trnAmnt1" = trnAmnt1,
+							"trnAmnt2" = trnAmnt2
+						})>
+						<cfset loc.result.balance += (trnAmnt1+trnAmnt2)>
+					</cfif>
+					<cfset loc.lineCount++>
+				</cfloop>
+			</cfif>
 		</cfif>
-			
-		<cfreturn result>
+		<cfreturn loc.result>
 	</cffunction>
 	
 	<cffunction name="LoadInvoice" access="public" returntype="struct">
@@ -233,6 +257,7 @@
 		<cfset result.delChargeTotal=0>
 		<cfset result.NetDisc=0>
 		<cfset result.transType="inv">
+		<cfset result.invDate = args.invDate>
 		
 		<cftry>
 			<cfquery name="QClients" datasource="#args.datasource#">
@@ -258,7 +283,11 @@
 			<cfset result.Discount=QClients.cltDiscount/100>
 			<cfset result.debit=ArrayNew(1)>
 			<cfset result.credit=ArrayNew(1)>
-	
+			
+			<cfset result.datasource = args.datasource>
+			<cfset result.cltShowBal = QClients.cltShowBal>
+			<cfset result.statement = LoadStatement(result)>
+			
 			<cfquery name="QOrders" datasource="#args.datasource#">
 				SELECT *
 				FROM tblOrder, tblStreets2
@@ -273,7 +302,7 @@
 			<cfif QOrders.ordDifferent>
 				<cfset result.deliverTo="To: #QOrders.ordHouseName# #QOrders.ordHouseNumber# #QOrders.stName#">
 			<cfelse><cfset result.deliverTo=""></cfif>
-			<cfquery name="QCharges" datasource="#args.datasource#" result="QChargesResult">
+			<cfquery name="QCharges" datasource="#args.datasource#" result="result.QChargesResult">
 				SELECT tblDelItems.*,tblPublication.pubID,tblPublication.pubTitle,tblPublication.pubGroup
 				FROM tblDelItems
 				INNER JOIN tblPublication ON pubID=diPubID
@@ -293,7 +322,7 @@
 				</cfif>
 				ORDER BY pubGroup asc, pubTitle asc, diPrice asc
 			</cfquery>
-
+			<cfset result.QCharges=QCharges>
 			<cfloop query="QCharges">
 				<cfset charge={}>
 				<cfset charge.ID=QCharges.diID>
@@ -400,7 +429,6 @@
 					</cfcase>
 					<cfcase value="credit">
 						<cfquery name="QDebit" datasource="#args.datasource#">
-						
 							SELECT *
 							FROM tblDelItems
 							WHERE diOrderID=#charge.OrderID#
@@ -453,6 +481,7 @@
 				AND psDate >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'
 				AND psDate <= '#LSDateFormat(args.toDate,"yyyy-mm-dd")#'
 			</cfquery>
+			<cfset result.QReturnCredit=QReturnCredit>
 			<cfloop query="QReturnCredit">
 				<cfset re={}>
 				<cfset re.sort=QReturnCredit.pubGroup & QReturnCredit.pubTitle>
@@ -526,6 +555,7 @@
 					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 			</cfcatch>
 		</cftry>
+				<!---<cfdump var="#result#" label="LoadInvoice" expand="no" format="html">--->
 		
 		<cfreturn result>
 	</cffunction>
@@ -602,6 +632,7 @@
 							trnRef,
 							trnDate,
 							trnAmnt1,
+							trnDesc, 
 							trnTest
 						) VALUES (
 							'sales',
@@ -613,6 +644,7 @@
 							#val(result.InvoiceRef)#,
 							'#LSDateFormat(args.invDate,"yyyy-mm-dd")#',
 							#args.Total#,
+							'#args.ordContact#',
 							#args.testmode#
 						)
 					</cfquery>

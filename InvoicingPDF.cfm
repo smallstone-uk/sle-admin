@@ -512,7 +512,7 @@
 									<th align="left" valign="middle" style="font-size:14px;"><strong>Amount To Pay</strong></th>
 									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(balanceDue + totalToPay)#</strong></td>
 								</tr>
-							<cfelseif grandTotal lt 0>
+							<cfelseif grandTotal lte 0>
 								<tr>
 									<th align="left" valign="middle" style="font-size:14px;"><strong>Account in credit<br />(nothing to pay)</strong></th>
 									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(balanceDue + totalToPay)#</strong></td>

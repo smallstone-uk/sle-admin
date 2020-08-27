@@ -24,129 +24,130 @@
 </script>
 <script type="text/javascript" src="scripts/checkDates.js"></script>
 <script type="text/javascript">
-	var toggle=false;
-	function LoadLettersList() {
-		$.ajax({
-			type: 'POST',
-			url: 'clientPaymentsLetterList.cfm',
-			data: {"userID":$('#clientRef').val()},
-			success:function(data){
-				$('#lettersload').html(data);
-			}
-		});
-	}
-	function CheckClient() {
-		$('#searchMsg').fadeOut();
-		$('#clientResult').fadeIn();
-		var client=document.getElementById('clientRef').value;
-		var allTrans=document.getElementById('allTrans').checked;
-		$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
-		$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans, function (response, status, xhr) {
-			$('#loadingDiv').html("").fadeOut();
-			if (response.indexOf('Reference') == -1) {
-				var msg=$.trim($("#clientResult").text());
-			//	alert(msg);
-			//	$('#clientRef').focus(); let cursor go elsewhere
-				$('#pay').fadeOut();
-			} else {
-			//	$('#trnRef').focus();
-				$('#pay').fadeIn();
-			}
-		});
-		$('#cltDetailsLink').attr("href", "clientDetails.cfm?row=0&ref="+client).fadeIn();
-		LoadLettersList();
-	}
-	function NextClient(direction) {
-		$('#pay').fadeOut();
-		$('#clientResult').fadeOut();
-		var client=document.getElementById('clientRef').value;
-		var allTrans=document.getElementById('allTrans').checked;
-		$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
-		$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans+'&'+direction+'=true', function (response, status, xhr) {
-			var key=$('#clientKey').html();
-			document.getElementById('clientRef').value=key;
-			$('#loadingDiv').html("").fadeOut();
-			$('#trnRef').focus();
-			$('#pay').fadeIn();
+		var toggle=false;
+		function LoadLettersList() {
+			$.ajax({
+				type: 'POST',
+				url: 'clientPaymentsLetterList.cfm',
+				data: {"userID":$('#clientRef').val()},
+				success:function(data){
+					$('#lettersload').html(data);
+				}
+			});
+		}
+		function CheckClient() {
+			$('#searchMsg').fadeOut();
 			$('#clientResult').fadeIn();
-		});
-	}
-	function checkTotal(formname) {
-		var payTotal=0;
-		var payAmnt=0;
-		var maxLines=document.getElementById('tranCount').value;
-		for (var c=1;c<=maxLines;c++) {
-			if (eval("document.forms."+formname+".tick"+c+".checked")) {
-				payAmnt=(eval("document.forms."+formname+".amnt"+c+".value"));
-				payAmnt=Math.round(payAmnt*100); // force as clean integers or summation will float
-				payTotal=payTotal+payAmnt;
-			}
-		}
-		payTotal=payTotal/100; // convert back to decimal
-		document.forms[formname].Total.value=payTotal.toFixed(2); 
-	}
-	function getSelectedButton(buttonGroup)	{
-		for (var i=0; i<buttonGroup.length; i++)	{
-			if (buttonGroup[i].checked)	{
-				return i;
-			}
-		}
-		return 0;
-	}
-//	function checkall(formname,thestate)	{
-//		var maxLines=document.getElementById('tranCount').value;
-//		for (var c=1;c<=maxLines;c++)	{
-//			document.getElementById("tick"+c).checked=thestate;
-//		}
-//		toggle=!toggle;	
-//		
-//		checkTotal(formname);
-//	}
-
-	function checkForm(form)	{
-	//	if (!checkField(form.payAmnt1,"Amount received")) {return false;}
-		if (!checkDateFormat(form.trnDate.value))	{
-			alert("Transaction Date is incorrectly formatted");
-			return false;
-		}
-		if (form.clientRef.length < 1) {
-			alert("Please select a client first");
-			form.clientRef.focus();
-			return false;
-		}
-		if (document.getElementById('Total')) {
-			var bType=getSelectedButton(form.trnType);
-			if (form.trnType[bType].value == "pay")	{
-				if (document.getElementById('btnClicked').value == "btnSavePayment") {
-					if (Number(form.trnAmnt1.value) > 99999)	{
-						alert("Transaction Amount entered is too high");
-						return false;	
-					}
-					if (Number(form.trnAmnt2.value) > 99999)	{
-						alert("Settlement Discount entered is too high");
-						return false;	
-					}
-					if (Number(form.trnAmnt1.value)+Number(form.trnAmnt2.value) == 0) {
-						alert("Please enter an amount in either the Net Amount or Discount field.");
-						return false;		
-					}
-					if ($('#trnMethod').val() == "") {
-						alert("Please select the payment method");
-						return false;							
-					}
+			var dateFrom = $('#srchDateFrom').val()
+			var client=document.getElementById('clientRef').value;
+			var allTrans=document.getElementById('allTrans').checked;
+			$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
+			$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans+'&dateFrom='+dateFrom, function (response, status, xhr) {
+				$('#loadingDiv').html("").fadeOut();
+				if (response.indexOf('Reference') == -1) {
+					var msg=$.trim($("#clientResult").text());
+				//	alert(msg);
+				//	$('#clientRef').focus(); let cursor go elsewhere
+					$('#pay').fadeOut();
+				} else {
+				//	$('#trnRef').focus();
+					$('#pay').fadeIn();
 				}
-				if ((Number(form.trnAmnt1.value)+Number(form.trnAmnt2.value) != Number(form.Total.value)) && document.getElementById("Total").value != 0)	{
-					alert("Net Amount does not equal the allocated balance.");
-					return false;
+			});
+			$('#cltDetailsLink').attr("href", "clientDetails.cfm?row=0&ref="+client).fadeIn();
+			LoadLettersList();
+		}
+		function NextClient(direction) {
+			$('#pay').fadeOut();
+			$('#clientResult').fadeOut();
+			var client=document.getElementById('clientRef').value;
+			var allTrans=document.getElementById('allTrans').checked;
+			$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
+			$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans+'&'+direction+'=true', function (response, status, xhr) {
+				var key=$('#clientKey').html();
+				document.getElementById('clientRef').value=key;
+				$('#loadingDiv').html("").fadeOut();
+				$('#trnRef').focus();
+				$('#pay').fadeIn();
+				$('#clientResult').fadeIn();
+			});
+		}
+		function checkTotal(formname) {
+			var payTotal=0;
+			var payAmnt=0;
+			var maxLines=document.getElementById('tranCount').value;
+			for (var c=1;c<=maxLines;c++) {
+				if (eval("document.forms."+formname+".tick"+c+".checked")) {
+					payAmnt=(eval("document.forms."+formname+".amnt"+c+".value"));
+					payAmnt=Math.round(payAmnt*100); // force as clean integers or summation will float
+					payTotal=payTotal+payAmnt;
 				}
 			}
-		} else {
-			alert("please select a client first");
-			form.clientRef.focus();
-			return false;
+			payTotal=payTotal/100; // convert back to decimal
+			document.forms[formname].Total.value=payTotal.toFixed(2); 
 		}
-		return true
-	}
+		function getSelectedButton(buttonGroup)	{
+			for (var i=0; i<buttonGroup.length; i++)	{
+				if (buttonGroup[i].checked)	{
+					return i;
+				}
+			}
+			return 0;
+		}
+	//	function checkall(formname,thestate)	{
+	//		var maxLines=document.getElementById('tranCount').value;
+	//		for (var c=1;c<=maxLines;c++)	{
+	//			document.getElementById("tick"+c).checked=thestate;
+	//		}
+	//		toggle=!toggle;	
+	//		
+	//		checkTotal(formname);
+	//	}
+	
+		function checkForm(form)	{
+		//	if (!checkField(form.payAmnt1,"Amount received")) {return false;}
+			if (!checkDateFormat(form.trnDate.value))	{
+				alert("Transaction Date is incorrectly formatted");
+				return false;
+			}
+			if (form.clientRef.length < 1) {
+				alert("Please select a client first");
+				form.clientRef.focus();
+				return false;
+			}
+			if (document.getElementById('Total')) {
+				var bType=getSelectedButton(form.trnType);
+				if (form.trnType[bType].value == "pay")	{
+					if (document.getElementById('btnClicked').value == "btnSavePayment") {
+						if (Number(form.trnAmnt1.value) > 99999)	{
+							alert("Transaction Amount entered is too high");
+							return false;	
+						}
+						if (Number(form.trnAmnt2.value) > 99999)	{
+							alert("Settlement Discount entered is too high");
+							return false;	
+						}
+						if (Number(form.trnAmnt1.value)+Number(form.trnAmnt2.value) == 0) {
+							alert("Please enter an amount in either the Net Amount or Discount field.");
+							return false;		
+						}
+						if ($('#trnMethod').val() == "") {
+							alert("Please select the payment method");
+							return false;							
+						}
+					}
+					if ((Number(form.trnAmnt1.value)+Number(form.trnAmnt2.value) != Number(form.Total.value)) && document.getElementById("Total").value != 0)	{
+						alert("Net Amount does not equal the allocated balance.");
+						return false;
+					}
+				}
+			} else {
+				alert("please select a client first");
+				form.clientRef.focus();
+				return false;
+			}
+			return true
+		}
 	$(document).ready(function() {
 		$('#trnDate').blur(function(event) {
 			var dateChecked=checkDate($('#trnDate').val(),false);
@@ -223,6 +224,7 @@
 			$("#orderOverlay-ui").fadeOut();
 			e.preventDefault();
 		});
+		$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 	});
 </script>
 <cfif StructKeyExists(URL,"rec")>
@@ -283,7 +285,7 @@
 									<td width="120">Client Reference</td>
 									<td>
 										<input type="text" class="inputfield" name="clientRef" id="clientRef" value="<cfif StructKeyExists(URL,"rec")>#val(url.rec)#</cfif>" size="40" maxlength="20" onBlur="CheckClient()" />
-										<label style="padding:0 0 0 10px;"><input type="checkbox" name="allTrans" id="allTrans" onClick="CheckClient()" />&nbsp;All transactions.</label>
+										<label style="padding:0 0 0 10px;"><input type="checkbox" name="allTrans" id="allTrans" onClick="CheckClient()" />&nbsp;All transactions from: </label><input type="text" name="srchDateFrom" id="srchDateFrom" value="" size="15" class="datepicker" />
 									</td>
 								</tr>
 							</table>
@@ -364,8 +366,8 @@
 											<tr>
 												<td align="right">Type</td>
 												<td>
-													<input type="radio" class="inputfield" name="trnType" id="trnType" value="pay" checked="checked" /> Payment
-													<input type="radio" class="inputfield" name="trnType" id="trnType" value="jnl" /> Journal
+													<input type="radio" class="inputfield" name="trnType" id="trnTypepay" value="pay" checked="checked" /> Payment
+													<input type="radio" class="inputfield" name="trnType" id="trnTypejnl" value="jnl" /> Journal
 												</td>
 											</tr>
 										</table>

@@ -40,7 +40,7 @@
 					<cfset currClient=QClient.cltRef>
 					<cfif StructKeyExists(url,"dateFrom") AND IsDate(url.dateFrom)>
 						<cfset dateFrom = url.dateFrom>
-						<cfquery name="QBfwd" datasource="#application.site.datasource1#"> <!--- Get transaction records --->
+						<cfquery name="QBfwd" datasource="#application.site.datasource1#"> <!--- Get bfwd balance --->
 							SELECT SUM(trnAmnt1) AS total
 							FROM tblTrans
 							WHERE trnClientRef='#val(currClient)#'
@@ -52,10 +52,10 @@
 						SELECT *
 						FROM tblTrans
 						WHERE trnClientRef='#val(currClient)#'
-						<cfif len(dateFrom)>
-							AND trnDate >= '#dateFrom#'
-						<cfelseif StructKeyExists(url,"allTrans") AND url.allTrans eq false>
+						<cfif StructKeyExists(url,"allTrans") AND url.allTrans eq false>
 							AND trnAlloc=0
+						<cfelseif len(dateFrom)>
+							AND trnDate >= '#dateFrom#'
 						</cfif>
 						ORDER BY trnDate, trnType DESC, trnID	<!--- show all payments before invoices on same date --->
 					</cfquery>

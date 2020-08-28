@@ -104,16 +104,16 @@
 								<td>Search by Payment Method</td>
 								<td>
 									<select name="srchMethod">
-										<option value="">Any Method</option>
-										<option value="cash">Cash</option>
-										<option value="chq">Cheque</option>
-										<option value="card">Card Payment</option>
+										<option value=""<cfif srchMethod eq ""> selected="selected"</cfif>>Any Method</option>
+										<option value="cash"<cfif srchMethod eq "cash"> selected="selected"</cfif>>Cash</option>
+										<option value="chq"<cfif srchMethod eq "chq"> selected="selected"</cfif>>Cheque</option>
+										<option value="card"<cfif srchMethod eq "card"> selected="selected"</cfif>>Card Payment</option>
 										<option disabled>-----------------</option>
-										<option value="coll">Cash Collected</option>
-										<option value="phone">Card by Phone</option>
-										<option value="ib">Internet Banking</option>
-										<option value="acct">Shop Credit Account</option>
-										<option value="qs">Paid via Quickstop</option>
+										<option value="coll"<cfif srchMethod eq "coll"> selected="selected"</cfif>>Cash Collected</option>
+										<option value="phone"<cfif srchMethod eq "phone"> selected="selected"</cfif>>Card by Phone</option>
+										<option value="ib"<cfif srchMethod eq "ib"> selected="selected"</cfif>>Internet Banking</option>
+										<option value="acct"<cfif srchMethod eq "acct"> selected="selected"</cfif>>Shop Credit Account</option>
+										<option value="qs"<cfif srchMethod eq "qs"> selected="selected"</cfif>>Paid via Quickstop</option>
 									</select>
 								</td>
 							</tr>

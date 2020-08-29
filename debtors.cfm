@@ -123,11 +123,11 @@
 							</tr>
 							<tr>
 								<td>Skip Allocated Transactions</td>
-								<td><input type="checkbox" name="srchSkipAllocated" value="1"<cfif srchSkipAllocated> checked="checked"</cfif> /></td>
+								<td><input type="checkbox" name="srchSkipAllocated" value="1"<cfif StructKeyExists(form,"srchSkipAllocated")> checked="checked"</cfif> /></td>
 							</tr>
 							<tr>
 								<td>Skip Zero Balance</td>
-								<td><input type="checkbox" name="srchSkipZeros" value="1"<cfif srchSkipZeros> checked="checked"</cfif> /></td>
+								<td><input type="checkbox" name="srchSkipZeros" value="1"<cfif StructKeyExists(form,"srchSkipZeros")> checked="checked"</cfif> /></td>
 							</tr>
 							<tr>
 								<td>Sort By</td>

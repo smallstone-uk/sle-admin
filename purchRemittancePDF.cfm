@@ -72,7 +72,7 @@
 	<cfoutput>
 	<body>
 		<div class="header">
-			<cfinclude template="busHeader.cfm">
+			<cfinclude template="busHeader2.cfm">
 		</div>
 			<table border="0" class="tableList" width="100%" id="tranListTable">
 				<tr>
@@ -105,7 +105,7 @@
 					<th>VAT</th>
 					<th>Gross</th>
 					<th>Balance</th>
-					<th class="noPrint">Allocated</th>
+					<th class="noPrint">Alloc. ID</th>
 				</tr>
 				<cfloop query="data.QTrans">
 					<cfset totAmnt1 += val(trnAmnt1)>
@@ -124,9 +124,15 @@
 						<td id="trnItem_Alloc" align="center" class="noPrint">#trnAllocID#</td>
 					</tr>
 				</cfloop>
+				<tr>
+					<th colspan="9">
+						Please allocate our payment as shown above.<br />
+						If your records do not correspond with ours, please send a copy of your statement to accounts@shortlanesendstore.co.uk.
+					</th>
+				</tr>
 			</table>
-		</cfoutput>
-	</body>
+		</body></cfoutput>
+	
 </html>
 <!---<cfinclude template="purchRemittance.cfm">--->
 </cfdocument>
@@ -136,19 +142,58 @@
 		<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<meta name="viewport" content="width=device-width,initial-scale=1.0">
+			<script src="scripts/jquery-1.9.1.js"></script>
+			<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+			<script>
+				$(document).ready(function() {
+					$('#btnSendEmail').click(function(e) {
+						$.ajax({
+							type: 'POST',
+							url: 'purchRemittanceSend.cfm',
+							data : $('#emailForm').serialize(),
+							beforeSend:function(){
+								$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Sending...").fadeIn();
+							},
+							success:function(data){
+								$('#loadingDiv').fadeOut();
+								$('#resultDiv').html(data).show();
+							},
+							error:function(data){
+								$('#resultDiv').html(data);
+								$('#loadingDiv').loading(false);
+							}
+						});
+						e.preventDefault();
+					});
+				});
+			</script>
 		</head>
 		<body>
+			<div id="loadingDiv"></div>
 			<cfoutput>
 				<cfif len(data.QSupplier.accEmail)>
-					<p>Email this remittance to: #data.QSupplier.accName#</p>
-					Send to: #data.QSupplier.accEmail#<br />
-					Attachment: #filename#<br />
+					<table>
+						<tr><td>Remittance for:</td><td>#data.QSupplier.accName#</td></tr>
+						<tr><td>Email to:</td><td>#data.QSupplier.accEmail#</td></tr>
+						<tr><td>Download:</td><td><a href="#application.site.url_data#remittances\#filename#" target="_blank">#filename#</a></td></tr>
+						<tr><td>Attachment:</td><td>#filename#</td></tr>
+					</table>					
+					<form name="emailForm" id="emailForm" method="post">
+						<input type="hidden" name="accountID" value="#url.accountID#" />
+						<input type="hidden" name="allocationID" value="#url.allocationID#" />
+						<input type="hidden" name="sendTo" value="#data.QSupplier.accEmail#" />
+						<input type="hidden" name="attachment" value="#filename#" />
+						<textarea cols="40" rows="6" name="msgText">Please see attached PDF document.<br />This shows how we allocated our payment.</textarea>
+						<input type="button" id="btnSendEmail" value="Send Email" />
+					</form>
 				<cfelse>
-					No email address available.<br />
+					<table>
+						<tr><td>No email address available.</td></tr>
+						<tr><td>Download:</td><td><a href="#application.site.url_data#remittances\#filename#" target="_blank">#filename#</a></td></tr>
+					</table>					
 				</cfif>
-				Click to print: <a href="#application.site.url_data#remittances\#filename#" target="_blank">#filename#</a>
 			</cfoutput>
-			<cfdump var="#data#" label="data" expand="false">
+			<div id="resultDiv"></div>
 		</body>
 	</html>
 

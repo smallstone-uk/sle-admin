@@ -18,10 +18,14 @@
 
 <cfquery name="QBarcodes" datasource="#parm.datasource#">
 	SELECT barcode,prodID,prodRef,prodTitle, prodUnitSize,prodReorder
-	FROM tblProducts
-	INNER JOIN tblBarcodes ON barProdID=prodID
-	AND barType = 'product'
-	WHERE prodReorder IN ('#parm.nextDel#','Every')
+	FROM tblProducts p
+	JOIN (SELECT MAX(barID) maxBarID, barProdID
+		FROM tblBarcodes 
+		GROUP BY barProdID
+	) barMax ON (barMax.barProdID=p.prodID)
+	JOIN tblBarcodes bars ON (bars.barID=barMax.maxBarID)
+		WHERE prodReorder IN ('#parm.nextDel#','Every')
+		AND prodStatus = 'active'
 </cfquery>
 <cfif FileExists(parm.outFile)>
 	<cffile action="delete" file="#parm.outFile#">

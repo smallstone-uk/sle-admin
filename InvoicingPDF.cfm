@@ -32,7 +32,6 @@
 	<cfset parm.TransType=TransType>
 	
 	<cfset invoice=inv.LoadInvoice(parm)>
-	
 	<cfset parm.cltID=invoice.ID>
 	<cfset parm.cltRef=invoice.Ref>
 	<cfset parm.orderID=invoice.ordID>
@@ -510,17 +509,26 @@
 							<cfif grandTotal gt 0>
 								<tr>
 									<th align="left" valign="middle" style="font-size:14px;"><strong>Amount To Pay</strong></th>
-									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(balanceDue + totalToPay)#</strong></td>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
 								</tr>
 							<cfelseif grandTotal lte 0>
 								<tr>
 									<th align="left" valign="middle" style="font-size:14px;"><strong>Account in credit<br />(nothing to pay)</strong></th>
-									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(balanceDue + totalToPay)#</strong></td>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
 								</tr>
 							<cfelse>
 								<tr>
 									<th align="left" valign="middle" style="font-size:14px;"><strong>Amount To Pay</strong></th>
-									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(totalToPay)#</strong></td>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
+								</tr>
+							</cfif>
+							<cfif invoice.cltPayMethod eq "phone" AND grandTotal gt 0>
+								<tr>
+									<td colspan="2">
+										We have your card details safely stored and will debit your account the sum of &pound;#DecimalFormat(grandTotal)#, 
+										on or after #LSDateFormat(DateAdd("d",7,parm.invDate),"DD/MM/YYYY")#. Please contact us before that date if you believe
+										there is an error in your bill.
+									</td>
 								</tr>
 							</cfif>
 						</table>

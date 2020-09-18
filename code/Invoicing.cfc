@@ -281,6 +281,7 @@
 			<cfset result.County=QClients.cltCounty>
 			<cfset result.Postcode=QClients.cltPostCode>
 			<cfset result.Discount=QClients.cltDiscount/100>
+			<cfset result.cltPayMethod = QClients.cltPayMethod>
 			<cfset result.debit=ArrayNew(1)>
 			<cfset result.credit=ArrayNew(1)>
 			

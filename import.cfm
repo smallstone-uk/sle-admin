@@ -53,6 +53,7 @@
 				<th width="50">PM</th>
 				<th width="50">Pack Qty</th>
 				<th width="50">Unit Size</th>
+				<th width="50">Order<br>Qty</th>
 				<th width="50">RRP</th>
 				<th width="50">Our Price</th>
 				<th width="50">VAT</th>
@@ -88,6 +89,7 @@
 					<td align="center">#rec.pm#</td>
 					<td align="center">#rec.packQty#</td>
 					<td>#rec.fld04#</td>
+					<td align="center">#StructFind(rec,qtyField)#</td>
 					<td align="right">#recResult.RRP#</td>
 					<td align="right"><strong>#recResult.ourPrice#</strong></td>
 					<td align="right">#recResult.VAT#%</td>
@@ -101,7 +103,7 @@
 			<cfif totRetail GT 0>
 				<cfset totPOR=DecimalFormat((totProfit/totRetail)*100)>
 				<tr>
-					<td class="amountTotal" colspan="10">Totals</td>
+					<td class="amountTotal" colspan="11">Totals</td>
 					<td class="amountTotal">#DecimalFormat(totWSP)#</td>
 					<td class="amountTotal">#DecimalFormat(totRetail)#</td>
 					<td class="amountTotal">#DecimalFormat(totProfit)#</td>

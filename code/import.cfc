@@ -89,26 +89,26 @@
 	<cffunction name="determineQtyFld" access="public" returntype="string">
 		<cfargument name="recs" type="array" required="yes">
 		<cfset var loc={}>
-		<cfset loc.result={"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
+		<cfset loc.result={"f09"=0,"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
 		<cfset loc.value=0>
-		<cfset loc.field=10>
+		<cfset loc.field=9>		
 		<cfif ArrayLen(recs)>
 			<cfloop array="#recs#" index="loc.item">
-				<cfloop from="10" to="13" index="loc.i">
-					<cfset loc.value=StructFind(loc.result,"f#loc.i#")>
-					<cfset StructUpdate(loc.result,"f#loc.i#",loc.value+val(StructFind(loc.item,"fld#loc.i#")))>
+				<cfloop from="9" to="13" index="loc.i">
+					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
+					<cfset StructUpdate(loc.result,"f#NumberFormat(loc.i,"00")#",loc.value+val(StructFind(loc.item,"fld#NumberFormat(loc.i,"00")#")))>
 				</cfloop>
 			</cfloop>
 			<cfset loc.value=0>
-			<cfset loc.field=10>
-			<cfloop from="10" to="13" index="loc.i">
-				<cfif StructFind(loc.result,"f#loc.i#") GT loc.value>
-					<cfset loc.value=StructFind(loc.result,"f#loc.i#")>
+			<cfset loc.field=9>
+			<cfloop from="9" to="13" index="loc.i">
+				<cfif val(StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")) GT loc.value>
+					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
 					<cfset loc.field=loc.i>
 				</cfif>
 			</cfloop>
 		</cfif>
-		<cfreturn "fld#loc.field#">
+		<cfreturn "fld#NumberFormat(loc.field,"00")#">
 	</cffunction>
 
 	<cffunction name="CheckStockOrder" access="public" returntype="struct" hint="checks existence of/or creates stock order header record">

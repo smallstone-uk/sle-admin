@@ -89,19 +89,19 @@
 	<cffunction name="determineQtyFld" access="public" returntype="string">
 		<cfargument name="recs" type="array" required="yes">
 		<cfset var loc={}>
-		<cfset loc.result={"f09"=0,"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
+		<cfset loc.result={"f08"=0,"f09"=0,"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
 		<cfset loc.value=0>
-		<cfset loc.field=9>		
+		<cfset loc.field=8>		
 		<cfif ArrayLen(recs)>
 			<cfloop array="#recs#" index="loc.item">
-				<cfloop from="9" to="13" index="loc.i">
+				<cfloop from="8" to="13" index="loc.i">
 					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
 					<cfset StructUpdate(loc.result,"f#NumberFormat(loc.i,"00")#",loc.value+val(StructFind(loc.item,"fld#NumberFormat(loc.i,"00")#")))>
 				</cfloop>
 			</cfloop>
 			<cfset loc.value=0>
-			<cfset loc.field=9>
-			<cfloop from="9" to="13" index="loc.i">
+			<cfset loc.field=8>
+			<cfloop from="8" to="13" index="loc.i">
 				<cfif val(StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")) GT loc.value>
 					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
 					<cfset loc.field=loc.i>

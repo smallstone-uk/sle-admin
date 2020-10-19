@@ -974,7 +974,7 @@
 														<td colspan="5"></td>
 														<td>Total</td>
 														<td align="right">#DecimalFormat(subTotal)#</td>
-														<cfif netTotal neq subTotal><td colspan="2" class="err">Analysis not balanced</td>
+														<cfif abs(netTotal - subTotal) gt 0.01><td colspan="2" class="err">Analysis not balanced</td>
 															<cfelse><td colspan="2"></td></cfif>
 													</tr>
 													<cfset GnetTotal += netTotal>

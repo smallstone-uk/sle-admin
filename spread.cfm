@@ -267,6 +267,14 @@
 								<cfset rec.description="FPIO #rec.description#">
 								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 							</cfcase>
+							<cfcase value="FPOW" delimiters="|">	<!--- staff wages --->
+								<cfset rec.description="FPOW #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
+							<cfcase value="FPIW" delimiters="|">	<!--- card paymenr receipts --->
+								<cfset rec.description="FPIW #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
 							<cfcase value="FPI|BGC|BP|DEP|DEPQ|SO" delimiters="|">
 								<cfif Find("CARDNET",rec.description)>	<!--- Card Receipts --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>

@@ -46,48 +46,48 @@
 				<th align="right">Profit</th>
 				<th align="right">POR%</th>
 			</tr>
-		<cfset dateKey = 0>
-		<cfset totSales = 0>
-		<cfset totWaste = 0>
-		<cfset totNet = 0>
-		<cfset totValue = 0>
-		<cfset totTrade = 0>
-		<cfset totProfit = 0>
-		<cfloop query="QSalesItems">
-			<cfset valueNet += eiNet>
-			<cfset valueTrade += eiTrade>
-			<cfif eiQty gt 0>
-				<cfset numSales += eiQty>
-				<cfset totSales += eiQty>
-			<cfelse>
-				<cfset numWaste -= eiQty>
-				<cfset totWaste -= eiQty>
-			</cfif>
-			<cfif dateKey gt 0 AND dateKey neq LSDateFormat(eiTimeStamp,"yyyymm")>
-				<cfset profit = valueNet + valueTrade>
-				<cfset totNet += (numSales - numWaste)>
-				<cfset totValue += valueNet>
-				<cfset totTrade += valueTrade>
-				<cfset totProfit += profit>
-				<tr>
-					<td align="right">#LSDateFormat(eiTimeStamp,"mmmm-yyyy")#</td>
-					<td align="right">#numSales#</td>
-					<td align="right">#numWaste#</td>
-					<td align="right">#numSales - numWaste#</td>
-					<td>&nbsp;</td>
-					<td align="right">&pound;#DecimalFormat(-valueNet)#</td>
-					<td align="right">&pound;#DecimalFormat(valueTrade)#</td>
-					<td align="right">&pound;#DecimalFormat(-profit)#</td>
-					<td align="right">#DecimalFormat((profit / valueNet) * 100)#%</td>
-				</tr>
-				<cfset numSales = 0>
-				<cfset numWaste = 0>
-				<cfset numNet = 0>
-				<cfset valueNet = 0>
-				<cfset valueTrade = 0>
-			</cfif>
-			<cfset dateKey = LSDateFormat(eiTimeStamp,"yyyymm")>
-		</cfloop>
+			<cfset dateKey = DateAdd("d",1,Now())>
+			<cfset totSales = 0>
+			<cfset totWaste = 0>
+			<cfset totNet = 0>
+			<cfset totValue = 0>
+			<cfset totTrade = 0>
+			<cfset totProfit = 0>
+			<cfloop query="QSalesItems">
+				<cfset valueNet += eiNet>
+				<cfset valueTrade += eiTrade>
+				<cfif eiQty gt 0>
+					<cfset numSales += eiQty>
+					<cfset totSales += eiQty>
+				<cfelse>
+					<cfset numWaste -= eiQty>
+					<cfset totWaste -= eiQty>
+				</cfif>
+				<cfif dateKey gt 0 AND dateKey neq LSDateFormat(eiTimeStamp,"yyyymm")>
+					<cfset profit = valueNet + valueTrade>
+					<cfset totNet += (numSales - numWaste)>
+					<cfset totValue += valueNet>
+					<cfset totTrade += valueTrade>
+					<cfset totProfit += profit>
+					<tr>
+						<td align="right">#LSDateFormat(eiTimeStamp,"mmmm-yyyy")#</td>
+						<td align="right">#numSales#</td>
+						<td align="right">#numWaste#</td>
+						<td align="right">#numSales - numWaste#</td>
+						<td>&nbsp;</td>
+						<td align="right">&pound;#DecimalFormat(-valueNet)#</td>
+						<td align="right">&pound;#DecimalFormat(valueTrade)#</td>
+						<td align="right">&pound;#DecimalFormat(-profit)#</td>
+						<td align="right">#DecimalFormat((profit / valueNet) * 100)#%</td>
+					</tr>
+					<cfset numSales = 0>
+					<cfset numWaste = 0>
+					<cfset numNet = 0>
+					<cfset valueNet = 0>
+					<cfset valueTrade = 0>
+				</cfif>
+				<cfset dateKey = LSDateFormat(eiTimeStamp,"yyyymm")>
+			</cfloop>
 			<tr>
 				<th></th>
 				<th align="right">#totSales#</th>

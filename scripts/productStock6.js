@@ -175,6 +175,21 @@ function LoadStockItems(bcode,productID,result) {
 	});
 }
 
+function LoadSalesItems(bcode,productID,result) {
+	 console.log("LoadSalesItems - bcode " + bcode + " productID " + productID + " result " + result);
+	$.ajax({
+		type: 'POST',
+		url: 'ProductStock6SalesItems.cfm',
+		data : {"bcode":bcode,"productID":productID},
+		beforeSend:function(){
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales Items...");
+		},
+		success:function(data){
+			$(result).html(data);
+		}
+	});
+}
+
 function LoadGroups(result) {
 	$.ajax({
 		type: 'POST',

@@ -1,5 +1,74 @@
 <cfcomponent displayname="productstock" extends="core">
 
+	<cffunction name="LoadProductAndLatestStockItem" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.QProduct" datasource="#args.datasource#" result="loc.QQueryResult">
+				SELECT 	prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+						prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
+						siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
+				FROM tblProducts
+				LEFT JOIN tblStockItem ON prodID = siProduct
+				AND tblStockItem.siID = (
+					SELECT MAX( siID )
+					FROM tblStockItem
+					WHERE prodID = siProduct )
+				WHERE prodID=#val(args.productID)#
+				LIMIT 1;
+			</cfquery>
+
+			<cfloop query="loc.QProduct">
+				<cfset loc.rec = {}>
+				<cfset loc.rec.prodID = prodID>
+				<cfset loc.rec.prodRef = prodRef>
+				<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
+				<cfset loc.rec.prodRecordTitle = prodRecordTitle>
+				<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
+				<cfset loc.rec.prodTitle = prodTitle>
+				<cfset loc.rec.prodCountDate = LSDateFormat(prodCountDate,"dd-mmm-yyyy")>
+				<cfset loc.rec.prodStockLevel = prodStockLevel> <!--- + int(prodStockLevel eq 0)	add 1 if zero --->
+				<cfset loc.rec.prodCatID = prodCatID>
+				<cfset loc.rec.prodEposCatID = prodEposCatID>
+				<cfset loc.rec.prodPriceMarked = prodPriceMarked>
+				<cfset loc.rec.prodVATRate = prodVATRate>
+				<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
+				<cfset loc.rec.prodMinPrice = prodMinPrice>
+				<cfset loc.rec.prodOurPrice = prodOurPrice>
+				<cfset loc.rec.prodStatus = prodStatus>
+				<cfset loc.rec.prodReorder = prodReorder>
+				<cfset loc.rec.prodUnitSize = prodUnitSize>
+				
+				<cfset loc.stockItem = {}>
+				<cfset loc.stockItem.siID = siID>
+				<cfset loc.stockItem.siRef = siRef>
+				<cfset loc.stockItem.siUnitSize = siUnitSize>
+				<cfset loc.stockItem.siPackQty = siPackQty>
+				<cfset loc.stockItem.siQtyPacks = siQtyPacks>
+				<cfset loc.stockItem.siQtyItems = siQtyItems>
+				<cfset loc.stockItem.siWSP = siWSP>
+				<cfset loc.stockItem.siUnitTrade = siUnitTrade>
+				<cfset loc.stockItem.siRRP = siRRP>
+				<cfset loc.stockItem.siOurPrice = siOurPrice>
+				<cfset loc.stockItem.siPOR = siPOR>
+				<cfset loc.stockItem.siReceived = siReceived>
+				<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn,"yyyy-mm-dd")>
+				<cfset loc.stockItem.siExpires = siExpires>
+				<cfset loc.stockItem.siStatus = siStatus>						 	 	 	 	 	 	 	 	 	 	 	 	 
+			</cfloop>
+			<cfset loc.result.product = loc.rec>
+			<cfset loc.result.stockItem = loc.stockItem>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="FindProduct" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -9,7 +78,6 @@
 		<cfset loc.result.barcode = "">
 		<cfset loc.result.msg = "">
 		<cfset loc.result.msgs = []>
-		
 		<cftry>
 			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
 				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>

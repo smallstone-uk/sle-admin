@@ -111,13 +111,12 @@
 				LoadStockItems(bcode,productID,'#stockdiv');
 				$('#stockTab').blur();
 			});
-<!---
-			$('#groupsTab').click(function() {
+			$('#salesTab').click(function() {
 				var	bcode = $('#bcode').html()
-				LoadGroups('#groupsdiv');
-				$('#groupsTab').blur();
+				var	productID = $('#productID').html()
+				LoadSalesItems(bcode,productID,'#salesdiv');
+				$('#salesTab').blur();
 			});
---->
 			$('#groupsBtn').click(function() {
 				window.open( 'ProductStock6GroupsMain.cfm' );
 			});
@@ -171,10 +170,12 @@
 					<ul>
 						<li><a href="##productdiv" id="productTab">Product</a></li>
 						<li><a href="##stockdiv" id="stockTab">Stock</a></li>
+						<li><a href="##salesdiv" id="salesTab">Sales</a></li>
 					</ul>
 					<div id="productdiv"><div class="title">Scan product...</div></div>
 					<div id="stockdiv"></div>
 					<div id="groupsdiv"></div>
+					<div id="salesdiv"></div>
 					<div style="clear:both"></div>
 					<div id="result"></div>
 				</div>

@@ -75,7 +75,7 @@
 					</cfif>
 					<cfif len(StructFind(args.form,"srchType"))>
 						<cfif args.form.srchType eq 'debits'>AND trnType IN ('inv','crn')
-						<cfelseif args.form.srchType eq 'credits'>AND trnType IN ('pay','jnl')</cfif>
+						<cfelseif args.form.srchType eq 'credits'>AND trnType IN ('pay','jnl','nom','rfd','dbt')</cfif>
 					</cfif>
 					<cfif StructKeyExists(args.form,"srchAllocated")>AND trnAlloc=0</cfif>
 					ORDER BY trnDate

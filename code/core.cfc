@@ -720,26 +720,32 @@
 			</cfquery>
 			<cfif loc.QLoadTran.recordCount EQ 1>
 				<cfswitch expression="#loc.QLoadTran.trnMethod#">
-					<cfcase value="card">
-						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 191) --->
-					</cfcase>
 					<cfcase value="cash">
 						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 181) --->
 					</cfcase>
 					<cfcase value="chqs">
 						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 1472) --->
 					</cfcase>
-					<cfcase value="chq">
-						<cfset loc.nomID=1472>	<!--- cheque holding account (cheques collected or posted --->
+					<cfcase value="card">
+						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 191) --->
 					</cfcase>
 					<cfcase value="coll">
 						<cfset loc.nomID=1482>	<!--- cash collected account --->
 					</cfcase>
-					<cfcase value="dv">
-						<cfset loc.nomID=231>	<!--- News Subscription Vouchers --->
+					<cfcase value="chq">
+						<cfset loc.nomID=1472>	<!--- cheque holding account (cheques collected or posted --->
+					</cfcase>
+					<cfcase value="phone">
+						<cfset loc.nomID=2862>	<!--- payments taken online via card system (Stripe) --->
 					</cfcase>
 					<cfcase value="ib">
 						<cfset loc.nomID=41>	<!--- Bank Account --->
+					</cfcase>
+					<cfcase value="acct">
+						<cfset loc.nomID=2802>	<!--- Customer Shop Account --->
+					</cfcase>
+					<cfcase value="dv">
+						<cfset loc.nomID=231>	<!--- News Subscription Vouchers --->
 					</cfcase>
 					<cfcase value="qchq|qs|qsib|qslost" delimiters="|">
 						<cfset loc.nomID=1561>	<!--- Paid Via Quickstop (no longer used) --->
@@ -1022,7 +1028,6 @@
 						<hr>
 						<p style="color:##666;">
 							If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
-							#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#
 						</p>
 					</body>
 					</html>

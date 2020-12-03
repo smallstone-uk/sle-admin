@@ -87,7 +87,7 @@
 								</cfloop>
 							</tr>
 						</cfloop>
-						<cfloop from="#deptCount+1#" to="5" index="deptRow">	<!--- pad area to same depth --->
+						<cfloop from="#deptCount+1#" to="7" index="deptRow">	<!--- pad area to same depth --->
 							<tr class="pr2_depts">
 								<th class="pr2_dept" align="left">&nbsp;</th>
 								<td width="75" align="center"></td>

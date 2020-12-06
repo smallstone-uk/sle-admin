@@ -83,7 +83,8 @@
 					SELECT MAX(siID)
 					FROM tblStockItem
 					WHERE prodID = siProduct
-					AND siStatus = "closed")
+					AND siStatus = "closed"
+					AND siBookedIn IS NOT NULL)
 				INNER JOIN tblProductCats ON pcatID = prodCatID
 				INNER JOIN tblProductGroups ON pcatGroup = pgID
 				WHERE pgType != 'epos'

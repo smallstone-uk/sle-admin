@@ -102,7 +102,7 @@
 								<tr>
 									<td>#recCount#</td>
 									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
-									<td><a href="import.cfm?fileSrc=#name#" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#" target="_blank">import</a></td>
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>
@@ -117,7 +117,7 @@
 								<tr>
 									<td>#recCount#</td>
 									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
-									<td><a href="import.cfm?fileSrc=#name#" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#" target="_blank">import</a></td>
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>

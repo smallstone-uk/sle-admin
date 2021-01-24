@@ -258,7 +258,7 @@
 							<td width="25" align="left">
 								<a href="javascript:void(0)" class="ctrlDelProdItem" data-prodID="#item.ediProduct#" data-dealID="#item.ediParent#" title="Delete Row"></a>
 							</td>
-							<td>#item.ediProduct#</td>
+							<td><a href="productStock6.cfm?product=#item.ediProduct#" target="productindeal">#item.ediProduct#</a></td>
 							<td align="left" id="rli_name">
 								<a href="javascript:void(0)" class="deal_product_item" title="#item.ediProduct#" data-title="#item.prodTitle#" data-id="#item.ediProduct#">#item.prodTitle#</a>
 							</td>

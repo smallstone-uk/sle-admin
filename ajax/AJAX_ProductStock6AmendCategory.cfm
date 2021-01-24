@@ -8,14 +8,16 @@
 	<cfobject component="code/ProductStock6" name="pstock">
 	<cfset record = pstock.LoadProductCategory(parm)>
 	<cfset data = pstock.LoadProductGroups(parm)>
+	<style>
+		#pcatDescription {z-index:999999999}
+	</style>
 	<cfoutput>
-		<form method="post" enctype="multipart/form-data" id="AmendCategory">
-			<input type="hidden" name="pcatID" id="pcatID" value="#form.id#" />
 			<span class="FCPDIHeader">
 				<span class="FCPDITitle">Amend Category</span>
 				<a href="javascript:void(0)" class="FCPDIClose" onclick="javascript:$.closeDialog();" title="Close popup"></a>
 			</span>
 			<div class="FCPopupDialogInner">
+				<script src="scripts/main.js"></script>
 				<script>
 					$(document).ready(function(e) {
 						$('##AmendCategory').submit(function(event) {
@@ -30,32 +32,46 @@
 							});
 							event.preventDefault();
 						});
+//						$('##pcatDescription').keyup(function(event) {console.log(event);});
 					});
 				</script>
 				<span class="FCPDIContent">
-					<table width="100%" border="0" class="tableList" style="border:none;">
-						<tr>
-							<td align="right">Title</td>
-							<td><input type="text" name="pcatTitle" size="25" value="#record.category.pcatTitle#" /></td>
-						</tr>
-						<tr>
-							<td align="right">Group</td>
-							<td>
-								<select name="pcatGroup">
-									<cfloop query="data.groups">
-										<option value="#pgID#"<cfif record.category.pcatGroup eq pgID> selected="selected"</cfif>>#pgTitle#</option>
-									</cfloop>
-								</select>
-							</td>
-						</tr>
-					</table>
+					<form method="post" enctype="multipart/form-data" id="AmendCategory">
+						<input type="hidden" name="pcatID" id="pcatID" value="#form.id#" />
+						<table width="100%" border="0" class="tableList" style="border:none;">
+							<tr>
+								<td align="right">Title</td>
+								<td><input type="text" name="pcatTitle" size="25" value="#record.category.pcatTitle#" /></td>
+							</tr>
+							<tr>
+								<td align="right">Group</td>
+								<td>
+									<select name="pcatGroup">
+										<cfloop query="data.groups">
+											<option value="#pgID#"<cfif record.category.pcatGroup eq pgID> selected="selected"</cfif>>#pgTitle#</option>
+										</cfloop>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td align="right">Description</td>
+								<td><textarea class="textBox" name="pcatDescription" cols="40" rows="6" id="pcatDescription">#record.category.pcatDescription#</textarea></td>
+							</tr>
+							<tr>
+								<td align="right">Visible</td>
+								<td>
+									<input type="radio" name="pcatShow" value="1"<cfif record.category.pcatShow eq 1> checked="checked"</cfif> />Show on Live Site<br />
+									<input type="radio" name="pcatShow" value="0"<cfif record.category.pcatShow eq 0> checked="checked"</cfif> />Hide on Live Site<br />								
+								</td>
+							</tr>
+						</table>
+						<span class="FCPDIControls">
+							<input type="submit" name="Submit" value="Save" class="NAFSubmit" style="float:right;margin-right:10px;" />
+							<input type="button" name="cancel" value="Cancel" class="button_white" style="float:right;" onclick="javascript:$.closeDialog();" />
+						</span>
+					</form>
 				</span>
 			</div>
-			<span class="FCPDIControls">
-				<input type="submit" name="Submit" value="Save" class="NAFSubmit" style="float:right;margin-right:10px;" />
-				<input type="button" name="cancel" value="Cancel" class="button_white" style="float:right;" onclick="javascript:$.closeDialog();" />
-			</span>
-		</form>
 	</cfoutput>
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

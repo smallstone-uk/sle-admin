@@ -720,26 +720,32 @@
 			</cfquery>
 			<cfif loc.QLoadTran.recordCount EQ 1>
 				<cfswitch expression="#loc.QLoadTran.trnMethod#">
-					<cfcase value="card">
-						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 191) --->
-					</cfcase>
 					<cfcase value="cash">
 						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 181) --->
 					</cfcase>
 					<cfcase value="chqs">
 						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 1472) --->
 					</cfcase>
-					<cfcase value="chq">
-						<cfset loc.nomID=1472>	<!--- cheque holding account (cheques collected or posted --->
+					<cfcase value="card">
+						<cfset loc.nomID=871>	<!--- A17 News accounts payment via shop (was 191) --->
 					</cfcase>
 					<cfcase value="coll">
 						<cfset loc.nomID=1482>	<!--- cash collected account --->
 					</cfcase>
-					<cfcase value="dv">
-						<cfset loc.nomID=231>	<!--- News Subscription Vouchers --->
+					<cfcase value="chq">
+						<cfset loc.nomID=1472>	<!--- cheque holding account (cheques collected or posted --->
+					</cfcase>
+					<cfcase value="phone">
+						<cfset loc.nomID=2862>	<!--- payments taken online via card system (Stripe) --->
 					</cfcase>
 					<cfcase value="ib">
 						<cfset loc.nomID=41>	<!--- Bank Account --->
+					</cfcase>
+					<cfcase value="acct">
+						<cfset loc.nomID=2802>	<!--- Customer Shop Account --->
+					</cfcase>
+					<cfcase value="dv">
+						<cfset loc.nomID=231>	<!--- News Subscription Vouchers --->
 					</cfcase>
 					<cfcase value="qchq|qs|qsib|qslost" delimiters="|">
 						<cfset loc.nomID=1561>	<!--- Paid Via Quickstop (no longer used) --->
@@ -936,7 +942,8 @@
 			<cfif StructKeyExists(args,"pubID")>AND pubID IN (#args.pubID#)</cfif>
 			AND vchPubID=pubID
 			AND vchStatus='in'
-			<cfif StructKeyExists(args,"fromDate")>AND vchStop >= '#LSDateFormat(args.fromDate,"yyyy-mm-dd")#'</cfif>	<!--- 28/9/14 ignore vouchers expired before this invoice run --->
+			<cfif StructKeyExists(args,"showCurrent")>AND vchStop >= '#LSDateFormat(Now(),"yyyy-mm-dd")#'</cfif>	
+			<cfif StructKeyExists(args,"hideOld")>AND vchStop > DATE_ADD(Now(), INTERVAL -1 YEAR)</cfif>	
 			ORDER BY vchPubID asc, vchStop desc
 		</cfquery>
 		<cfloop query="QVouchers">
@@ -1020,7 +1027,8 @@
 						</div>
 						<hr>
 						<p style="color:##666;">
-							If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk</p>
+							If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+						</p>
 					</body>
 					</html>
 				</cfoutput>
@@ -1031,7 +1039,7 @@
 				bcc="news@shortlanesendstore.co.uk" 
 				server="mail.shortlanesendstore.co.uk" 
 				username="steven@shortlanesendstore.co.uk" 
-				password="kcc150297"
+				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
 				subject="#args.subject# - Shortlanesend Store">
 				<cfmailpart type="plain">
 					Hello #args.name#,

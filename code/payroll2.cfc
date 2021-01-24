@@ -232,6 +232,7 @@
 					phDate,
 					phEmployee,
 					phWeekNo,
+					phMethod,
 					phGross,
 					phPAYE,
 					phNI,
@@ -247,6 +248,7 @@
 					'#args.form.header.weekending#',
 					#val(args.form.header.employee)#,
 					#val(args.form.header.weekno)#,
+					'#args.form.header.method#',
 					#val(args.form.header.gross)#,
 					#val(args.form.header.paye)#,
 					#val(args.form.header.ni)#,
@@ -268,6 +270,7 @@
 				SET phDate = '#args.form.header.weekending#',
 					phEmployee = #val(args.form.header.employee)#,
 					phWeekNo = #val(args.form.header.weekno)#,
+					phMethod = '#args.form.header.method#',
 					phGross = #val(args.form.header.gross)#,
 					phPAYE = #val(args.form.header.paye)#,
 					phNI = #val(args.form.header.ni)#,
@@ -495,7 +498,7 @@
 		<cfset loc.result.EmployerRef = loc.employee.EmployerRef>
 		<cfset loc.result.NI = loc.employee.empNI>
 		<cfset loc.result.empPaySlip = loc.employee.empPaySlip>
-
+		<cfset loc.result.Method = loc.employee.empMethod>
 		<cfreturn loc.result>
 	</cffunction>
 

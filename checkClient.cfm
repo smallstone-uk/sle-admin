@@ -1,4 +1,18 @@
 <!--- AJAX call - check client do not show debug data at all --->
+	
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#selectAll').click(function(e) {   
+			if(this.checked) {
+				$('input.trans').each(function() {this.checked = true;});
+			} else {
+				$('input.trans').each(function() {this.checked = false;});
+			}
+		});
+	});
+</script>
+
+
 <cftry>
 	<cfset callback=1> <!--- force exit of onrequestend.cfm --->
 	<cfset tabWidth="100%">
@@ -26,7 +40,7 @@
 					<cfset currClient=QClient.cltRef>
 					<cfif StructKeyExists(url,"dateFrom") AND IsDate(url.dateFrom)>
 						<cfset dateFrom = url.dateFrom>
-						<cfquery name="QBfwd" datasource="#application.site.datasource1#"> <!--- Get transaction records --->
+						<cfquery name="QBfwd" datasource="#application.site.datasource1#"> <!--- Get bfwd balance --->
 							SELECT SUM(trnAmnt1) AS total
 							FROM tblTrans
 							WHERE trnClientRef='#val(currClient)#'
@@ -38,10 +52,10 @@
 						SELECT *
 						FROM tblTrans
 						WHERE trnClientRef='#val(currClient)#'
-						<cfif len(dateFrom)>
-							AND trnDate >= '#dateFrom#'
-						<cfelseif StructKeyExists(url,"allTrans") AND url.allTrans eq false>
+						<cfif StructKeyExists(url,"allTrans") AND url.allTrans eq false>
 							AND trnAlloc=0
+						<cfelseif len(dateFrom)>
+							AND trnDate >= '#dateFrom#'
 						</cfif>
 						ORDER BY trnDate, trnType DESC, trnID	<!--- show all payments before invoices on same date --->
 					</cfquery>
@@ -58,7 +72,7 @@
 					</cfif>
 						<cfif print><cfinclude template="busHeader.cfm"></cfif>
 						<cfif print>
-							<cfset tabWidth=630>
+							<cfset tabWidth=600>
 							<cfloop query="QClient">
 							<div style="float:left;width:310px;margin:20px 0 40px 50px;">
 								<cfset ln=0>
@@ -78,8 +92,6 @@
 									<cfif len(cltAddr1)><cfset ln++><tr><td valign="top">#cltAddr1#</td></tr></cfif>
 									<cfif len(cltAddr2)><cfset ln++><tr><td valign="top">#cltAddr2#</td></tr></cfif>
 									<cfif len(cltTown)><cfset ln++><tr><td valign="top">#cltTown#</td></tr></cfif>
-									<cfif len(cltCity)><cfset ln++><tr><td valign="top">#cltCity#</td></tr></cfif>
-									<cfif len(cltCounty)><cfset ln++><tr><td valign="top">#cltCounty#</td></tr></cfif>
 									<cfif len(cltPostcode)><cfset ln++><tr><td valign="top">#cltPostcode#</td></tr></cfif>
 									<cfloop from="#ln+1#" to="9" index="i">
 										<tr><td>&nbsp;</td></tr>
@@ -103,11 +115,11 @@
 							<tr>
 								<cfif NOT print><th>ID</th></cfif>
 								<th>Reference</th>
-								<th>Date</th>
+								<th width="100">Date</th>
 								<th>Type</th>
 								<th>Method</th>
-								<th align="right">DR</th>
-								<th align="right">CR</th>
+								<th align="right">Debits<br />(invoices)</th>
+								<th align="right">Credits<br />(payments)</th>
 								<th align="right">Balance</th>
 								<th>Allocated</th>
 								<cfif NOT print>
@@ -116,7 +128,7 @@
 							</tr>
 							<cfif bfwd neq 0>
 								<tr>
-									<td colspan="3"></td>
+									<td colspan="4"></td>
 									<td colspan="3" align="right"><strong>Brought Forward from #DateFormat(dateFrom,'dd-mmm-yyyy')#</strong></td>
 									<td align="right"><strong>#bfwd#</strong></td>
 								</tr>
@@ -146,7 +158,7 @@
 											</cfcase>
 										</cfswitch>
 									</td>
-									<td class="centre">#trnMethod#</td>
+									<td class="centre"><cfif trnMethod  eq "sv">VOUCHERS<cfelse>#trnMethod#</cfif></td>
 									<cfif trnAmnt1 gt 0>
 										<cfset totalDebit=totalDebit+trnAmnt1>
 										<td width="80" align="right">&pound;#DecimalFormat(trnAmnt1)#</td>
@@ -162,17 +174,27 @@
 									<cfelse>
 										<td class="centre">
 											<input type="hidden" name="amnt#currentrow#" value="#trnAmnt1#" />
-											<input type="checkbox" name="tick#currentrow#" id="tick#currentrow#" onClick="checkTotal('payForm');" 
+											<input type="checkbox" name="tick#currentrow#" id="tick#currentrow#" class="trans" onClick="checkTotal('payForm');" 
 												value="#trnID#"<cfif trnAlloc> checked="checked"</cfif> />
 										</td>
 										<td class="centre">#trnPaidin#</td>
 									</cfif>
 								</tr>
+								<cfif len(trnDesc)>
+									<tr>
+										<td></td>
+										<td colspan="3">#trnDesc#</td>
+										<td colspan="4"></td>
+									</tr>
+								</cfif>
 							</cfloop>
 							<cfif print>
 								<tr>
-									<td colspan="3">SV=Subscription voucher</td>
-									<td height="40" colspan="3" class="amountTotal"><cfif balance lt 0>Account in credit<cfelse>Account Balance</cfif></td>
+									<td colspan="4" class="totalInfo">
+										The balance includes all invoices up to date.
+									</td>
+									<td height="40" colspan="2" class="amountTotal">
+										<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
 									<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
 									<td></td>
 								</tr>
@@ -181,7 +203,7 @@
 										Please make payment to <strong>Shortlanesend Store.</strong><br />
 										Payment can also be made online using internet banking.<br />
 										Bank: Lloyds Bank plc. Sort Code: <strong>30-98-76</strong> Account: <strong>3534 5860</strong><br />
-										Please quote your account number <strong>"#QClient.cltRef#"</strong> with your payment.<br />
+										Please quote your account number <strong>"ACC #QClient.cltRef#"</strong> with your payment.<br />
 										If you have already paid this amount or believe there is an error on your account, please let us know.
 									</td>
 								</tr>
@@ -193,7 +215,7 @@
 										<input type="hidden" name="tranCount" id="tranCount" value="#QTrans.recordcount#" />
 										<input type="hidden" name="clientID" value="#QClient.cltID#" />
 									</td>
-									<td align="center"><input type="checkbox" name="selectAll" onClick="javascript:checkall('payForm',toggle)" title="Select All" /></td>
+									<td align="center"><input type="checkbox" name="selectAll" id="selectAll" title="Select All" /></td>
 									<td></td>
 								</tr>
 							</cfif>

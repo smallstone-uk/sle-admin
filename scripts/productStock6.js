@@ -52,7 +52,7 @@ function scanner(e) {
 }
 
 function LookupBarcode(source,code,productID,dest) {
-	console.log("LookupBarcode: " + source + " code " + code + " productID " + productID + " dest " + dest);
+	// console.log("LookupBarcode: source=" + source + " code=" + code + " productID=" + productID + " dest=" + dest);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6Lookup.cfm',
@@ -67,7 +67,7 @@ function LookupBarcode(source,code,productID,dest) {
 }
 
 function DeleteBarcode(barID,code,dest) {
-	console.log("DeleteBarcode: " + barID + " code " + code);
+	// console.log("DeleteBarcode: " + barID + " code " + code);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6DeleteBarcode.cfm',
@@ -82,6 +82,7 @@ function DeleteBarcode(barID,code,dest) {
 }
 
 function LoadProductByID(source,productID,dest) {
+	// console.log("LoadProductByID: source=" + source + " productID=" + productID + " dest=" + dest);	
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6Lookup.cfm',
@@ -96,7 +97,7 @@ function LoadProductByID(source,productID,dest) {
 }
 
 function LookupProductStockID(source,code,dest) {
-	console.log("LookupProductStockID: " + source + " " + code);
+	// console.log("LookupProductStockID: " + source + " " + code);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6ProdStock.cfm',
@@ -111,7 +112,7 @@ function LookupProductStockID(source,code,dest) {
 }
 
 function AddProductToList(code,prodID) {
-	console.log("AddProductToList: " + prodID);
+	// console.log("AddProductToList: " + prodID);
 	$.ajax({
 		type: "POST",
 		url: "#parm.url#ajax/AJAX_LabelSaveList.cfm",
@@ -145,7 +146,6 @@ function AddProduct(form,result) {
 }
 
 function AmendProduct(form,result) {
-	// console.log($(form).serialize());
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6Product.cfm',
@@ -154,19 +154,35 @@ function AmendProduct(form,result) {
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Amending Product...");
 		},
 		success:function(data){
+			// console.log("after amending product " + data);
 			$(result).html(data);
 		}
 	});
 }
 
 function LoadStockItems(bcode,productID,result) {
-	console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " result " + result);
+//	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6StockItems.cfm',
 		data : {"bcode":bcode,"productID":productID},
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Stock Items...");
+		},
+		success:function(data){
+			$(result).html(data);
+		}
+	});
+}
+
+function LoadSalesItems(bcode,productID,result) {
+	 console.log("LoadSalesItems - bcode " + bcode + " productID " + productID + " result " + result);
+	$.ajax({
+		type: 'POST',
+		url: 'ProductStock6SalesItems.cfm',
+		data : {"bcode":bcode,"productID":productID},
+		beforeSend:function(){
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales Items...");
 		},
 		success:function(data){
 			$(result).html(data);
@@ -253,7 +269,7 @@ function AddStock(form,result) {
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }
@@ -270,22 +286,22 @@ function SaveStock(form,result) {
 			$(result).html(data);
 			$.closeDialog();
 			$.messageBox("Stock Item Saved", "success");
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }
 
-function DeleteStockItem(stockitem,barcode,result) {
+function DeleteStockItem(stockitem,productID,result) {
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6DeleteStock.cfm',
-		data: {"stockitem" : stockitem, "barcode" : barcode},
+		data: {"stockitem" : stockitem, "productID" : productID},
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Deleting Stock Item...");
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems(data,0,result);
+			LoadStockItems("",data,result);
 		}
 	});
 }
@@ -347,7 +363,7 @@ function checkPrice(target) {
 	var retailPrice = $('#siRRP').val();	// get current value
 	var ourPrice = $('#siOurPrice').val();	// get current value
 	var prodMinPrice = $('#prodMinPrice').val();	// get current value
-	console.log("min price " + prodMinPrice);
+	// console.log("min price " + prodMinPrice);
 	var unitGross = unitPrice * (1 + vatrate); // gross trade price per unit
 	var pricemarked = $('#prodPriceMarked').prop('checked');
 	if (target == 0) target = 0.43;
@@ -400,7 +416,7 @@ function xxscanner(e,source,id) {
 		} else {
 			code=code;
 		}
-		console.log(source + " = " + code);
+		// console.log(source + " = " + code);
 		return code;
 	} else { //building up barcode
 		if (code != "") {
@@ -410,7 +426,7 @@ function xxscanner(e,source,id) {
 			var newString=String.fromCharCode(keyCode);
 		}
 		Barcode=newString;
-		console.log("build code = " + Barcode);
+		// console.log("build code = " + Barcode);
 		return false;
 	}
 	return Barcode;
@@ -430,7 +446,7 @@ function xscanner(e,source,id) {
 		} else {
 			code=code;
 		}
-		console.log(code);
+		// console.log(code);
 		if (code.length == 13) {
 		//	LookupBarcode(code,from,id,origCode,1);
 		} else {
@@ -449,7 +465,7 @@ function xscanner(e,source,id) {
 			var newString=String.fromCharCode(keyCode);
 		}
 		Barcode=newString;
-		console.log(Barcode);
+		// console.log(Barcode);
 	}
 	return Barcode;
 }
@@ -473,7 +489,7 @@ function xLookupBarcode(code,source,id,origCode,tryCount) {
 			} else {
 				if (tryCount != 2) {
 					LookupBarcode(origCode,source,id,origCode,2);
-					console.log("origCode"+origCode);
+					// console.log("origCode"+origCode);
 				} else {
 					$('#result').html("<h1>Unrecognised barcode</h1><p>This product's barcode is not in our database.</p><img src='images/cross.png' width='128' />");
 				}
@@ -509,7 +525,7 @@ function LoadStockList(dest) {
 }
 
 function AddProductToList(source,bcode,dest) {
-	console.log("barcode " + bcode);
+	// console.log("barcode " + bcode);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6AddToList.cfm',

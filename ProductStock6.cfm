@@ -34,13 +34,14 @@
 		#AddProductForm {display:none;}
 		#AddStockForm {display:none;}
 		#AmendProductForm {display:none;}
-		.btn {float:left;}
 		#groupList {overflow:auto; float:left; height:400px; width:350px; margin-right:10px}
 		#catList {overflow:auto; float:left; height:400px; width:300px; margin-right:10px}
-		#prodList {overflow:auto; float:left; height:400px; width:350px}
+		#prodList {overflow:auto; float:left; height:400px; width:500px}
 		#product {min-width:500px;}
 		.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
 		#newProduct {float:right}
+		.lookup {float:left}
+		#textBox {line-height:1em; z-index:99999999}
 	</style>
 	
 	<script src="common/scripts/common.js" type="text/javascript"></script>
@@ -110,10 +111,14 @@
 				LoadStockItems(bcode,productID,'#stockdiv');
 				$('#stockTab').blur();
 			});
-			$('#groupsTab').click(function() {
+			$('#salesTab').click(function() {
 				var	bcode = $('#bcode').html()
-				LoadGroups('#groupsdiv');
-				$('#groupsTab').blur();
+				var	productID = $('#productID').html()
+				LoadSalesItems(bcode,productID,'#salesdiv');
+				$('#salesTab').blur();
+			});
+			$('#groupsBtn').click(function() {
+				window.open( 'ProductStock6GroupsMain.cfm' );
 			});
 			$('.price').blur(function(e) {
 				var retailPrice = $('#prodRRP').val();
@@ -149,26 +154,28 @@
 			<div id="content-inner">
 				<div class="title">
 					<form method="post">
-						Manual Entry: <input name="barcodefld" id="barcodefld" type="text" size="15" maxlength="15" />
-						<input type="submit" name="manual" id="manual" class="btn" value="Look up" />
+						<span class="lookup">Manual Entry: </span><input name="barcodefld" id="barcodefld" class="lookup" type="text" size="15" maxlength="20" />
+						<input type="button" name="manual" id="manual" class="lookup" style="float:left" value="Look-up" />
 					</form>
 					<div style="clear:both"></div>
 					<button id="newProduct">New Product</button>
+					<button id="groupsBtn">Groups</button>
 				</div>
 				<div id="content-header">
-					<div id="bcode">bcode</div>
-					<div id="productID">productID</div>
+					<div id="bcode"></div>
+					<div id="productID"></div>
 					<div style="clear:both"></div>
 				</div>
 				<div id="tabs">
 					<ul>
 						<li><a href="##productdiv" id="productTab">Product</a></li>
 						<li><a href="##stockdiv" id="stockTab">Stock</a></li>
-						<li><a href="##groupsdiv" id="groupsTab">Groups</a></li>
+						<li><a href="##salesdiv" id="salesTab">Sales</a></li>
 					</ul>
 					<div id="productdiv"><div class="title">Scan product...</div></div>
 					<div id="stockdiv"></div>
 					<div id="groupsdiv"></div>
+					<div id="salesdiv"></div>
 					<div style="clear:both"></div>
 					<div id="result"></div>
 				</div>

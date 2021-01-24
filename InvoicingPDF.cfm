@@ -18,20 +18,20 @@
 	<cfset parm={}>
 	<cfset parm.datasource=application.site.datasource1>
 	<cfset parm.testmode=testmode>
-	<cfset parm.InvID=InvID>
-	<cfset parm.InvRef=InvRef>
-	<cfset parm.clientID=clientID>
-	<cfset parm.ordID=ordID>
 	<cfset parm.fixflag=fixflag>
 	<cfset parm.onlycredits=onlycredits>
+	<cfset parm.clientID=clientID>
+	<cfset parm.ordID=ordID>
 	<cfset parm.fromDate=fromDate>
 	<cfset parm.toDate=toDate>
 	<cfset parm.invDate=invDate>
+	
+	<cfset parm.InvID=InvID>
+	<cfset parm.InvRef=InvRef>
 	<cfset parm.delDate=delDate>
 	<cfset parm.TransType=TransType>
 	
 	<cfset invoice=inv.LoadInvoice(parm)>
-	
 	<cfset parm.cltID=invoice.ID>
 	<cfset parm.cltRef=invoice.Ref>
 	<cfset parm.orderID=invoice.ordID>
@@ -40,12 +40,9 @@
 	<cfset parm.Date=parm.toDate>
 	<cfset parm.Total=invoice.total>
 	
-	<cfset bal=inv.LoadBalance(parm)>
+	<cfset parm.hideOld = true>
 	<cfset expiring=core.ExpiringVouchers(parm)>
-	
-<!---	<cfdump var="#parm#" label="" expand="yes" format="html" 
-		output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
---->	
+		
 	<cfquery name="QHeader" datasource="#application.site.dataSource0#">
 		SELECT *
 		FROM cmsclients
@@ -58,7 +55,9 @@
 		WHERE ctlID=1
 		LIMIT 1;
 	</cfquery>
-	
+<!---	<cfdump var="#invoice#" label="invoice" expand="yes" format="html" 
+	output="#application.site.dir_logs#inv-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->
 	<cfoutput>
 	<cfif NOT DirectoryExists("#application.site.dir_invoices##DateFormat(parm.invDate,'yy-mm-dd')#")>
 		<cfdirectory directory="#application.site.dir_invoices##DateFormat(parm.invDate,'yy-mm-dd')#" action="create">
@@ -77,7 +76,7 @@
 			fontEmbed="yes" 
 			encryption="none" 
 			scale="100" 
-			pagetype="a4" 
+			pagetype="A4" 
 			margintop="1.5" 
 			marginbottom="1.5" 
 			unit="in">
@@ -214,7 +213,6 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfset lineGroup="">
 					<cfloop array="#invoice.debit#" index="index">
@@ -230,7 +228,6 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfif ArrayLen(invoice.debit) gte 20>
@@ -246,7 +243,6 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -267,7 +263,6 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfset lineGroup="">
 					<cfloop array="#invoice.credit#" index="index">
@@ -283,7 +278,6 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfif ArrayLen(invoice.credit) gte 20>
@@ -299,7 +293,6 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -320,7 +313,6 @@
 						<th align="center" width="100">Quantity</th>
 						<th align="right" width="100">Price</th>
 						<th align="right" width="100">Line Total</th>
-						<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 					</tr>
 					<cfloop array="#invoice.vouchers#" index="item">
 						<cfset i=StructFind(invoice.voucherGroup,item)>
@@ -335,7 +327,6 @@
 									<th align="center" width="100">Quantity</th>
 									<th align="right" width="100">Price</th>
 									<th align="right" width="100">Line Total</th>
-									<!--- <cfif invoice.InvoiceType is "detail"><th align="right" width="100">VAT</th></cfif> --->
 								</tr>
 						</cfif>
 						<cfset HeightTotal=HeightTotal+rowHeight>
@@ -344,7 +335,6 @@
 							<td align="center">#i.qty#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price)#</td>
 							<td align="right">-&pound;#DecimalFormat(i.price*i.qty)#</td>
-							<!--- <cfif invoice.InvoiceType is "detail"><td align="right">#i.vat*100#%</td></cfif> --->
 						</tr>
 					</cfloop>
 					<tr>
@@ -362,7 +352,8 @@
 				<table border="0" cellspacing="0" class="tableList" width="100%">
 					<tr>
 						<th align="left">Publication</th>
-						<th width="80" align="left">Expiring</th>
+						<th width="80" align="left">Status</th>
+						<th width="80" align="left">Expires</th>
 					</tr>
 					<cfloop array="#expiring#" index="item">
 						<cfif HeightTotal gte HeightLimit>
@@ -373,26 +364,27 @@
 							<table border="0" cellspacing="0" class="tableList" width="100%">
 								<tr>
 									<th align="left">Publication</th>
-									<th width="80" align="left">Expiring</th>
+									<th width="80" align="left">Status</th>
+									<th width="80" align="left">Expires</th>
 								</tr>
 						</cfif>
 						<cfset HeightTotal=HeightTotal+rowHeight>
 						<tr>
+							<td>#item.pub#</td>
 							<td>
-								#item.pub#
 								<cfif item.stop lte parm.Date>
-									<i class="expired" style="float:right;">Expired</i>
+									<i class="expired" style="float:left;">Expired</i>
 								<cfelse>
-									<i style="float:right;"<cfif item.reDays lte 3> class="expiring"</cfif>>
+									<i style="float:left;"<cfif item.reDays lte 3> class="expiring"</cfif>>
 										<cfif item.reDays gt 0>#item.reDays# <cfif item.reDays neq 1>days<cfelse>day</cfif><cfelse>Expired</cfif> left
 									</i>
 								</cfif>
 							</td>
 							<td>
 								<cfif item.stop lte parm.Date>
-									<b class="expired">#LSDateFormat(item.stop,"dd/mm/yyyy")#</b>
+									<b class="expired">#LSDateFormat(item.stop,"dd-mmm-yyyy")#</b>
 								<cfelse>
-									<b>#LSDateFormat(item.stop,"dd/mm/yyyy")#</b>
+									<b>#LSDateFormat(item.stop,"dd-mmm-yyyy")#</b>
 								</cfif>
 							</td>
 						</tr>
@@ -419,32 +411,47 @@
 			<table border="0" cellspacing="0" class="tableList" width="100%" style="font-size:11px;">
 				<tr>
 					<td width="50%">	<!--- left --->
-						<cfif invoice.InvoiceType is "detail">
-							<table border="0" cellspacing="0" class="tableList" width="100%">
+
+						<cfset balanceDue = invoice.statement.balance + invoice.statement.BFwd>
+						<cfif invoice.statement.cltShowBal AND balanceDue neq 0>
+							<h2>Account Statement</h2>
+							<table border="0" cellspacing="0" class="tableList" width="100%" style="font-size:11px;">
 								<tr>
-									<th align="right" width="150">VAT Analysis</th>
-									<th align="right" width="75">Net</th>
-									<th align="right" width="75">VAT</th>
+									<th>Reference</th>
+									<th>Type</th>
+									<th>Date</th>
+									<th>Amount</th>
 								</tr>
+								<cfif invoice.statement.bFwd neq 0>
+									<tr>
+										<td colspan="2">Brought Forward</td>
+										<td align="right">#DateFormat(invoice.statement.bfDate,"dd-mmm-yy")#</td>
+										<td align="right">#DecimalFormat(invoice.statement.bFwd)#</td>
+									</tr>
+								</cfif>
+								<cfset tranValue = 0>
+								<cfloop array="#invoice.statement.trans#" index="tran">
+									<cfset tranValue += (tran.trnAmnt1 + tran.trnAmnt2)>
+									<cfif tran.trnDate lt parm.invDate>
+										<tr>
+											<td>#tran.trnRef#</td>
+											<td>
+												<cfswitch expression="#tran.trnType#">
+													<cfcase value="inv">invoice</cfcase>
+													<cfcase value="crn">credit note</cfcase>
+													<cfcase value="pay">payment</cfcase>
+													<cfcase value="jnl">adjustment</cfcase>
+													<cfdefaultcase>#tran.trnType#</cfdefaultcase>
+												</cfswitch>
+											</td>
+											<td align="right">#DateFormat(tran.trnDate,"dd-mmm-yy")#</td>
+											<td align="right">#DecimalFormat(tran.trnAmnt1 + tran.trnAmnt2)#</td>
+										</tr>
+									</cfif>
+								</cfloop>
 								<tr>
-									<th align="right">0.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net0)#</td>
-									<td align="right">&pound;0.00</td>
-								</tr>
-								<tr>
-									<th align="right">20.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net20)#</td>
-									<td align="right">&pound;#DecimalFormat(invoice.vat20)#</td>
-								</tr>
-								<tr>
-									<th align="right">5.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net5)#</td>
-									<td align="right">&pound;#DecimalFormat(invoice.vat5)#</td>
-								</tr>
-								<tr>
-									<th align="right">Total</th>
-									<td align="right">&pound;#DecimalFormat(vatNet)#</td>
-									<td align="right">&pound;#DecimalFormat(vatVat)#</td>
+									<td colspan="3"><strong>Account Balance as at #DateFormat(Now(),"dd-mmm-yyyy")#</strong></td>
+									<td align="right"><strong>#DecimalFormat(invoice.statement.bFwd + tranValue)#</strong></td>
 								</tr>
 							</table>
 						<cfelse>
@@ -452,11 +459,25 @@
 						</cfif>
 					</td>
 					<td width="50%">	<!--- right --->
+						<h2>Invoice Summary</h2>
+						<cfset totalToPay = invoice.debittotal - invoice.credittotal - invoice.vouchertotal + invoice.DelChargeTotal>
 						<table border="0" cellspacing="0" class="tableList" width="100%">
 							<tr>
-								<th width="250" align="left" valign="middle">Sub-Total</th>
-								<td width="150" align="right" valign="middle">&pound;#DecimalFormat(subTotal)#</td>
+								<th width="250" align="left" valign="middle"> Publications Total</th>
+								<td width="150" align="right" valign="middle">&pound;#DecimalFormat(invoice.debittotal)#</td>
 							</tr>
+							<cfif invoice.vouchertotal neq 0>
+							<tr>
+								<th align="left" valign="middle">Less Vouchers Redeemed</th>
+								<td align="right" valign="middle">-&pound;#DecimalFormat(invoice.vouchertotal)#</td>
+							</tr>
+							</cfif>
+							<cfif invoice.credittotal neq 0>
+							<tr>
+								<th width="250" align="left" valign="middle"> Less Credits</th>
+								<td width="150" align="right" valign="middle">-&pound;#DecimalFormat(invoice.credittotal)#</td>
+							</tr>
+							</cfif>
 							<cfif invoice.NetDisc neq 0>
 							<tr>
 								<th align="left" valign="middle">Less Discount @ #invoice.Discount*100#%</th>
@@ -468,109 +489,56 @@
 								<td align="right" valign="middle">&pound;#DecimalFormat(invoice.DelChargeTotal)#</td>
 							</tr>
 							<tr>
-								<th align="left" valign="middle" style="font-size:12px;"><strong>Net Total</strong></th>
-								<td align="right" valign="middle"><strong>&pound;#DecimalFormat(invoice.TotalNet)#</strong></td>
+								<th align="left" valign="middle">Sub-Total</th>
+								<td align="right" valign="middle"><strong>&pound;#DecimalFormat(totalToPay)#</strong></td>
 							</tr>
-							<cfif invoice.InvoiceType is "detail">
+							<tr>
+								<th>&nbsp;</th>
+								<td>&nbsp;</td>
+							</tr>
+							<cfif balanceDue neq 0>
 								<tr>
-									<th align="left" valign="middle">Vat Amount</th>
-									<td align="right" valign="middle">&pound;#DecimalFormat(invoice.TotalVAT)#</td>
+									<th align="left" valign="middle">
+										<cfif balanceDue lt 0>Less Credit Balance
+											<cfelse>Plus Account Balance</cfif>
+									</th>
+									<td align="right" valign="middle">&pound;#DecimalFormat(balanceDue)#</td>
 								</tr>
 							</cfif>
-							<tr>
-								<th align="left" valign="middle" style="font-size:12px;"><strong>Invoice Total</strong></th>
-								<td align="right" valign="middle" style="font-size:12px;"><strong>&pound;#DecimalFormat(invoice.total)#</strong></td>
-							</tr>
-							<cfif invoice.vouchertotal neq 0>
-							<tr>
-								<th align="left" valign="middle">Vouchers Redeemed</th>
-								<td align="right" valign="middle">-&pound;#DecimalFormat(invoice.vouchertotal)#</td>
-							</tr>
+							<cfset grandTotal = balanceDue + totalToPay>
+							<cfif grandTotal gt 0>
+								<tr>
+									<th align="left" valign="middle" style="font-size:14px;"><strong>Amount To Pay</strong></th>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
+								</tr>
+							<cfelseif grandTotal lte 0>
+								<tr>
+									<th align="left" valign="middle" style="font-size:14px;"><strong>Account in credit<br />(nothing to pay)</strong></th>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
+								</tr>
+							<cfelse>
+								<tr>
+									<th align="left" valign="middle" style="font-size:14px;"><strong>Amount To Pay</strong></th>
+									<td align="right" valign="middle" style="font-size:14px;"><strong>&pound;#DecimalFormat(grandTotal)#</strong></td>
+								</tr>
 							</cfif>
-							<cfset tot=invoice.grandtotal>
-							<tr><!---<cfif invoice.InvoiceType is "detail"> colspan="2"</cfif>--->
-								<th align="right" valign="middle" style="font-size:16px;">
-								<cfif tot gt 0>Amount Now Due<cfelseif tot lt 0>Amount in Credit<cfelse>Account Paid</cfif></th>
-								<td align="right" valign="middle" style="font-size:16px;"><strong>&pound;#DecimalFormat(tot)#</strong></td>
-							</tr>
+							<cfif invoice.cltPayMethod eq "phone" AND grandTotal gt 0>
+								<tr>
+									<td colspan="2">
+										We have your card details safely stored and will debit your account the sum of &pound;#DecimalFormat(grandTotal)#, 
+										on or after #LSDateFormat(DateAdd("d",7,parm.invDate),"DD/MM/YYYY")#. Please contact us before that date if you believe
+										there is an error in your bill.
+									</td>
+								</tr>
+							</cfif>
 						</table>
 					</td>
 				</tr>
 			</table>
-		
-	<!---		<table border="0" cellspacing="0" class="tableList" width="100%" style="font-size:11px;">
-				<tr>
-					<td width="300" rowspan="#rowspan#" valign="middle">
-						<cfif invoice.InvoiceType is "detail">
-							<table border="0" cellspacing="0" class="tableList" width="100%">
-								<tr>
-									<th align="right" width="150">VAT Analysis</th>
-									<th align="right" width="75">Net</th>
-									<th align="right" width="75">VAT</th>
-								</tr>
-								<tr>
-									<th align="right">0.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net0)#</td>
-									<td align="right">&pound;0.00</td>
-								</tr>
-								<tr>
-									<th align="right">20.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net20)#</td>
-									<td align="right">&pound;#DecimalFormat(invoice.vat20)#</td>
-								</tr>
-								<tr>
-									<th align="right">5.00%</th>
-									<td align="right">&pound;#DecimalFormat(invoice.net5)#</td>
-									<td align="right">&pound;#DecimalFormat(invoice.vat5)#</td>
-								</tr>
-								<tr>
-									<th align="right">Total</th>
-									<cfset vatNet=invoice.net0+invoice.net20+invoice.net5>
-									<cfset vatVat=invoice.vat0+invoice.vat20+invoice.vat5>
-									<td align="right">&pound;#DecimalFormat(vatNet)#</td>
-									<td align="right">&pound;#DecimalFormat(vatVat)#</td>
-								</tr>
-							</table>
-						</cfif>
-					</td>
-					<th width="250" align="left" valign="middle">Delivery</th>
-					<td align="right" valign="middle">&pound;#DecimalFormat(invoice.DelChargeTotal)#</td>
-				</tr>
-				<cfif invoice.NetDisc neq 0>
-				<tr>
-					<th align="left" valign="middle">Less Discount @ #invoice.Discount*100#%</th>
-					<td align="right" valign="middle">&pound;#DecimalFormat(invoice.NetDisc)#</td>
-				</tr>
-				</cfif>
-				<tr>
-					<th align="left" valign="middle">Net Total</th>
-					<td align="right" valign="middle">&pound;#DecimalFormat(invoice.TotalNet)#</td>
-				</tr>
-				<cfif invoice.InvoiceType is "detail">
-					<tr>
-						<th align="left" valign="middle">Vat Amount</th>
-						<td align="right" valign="middle">&pound;#DecimalFormat(invoice.TotalVAT)#</td>
-					</tr>
-				</cfif>
-				<tr>
-					<th align="left" valign="middle" style="font-size:12px;"><strong>Invoice Total</strong></th>
-					<td align="right" valign="middle" style="font-size:12px;"><strong>&pound;#DecimalFormat(invoice.total)#</strong></td>
-				</tr>
-				<tr>
-					<th align="left" valign="middle">Vouchers</th>
-					<td align="right" valign="middle"><cfif invoice.vouchertotal neq 0>-</cfif>&pound;#DecimalFormat(invoice.vouchertotal)#</td>
-				</tr>
-				<cfset tot=invoice.grandtotal>
-				<tr>
-					<th align="right" valign="middle" style="font-size:16px;"<cfif invoice.InvoiceType is "detail"> colspan="2"</cfif>>
-					<cfif tot gt 0>Amount Now Due<cfelseif tot lt 0>Amount in Credit<cfelse>Account Paid</cfif></th>
-					<td align="right" valign="middle" style="font-size:16px;"><strong>&pound;#DecimalFormat(tot)#</strong></td>
-				</tr>
-			</table>
-	--->		
+			
 			<cfdocumentitem type="footer" evalAtPrint="true">
 				<div style="font-size:11px;font-family: Arial, Helvetica, sans-serif;padding:10px 0 0 0;line-height:16px;border-top:1px solid ##999;">
-					<div style="float:right;font-size:12px;line-height:18px;font-weight:bold; text-align:right; width:250px;">
+					<div style="float:right;font-size:12px;line-height:18px;font-weight:bold; text-align:left; width:300px;">
 						Please quote your account reference "#invoice.Ref#" with your payment.<br />
 						Any discrepancies must be reported within seven days of the invoice date.
 					</div>
@@ -590,7 +558,7 @@
 		<cfif row neq total>
 			<p>Created PDF for #invoice.ClientName#</p>
 		<cfelse>
-			<p>Completely complete.</p>
+			<p>Invoice run complete.</p>
 		</cfif>
 	<cfelse>
 		<p>#error#</p>
@@ -607,18 +575,19 @@
 			<cfset comp.form.toDate=LSDateFormat(parm.toDate,"yyyy-mm-dd")>
 			<cfset comp.form.folderDate=LSDateFormat(parm.invDate,"yy-mm-dd")>
 			<cfset compile=inv.LoadInvoiceRun(comp)>
-	
+<!---	<cfdump var="#compile#" label="compile" expand="false">
+--->
 			<cfloop array="#compile.rounds#" index="r">
-				<cfdocument format="PDF" name="cfdoc#r.RoundID#" pagetype="a4" margintop="1.5" marginbottom="1.5" unit="in">
+				<cfdocument format="PDF" name="cfdoc#r.RoundID#" pagetype="A4" margintop="1.5" marginbottom="1.5" unit="in">
 					<h1 style="text-align:center;margin:150px 0 0 0;">#r.roundTitle#</h1>
 					<h1>Please ensure all invoices are delivered within 7 days</h1>
 					<h1>Thank you</h1>
 				</cfdocument>
 			</cfloop>
-			<cfdocument format="PDF" name="cfdocPost" pagetype="a4" margintop="1.5" marginbottom="1.5" unit="in">
+			<cfdocument format="PDF" name="cfdocPost" pagetype="A4" margintop="1.5" marginbottom="1.5" unit="in">
 				<h1 style="text-align:center;margin:250px 0 0 0;">Post</h1>
 			</cfdocument>
-			<cfdocument format="PDF" name="cfdocEmail" pagetype="a4" margintop="1.5" marginbottom="1.5" unit="in">
+			<cfdocument format="PDF" name="cfdocEmail" pagetype="A4" margintop="1.5" marginbottom="1.5" unit="in">
 				<h1>Email</h1>
 				<table>
 					<tr>
@@ -669,6 +638,7 @@
 		</cfif>
 	</div>
 	</cfoutput>
+	
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

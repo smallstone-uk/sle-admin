@@ -1349,6 +1349,7 @@
 			<cfelse>
 				WHERE 1
 			</cfif>
+			AND accStatus='active'
 			ORDER BY accType,accName
 		</cfquery>
 		<cfset result.accounts=QueryToArrayOfStruct(QAccounts)>
@@ -1657,7 +1658,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
-		<cfset loc.rec={}>
+		<cfset loc.rec = {}>
 		<cfset loc.result.codes = {}>
 		<cftry>
 			<cfquery name="loc.result.QNominal" datasource="#args.datasource#">
@@ -1921,15 +1922,18 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+<!--- COLL,CHQS nomTillBtn was 2 --->
 	<cffunction name="LoadPayAccounts" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.result.payItems = []>
 		<cfquery name="loc.QNomPayAccounts" datasource="#args.datasource#">
-			SELECT nomID,nomCode,nomGroup,nomTitle
+			SELECT nomID,nomCode,nomGroup,nomTitle,nomOrder
 			FROM tblNominal
-			WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV')
+			<!---WHERE nomCode IN ('ACC','CASH','CARD','CHQ','SUPP','CB','NSV','HSV','SHOPPAY')--->
+			WHERE nomTillBtn=2
+			AND nomStatus=1
 			ORDER BY nomOrder
 		</cfquery>
 		<cfloop query="loc.QNomPayAccounts">

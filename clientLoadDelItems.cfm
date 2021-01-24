@@ -11,6 +11,7 @@
 	<cfset customer=cust.LoadClient(search)>
 	<cfset custDelItems=cust.LoadClientDelItems(customer)>
 	<cfinclude template="clientDelItems.cfm">
+	
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
 		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

@@ -75,7 +75,7 @@
 					</cfif>
 					<cfif len(StructFind(args.form,"srchType"))>
 						<cfif args.form.srchType eq 'debits'>AND trnType IN ('inv','crn')
-						<cfelseif args.form.srchType eq 'credits'>AND trnType IN ('pay','jnl')</cfif>
+						<cfelseif args.form.srchType eq 'credits'>AND trnType IN ('pay','jnl','nom','rfd','dbt')</cfif>
 					</cfif>
 					<cfif StructKeyExists(args.form,"srchAllocated")>AND trnAlloc=0</cfif>
 					ORDER BY trnDate
@@ -432,6 +432,25 @@
 		<cfreturn loc.result>
 	</cffunction>
 	
+	<cffunction name="TranRemittance" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+			
+		<cfquery name="loc.QTrans" datasource="#args.datasource#">
+			SELECT *
+			FROM tbltrans
+			WHERE trnAccountID = #args.accountID#
+			AND trnAllocID = #args.allocationID#	
+			ORDER BY trnDate ASC
+		</cfquery>
+		<cfquery name="loc.QSupplier" datasource="#args.datasource#">
+			SELECT *
+			FROM tblAccount
+			WHERE accID = #args.accountID#
+		</cfquery>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="TranList" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -440,7 +459,7 @@
 		<cfset var rec={}>
 		
 		<cftry>
-			<cfquery name="QTrans" datasource="#args.datasource#" result="loc.QTransResult">
+			<cfquery name="QTrans" datasource="#args.datasource#">
 				SELECT accID,accName,accType,accNomAcct,accPayAcc, trnID,trnLedger,trnRef,trnDesc,trnDate,trnAccountID,trnClientRef,trnType,trnMethod,trnAmnt1,trnAmnt2
 				FROM tblTrans,tblAccount
 				WHERE trnAccountID=accID
@@ -472,7 +491,6 @@
 					ORDER BY #args.form.srchSort#
 				</cfif>
 			</cfquery>
-			<cfset result.QResult = loc.QTransResult.sql>
 			<cfset result.tranArray=[]>
 			<cfset result.totAmnt1=0>
 			<cfset result.totAmnt2=0>
@@ -521,6 +539,7 @@
 			
 			<cfif val(args.form.srchAccount) gt 0>AND trnAccountID=<cfqueryparam cfsqltype="cf_sql_integer" value="#args.form.srchAccount#"></cfif>
 			<cfif len(args.form.srchLedger) gt 0>AND trnLedger=<cfqueryparam cfsqltype="cf_sql_varchar" value="#args.form.srchLedger#"></cfif>
+			<cfif len(args.form.srchParmNum) gt 0>AND trnAllocID=<cfqueryparam cfsqltype="cf_sql_integer" value="#args.form.srchParmNum#"></cfif>
 				<cfif len(args.form.srchRange)>
 					<cfif Left(args.form.srchRange,2) eq 'FY'>
 						<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>

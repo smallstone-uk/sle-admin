@@ -8,6 +8,9 @@
 	<cfset parm.form = form>
 	<cfset data = pstock.LoadCategories(parm)>
 
+	<script src="scripts/jquery-1.11.1.min.js" type="text/javascript"></script>
+	<script src="scripts/main.js"></script>
+	<script src="scripts/popup.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#btnNewCategory').click(function(e) {
@@ -28,7 +31,25 @@
 				});
 				e.preventDefault();
 			});
-			$('.btnDelete').click(function(e) {
+
+/*				$.ajax({
+					type: "POST",
+					url: "ajax/AJAX_ProductStock6AmendCategory.cfm",
+					data: {"id": id},
+					cache: false,
+					beforeSend: function() {
+						$('#FCPopupDialog').remove();
+						$('#FCPopupDim').remove();
+						$('body').prepend("<div id='FCPopupDim'></div>");
+						$('body').prepend("<div id='FCPopupDialog' style='width:" + 500 + "px;'></div>");
+					},
+					success: function(data) {
+						$('#FCPopupDialog').html("<div id='FCPopupDialogInner'>" + data + "</div>");
+					}
+				});
+				e.preventDefault();
+			});
+*/			$('.btnDelete').click(function(e) {
 				var group = $('#groupID').val();
 				var category = $(this).attr("data-category");
 				var delCat = confirm("delete category? "+category);
@@ -52,10 +73,15 @@
 		<cfif data.categories.recordcount gt 0>
 			<table class="tableList" width="100%" border="1">
 				<tr>
-					<th></th>
+					<th>
+						<a href="javascript:void(0)" id="btnNewCategory" tabindex="-1">
+							<img src="images/icons/Add-icon.png" width="24" height="24" />
+						</a>
+					</th>
 					<th></th>
 					<th>#data.categories.pgTitle#</th>
 					<th align="right">Products</th>
+					<th>Live</th>
 				</tr>
 				<cfloop query="data.categories">
 					<tr>
@@ -70,6 +96,7 @@
 						</td>
 						<td><a href="##" data-category=#pcatID# class="categoryItem">#pcatTitle#</a></td>
 						<td align="right">#products#</td>
+						<td align="center">#pcatShow#</td>
 					</tr>
 				</cfloop>
 			</table>
@@ -79,7 +106,6 @@
 		<form method="post">
 			<input type="hidden" name="groupID" id="groupID" value="#data.groupID#" />
 		</form>
-		<a href="javascript:void(0)" class="button button_white" id="btnNewCategory" style="float:left;font-size: 14px; margin-top:4px;" tabindex="-1">New Category</a>
 	</cfoutput>
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

@@ -1,5 +1,74 @@
 <cfcomponent displayname="productstock" extends="core">
 
+	<cffunction name="LoadProductAndLatestStockItem" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.QProduct" datasource="#args.datasource#" result="loc.QQueryResult">
+				SELECT 	prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+						prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
+						siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
+				FROM tblProducts
+				LEFT JOIN tblStockItem ON prodID = siProduct
+				AND tblStockItem.siID = (
+					SELECT MAX( siID )
+					FROM tblStockItem
+					WHERE prodID = siProduct )
+				WHERE prodID=#val(args.productID)#
+				LIMIT 1;
+			</cfquery>
+
+			<cfloop query="loc.QProduct">
+				<cfset loc.rec = {}>
+				<cfset loc.rec.prodID = prodID>
+				<cfset loc.rec.prodRef = prodRef>
+				<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
+				<cfset loc.rec.prodRecordTitle = prodRecordTitle>
+				<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
+				<cfset loc.rec.prodTitle = prodTitle>
+				<cfset loc.rec.prodCountDate = LSDateFormat(prodCountDate,"dd-mmm-yyyy")>
+				<cfset loc.rec.prodStockLevel = prodStockLevel> <!--- + int(prodStockLevel eq 0)	add 1 if zero --->
+				<cfset loc.rec.prodCatID = prodCatID>
+				<cfset loc.rec.prodEposCatID = prodEposCatID>
+				<cfset loc.rec.prodPriceMarked = prodPriceMarked>
+				<cfset loc.rec.prodVATRate = prodVATRate>
+				<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
+				<cfset loc.rec.prodMinPrice = prodMinPrice>
+				<cfset loc.rec.prodOurPrice = prodOurPrice>
+				<cfset loc.rec.prodStatus = prodStatus>
+				<cfset loc.rec.prodReorder = prodReorder>
+				<cfset loc.rec.prodUnitSize = prodUnitSize>
+				
+				<cfset loc.stockItem = {}>
+				<cfset loc.stockItem.siID = siID>
+				<cfset loc.stockItem.siRef = siRef>
+				<cfset loc.stockItem.siUnitSize = siUnitSize>
+				<cfset loc.stockItem.siPackQty = siPackQty>
+				<cfset loc.stockItem.siQtyPacks = siQtyPacks>
+				<cfset loc.stockItem.siQtyItems = siQtyItems>
+				<cfset loc.stockItem.siWSP = siWSP>
+				<cfset loc.stockItem.siUnitTrade = siUnitTrade>
+				<cfset loc.stockItem.siRRP = siRRP>
+				<cfset loc.stockItem.siOurPrice = siOurPrice>
+				<cfset loc.stockItem.siPOR = siPOR>
+				<cfset loc.stockItem.siReceived = siReceived>
+				<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn,"yyyy-mm-dd")>
+				<cfset loc.stockItem.siExpires = siExpires>
+				<cfset loc.stockItem.siStatus = siStatus>						 	 	 	 	 	 	 	 	 	 	 	 	 
+			</cfloop>
+			<cfset loc.result.product = loc.rec>
+			<cfset loc.result.stockItem = loc.stockItem>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="FindProduct" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -10,9 +79,6 @@
 		<cfset loc.result.msg = "">
 		<cfset loc.result.msgs = []>
 		<cftry>
-		<cfdump var="#args#" label="args" expand="yes" format="html" 
-	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
 			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
 				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>
 				<cfquery name="loc.QBarcode" datasource="#args.datasource#">
@@ -60,7 +126,7 @@
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
-							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
@@ -68,7 +134,7 @@
 						SELECT MAX( siID )
 						FROM tblStockItem
 						WHERE prodID = siProduct
-						AND siStatus NOT IN ("returned,inactive") )
+						AND siStatus NOT IN ("returned","inactive") )
 					WHERE prodID=#val(loc.result.productID)#
 					LIMIT 1;
 				</cfquery>
@@ -87,16 +153,18 @@
 						<cfset loc.rec.prodRecordTitle = prodRecordTitle>
 						<cfset loc.rec.prodLastBought = LSDateFormat(prodLastBought,"dd-mmm-yyyy")>
 						<cfset loc.rec.prodTitle = prodTitle>
-						<cfset loc.rec.prodCountDate = prodCountDate>
-						<cfset loc.rec.prodStockLevel = prodStockLevel + int(prodStockLevel eq 0)>	<!--- add 1 if zero --->
+						<cfset loc.rec.prodCountDate = LSDateFormat(prodCountDate,"dd-mmm-yyyy")>
+						<cfset loc.rec.prodStockLevel = prodStockLevel> <!--- + int(prodStockLevel eq 0)	add 1 if zero --->
 						<cfset loc.rec.prodCatID = prodCatID>
 						<cfset loc.rec.prodEposCatID = prodEposCatID>
 						<cfset loc.rec.prodPriceMarked = prodPriceMarked>
 						<cfset loc.rec.prodVATRate = prodVATRate>
-						<cfset loc.rec.prodStaffDiscount = prodStaffDiscount>
 						<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
 						<cfset loc.rec.prodMinPrice = prodMinPrice>
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
+						<cfset loc.rec.prodStatus = prodStatus>
+						<cfset loc.rec.prodReorder = prodReorder>
+						<cfset loc.rec.prodUnitSize = prodUnitSize>
 						
 						<cfset loc.stockItem = {}>
 						<cfset loc.stockItem.siID = siID>
@@ -111,7 +179,7 @@
 						<cfset loc.stockItem.siOurPrice = siOurPrice>
 						<cfset loc.stockItem.siPOR = siPOR>
 						<cfset loc.stockItem.siReceived = siReceived>
-						<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn)>
+						<cfset loc.stockItem.siBookedIn = LSDateFormat(siBookedIn,"yyyy-mm-dd")>
 						<cfset loc.stockItem.siExpires = siExpires>
 						<cfset loc.stockItem.siStatus = siStatus>						 	 	 	 	 	 	 	 	 	 	 	 	 
 					</cfloop>
@@ -137,6 +205,32 @@
 						WHERE barProdID = #val(loc.result.productID)#
 						AND barType = 'product'
 					</cfquery>
+					<cfquery name="loc.result.QDeals" datasource="#args.datasource#">
+						SELECT ercTitle, edTitle,edType,edStarts,edEnds,edQty,edStatus,edDealType,edAmount
+						FROM tblepos_dealitems
+						INNER JOIN tblepos_deals ON edID = ediParent
+						INNER JOIN tblepos_retailclubs ON ercID = edRetailClub
+						WHERE ediProduct = #val(loc.result.productID)#
+						AND edStarts <= NOW()
+						AND edEnds >= NOW()
+						ORDER BY ediID DESC
+					</cfquery>
+					<cfif loc.result.QDeals.recordcount gt 0>
+						<cfset loc.result.deals = []>
+						<cfloop query="loc.result.QDeals">
+							<cfset loc.deal = {}>
+							<cfset loc.deal.ercTitle = ercTitle>
+							<cfset loc.deal.edTitle = edTitle>
+							<cfset loc.deal.edType = edType>
+							<cfset loc.deal.edStarts = edStarts>
+							<cfset loc.deal.edEnds = edEnds>
+							<cfset loc.deal.edQty = edQty>
+							<cfset loc.deal.edStatus = edStatus>
+							<cfset loc.deal.edDealType = edDealType>
+							<cfset loc.deal.edAmount = edAmount>
+							<cfset ArrayAppend(loc.result.deals,loc.deal)>
+						</cfloop>
+					</cfif>
 					<cfquery name="loc.CategoryGroup" datasource="#args.datasource#">
 						SELECT pcatID,pgID,pcatTitle,pgTitle,pgTarget
 						FROM tblProductCats
@@ -155,6 +249,7 @@
 			<cfquery name="loc.result.groups" datasource="#args.datasource#">
 				SELECT *
 				FROM tblProductGroups
+				WHERE pgType = 'sale'
 				ORDER BY pgTitle
 			</cfquery>
 			<cfset ArrayAppend(loc.result.msgs,loc.result.msg)>
@@ -234,7 +329,7 @@
 				SELECT MAX( siID )
 				FROM tblStockItem
 				WHERE prodID = siProduct
-				AND siStatus NOT IN ("returned,inactive")  )
+				AND siStatus NOT IN ("returned","inactive")  )
 			LEFT JOIN tblBarcodes ON prodID = barProdID
 			AND tblBarcodes.barID = (
 				SELECT MAX(barID)
@@ -294,6 +389,7 @@
 		<cftry>
 			<cfquery name="loc.QAddProduct" datasource="#args.datasource#" result="loc.QAddProductResult">
 				INSERT INTO tblProducts (
+					prodRef,
 					prodRecordTitle,
 					prodTitle,
 					prodCatID,
@@ -303,6 +399,7 @@
 					prodVATRate,
 					prodEposCatID
 				) VALUES (
+					'#args.form.prodRef#',
 					'#args.form.prodRecordTitle#',
 					'#args.form.prodTitle#',
 					#val(args.form.prodCatID)#,
@@ -355,17 +452,25 @@
 	<cffunction name="AmendProduct" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
+		<cfset loc.resultStr = "An error occurred updating the record.">
 		<cftry>
 			<cfquery name="loc.QUpdate" datasource="#args.datasource#">
 				UPDATE tblProducts
-				SET prodRecordTitle= '#args.form.prodRecordTitle#',
-					prodTitle= '#args.form.prodTitle#',
+				SET prodRef = '#args.form.prodRef#',
+					prodRecordTitle = '#args.form.prodRecordTitle#',
+					prodTitle = '#args.form.prodTitle#',
 					prodCatID = #val(args.form.prodCatID)#,
 					prodPriceMarked = #int(StructKeyExists(args.form,"prodPriceMarked"))#,
 					prodMinPrice = #val(args.form.prodMinPrice)#,
 					prodOurPrice = #val(args.form.prodOurPrice)#,
+					prodCountDate = <cfif len(args.form.prodCountDate)>'#LSDateFormat(args.form.prodCountDate,"yyyy-mm-dd")#',<cfelse>null,</cfif>
+					prodStockLevel = #val(args.form.prodStockLevel)#,
 					prodVATRate = #args.form.prodVATRate#,
-					prodEposCatID = #val(args.form.prodEposCatID)#
+					prodEposCatID = #val(args.form.prodEposCatID)#,
+					prodStaffDiscount = '#StructKeyExists(args.form,"prodStaffDiscount")#',
+					prodStatus = '#args.form.prodStatus#',
+					prodUnitSize = '#args.form.prodUnitSize#',
+					prodReorder = '#args.form.prodReorder#'
 				WHERE prodID = #val(args.form.prodID)#
 			</cfquery>
 			<cfset loc.resultStr = "Product Updated.">
@@ -452,6 +557,7 @@
 				</cfif>	
 				<cfset loc.result.msg = "Stock item added.">
 				<cfset loc.result.barcode = args.form.barcode>
+				<cfset loc.result.prodID = args.form.productID>
 			<cfelse>
 				<cfset loc.result.msg = "Stock quantity received was zero.">
 			</cfif>
@@ -473,7 +579,21 @@
 		<cftry>
 			<cfset loc.result = {}>
 			<cfset loc.args = args>
-			<cfset loc.qtyItems = args.form.siPackQty * args.form.siQtyPacks>
+			<cfif args.form.siStatus eq 'closed'>
+				<cfset loc.qtyItems = args.form.siPackQty * args.form.siQtyPacks>
+				<cfset loc.received = args.form.siReceived>
+				<cfset loc.bookedIn = args.form.siBookedIn>
+			<cfelse>
+				<cfset loc.qtyItems = 0>
+				<cfset loc.received = 0>
+				<cfset loc.bookedIn = "">
+			</cfif>
+
+<!---
+			<cfif IsDate(loc.bookedIn)>
+				<cfset loc.bookedIn = LSDateFormat(loc.bookedIn,"yyyy-mm-dd")>
+			</cfif>
+--->
 			<cfset loc.tradeNet = args.form.siWSP / args.form.siPackQty>
 			<cfset loc.tradeGross = loc.tradeNet * (1 + (args.form.vatRate / 100))>
 			<cfif StructKeyExists(args.form,"siOurPrice")>
@@ -497,12 +617,15 @@
 					siUnitTrade = #args.form.siWSP / args.form.siPackQty#,
 					siExpires = <cfif len(args.form.siExpires)>'#LSDateFormat(args.form.siExpires,"yyyy-mm-dd")#',<cfelse>null,</cfif>
 					siStatus = '#args.form.siStatus#',
+					siReceived = #loc.received#,
+					<!---siBookedIn = <cfif len(loc.bookedIn)>'#loc.bookedIn#',<cfelse>null,</cfif>--->
 					siPOR = #loc.POR#,
 					soDate = '#LSDateFormat(args.form.soDate,"yyyy-mm-dd")#',
 					soAccountID = #args.form.accID#
 				WHERE siID = #args.form.siID#
 			</cfquery>
 			<cfset loc.result.barcode = args.form.barcode>
+			<cfset loc.result.prodID = args.form.prodID>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -591,7 +714,7 @@
 					WHERE prodID = #val(args.productID)#
 					LIMIT 1;
 				</cfquery>
-			<cfelse>
+			<cfelseif len(loc.barcode)>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 					FROM tblProducts
@@ -662,7 +785,7 @@
 --->
 		<cftry>
 			<cfquery name="loc.QProduct" datasource="#args.datasource#">
-				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodMinPrice, pcatID,pgID,pcatTitle,pgTitle,pgTarget
+				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodMinPrice,prodCountDate,prodStockLevel, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 				FROM tblProducts
 				INNER JOIN tblStockItem ON siProduct = prodID
 				INNER JOIN tblProductCats ON prodCatID = pcatID
@@ -678,7 +801,8 @@
 					<cfset loc.rec.prodVATRate=prodVATRate>
 					<cfset loc.rec.PriceMarked=GetToken(" |PM",val(prodPriceMarked)+1,"|")>
 					<cfset loc.rec.prodMinPrice=prodMinPrice>
-
+					<cfset loc.rec.prodCountDate=prodCountDate>
+					<cfset loc.rec.prodStockLevel=prodStockLevel>
 					<cfset loc.rec.catID=pcatID>
 					<cfset loc.rec.catTitle=pcatTitle>
 					<cfset loc.rec.groupID=pgID>
@@ -755,7 +879,8 @@
 				UPDATE tblProductGroups
 				SET 
 					pgTitle = '#args.form.pgTitle#',
-					pgTarget = #args.form.pgTarget#
+					pgTarget = #args.form.pgTarget#,
+					pgShow = #args.form.pgShow#
 				WHERE pgID = #args.form.pgID#
 			</cfquery>
 			<cfset loc.result.msg = "Group saved">
@@ -774,7 +899,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QGroups" datasource="#args.datasource#">
-				SELECT pgID,pgTitle,pgTarget, Count(pcatID) AS Categories
+				SELECT pgID,pgTitle,pgTarget,pgShow, Count(pcatID) AS Categories
 				FROM tblProductGroups
 				LEFT JOIN tblProductCats ON pcatGroup=pgID
 				WHERE pgType != 'epos'
@@ -798,8 +923,8 @@
 		<cftry>
 			<cfquery name="loc.QAddCategory" datasource="#args.datasource#">
 				INSERT INTO tblProductCats 
-				(pcatGroup,pcatTitle) 
-				VALUES (#args.form.pcatGroup#,'#args.form.pcatTitle#')
+				(pcatGroup,pcatTitle,pcatDescription) 
+				VALUES (#args.form.pcatGroup#,'#args.form.pcatTitle#','#args.form.pcatDescription#')
 			</cfquery>
 
 		<cfcatch type="any">
@@ -840,7 +965,9 @@
 				UPDATE tblProductCats
 				SET 
 					pcatTitle = '#args.form.pcatTitle#',
-					pcatGroup = #args.form.pcatGroup#
+					pcatGroup = #args.form.pcatGroup#,
+					pcatShow = #val(args.form.pcatShow)#,
+					pcatDescription = '#args.form.pcatDescription#'
 				WHERE pcatID = #args.form.pcatID#
 			</cfquery>
 			<cfset loc.result.msg = "Category saved">
@@ -884,7 +1011,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QProducts" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT prodID,prodTitle,siUnitSize, siOurPrice, pcatID,pcatTitle
+				SELECT prodID,prodTitle,prodStatus,prodStaffDiscount, siUnitSize,siOurPrice, pcatID,pcatTitle
 				FROM tblProducts
 				INNER JOIN tblProductCats ON prodCatID = pcatID
 				LEFT JOIN tblStockItem ON prodID = siProduct
@@ -1001,7 +1128,7 @@
 					SELECT MAX( siID )
 						FROM tblStockItem
 						WHERE prodID = siProduct
-						AND siStatus NOT IN ("returned,inactive") )
+						AND siStatus NOT IN ("returned","inactive") )
 					WHERE prodID IN (#loc.result.stocklist#)
 				</cfquery>
 				<cfset loc.result.stockItems = loc.QProductList>

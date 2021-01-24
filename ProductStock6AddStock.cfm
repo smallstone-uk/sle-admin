@@ -4,6 +4,7 @@
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.form=form>
 <cfset result=pstock.AddStockItem(parm)>
+
 <cfoutput>
-	#form.barcode#
+	#result.prodID#
 </cfoutput>

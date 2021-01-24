@@ -23,7 +23,7 @@
 	});
 </script>
 
-<cfset fileLimit = 15>
+<cfset fileLimit = 30>
 <cfset dataDir="#application.site.dir_data#\stock\">
 <cfdirectory directory="#dataDir#" action="list" name="QDir" sort="name DESC">
 <cfquery name="QStockOrders" datasource="#application.site.datasource1#">

@@ -36,6 +36,7 @@
 				<cfset set.datasource=parm.datasource>
 				<cfset set.clientID=item.ID>
 				<cfset set.ordID=item.ordID>
+				<cfset set.ordContact=item.ordContact>
 				<cfif StructKeyExists(parm.form,"fixflag")>
 					<cfset set.fixflag=1>
 				<cfelse>
@@ -51,8 +52,10 @@
 				<cfset set.invDate=parm.form.invDate>
 				<cfset set.delDate=parm.form.delDate>
 				<cfset invoice=inv.LoadInvoice(set)>
+
 				<cfset set.cltID=invoice.ID>
 				<cfset set.cltRef=invoice.Ref>
+				<cfset set.cltShowBal=item.cltShowBal>
 				<cfset set.Total=invoice.total>
 				<cfset set.TransType=invoice.TransType>
 				<cfset set.vouchers=invoice.vouchertotal>
@@ -136,6 +139,7 @@
 				<cfset set.datasource=parm.datasource>
 				<cfset set.clientID=item.ID>
 				<cfset set.ordID=item.ordID>
+				<cfset set.ordContact=item.ordContact>
 				<cfif StructKeyExists(parm.form,"fixflag")>
 					<cfset set.fixflag=1>
 				<cfelse>
@@ -153,6 +157,7 @@
 				<cfset invoice=inv.LoadInvoice(set)>
 				<cfset set.cltID=invoice.ID>
 				<cfset set.cltRef=invoice.Ref>
+				<cfset set.cltShowBal=item.cltShowBal>
 				<cfset set.Total=invoice.total>
 				<cfset set.TransType=invoice.TransType>
 				<cfset set.vouchers=invoice.vouchertotal>
@@ -236,6 +241,7 @@
 				<cfset set.datasource=parm.datasource>
 				<cfset set.clientID=item.ID>
 				<cfset set.ordID=item.ordID>
+				<cfset set.ordContact=item.ordContact>
 				<cfif StructKeyExists(parm.form,"fixflag")>
 					<cfset set.fixflag=1>
 				<cfelse>
@@ -254,6 +260,7 @@
 				<cfset set.cltID=invoice.ID>
 				<cfset set.cltRef=invoice.Ref>
 				<cfset set.Total=invoice.total>
+				<cfset set.cltShowBal=item.cltShowBal>
 				<cfset set.TransType=invoice.TransType>
 				<cfset set.vouchers=invoice.vouchertotal>
 				<cfset set.testmode=testmode>
@@ -336,6 +343,7 @@
 				<cfset set.datasource=parm.datasource>
 				<cfset set.clientID=item.ID>
 				<cfset set.ordID=item.ordID>
+				<cfset set.ordContact=item.ordContact>
 				<cfif StructKeyExists(parm.form,"fixflag")>
 					<cfset set.fixflag=1>
 				<cfelse>
@@ -353,6 +361,8 @@
 				<cfset invoice=inv.LoadInvoice(set)>
 				<cfset set.cltID=invoice.ID>
 				<cfset set.cltRef=invoice.Ref>
+				<cfset set.cltShowBal=item.cltShowBal>
+				<cfset set.createPDF=parm.form.createPDF>
 				<cfset set.Total=invoice.total>
 				<cfset set.TransType=invoice.TransType>
 				<cfset set.vouchers=invoice.vouchertotal>

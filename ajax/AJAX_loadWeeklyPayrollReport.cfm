@@ -87,7 +87,7 @@
 								</cfloop>
 							</tr>
 						</cfloop>
-						<cfloop from="#deptCount+1#" to="5" index="deptRow">	<!--- pad area to same depth --->
+						<cfloop from="#deptCount+1#" to="7" index="deptRow">	<!--- pad area to same depth --->
 							<tr class="pr2_depts">
 								<th class="pr2_dept" align="left">&nbsp;</th>
 								<td width="75" align="center"></td>
@@ -108,29 +108,29 @@
 								<table class="tableList pr2_hour_totals" border="1">
 									<tr>
 										<th width="150">(Week #record.totals.recs#)</th>
-										<th width="80">This Period</th>
-										<th width="80">This Year</th>
+										<th width="90">This Year</th>
+										<th width="90">This Period</th>
 									</tr>
 									<tr>
 										<th align="left">Work Hours</th>
-										<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 										<td data-role="holiday" align="right">#record.totals.workSum#</td>
+										<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 									</tr>
 									<cfif record.employee.empPaySlip IS "detailed">	
 									<tr>
 										<th align="left">Holiday Entitlement</th>
-										<td></td>
 										<td data-role="holiday" align="right">#DecimalFormat(record.totals.annual)#</td>
+										<td></td>
 									</tr>				
 									<tr>
 										<th align="left">Holiday Taken</th>
-										<td align="right">#record.header.phHolHours#</td>
 										<td data-role="holiday" align="right">#record.totals.holSum#</td>
+										<td align="right">#record.header.phHolHours#</td>
 									</tr>				
 									<tr>
 										<th align="left">Holiday Remaining</th>
-										<td></td>
 										<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
+										<td></td>
 									</tr>
 									</cfif>		
 								</table>
@@ -139,8 +139,8 @@
 								<table class="tableList pr2_gross_totals" border="1">
 									<tr>
 										<th width="150"></th>
-										<th width="80">This Year</th>
-										<th width="80">This Period</th>
+										<th width="90">This Year</th>
+										<th width="90">This Period</th>
 									</tr>
 									<tr>
 										<th align="left">Pension Contribution</th>
@@ -186,9 +186,9 @@
 							<td style="vertical-align: top;padding: 0;" align="right">
 								<table class="tableList pr2_gross_totals" border="1">
 									<tr>
-										<th width="150"></th>
-										<th width="80">This Year</th>
-										<th width="80">This Period</th>
+										<th width="100"></th>
+										<th width="90">This Year</th>
+										<th width="90">This Period</th>
 									</tr>
 									<tr>
 										<th align="left">PAYE</th>
@@ -204,7 +204,7 @@
 										</td>
 									</tr>
 									<tr>
-										<th align="left">National Insurance</th>
+										<th align="left">N.I</th>
 										<td data-role="ni" align="right">
 											&pound;#record.totals.NISum#
 										</td>
@@ -219,12 +219,17 @@
 									<tr>
 										<th align="left">Gross Total</th>
 										<td data-role="gross" align="right">&pound;#DecimalFormat(record.totals.grossSum)#</td>
-										<td data-role="gross" align="right">&pound;#record.header.phGross#</td>
+										<td data-role="gross" align="right">&pound;#DecimalFormat(record.header.phGross)#</td>
 									</tr>
 									<tr>
 										<th align="left">Net Pay</th>
 										<td data-role="gross" align="right">&pound;#DecimalFormat(record.totals.npSum)#</td>
-										<td data-role="netpay" align="right">&pound;#record.header.phNP#</td>
+										<td data-role="netpay" align="right">&pound;#DecimalFormat(record.header.phNP)#</td>
+									</tr>
+									<tr>
+										<th align="left">Take Home</th>
+										<td data-role="gross" align="right"><strong>&pound;#DecimalFormat(record.totals.npSum-record.totals.LotterySum)#</strong></td>
+										<td data-role="netpay" align="right"><strong>&pound;#DecimalFormat(record.header.phNP-record.header.phLotterySubs)#</strong></td>
 									</tr>
 								</table>
 							</td>

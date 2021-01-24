@@ -56,6 +56,7 @@
 	<cfobject component="code/payroll" name="pr">
 	<cfset parm = {}>
 	<cfset parm.database = application.site.datasource1>
+	<cfset parm.active = false>
 	<cfset LoadEmployees = pr.LoadEmployees(parm)>
 	<cfset startMonth=CreateDate(year(now()),month(now()),1)>
 	<cfset endMonth=DateAdd("m",1,startMonth)>

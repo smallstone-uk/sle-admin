@@ -546,7 +546,7 @@
 				AND pubGroup='magazine'
 				AND oiStatus='active'
 				AND ordActive=1
-				HAVING AccountType<>'N'
+				HAVING AccountType NOT IN ('H','N')
 			</cfquery>
 			<cfset loc.result.QOrderItems = loc.QOrderItems>
 			<cfset loc.result.rounds={}>
@@ -595,7 +595,7 @@
 				INNER JOIN tblStreets2 ON stID = cltStreetCode
 				WHERE tblPublication.pubID=#val(args.pubID)#
 				AND tblOrderItem.oiStatus="active"
-				AND tblClients.cltAccountType NOT IN ('N','H')
+				<!---AND tblClients.cltAccountType NOT IN ('N','H')--->
 				AND ordActive
 				ORDER BY pubTitle, cltRef;
 			</cfquery>

@@ -2,50 +2,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Transaction Reports</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link href="css/main3.css" rel="stylesheet" type="text/css">
-<link href="css/main4.css" rel="stylesheet" type="text/css">
-<link href="css/chosen.css" rel="stylesheet" type="text/css">
-<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="common/scripts/common.js"></script>
-<script src="scripts/jquery-1.9.1.js"></script>
-<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>
-<script src="scripts/jquery.hoverIntent.minified.js"></script>
-<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
-		$(".srchAccount, .srchTranType").chosen({width: "300px"});
-	});
-</script>
-<style type="text/css">
-	.header {font-size:16px; font-weight:bold;}
-	.amount {text-align:right}
-	.amountTotal {text-align:right; font-weight:bold;}
-	.tranList {	
-		font-family:Arial, Helvetica, sans-serif;
-		font-size:13px;
-		border-collapse:collapse;
-	}
-	.tranList th, .tranList td {
-		padding:2px 4px; 
-		border: solid 1px #ccc;
-		background-color:#fff;
-	}
-	.vatTable {
-		border-spacing: 0px;
-		border-collapse: collapse;
-		border: 1px solid #CCC;
-		font-size: 12px;
-	}
-	.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
-	.vatTable td {padding: 5px; border-color: #ccc;}
-	.err {background-color:#FF0000}
-	.ok {background-color:#00DF00}
-</style>
-
+	<title>Transaction Reports</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<link href="css/main3.css" rel="stylesheet" type="text/css">
+	<link href="css/main4.css" rel="stylesheet" type="text/css">
+	<link href="css/chosen.css" rel="stylesheet" type="text/css">
+	<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="common/scripts/common.js"></script>
+	<script src="scripts/jquery-1.9.1.js"></script>
+	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>
+	<script src="scripts/jquery.hoverIntent.minified.js"></script>
+	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
+			$(".srchAccount, .srchTranType").chosen({width: "300px"});
+		});
+	</script>
+	<style type="text/css">
+		.header {font-size:16px; font-weight:bold;}
+		.amount {text-align:right}
+		.amountTotal {text-align:right; font-weight:bold;}
+		.tranList {	
+			font-family:Arial, Helvetica, sans-serif;
+			font-size:13px;
+			border-collapse:collapse;
+		}
+		.tranList th, .tranList td {
+			padding:2px 4px; 
+			border: solid 1px #ccc;
+			background-color:#fff;
+		}
+		.vatTable {
+			border-spacing: 0px;
+			border-collapse: collapse;
+			border: 1px solid #CCC;
+			font-size: 12px;
+		}
+		.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
+		.vatTable td {padding: 5px; border-color: #ccc;}
+		.err {background-color:#FF0000}
+		.ok {background-color:#00DF00}
+	</style>
 </head>
 
 <cfobject component="code/purchase" name="pur">
@@ -59,6 +58,7 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchMin" default="">
+<cfparam name="srchParmNum" default="">
 <cfparam name="srchSort" default="">
 <cfparam name="srchDept" default="">
 <cfparam name="srchLedger" default="">
@@ -144,6 +144,10 @@
 									<td><input type="text" name="srchMin" value="#srchMin#" size="5" value="0" /></td>
 								</tr>
 								<tr>
+									<td><b>Numeric Parameter</b></td>
+									<td><input type="text" name="srchParmNum" value="#srchParmNum#" size="5" value="0" /></td>
+								</tr>
+								<tr>
 									<td><b>Ledger</b></td>
 									<td>
 										<select name="srchLedger">
@@ -222,7 +226,7 @@
 									<cfset trans=pur.TranList(parms)>
 									<cfset accountID=0>
 									<cfset tranCountTotal = 0>
-									<table border="1" class="tableList" width="100%">
+									<table border="1" class="tableList" width="98%">
 										<cfloop array="#trans.tranArray#" index="tran">
 											<cfif accountID neq tran.accID>
 												<cfif accountID gt 0>
@@ -602,7 +606,7 @@
 								</cfcase>
 								<cfcase value="5">
 									<cfset trans=pur.NomTranSummary(parms)>
-									<!---<cfdump var="#trans#" label="trans" expand="no">--->
+									<cfdump var="#trans#" label="trans" expand="no">
 									<table border="1" class="tableList">
 										<tr>
 											<th width="50">Ledger</th>
@@ -970,7 +974,8 @@
 														<td colspan="5"></td>
 														<td>Total</td>
 														<td align="right">#DecimalFormat(subTotal)#</td>
-														<td colspan="2"></td>
+														<cfif abs(netTotal - subTotal) gt 0.01><td colspan="2" class="err">Analysis not balanced</td>
+															<cfelse><td colspan="2"></td></cfif>
 													</tr>
 													<cfset GnetTotal += netTotal>
 													<cfset GvatTotal += vatTotal>
@@ -1695,19 +1700,21 @@
 										<cfset errorCount = 0>
 										<table class="tableList" border="1">
 											<tr>
-												<td width="150">Name</td>
-												<td>ID</td>
-												<td width="80">Date</td>
+												<th colspan="12">#trans.QTrans.accName#</th>
+											</tr>
+											<tr>
+												<td align="right" class="noPrint">ID</td>
+												<td align="right">Date</td>
 												<td>Type</td>
 												<td>Method</td>
 												<td>Reference</td>
 												<td>Description</td>
-												<td>Amount1</td>
-												<td>Amount2</td>
-												<td>Total</td>
+												<td align="right">Amount1</td>
+												<td align="right">Amount2</td>
+												<td align="right">Total</td>
 												<td>Allocated</td>
 												<td>AllocID</td>
-												<td></td>
+												<td align="right">Balance</td>
 											</tr>
 											<cfloop query="trans.QTrans">
 												<cfif allocID gt -1 AND allocID neq trnAllocID>
@@ -1732,9 +1739,8 @@
 													<cfset allocBal = 0>
 												</cfif>
 												<tr>
-													<td>#accName#</td>
-													<td align="right">#trnID#</td>
-													<td align="right">#LSDateFormat(trnDate,'dd-mmm-yyyy')#</td>
+													<td align="right" class="noPrint">#trnID#</td>
+													<td align="right" nowrap>#LSDateFormat(trnDate,'dd-mmm-yy')#</td>
 													<td>#trnType#</td>
 													<td>#trnMethod#</td>
 													<td>#trnRef#</td>
@@ -1748,7 +1754,7 @@
 												</tr>
 											</cfloop>
 											<tr>
-												<td height="30" colspan="11"></td>
+												<td height="30" colspan="10"></td>
 												<td class="#class#" align="right">#allocID#</td>
 												<td class="#class#" align="center">#allocBal#</td>
 											</tr>

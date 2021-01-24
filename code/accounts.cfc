@@ -2730,6 +2730,7 @@
 				INNER JOIN tblClients ON trnClientRef=cltRef
 				WHERE trnClientRef=#val(args.form.clientRef)#
 				<cfif NOT StructKeyExists(args.form,"allTrans")>AND trnAlloc=0</cfif>
+				<cfif len(args.form.srchDateFrom)>AND trnDate >= #args.form.srchDateFrom#</cfif>
 				ORDER BY trnDate
 			</cfquery>
 			<cfset result.trans=qtrans>

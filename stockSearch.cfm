@@ -28,6 +28,7 @@
 			$(".srchCategory").chosen({width: "300px"});
 			$(".srchSupplier").chosen({width: "300px"});
 			$(".srchStatus").chosen({width: "300px"});
+			$(".srchReorder").chosen({width: "300px"});
 			$('#selectAll').click(function(e) {
 				if(this.checked) {
 					$('.selectitem').prop({checked: true});
@@ -134,12 +135,29 @@
 					}
 				});
 			});
+			$('.sod_status').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductStatus.cfm",
+					data: {"status": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
 		});
 	</script>
 	<style type="text/css">
 		@page {size:portrait;margin:40px;}
 		.lowPOR {background-color:#FF8080;}
 		.pm {background-color: #D2E9FF;}
+		.catActive {color:#0000FF}
+		.catInactive {color:#FF0000}
 	</style>
 </head>
 
@@ -158,7 +176,11 @@
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchStockDate" default="">
 <cfparam name="srchStatus" default="">
+<cfparam name="srchProdStatus" default="">
+<cfparam name="srchReorder" default="">
 <cfset statusTitles = "open,closed,outofstock,promo,returned,inactive">
+<cfset prodStatusTitles = "active,inactive,donotbuy">
+<cfset reOrderTitles = "None,Monday,Thursday,Every">
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -205,11 +227,31 @@
 									</td>
 								</tr>
 								<tr>
-									<td><b>Status</b></td>
+									<td><b>Product Status</b></td>
+									<td>
+										<select name="srchProdStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop list="#prodStatusTitles#" index="i" delimiters=",">
+												<option value="#i#"<cfif ListFind(srchProdStatus,i)> selected="selected"</cfif>>#i#</option>
+											</cfloop>
+										</select>									
+									</td>
+								</tr>
+								<tr>
+									<td><b>Stock Status</b></td>
 									<td>
 										<select name="srchStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
 											<cfloop list="#statusTitles#" index="i" delimiters=",">
 												<option value="#i#"<cfif ListFind(srchStatus,i)> selected="selected"</cfif>>#i#</option>
+											</cfloop>
+										</select>									
+									</td>
+								</tr>
+								<tr>
+									<td><b>Reorder Status</b></td>
+									<td>
+										<select name="srchReorder" class="srchReorder" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop list="#reOrderTitles#" index="i" delimiters=",">
+												<option value="#i#"<cfif ListFind(srchReorder,i)> selected="selected"</cfif>>#i#</option>
 											</cfloop>
 										</select>									
 									</td>
@@ -256,6 +298,7 @@
 					<span><div id="loading"></div></span>
 					<form method="post" id="listForm">
 						<div class="module listcontrols">
+							<a href="exportBarcodes.cfm" target="_blank" id="btnExport" class="button">Export Barcodes</a>
 							<a href="##" id="btnPrintLabels" class="button">Print Labels</a>
 							<a href="##" id="btnShowList" class="button">Show List</a>
 							<a href="##" id="btnSaveList" class="button">Update List</a>
@@ -289,7 +332,7 @@
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
-									<cfset colspan=8>
+									<cfset colspan=10>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -298,11 +341,13 @@
 													<th width="10"></th>
 													<th>ID</th>
 													<th>Reference</th>
-													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:96%;"></th>
+													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
+													<th>Product<br>Status</th>
 													<th>Unit Size</th>
 													<th>Our Price</th>
 													<th>Pack Qty</th>
-													<th>Status</th>
+													<th>Stock<br>Status</th>
+													<th>Reorder</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
@@ -311,7 +356,10 @@
 												<cfif prodCatID neq category>
 													<tr class="searchrow" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
-														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong></th>
+														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong>
+															<cfif pcatShow><span class="catActive">Active</span>
+																<cfelse><span class="catInactive">Inactive</span></cfif>
+														</th>
 													</tr>
 													<cfset category=prodCatID>
 												</cfif>
@@ -320,11 +368,17 @@
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
+													<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
 													<td>#siUnitSize#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
-													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
+													<td>#prodReorder#</td>
+													<td>
+														<cfif StructKeyExists(stocklist.stockItems,'soDate')>
+															#LSDateFormat(soDate,"ddd dd-mmm yy")# <span class="tiny">ordered</span>
+														<cfelse>#DateFormat(prodLastBought,"dd-mmm-yyyy")#</cfif>
+													</td>
 												</tr>
 											</cfloop>
 											</table>
@@ -336,7 +390,7 @@
 								<cfcase value="2">
 									<cfset stocklist=stock.StockSearch(parm)>
 									<cfif stocklist.recCount GT 0>
-										<cfset colspan=11>
+										<cfset colspan=13>
 										<cfoutput>
 											<p>#stocklist.recCount# products</p>
 											<table width="100%" class="tableList" border="1">
@@ -352,11 +406,13 @@
 													<th>Unit Trade</th>
 													<th>Our Price</th>
 													<th>POR%</th>
+													<th>Reorder</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
+												<cfset ourPrice = val(ourPrice) eq 0 ? 0.01 : ourPrice>
 												<!---<cfset profit = ourPrice - siUnitTrade>
 												<cfset POR = int((profit / ourPrice) * 100)>--->
 
@@ -386,7 +442,8 @@
 													<td align="right">&pound;#DecimalFormat(unitGross)#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#POR#%</td>
-													<td>#LSDateFormat(soDate,"ddd dd-mmm yy")#</td>
+													<td>#prodReorder#</td>
+													<td><cfif StructKeyExists(stocklist.stockItems,'soDate')>#LSDateFormat(soDate,"ddd dd-mmm yy")#</cfif></td>
 												</tr>
 											</cfloop>
 											</table>
@@ -443,7 +500,7 @@
 --->
 								<cfcase value="4">
 									<cfset stocklist=stock.StockTakeList(parm)>
-									<cfdump var="#stocklist#" label="stocklist" expand="no">
+									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=7>
 										<cfoutput>

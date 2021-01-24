@@ -183,11 +183,14 @@
 				var netString=$('#NetAmount').val();
 				var totString=$('#check-total').val();
 				var payString=$('#paycheck-total').val();
+				var w2String=$('#W2').val();
 				var netNum=Number(netString,10);
 				var totNum=Number(totString,10);
 				var payNum=Number(payString,10);
+				var w2Num=Number(w2String,10);
 				var checktotal=netNum-totNum;
 				var paytotal=netNum-payNum;
+				// console.log(paytotal);
 
 				var cashString=$('#CASH').val();
 				var cardString=$('#CARD').val();

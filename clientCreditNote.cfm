@@ -65,14 +65,28 @@
 				<select name="crdReason">
 					<option value="">Select...</option>
 					<option value="missed">Missed Delivery</option>
+					<option value="short">Short Stock</option>
 					<option value="wrong">Wrong Delivery</option>
 					<option value="unwanted">Unwanted Delivery</option>
-					<option value="holiday">Holiday</option>
+					<option value="On Holiday">Holiday</option>
+					<option value="admin">Admin Error</option>
 				</select>
 			</td>
 		</tr>
 		<tr>
 			<th colspan="2"><input type="button" id="btnFindCharges" value="Find" /></th>
+		</tr>
+		<tr>
+			<td colspan="2">
+				Reasons:-<br />
+				*Missed Delivery - Driver failed to deliver.<br />
+				Short Stock - Papers late or short stock.<br />
+				*Wrong Delivery - Wrong title delivered.<br />
+				*Unwanted Delivery - Delivered while cancelled.<br />
+				Holiday - Normal cancellation.<br />
+				<br />
+				* Deducted from drivers pay
+			</td>
 		</tr>
 	</table>
 	<div class="clear" style="padding:5px 0;"></div>

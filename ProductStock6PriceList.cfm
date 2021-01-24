@@ -91,7 +91,7 @@
 
 		<cftry>
 			<cfquery name="loc.QProducts" datasource="#args.datasource#" result="loc.QProductsResult">
-				SELECT prodID,prodRef,prodTitle,prodPriceMarked, siID,siRef,siUnitSize,siOurPrice,soDate
+				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodStaffDiscount, siID,siRef,siUnitSize,siOurPrice,soDate
 				FROM tblProducts
 				LEFT JOIN tblStockItem ON prodID = siProduct
 				INNER JOIN tblStockOrder ON soID = siOrder
@@ -124,7 +124,7 @@
 		<cfset loc.result = {}>
 		<cftry>
 			<cfquery name="loc.QProduct" datasource="#args.datasource#">
-				SELECT prodID,prodRef,prodTitle,prodPriceMarked, siID,siRef,siUnitSize,siOurPrice,soDate
+				SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodStaffDiscount, siID,siRef,siUnitSize,siOurPrice,soDate
 				FROM tblProducts
 				LEFT JOIN tblStockItem ON prodID = siProduct
 				INNER JOIN tblStockOrder ON soID = siOrder
@@ -251,7 +251,7 @@
 					<cfif items.products.recordcount gt 0>
 						<cfset recCount += items.products.recordcount>
 						<tr>
-							<th colspan="8" align="left">#pcatTitle#</th>
+							<th colspan="9" align="left">#pcatTitle#</th>
 						</tr>
 						<cfloop query="items.products">
 							<tr>
@@ -261,6 +261,7 @@
 								<cfif showSize><td>#siUnitSize#</td></cfif>
 								<td align="right">&pound;#siOurPrice#</td>
 								<td>#GetToken(" |PM",prodPriceMarked+1,"|")#</td>
+								<td>#prodStaffDiscount#</td>
 								<td align="right">#LSDateFormat(soDate)#</td>
 								<td><cfif !prodPriceMarked>
 									<a href="?fixPrice=#prodID#&amp;group=#group#&amp;period=#period#&amp;showSize=#showSize#&amp;ignorePM=#ignorePM#&amp;pricelist=#pricelist#">Fix</a></cfif></td>
@@ -270,7 +271,7 @@
 				</cfloop>
 				<tr>
 					<td colspan="#cols#" height="30">#recCount# products listed</td>
-					<td colspan="4" align="right">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
+					<td colspan="5" align="right">#LSDateFormat(Now(),"dd-mmm-yyyy")#</td>
 				</tr>
 			</table>
 		<cfelse>

@@ -29,11 +29,11 @@
 	<cfif dayNo LT 6>
 		AND (pubType = 'weekly' AND pubArrival=#val(dayNo)# OR pubType = 'morning')
 	<cfelseif dayNo eq 6>
-		AND pubType='saturday'
+		AND (pubType='saturday' OR pubType = 'weekend')
 	<cfelseif dayNo eq 7>
 		AND pubType='sunday'
 	</cfif>
-	ORDER BY pubType, pubShortTitle, pubPrice
+	ORDER BY pubShortTitle, pubPrice	<!---pubType, --->
 </cfquery>
 <!---<cfdump var="#QResult#" label="QResult" expand="false">--->
 <cfset pubList=[]>
@@ -97,7 +97,7 @@
 	</tr>
 	<cfloop array="#pubList#" index="item">
 	<tr>
-		<td>#item.title#</td>
+		<td height="30">#item.title#</td>
 		<td align="right">#item.price#</td>
 		<td align="right">#item.qty#</td>
 		<td class="boldie"></td>
@@ -110,7 +110,7 @@
 	</cfloop>
 	<cfloop from="1" to="2" index="i">
 		<tr>
-			<td>&nbsp;</td>
+			<td height="30">&nbsp;</td>
 			<td></td>
 			<td></td>
 			<td class="boldie"></td>
@@ -122,7 +122,7 @@
 		</tr>
 	</cfloop>
 	<tr>
-		<td colspan="8" align="right">Amount Claimed</td>
+		<td colspan="8" align="right" height="30">Amount Claimed</td>
 		<td class="boldie">&pound;</td>
 	</tr>
 </table>
@@ -130,20 +130,17 @@
 	<ol>
 		<li>Select papers required for Shop Save (these are included in the Round Stock figure).</li>
 		<li>Count the papers left for shop sale and enter under Shop Stock (B).</li>
-		<li>Enter the quantities sent out to hotels from the telephone sheet (C).</li>
-		<li>Enter the quantities of spoilt papers (D).</li>
+		<li>Enter the quantities sent out to hotels from the telephone sheet (C) and spoilt papers (D).</li>
 		<li>Enter the quantities received from the Smiths delivery note (E).</li>
 		<li>Add A+B+C+D then subtract column E and enter the result in the Difference column.</li>
 		<li>Negative differences indicate a shortage to be claimed from Smiths.</li>
 		<li>Positive differences indicate missed deliveries and can be ignored.</li>
-		<li>Enter the quantities claimed from Smiths.</li>
 	</ol>
 	
 	<p class="msg">
 		Missing newspaper claims must be reported to Smiths by 9:00am or claimed online by 10:00am.<br />
 		Please call Smiths on <strong>03451 255 070</strong> quoting our box number <strong>212956</strong><br />
-		Magazines claims to be made by noon same day.<br />
-		Missing credits by Tuesday noon.<br />
+		Magazines claims to be made by noon same day. Missing credits by Tuesday noon.<br />
 	</p>
 	<table>
 		<tr>

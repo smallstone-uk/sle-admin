@@ -148,7 +148,11 @@
 							<option value="cash"<cfif customer[1].cltPayMethod eq "cash"> selected="selected"</cfif>>Cash</option>
 							<option value="chq"<cfif customer[1].cltPayMethod eq "chq"> selected="selected"</cfif>>Cheque</option>
 							<option value="card"<cfif customer[1].cltPayMethod eq "card"> selected="selected"</cfif>>Card Payment</option>
+							<option disabled>-----------------</option>
+							<option value="coll"<cfif customer[1].cltPayMethod eq "coll"> selected="selected"</cfif>>Cash Collected</option>
+							<option value="phone"<cfif customer[1].cltPayMethod eq "phone"> selected="selected"</cfif>>Card by Phone</option>
 							<option value="ib"<cfif customer[1].cltPayMethod eq "ib"> selected="selected"</cfif>>Internet Banking</option>
+							<option value="acct"<cfif customer[1].cltPayMethod eq "acct"> selected="selected"</cfif>>Shop Credit Account</option>
 						</select>
 					</td>
 				</tr>

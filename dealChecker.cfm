@@ -13,9 +13,9 @@
 		
 		<cftry>
 			<cfif args.range eq "current">
-				<cfset loc.dateRange = " AND edStarts <= DATE(Now()) AND edEnds > DATE(Now())">
+				<cfset loc.dateRange = " AND edStarts <= DATE(Now()) AND edEnds >= DATE(Now())">
 			<cfelseif args.range eq "future">
-				<cfset loc.dateRange = " AND edStarts > DATE(Now())">
+				<cfset loc.dateRange = " AND edStarts >= DATE(Now())">
 			<cfelseif args.range eq "past">
 				<cfset loc.dateRange = " AND edEnds < DATE(Now())">
 			<cfelseif args.range eq "all">
@@ -33,6 +33,7 @@
 				#loc.dateRange#
 				ORDER BY ercID, edID, ediProduct
 			</cfquery>
+			<cfset loc.today = CreateDate(year(now()),month(now()),day(now()))>
 			<cfset loc.result.QDeals = loc.QDeals>
 			<cfset loc.result.items = []>
 			<cfset loc.lastProd = 0>
@@ -61,11 +62,11 @@
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
 						<cfset loc.result.items[loc.lastItem].style = "blue">
 						<!---<cfdump var="#loc.result.items[loc.lastItem]#" label="#prodTitle# #loc.lastItem#" expand="false">--->
-					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
+					<cfelseif loc.rec.edStarts gte loc.today OR loc.rec.edEnds lte loc.today>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
 					</cfif>
-				<cfelseif edStarts gt Now() OR edEnds lt Now()>
+				<cfelseif edStarts gte loc.today OR edEnds lte loc.today>
 					<cfset loc.rec.style = "##eee">
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
 				<cfelse>
@@ -88,12 +89,13 @@
 		<cfset loc.result = {}>
 		
 		<cftry>
+			<cfset loc.today = CreateDate(year(now()),month(now()),day(now()))>
 			<cfif args.range eq "currentx">
-				<cfset loc.dateRange = " AND edStarts <= Now() AND edEnds > Now()">
+				<cfset loc.dateRange = " AND edStarts <= DATE(Now()) AND edEnds >= DATE(Now())">
 			<cfelseif args.range eq "futurex">
-				<cfset loc.dateRange = " AND edStarts > Now()">
+				<cfset loc.dateRange = " AND edStarts > DATE(Now())">
 			<cfelseif args.range eq "pastx">
-				<cfset loc.dateRange = " AND edEnds < Now()">
+				<cfset loc.dateRange = " AND edEnds < DATE(Now())">
 			<cfelseif args.range eq "allx">
 				<cfset loc.dateRange = "">
 			</cfif>
@@ -134,12 +136,12 @@
 						<cfset loc.rec.style = "red">
 						<cfset loc.result.items[loc.lastItem].style = "red">
 						<!---<cfdump var="#loc.prev#" label="#prodTitle#" expand="false">--->
-					<cfelseif loc.rec.edStarts gt Now() OR loc.rec.edEnds lt Now()>
+					<cfelseif loc.rec.edStarts gte loc.today OR loc.rec.edEnds lte loc.today>
 						<cfset loc.rec.style = "##eee">
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
 					</cfif>
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
-				<cfelseif edStarts gt Now() OR edEnds lt Now()>
+				<cfelseif edStarts gte loc.today OR edEnds lte loc.today>
 					<cfset loc.rec.style = "##eee">
 					<cfset ArrayAppend(loc.result.items,loc.rec)>
 				<cfelse>
@@ -217,7 +219,7 @@
 						<tr bgcolor="#item.style#">
 							<td>#recCount#</td>
 							<td>#item.ediID#</td>
-							<td>#item.prodID#</td>
+							<td><a href="productStock6.cfm?product=#item.prodID#" target="checkDeal">#item.prodID#</a></td>
 							<td>#item.prodRef#</td>
 							<td>#item.edDealType#</td>
 							<td>#item.edQty#</td>
@@ -266,7 +268,7 @@
 							<td>#item.ercID#</td>
 							<td>#item.ercTitle#</td>
 							<td>#item.ediID#</td>
-							<td>#item.prodID#</td>
+							<td><a href="productStock6.cfm?product=#item.prodID#" target="checkDeal">#item.prodID#</a></td>
 							<td>#item.prodRef#</td>
 							<td>#item.edDealType#</td>
 							<td>#item.edQty#</td>

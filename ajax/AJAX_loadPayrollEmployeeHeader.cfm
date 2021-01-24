@@ -33,6 +33,7 @@
 					weekending: "#parm.form.weekending#",
 					employee: "#record.employee.ID#",
 					weekno: "#pr2.GetPayrollWeekNumber(parm.form.weekending)#",
+					method: $('##payMethod').find(":selected").text(),
 					gross: calculateGrossTotal(),
 					paye: nf($('.pr2_gt_paye').val(), "num"),
 					ni: nf($('.pr2_gt_ni').val(), "num"),
@@ -278,6 +279,13 @@
 			});
 		});
 	</script>
+	<cfif StructIsEmpty(record.header)>
+		<cfset payMethod = record.employee.Method>
+	<cfelseif StructKeyExists(record.header,"phMethod")>
+		<cfset payMethod = record.header.phMethod>
+	<cfelse>
+		<cfset payMethod = 'cash'>
+	</cfif>
 	<div class="pr2-table">
 		<table class="tableList" border="1" width="100%">
 			<tr>
@@ -287,10 +295,21 @@
 				<td width="250">#DateFormat(parm.form.weekending, "dd/mm/yyyy")#</td>
 			</tr>
 			<tr>
-				<th align="left" width="200">Tax Code</th>
-				<td width="250">#record.employee.TaxCode#</td>
+				<th align="left" width="200">Pay Method</th>
+				<td width="250">
+					<select name="payMethod" id="payMethod">
+						<option value="cash" <cfif payMethod eq "cash">selected="selected"</cfif>>Cash</option>
+						<option value="bacs" <cfif payMethod eq "bacs">selected="selected"</cfif>>BACS</option>
+					</select>
+				</td>
 				<th align="left" width="200">Week Number</th>
 				<td width="250">#pr2.GetPayrollWeekNumber(parm.form.weekending)#</td>
+			</tr>
+			<tr>
+				<th align="left" width="200">Tax Code</th>
+				<td width="250">#record.employee.TaxCode#</td>
+				<th align="left" width="200">Employer Ref</th>
+				<td width="250">#application.controls.employerRef#</td>
 			</tr>
 		</table>
 		<div style="padding:5px 0;"></div>
@@ -336,27 +355,7 @@
 							</cfif>
 						</cfloop>
 					</tr>
-<!---					<tr class="pr2_depts_hol">
-						<th class="pr2_dept_hol" data-dept="#dept.depID#" data-rate="#payRate#" align="left">
-							#dept.depName# Holiday<strong style="float:right;">#payRate#</strong></th>
-						<cfloop from="1" to="7" index="i">
-							<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
-								<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
-								<td class="pr2_item_hol" width="75" data-day="#DayOfWeekAsString(i)#">
-									<cfif dayItem.piHolHours gt 0>
-										<input type="text" data-item="false" id="#dept.depID#-#i#" class="pr2_item_hol_field" value="#dayItem.piHolHours#">
-									<cfelse>
-										<input type="text" data-item="false" id="#dept.depID#-#i#" class="pr2_item_hol_field" value="">
-									</cfif>
-								</td>
-							<cfelse>
-								<td class="pr2_item_hol" width="75" data-day="#DayOfWeekAsString(i)#">
-									<input type="text" data-item="false" id="#dept.depID#-#i#" class="pr2_item_hol_field" value="">
-								</td>
-							</cfif>
-						</cfloop>
-					</tr>
---->				</cfif>
+				</cfif>
 			</cfloop>
 			<tr>
 				<th align="left">Holiday</th>
@@ -375,20 +374,7 @@
 					</td>
 				</cfloop>
 			</tr>
-<!---			<tr>
-				<th align="left">Holiday Hours</th>
-				<cfloop from="1" to="7" index="i">
-					<cfset holArray = StructFindKey(record.items, "#DayOfWeekAsString(i)#", "all")>
-					<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#">
-						<cfif dayItem.piHolHours gt 0>
-							<input type="text" data-item="true" class="pr2_item_field" value="#dayItem.piHolHours#">
-						<cfelse>
-							<input type="text" data-item="true" class="pr2_item_field" value="">
-						</cfif>
-					</td>
-				</cfloop>
-			</tr>
---->			<tr class="pr2_totals">
+			<tr class="pr2_totals">
 				<th align="left">Total</th>
 				<cfloop from="1" to="7" index="i">
 					<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#">

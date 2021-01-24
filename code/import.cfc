@@ -32,11 +32,16 @@
 							StructInsert(loc.fields,"barcode",loc.image.attr("alt")); // store barcode text
 							loc.headText=ReReplace(loc.head.text(),"\(\d+\)","","all"); // remove counter and brackets
 							loc.headText=Replace(loc.headText,"(Ret.)","","one"); // remove "(Ret.)"
+							if (FindNoCase('RosÃ©',loc.headText,1)) { // odd e on rose word
+								loc.headText=Replace(loc.headText,'RosÃ©',"Rose","all"); // replace it with an e
+							//	WriteOutput(loc.headText);
+							}
+
 							StructInsert(loc.fields,"category",loc.headText); // store header text
 							for (loc.cell in loc.cells)	{ // loop cells
 								loc.count++;
 								loc.fld=loc.cell.text();	// get text in field
-							//	WriteOutput(loc.count & ":" & fld&"<br>");
+								// WriteOutput(loc.count & ":" & loc.fld&"<br>");
 								if (FindNoCase(chr(194),loc.fld,1)) { // odd character
 									loc.fld=Replace(loc.fld,chr(194),"","all"); // remove it
 								}
@@ -84,26 +89,26 @@
 	<cffunction name="determineQtyFld" access="public" returntype="string">
 		<cfargument name="recs" type="array" required="yes">
 		<cfset var loc={}>
-		<cfset loc.result={"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
+		<cfset loc.result={"f08"=0,"f09"=0,"f10"=0,"f11"=0,"f12"=0,"f13"=0}>
 		<cfset loc.value=0>
-		<cfset loc.field=10>
+		<cfset loc.field=8>		
 		<cfif ArrayLen(recs)>
 			<cfloop array="#recs#" index="loc.item">
-				<cfloop from="10" to="13" index="loc.i">
-					<cfset loc.value=StructFind(loc.result,"f#loc.i#")>
-					<cfset StructUpdate(loc.result,"f#loc.i#",loc.value+val(StructFind(loc.item,"fld#loc.i#")))>
+				<cfloop from="8" to="13" index="loc.i">
+					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
+					<cfset StructUpdate(loc.result,"f#NumberFormat(loc.i,"00")#",loc.value+val(StructFind(loc.item,"fld#NumberFormat(loc.i,"00")#")))>
 				</cfloop>
 			</cfloop>
 			<cfset loc.value=0>
-			<cfset loc.field=10>
-			<cfloop from="10" to="13" index="loc.i">
-				<cfif StructFind(loc.result,"f#loc.i#") GT loc.value>
-					<cfset loc.value=StructFind(loc.result,"f#loc.i#")>
+			<cfset loc.field=8>
+			<cfloop from="8" to="13" index="loc.i">
+				<cfif val(StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")) GT loc.value>
+					<cfset loc.value=StructFind(loc.result,"f#NumberFormat(loc.i,"00")#")>
 					<cfset loc.field=loc.i>
 				</cfif>
 			</cfloop>
 		</cfif>
-		<cfreturn "fld#loc.field#">
+		<cfreturn "fld#NumberFormat(loc.field,"00")#">
 	</cffunction>
 
 	<cffunction name="CheckStockOrder" access="public" returntype="struct" hint="checks existence of/or creates stock order header record">
@@ -185,7 +190,7 @@
 			<cfelse>
 				<cfquery name="loc.QAddCategory" datasource="#application.site.datasource1#" result="loc.QAddCategoryResult">
 					INSERT INTO tblProductCats (pCatTitle) 
-					VALUES ('#loc.newCat#')
+					VALUES ('#Trim(loc.newCat)#')
 				</cfquery>
 				<cfset loc.categoryID=loc.QAddCategoryResult.generatedKey>
 				<cfset loc.result.action="#loc.result.action#cat added<br>">
@@ -280,10 +285,11 @@
 					</cfif>
 				</cfif>
 				
-				<!--- barcode record (remove leading zeroes --->
+				<!--- barcode record (remove leading zeroes) --->
 				<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
 					<cfset args.barcode = mid(args.barcode,3,13)>
 				</cfif>
+				<cfset args.barcode = NumberFormat(trim(args.barcode),"0000000000000")>
 				<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
 					SELECT barID
 					FROM tblBarcodes
@@ -295,14 +301,14 @@
 					<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
 						UPDATE tblBarcodes
 						SET barProdID=#loc.productID#,
-							barcode='#trim(args.barcode)#'
+							barcode='#args.barcode#'
 						WHERE barID=#loc.barcodeExists.barID#
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
 				<cfelse>
 					<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
 						INSERT INTO tblBarcodes (barCode,barType,barProdID) 
-						VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.productID#)
+						VALUES ('#args.barcode#','product',#loc.productID#)
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#barcode added<br>">
 				</cfif>
@@ -316,14 +322,13 @@
 					AND siProduct=#loc.productID#
 					LIMIT 1;
 				</cfquery>
-				<cfset loc.qtyItems = args.packQty * loc.result.ordQty>
+				<!---<cfset loc.qtyItems = args.packQty * loc.result.ordQty> REMOVED - this is updated when stock is booked in 18/04/19 --->
 				<cfif loc.stockItemExists.recordcount eq 1>
 					<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
 						UPDATE tblStockItem
 						SET 
 							siPackQty=#args.packQty#,
 							siQtyPacks=#loc.result.ordQty#,
-							siQtyItems=#loc.qtyItems#,
 							siWSP=#loc.result.WSP#,
 							siUnitTrade=#loc.result.unitTrade#,
 							siRRP=#loc.result.RRP#,
@@ -337,9 +342,9 @@
 					<cfset loc.result.action="#loc.result.action#stock item updated<br>">
 				<cfelse>
 					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
-						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
+						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef) 
 						VALUES (#args.stockOrderID#,#loc.productID#,#loc.result.ordQty#,#loc.result.WSP#,#loc.result.unitTrade#,
-							#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#',#loc.qtyItems#)
+							#loc.result.RRP#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.fld04#',#args.packQty#,'#args.fld02#')
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>

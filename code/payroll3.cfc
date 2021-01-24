@@ -33,7 +33,7 @@
 		<cfset loc.currentDate = "">
 		
 		<cfquery name="loc.weeks" datasource="#args.database#">
-			SELECT phDate
+			SELECT phWeekNo,phDate
 			FROM tblPayHeader
 			WHERE phDate BETWEEN '#loc.fromDate#' AND '#loc.toDate#'
 			GROUP BY phDate
@@ -43,7 +43,7 @@
 		<cfloop query="loc.weeks">
 			<cfset arrayAppend(loc.result, {
 				"weekEnding" = "#DateFormat(phDate, 'yyyy-mm-dd')#",
-				"weekNo" = <!--- phWeekNo --->'Redacted',
+				"weekNo" =  phWeekNo,
 				"items" = []
 			})>
 		</cfloop>

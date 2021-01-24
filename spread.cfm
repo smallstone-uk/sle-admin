@@ -62,8 +62,10 @@
 	<cffunction name="ExtractRef" access="public" returntype="numeric">
 		<cfargument name="keyStruct" type="struct" required="yes">
 		<cfargument name="args" type="struct" required="yes">
+
 		<cfset var loc={}>
 		<cfset loc.result=0>
+		<cfset loc.desc = args.description>	<!--- debug --->
 		<cfset loc.re="((?:(?![0-9]{5,}|(\d\d[A-Z]{3}\d\d)|(\d\d-\d\d-\d\d)).)*)">
 		<cfset loc.words=ReFindNoCase(loc.re,args.description,1,true)>
 		<cfif ArrayLen(loc.words.pos) AND loc.words.len[1] GT 0>
@@ -261,7 +263,19 @@
 					</cfif>
 					<cfif loc.inRange AND loc.inFilter>
 						<cfswitch expression="#rec.TYPE#">
-							<cfcase value="FPI|BGC|BP|DEP|COR|SO" delimiters="|">
+							<cfcase value="FPIO" delimiters="|">	<!--- shop online payments --->
+								<cfset rec.description="FPIO #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
+							<cfcase value="FPOW" delimiters="|">	<!--- staff wages --->
+								<cfset rec.description="FPOW #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
+							<cfcase value="FPIW" delimiters="|">	<!--- card paymenr receipts --->
+								<cfset rec.description="FPIW #rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+							</cfcase>
+							<cfcase value="FPI|BGC|BP|DEP|DEPQ|SO" delimiters="|">
 								<cfif Find("CARDNET",rec.description)>	<!--- Card Receipts --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 									<cfset rec.description=ListDeleteAt(rec.description,2," ")>
@@ -284,6 +298,9 @@
 								<cfelse>
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								</cfif>
+							</cfcase>
+							<cfcase value="COR" delimiters="|">
+								<cfset loc.accountRef=ExtractRef(refs.customers,rec)>
 							</cfcase>
 							<cfcase value="FPO|DD|DEB|PAY|DC|CHG" delimiters="|">
 								<cfif Find("LOAN",rec.description)> <!--- bank loan --->
@@ -341,9 +358,9 @@
 		<cfargument name="tran" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset loc.result="checkClientTran">
-		<cfset loc.trnTotalNum=tran.cr-tran.dr>
+		<cfset loc.trnTotalNum=tran.dr-tran.cr>
 		<cfset loc.tranType="pay">
-		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
+		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#" result="loc.QCheckExistsResult">
 			SELECT *
 			FROM tblTrans,tblAccount
 			WHERE trnAccountID=accID
@@ -352,7 +369,9 @@
 			AND trnDate='#tran.date#'
 			AND trnLedger='sales'
 			AND trnType='pay'
-		<!--- 	AND trnDesc='#tran.description#'	added to fix a/c 217 2 payments on same day --->
+			AND trnRef='#tran.type#'
+			AND trnAmnt1 = #loc.trnTotalNum#
+			AND trnDesc LIKE '#tran.description#%'
 		</cfquery>
 		<cfif loc.QCheckExists.recordcount IS 0>
 			<cfset loc.parm.database=application.site.datasource1>
@@ -367,7 +386,7 @@
 			<cfset loc.parm.header.accNomAcct=acct.NomAcct>
 			<cfset loc.parm.header.tranType=loc.tranType>
 			<cfset loc.parm.header.trnType=loc.tranType>
-			<cfset loc.parm.header.trnAmnt1=abs(loc.trnTotalNum)>
+			<cfset loc.parm.header.trnAmnt1=-loc.trnTotalNum>	<!--- invert to save tran --->
 			<cfset loc.parm.header.trnAmnt2=0>
 			<cfset loc.parm.header.trnRef=tran.type>
 			<cfset loc.parm.header.trnMethod="ib">

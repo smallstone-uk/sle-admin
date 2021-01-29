@@ -271,12 +271,12 @@
 				</cfif>
 			
 				<!--- barcode record (remove leading zeroes --->
+				<cfset loc.result.barcode = "">
 				<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
 					<cfset args.barcode = mid(args.barcode,3,13)>
-					<cfset args.barcode = NumberFormat(trim(args.barcode),"0000000000000")>
 				</cfif>
-				<cfset loc.result.barcode = args.barcode>
-				<cfif len(loc.result.barcode)>
+				<cfif len(args.barcode)>
+					<cfset loc.result.barcode = NumberFormat(trim(args.barcode),"0000000000000")>
 					<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
 						SELECT barID
 						FROM tblBarcodes
@@ -325,7 +325,7 @@
 							siRRP=#loc.result.retail#,
 							siOurPrice=#loc.result.ourPrice#,
 							siPOR=#loc.result.POR#,
-							siStatus='#loc.status#',
+						<!---	siStatus='#loc.status#', don't change status, may already be booked in --->
 							siUnitSize='#args.packsize#',
 							siRef='#args.code#'
 						WHERE siID=#loc.stockItemExists.siID#

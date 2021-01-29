@@ -7,6 +7,7 @@
 	<style>
 		.different {color:#553FFF; font-size:16px; font-weight:bold; background-color:#FFCCFF !Important}
 		.ourPrice {color:#553FFF; font-size:16px; font-weight:bold !Important}
+		.noBarcode {color:#FF0000; font-weight:bold}
 	</style>
 </head>
 
@@ -79,6 +80,7 @@
 			<cfset totRetail=0>
 			<cfset totalValue=0>
 			<cfset category="">
+			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
 				<cfset lineCount++>
@@ -94,10 +96,15 @@
 				<tr>
 					<td colspan="16"><cfdump var="#recResult#" label="#rec.description#" expand="no"></td>
 				</tr>
+
 --->
 				<tr>
 					<td align="center">#lineCount#</td>
-					<td>#rec.barcode#</td>	<!---<img src="http://www.booker.co.uk/catalog/barcode.aspx?barcode=#rec.fld01#" width="200px" />--->
+					<td>
+						<cfif len(recResult.barcode)>
+							<a href="https://www.booker.co.uk/products/product-list?keywords=#recResult.barcode#" target="_blank">#recResult.barcode#</a>
+						<cfelse><span class="noBarcode">NO BARCODE</span><cfset noBarcodeCount ++></cfif>
+					</td>
 					<td><a href="productStock6.cfm?product=#recResult.productID#" target="_blank">#rec.code#</a></td>
 					<td>#rec.description#</td>
 					<td>#rec.packsize#</td>
@@ -118,7 +125,8 @@
 				<cfset totProfit = totRetail - totWSP>
 				<cfset totPOR=DecimalFormat((totProfit / totRetail)*100)>
 				<tr>
-					<td class="amountTotal" colspan="12">Totals</td>
+					<td class="amountTotal noBarcode" colspan="2">#noBarcodeCount# without barcodes.</td>
+					<td class="amountTotal" colspan="10">Totals</td>
 					<td class="amountTotal">&pound;#DecimalFormat(totWSP)#</td>
 					<td class="amountTotal">&pound;#DecimalFormat(totRetail)#</td>
 					<td class="amountTotal">&pound;#DecimalFormat(totProfit)#</td>

@@ -260,7 +260,7 @@
 						<cfset loc.result.ourPrice = loc.prodExists.prodMinPrice>
 					</cfif>
 <!---
-					// Don't do this yet - awaiting bug fix from Booker
+					// Don't do this yet - awaiting bug fix from Booker 25/1/21
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#">
 						UPDATE tblProducts
 						SET prodPriceMarked = #int(args.pm)#
@@ -273,28 +273,34 @@
 				<!--- barcode record (remove leading zeroes --->
 				<cfif len(args.barcode) eq 15 AND left(args.barcode,2) eq "00">
 					<cfset args.barcode = mid(args.barcode,3,13)>
+					<cfset args.barcode = NumberFormat(trim(args.barcode),"0000000000000")>
 				</cfif>
-				<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
-					SELECT barID
-					FROM tblBarcodes
-					WHERE barcode='#args.barcode#'
-					LIMIT 1;
-				</cfquery>
-				<!---#Trim(NumberFormat(args.barcode,"_____________"))#--->
-				<cfif loc.barcodeExists.recordcount eq 1>
-					<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
-						UPDATE tblBarcodes
-						SET barProdID=#loc.result.productID#,
-							barcode='#trim(args.barcode)#'
-						WHERE barID=#loc.barcodeExists.barID#
+				<cfset loc.result.barcode = args.barcode>
+				<cfif len(loc.result.barcode)>
+					<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
+						SELECT barID
+						FROM tblBarcodes
+						WHERE barcode = '#loc.result.barcode#'
+						LIMIT 1;
 					</cfquery>
-					<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
+					<!---#Trim(NumberFormat(loc.result.barcode,"_____________"))#--->
+					<cfif loc.barcodeExists.recordcount eq 1>
+						<cfquery name="loc.QUpdateStockBarcode" datasource="#application.site.datasource1#">
+							UPDATE tblBarcodes
+							SET barProdID=#loc.result.productID#,
+								barcode='#loc.result.barcode#'
+							WHERE barID=#loc.barcodeExists.barID#
+						</cfquery>
+						<cfset loc.result.action="#loc.result.action#barcode updated<br>">			
+					<cfelse>
+						<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
+							INSERT INTO tblBarcodes (barCode,barType,barProdID) 
+							VALUES ('#loc.result.barcode#','product',#loc.result.productID#)
+						</cfquery>
+						<cfset loc.result.action="#loc.result.action#barcode added<br>">
+					</cfif>
 				<cfelse>
-					<cfquery name="loc.QAddStockBarcode" datasource="#application.site.datasource1#">
-						INSERT INTO tblBarcodes (barCode,barType,barProdID) 
-						VALUES ('#NumberFormat(trim(args.barcode),"0000000000000")#','product',#loc.result.productID#)
-					</cfquery>
-					<cfset loc.result.action="#loc.result.action#barcode added<br>">
+					<cfset loc.result.action="#loc.result.action#NO BARCODE<br>">				
 				</cfif>
 				
 				<!--- stock item record --->

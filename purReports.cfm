@@ -99,6 +99,7 @@
 											<option value="13"<cfif srchReport eq "13"> selected="selected"</cfif>>Banking Analysis</option>
 											<option value="14"<cfif srchReport eq "14"> selected="selected"</cfif>>Transaction Check</option>
 											<option value="15"<cfif srchReport eq "15"> selected="selected"</cfif>>Allocation Check</option>
+											<option value="16"<cfif srchReport eq "16"> selected="selected"</cfif>>Data Check Reports</option>
 										</select>
 									</td>
 								</tr>
@@ -1765,6 +1766,105 @@
 											</tr>
 										</table>
 									</cfoutput>
+								</cfcase>
+								<cfcase value="16">
+										<table class="tableList" border="1">
+											<tr>
+												<th colspan="4">EPOS Totals</th>
+											</tr>
+											<tr>
+												<th width="150">Title</th>
+												<th width="80">Net</th>
+												<th width="80">VAT</th>
+												<th width="80">Num</th>
+											</tr>
+									<cfset parms.payID = 0>
+									<cfset parms.Type = 'CASHINDW'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+									<cfset parms.Type = 'CARDINDW'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+									<cfset parms.Type = 'CHQINDW'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+									<cfset parms.Type = 'Healthy'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+									<cfset parms.Type = 'VOUCHER'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+									<cfset parms.Type = 'SUPPLIER'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+										<tr>
+											<th colspan="4">Payments on Account</th>
+										</tr>
+									<cfset totNet = 0>
+									<cfset totVAT = 0>
+									<cfset totNum = 0>
+									<cfset parms.Type = 'ACCINDW'>
+									<cfset result = pur.GetEPOSItemTotal(parms)>
+									<cfloop query="#result.QGetEPOSItemTotal#">
+										<cfset totNet += Net>
+										<cfset totVAT += VAT>
+										<cfset totNum += Num>
+										<tr>
+											<td>#eaTitle#</td>
+											<td align="right">#DecimalFormat(Net)#</td>
+											<td align="right">#DecimalFormat(VAT)#</td>
+											<td align="right">#NumberFormat(Num)#</td>
+										</tr>
+									</cfloop>
+										<tr>
+											<th>Total</th>
+											<th align="right">#DecimalFormat(totNet)#</th>
+											<th align="right">#DecimalFormat(totVAT)#</th>
+											<th align="right">#NumberFormat(totNum)#</th>
+										</tr>
+									</table>
 								</cfcase>
 							</cfswitch>
 						</cfif>

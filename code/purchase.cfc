@@ -1166,5 +1166,46 @@
 		</cftry>
 		<cfreturn loc.result>
 	</cffunction>
+
+	<cffunction name="GetEPOSItemTotal" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.result.QGetEPOSItemTotal" datasource="#args.datasource#" result="loc.result.qResult">
+				SELECT eaTitle, SUM(eiNet) AS Net, Sum(eiVAT) AS VAT, Count(*) AS Num
+				FROM tblepos_items
+				INNER JOIN tblepos_header ON ehID = eiParent
+				INNER JOIN tblepos_account ON eaID = eiPayID
+				WHERE 1
+				<cfif len(args.form.srchRange)>
+					<cfif Left(args.form.srchRange,2) eq 'FY'>
+						<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
+						<cfset loc.result.prdFrom = loc.fyDate.start>
+						<cfset loc.result.prdTo = loc.fyDate.end>
+						AND ehTimeStamp <= '#loc.result.prdTo#'		
+						AND ehTimeStamp >= '#loc.result.prdFrom#'
+					</cfif>
+				<cfelseif len(args.form.srchDateFrom)>
+					<cfset loc.result.prdFrom = LSDateFormat(args.form.srchDateFrom,"yyyy-mm-dd")>
+					<cfset loc.result.prdTo = LSDateFormat(args.form.srchDateTo,"yyyy-mm-dd")>
+					AND ehTimeStamp <= '#loc.result.prdTo#'			
+					AND ehTimeStamp >= '#loc.result.prdFrom#'
+				<cfelse>
+					AND 1=2
+				</cfif>
+				<cfif args.payID neq 0>AND eiPayID = #args.payID#</cfif>
+				<cfif StructKeyExists(args,'Type')>AND eiType LIKE '#args.Type#'</cfif>
+				GROUP By eaTitle
+			</cfquery>	
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="CheckChequeAccounts" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>		
 	
 </cfcomponent>

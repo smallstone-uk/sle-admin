@@ -1781,7 +1781,6 @@
 									<cfset parms.payID = 0>
 									<cfset parms.Type = 'CASHINDW'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfdump var="#result#" label="result" expand="false">
 									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>

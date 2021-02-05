@@ -1782,7 +1782,7 @@
 									<cfset parms.Type = 'CASHINDW'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
 									<cfdump var="#result#" label="result" expand="false">
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1792,7 +1792,7 @@
 									</cfloop>
 									<cfset parms.Type = 'CARDINDW'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1802,7 +1802,7 @@
 									</cfloop>
 									<cfset parms.Type = 'CHQINDW'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1812,7 +1812,7 @@
 									</cfloop>
 									<cfset parms.Type = 'Healthy'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1822,7 +1822,7 @@
 									</cfloop>
 									<cfset parms.Type = 'VOUCHER'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1832,7 +1832,7 @@
 									</cfloop>
 									<cfset parms.Type = 'SUPPLIER'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<tr>
 											<td>#eaTitle#</td>
 											<td align="right">#DecimalFormat(Net)#</td>
@@ -1848,7 +1848,7 @@
 									<cfset totNum = 0>
 									<cfset parms.Type = 'ACCINDW'>
 									<cfset result = pur.GetEPOSItemTotal(parms)>
-									<cfloop query="#result.QGetEPOSItemTotal#">
+									<cfloop query="result.QGetEPOSItemTotal">
 										<cfset totNet += Net>
 										<cfset totVAT += VAT>
 										<cfset totNum += Num>

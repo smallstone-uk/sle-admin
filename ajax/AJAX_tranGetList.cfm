@@ -201,7 +201,9 @@
 						<th align="right">VAT/<br />Disc</th>
 						<th align="right">Gross</th>
 						<th align="right">Balance</th>
-						<th class="noPrint">Allocated<br><input type="checkbox" name="selectAllOnList" class="selectAllOnList" style="width:20px; height:20px;"></th>
+						<th class="center">Allocated<br>
+							<span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" style="width:20px; height:20px;"></span>
+						</th>
 					</tr>
 					<cfset balance=trans.bfwd>
 					<cfif balance NEQ 0>
@@ -234,12 +236,14 @@
 							<td id="trnItem_Amount2" class="#amountClass#">#DecimalFormat(val(item.trnAmnt2))#</td>
 							<td id="trnItem_Amount3" class="#amountClass#">#DecimalFormat(val(item.trnAmnt1) + val(item.trnAmnt2))#</td>
 							<td id="trnItem_Balance" class="#amountClass#">#DecimalFormat(totAmnt1 + totAmnt2)#</td>
-							<td id="trnItem_Alloc" align="center" class="noPrint">
-								<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
-									value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
-									<cfif item.trnAllocID gt 0>
-										<a href="purchRemittancePDF.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
-									</cfif>
+							<td id="trnItem_Alloc" align="center">
+								<span class="noPrint">
+									<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
+										value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
+								</span>
+								<cfif item.trnAllocID gt 0>
+									<a href="purchRemittancePDF.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
+								</cfif>
 							</td>
 						</tr>
 					</cfloop>

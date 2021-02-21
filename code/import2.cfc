@@ -346,6 +346,10 @@
 						<cfset loc.result.qty1 = args.qty1 - loc.result.lastQty>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
+					<cfif loc.result.qty1 lt 0>
+						<cfset loc.result.qty1 = 1>
+						<cfset loc.result.classQty = "changed">
+					</cfif>
 				</cfif>
 				
 				<!--- stock item record --->
@@ -378,9 +382,9 @@
 					<cfset loc.result.action="#loc.result.action#stock item updated<br>">
 				<cfelse>
 					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
-						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
+						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef) 
 						VALUES (#header.stockOrderID#,#loc.result.productID#,#loc.result.qty1#,#args.WSP#,#loc.result.netUnitPrice#,
-							#loc.result.retail#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.packsize#',#args.packQty#,'#args.code#',#loc.qtyItems#)
+							#loc.result.retail#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.packsize#',#args.packQty#,'#args.code#')
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>

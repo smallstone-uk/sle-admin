@@ -19,7 +19,7 @@
 				loc.table = loc.doc.select("table").get(0); //select the first table.
 				loc.rows = loc.table.select("tr");
 				loc.result.header={"supplierID"=args.supplierID,"stockOrderID"=args.stockOrderID,"markup"=args.markup,
-					"validTo"=args.validTo,"orderDate"=args.orderDate};	// struct to store data
+					"validTo"=args.validTo,"orderDate"=args.orderDate,"orderRef"=args.orderRef};	// struct to store data
 				loc.result.basket = [];
 				loc.category = "";
 				loc.cell = "";
@@ -58,21 +58,32 @@
 							} else if (loc.j eq 6) { // VAT Rate
 								loc.vat=Replace(loc.cell,"%",""); // remove %
 								StructInsert(loc.record,"vat",loc.vat);	// add VAT to struct
-							} else { // qty ordered
+							} else if (loc.j eq 7) { // ordered Qty-4
+									loc.qty4 = val(loc.cell);
+							} else if (loc.j eq 8) { // ordered Qty-3
+									loc.qty3 = val(loc.cell);
+							} else if (loc.j eq 9) { // ordered Qty-2
+									loc.qty2 = val(loc.cell);
+							} else if (loc.j eq 10) { // ordered Qty-1
+									loc.qty1 = val(loc.cell);
+							} else { // other fields
 								if (val(loc.cell) gt 0) {
-									loc.qty = val(loc.cell);
+									loc.info = val(loc.cell);
 								}
 							}
 						//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
 						}
 						StructInsert(loc.record,"category",loc.category);	// add product category to record
-						StructInsert(loc.record,"qty",loc.qty + int(loc.qty eq 0));	// add order qty found in remaining fields
+						StructInsert(loc.record,"qty1",loc.qty1);	// add qtys found
+						StructInsert(loc.record,"qty2",loc.qty2);
+						StructInsert(loc.record,"qty3",loc.qty3);
+						StructInsert(loc.record,"qty4",loc.qty4);
 						ArrayAppend(loc.result.basket,loc.record);
 						//WriteOutput("<br />");
 					} else {
 						loc.category = ReReplace(loc.cols.text(),"\( \d+ \)","","all");// category title
 						if (len(loc.category)) 
-							loc.category = Replace(loc.category,"Retail","","one"); // remove Retail title
+							loc.category = Replace(loc.category,"Retail","","one"); // remove 'Retail' title
 					}
 				}
 			</cfscript>
@@ -203,7 +214,9 @@
 			<cfset loc.result.ourPrice = loc.grossRetailPrice>
 			<cfset loc.result.netTotalValue = loc.netRetailPrice * args.packQty>
 			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>
+
 			<cfset loc.result.class = "ourPrice">
+			<cfset loc.result.classQty = "">
 			<cfif loc.result.ourPrice neq args.retail><cfset loc.result.class = "different"></cfif>
 
 			<!--- product record --->
@@ -303,6 +316,38 @@
 					<cfset loc.result.action="#loc.result.action#NO BARCODE<br>">				
 				</cfif>
 				
+				<cfset loc.result.days = -1>
+				<cfset loc.result.lastQty = 0>
+				<cfset loc.result.qty1 = args.qty1>
+				<cfif args.qty1 gt 1><cfset loc.result.classQty = "more"></cfif>
+				<cfif args.qty1 gt 1>	<!--- get most recent stock item --->
+					<cfquery name="loc.QProduct" datasource="#application.site.datasource1#">
+						SELECT 	prodID,prodRef,prodTitle,prodLastBought,prodPriceMarked,prodVATRate,prodStatus,
+								siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siOurPrice,siReceived,siBookedIn,siStatus,
+                                soDate,soRef
+						FROM tblProducts
+						LEFT JOIN tblStockItem ON prodID = siProduct
+                        INNER JOIN tblstockorder ON soID = siOrder
+						AND tblStockItem.siID = (
+							SELECT MAX(siID)
+							FROM tblStockItem
+                            INNER JOIN tblstockorder so ON soID = siOrder
+							WHERE prodID = siProduct
+                            AND so.soRef != '#header.orderRef#'
+							AND so.soDate < '#LSDateFormat(header.orderDate,"yyyy-mm-dd")#'
+                        )
+						WHERE prodRef='#args.code#'
+						LIMIT 1;
+					</cfquery>
+					<cfset loc.result.QProduct = loc.QProduct>
+					<cfset loc.result.days = DateDiff("d",loc.QProduct.soDate,header.orderDate)>
+					<cfif loc.result.days lt 8>
+						<cfset loc.result.lastQty = val(loc.QProduct.siQtyPacks)>
+						<cfset loc.result.qty1 = args.qty1 - loc.result.lastQty>
+						<cfset loc.result.classQty = "changed">
+					</cfif>
+				</cfif>
+				
 				<!--- stock item record --->
 				<cfset loc.status=GetToken("open,promo",int(len(header.validTo) GT 0)+1,",")>
 				<cfquery name="loc.stockItemExists" datasource="#application.site.datasource1#">
@@ -312,14 +357,14 @@
 					AND siProduct=#loc.result.productID#
 					LIMIT 1;
 				</cfquery>
-				<cfset loc.qtyItems = args.packQty * args.qty>
+				<!---<cfset loc.qtyItems = args.packQty * args.qty1>--->
 				<cfif loc.stockItemExists.recordcount eq 1>
 					<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
 						UPDATE tblStockItem
 						SET 
 							siPackQty=#args.packQty#,
-							siQtyPacks=#args.qty#,
-							siQtyItems=#loc.qtyItems#,
+							siQtyPacks=#loc.result.qty1#,
+							<!---siQtyItems=#loc.qtyItems#, this is done when booking in --->
 							siWSP=#args.WSP#,
 							siUnitTrade=#loc.result.netUnitPrice#,
 							siRRP=#loc.result.retail#,
@@ -334,7 +379,7 @@
 				<cfelse>
 					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
 						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef,siQtyItems) 
-						VALUES (#header.stockOrderID#,#loc.result.productID#,#args.qty#,#args.WSP#,#loc.result.netUnitPrice#,
+						VALUES (#header.stockOrderID#,#loc.result.productID#,#loc.result.qty1#,#args.WSP#,#loc.result.netUnitPrice#,
 							#loc.result.retail#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.packsize#',#args.packQty#,'#args.code#',#loc.qtyItems#)
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">

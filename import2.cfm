@@ -5,7 +5,9 @@
 	<title>Import Data</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css"/>
 	<style>
+		.more {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D47FAA !Important}
 		.different {color:#553FFF; font-size:16px; font-weight:bold; background-color:#FFCCFF !Important}
+		.changed {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D4FF55 !Important}
 		.ourPrice {color:#553FFF; font-size:16px; font-weight:bold !Important}
 		.noBarcode {color:#FF0000; font-weight:bold}
 	</style>
@@ -46,6 +48,7 @@
 		<cfset parm.stockOrderID=CheckStockOrder.stockOrderID>
 		<cfset parm.validTo=CheckStockOrder.validTo>
 		<cfset parm.orderDate=CheckStockOrder.orderDate>
+		<cfset parm.orderRef=CheckStockOrder.orderRef>
 		<p><a href="bookerProcess.cfm">Select File...</a></p>
 		<h1><a href="#application.site.url_data#stock/#parm.sourcefile#" target="_blank">#parm.sourcefile#</a></h1>
 		<cfsetting requesttimeout="900">
@@ -83,7 +86,10 @@
 			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
-				<cfset lineCount++>
+<!---					<tr>
+						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" label="#rec.description#" expand="false"></td>
+					</tr>
+--->				<cfset lineCount++>
 				<cfset totWSP += rec.wsp>
 				<cfset totRetail += recResult.netTotalValue>
 				<cfif rec.category neq category>
@@ -92,12 +98,6 @@
 					</tr>
 					<cfset category=rec.category>
 				</cfif>
-<!---
-				<tr>
-					<td colspan="16"><cfdump var="#recResult#" label="#rec.description#" expand="no"></td>
-				</tr>
-
---->
 				<tr>
 					<td align="center">#lineCount#</td>
 					<td>
@@ -111,7 +111,7 @@
 					<td align="center">#rec.pm#</td>
 					<td align="center">#rec.packQty#</td>
 					<td align="right">&pound;#rec.retail#</td>
-					<td align="center">#rec.qty#</td>
+					<td align="center" class="#recResult.classQty#">#recResult.qty1#</td>
 					<td align="center">#rec.vat#%</td>
 					<td align="right" class="#recResult.class#">&pound;#recResult.ourPrice#</td>
 					<td align="right">#DecimalFormat(recResult.profit)#<br />#recResult.POR#%</td>

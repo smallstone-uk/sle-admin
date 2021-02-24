@@ -161,6 +161,7 @@
 			<cfset retailGrandTotal = 0>
 			<cfset tradeTotal = 0>
 			<cfset tradeGrandTotal = 0>
+			<cfset POR = 0>
 			<cfloop query="products.productList">
 				<cfif groupID neq pgID>
 					<tr>
@@ -231,8 +232,8 @@
 							<cfif StructKeyExists(pData,mnth)>
 								<cfset pMnth = StructFind(pData,mnth)>
 							</cfif>
-							<span class="sale"><cfif sMnth gt 0>#sMnth#<cfelse>&nbsp;</cfif><br /></span>
-							<span class="purch"><cfif pMnth gt 0>#pMnth#<cfelse>&nbsp;</cfif></span>
+							<span class="sale"><cfif sMnth neq 0>#sMnth#<cfelse>&nbsp;</cfif><br /></span>
+							<span class="purch"><cfif pMnth neq 0>#pMnth#<cfelse>&nbsp;</cfif></span>
 						</td>
 					</cfloop>
 					<td width="50" align="right">
@@ -277,7 +278,7 @@
 				<td align="right"><strong>#DecimalFormat(retailGrandTotal)#</strong></td>
 				<td align="right"><strong>#DecimalFormat(tradeGrandTotal)#</strong></td>
 				<cfset profit = retailGrandTotal - tradeGrandTotal>
-				<cfset POR = (profit / retailGrandTotal) * 100>
+				<cfif retailGrandTotal neq 0><cfset POR = (profit / retailGrandTotal) * 100></cfif>
 				<td align="right"><strong>#DecimalFormat(profit)#</strong></td>
 				<td align="right"><strong>#DecimalFormat(POR)#%</strong></td>
 			</tr>

@@ -75,7 +75,7 @@
 				</cfquery>
 				<cfset loc.GroupTitle = loc.group.pgTitle>
 			</cfif>
-			<cfquery name="loc.productList" datasource="#args.datasource#" result="loc.productListResult">
+			<cfquery name="loc.productList" datasource="#args.datasource#">
 				SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle,prodCountDate,prodStockLevel,prodPriceMarked,prodStatus,prodVATRate, siUnitSize,siOurPrice, siUnitTrade
 				FROM tblProducts
 				LEFT JOIN tblStockItem ON prodID = siProduct
@@ -119,10 +119,9 @@
 					SUM(siQtyItems) AS "total"
 					FROM tblproducts
 					INNER JOIN tblstockitem AS si ON siProduct = prodID
-					INNER JOIN tblStockOrder AS so ON siOrder = soID
 					WHERE prodID = #loc.productID#
 					AND siBookedIn BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
-					AND siStatus = 'closed'
+					AND siStatus IN ('closed','returned')
 					GROUP BY prodID
 				</cfquery>
 				<cfif loc.purchItems.recordCount gt 0>

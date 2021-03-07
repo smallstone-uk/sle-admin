@@ -37,7 +37,7 @@
 							} else if (loc.j eq 1){ // product code
 								StructInsert(loc.record,"code",loc.cell);
 							} else if (loc.j eq 2){ // description
-								loc.pm = Find("PM",loc.cell) gt 0;	// contains price mark e.g. PM159
+								loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("£",loc.cell) gt 0);	// contains price mark e.g. PM159
 								StructInsert(loc.record,"description",loc.cell);
 								StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
 							} else if (loc.j eq 3) { // qty field	e.g 12 x 100g
@@ -221,7 +221,7 @@
 
 			<!--- product record --->
 			<cfquery name="loc.prodExists" datasource="#application.site.datasource1#">
-				SELECT prodID,prodLastBought,prodMinPrice
+				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked
 				FROM tblProducts
 				WHERE prodRef='#args.code#'
 				LIMIT 1;

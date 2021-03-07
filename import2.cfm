@@ -86,10 +86,12 @@
 			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
-<!---					<tr>
+<!---
+					<tr>
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" label="#rec.description#" expand="false"></td>
 					</tr>
---->				<cfset lineCount++>
+--->
+				<cfset lineCount++>
 				<cfset totWSP += rec.wsp>
 				<cfset totRetail += recResult.netTotalValue>
 				<cfif rec.category neq category>

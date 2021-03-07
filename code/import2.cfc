@@ -197,6 +197,21 @@
 			<cfset loc.target = val(loc.category.pgTarget)>
 			<cfif loc.target IS 0><cfset loc.target = 43></cfif>
 			
+			<!--- get existing product if any --->
+			<cfset loc.result.prevPM = false>
+			<cfquery name="loc.prodExists" datasource="#application.site.datasource1#">
+				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked
+				FROM tblProducts
+				WHERE prodRef='#args.code#'
+				LIMIT 1;
+			</cfquery>
+			<cfif loc.prodExists.recordcount gt 0>
+				<cfset loc.result.prevPM = loc.prodExists.prodPriceMarked>
+				<cfif loc.prodExists.prodPriceMarked>
+					<cfset args.pm = true>
+				</cfif>
+			</cfif>
+			
 			<!--- sanitize data --->
 			<cfset args.packQty = Iif(val(args.packQty) eq 0,1,val(args.packQty))>
 
@@ -220,12 +235,6 @@
 			<cfif loc.result.ourPrice neq args.retail><cfset loc.result.class = "different"></cfif>
 
 			<!--- product record --->
-			<cfquery name="loc.prodExists" datasource="#application.site.datasource1#">
-				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked
-				FROM tblProducts
-				WHERE prodRef='#args.code#'
-				LIMIT 1;
-			</cfquery>
 			<cfif NOT loc.doUpdate>
 				<cfdump var="#loc#" label="#args.description#" expand="false">
 			<cfelse>
@@ -272,15 +281,13 @@
 					<cfif loc.prodExists.prodMinPrice gt loc.result.ourPrice>
 						<cfset loc.result.ourPrice = loc.prodExists.prodMinPrice>
 					</cfif>
-<!---
-					// Don't do this yet - awaiting bug fix from Booker 25/1/21
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#">
 						UPDATE tblProducts
-						SET prodPriceMarked = #int(args.pm)#
+						SET prodPriceMarked = #int(args.pm)#,
+							prodOurPrice = #loc.result.ourPrice#
 						WHERE prodID = #loc.result.productID#
 					</cfquery>
-					<cfset loc.result.action = "#loc.result.action#UPDATE SKIPPED<br>">
---->
+					<cfset loc.result.action = "#loc.result.action#Product Updated<br>">
 				</cfif>
 			
 				<!--- barcode record (remove leading zeroes --->

@@ -110,7 +110,7 @@
 					<td><a href="productStock6.cfm?product=#recResult.productID#" target="_blank">#rec.code#</a></td>
 					<td>#rec.description#</td>
 					<td>#rec.packsize#</td>
-					<td align="center">#rec.pm#</td>
+					<td align="center">#rec.pm#<br />#recResult.prevPM#</td>
 					<td align="center">#rec.packQty#</td>
 					<td align="right">&pound;#rec.retail#</td>
 					<td align="center" class="#recResult.classQty#">#recResult.qty1#</td>

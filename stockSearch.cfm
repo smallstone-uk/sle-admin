@@ -617,8 +617,8 @@
 													<th>Product</th>
 													<th>First Sale</th>
 													<th>Last Sale</th>
-													<th>Days</th>
-													<th>Last Sold</th>
+													<th>Day Span</th>
+													<th>Last Sold<br>(days ago)</th>
 													<th>No. Sold</th>
 													<th>Average</th>
 												</tr>

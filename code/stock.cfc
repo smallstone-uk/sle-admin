@@ -571,6 +571,8 @@ ORDER BY prodCatID,prodTitle  ASC
 				AND eiClass = 'sale'
 				<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory)>AND prodCatID IN (#args.form.srchCategory#)</cfif>
 				<cfif StructKeyExists(args.form,"srchGroup") AND len(args.form.srchGroup)>AND pgID IN (#args.form.srchGroup#)</cfif>
+				<!---<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier)>AND prodSuppID IN (#args.form.srchSupplier#)</cfif>--->
+				<cfif StructKeyExists(args.form,"srchProdStatus")>AND prodStatus = '#args.form.srchProdStatus#'</cfif>
 				<cfif len(args.form.srchProdStr)>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
 				group by tblproducts.prodID
 				ORDER BY pcatTitle, prodTitle

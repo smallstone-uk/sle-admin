@@ -538,6 +538,46 @@ ORDER BY prodCatID,prodTitle  ASC
 			</cfquery>
 			<cfset loc.result.QStock = loc.QStock>
 			<cfset loc.result.recCount = loc.QStock.recordcount>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	
+	<cffunction name="SalesPerformance" access="public" returntype="struct" hint="stock sales performance">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QStock" datasource="#args.datasource#" result="loc.result.QStockResult">
+				select prodID,prodRef,prodTitle,prodCatID,pgTitle,pcatTitle,
+					sum(tblepos_items.eiQty) as productsSold,
+					min(DATE(tblepos_header.ehTimeStamp)) as firstSale,
+					max(DATE(tblepos_header.ehTimeStamp)) as lastSale,
+					DATEDIFF(max(tblepos_header.ehTimeStamp),min(tblepos_header.ehTimeStamp)) as days,
+					sum(tblepos_items.eiQty) / DATEDIFF(max(tblepos_header.ehTimeStamp),min(tblepos_header.ehTimeStamp)) as averageSold,
+					DATEDIFF(NOW(),max(tblepos_header.ehTimeStamp)) AS lastSold
+				from tblproducts
+				inner join tblepos_items on tblproducts.prodID = tblepos_items.eiProdID
+				inner join tblepos_header on tblepos_items.eiParent = tblepos_header.ehID
+				inner join tblproductcats ON prodCatID = pcatID
+				inner join tblproductgroups ON pgID = pcatGroup
+				WHERE tblepos_header.ehTimeStamp > '#args.form.srchDateFrom#'
+				AND eiClass = 'sale'
+				<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory)>AND prodCatID IN (#args.form.srchCategory#)</cfif>
+				<cfif StructKeyExists(args.form,"srchGroup") AND len(args.form.srchGroup)>AND pgID IN (#args.form.srchGroup#)</cfif>
+				<cfif len(args.form.srchProdStr)>AND prodTitle LIKE '%#args.form.srchProdStr#%'</cfif>
+				group by tblproducts.prodID
+				ORDER BY pcatTitle, prodTitle
+			</cfquery>
+			<cfset loc.result.QStock = loc.QStock>
+			<cfset loc.result.recCount = loc.QStock.recordcount>
+			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

@@ -25,6 +25,7 @@
 		$(document).ready(function() {
 			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 			$(".srchReport").chosen({width: "200px",disable_search_threshold:10});
+			$(".srchGroup").chosen({width: "300px"});
 			$(".srchCategory").chosen({width: "300px"});
 			$(".srchSupplier").chosen({width: "300px"});
 			$(".srchStatus").chosen({width: "300px"});
@@ -163,11 +164,14 @@
 
 <cfobject component="code/stock" name="stock">
 <cfobject component="code/products" name="prod">
+<cfobject component="code/sales" name="sales">
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset categories=stock.LoadCategories(parm)>
 <cfset supps=prod.LoadSuppiers(parm)>
+<cfset groups = sales.LoadGroups(parm)>
 <cfparam name="srchReport" default="">
+<cfparam name="srchGroup" default="">
 <cfparam name="srchCategory" default="">
 <cfparam name="srchSupplier" default="">
 <cfparam name="srchCatStr" default="">
@@ -203,6 +207,17 @@
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Trade Price List</option>
 											<!---<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>Latest Price List</option>--->
 											<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>Stock Take Report</option>
+											<option value="5"<cfif srchReport eq "5"> selected="selected"</cfif>>Stock Sales Performance</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td><b>Group</b></td>
+									<td>
+										<select name="srchGroup" class="srchGroup" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop query="groups.ProductGroups">
+											<option value="#pgID#"<cfif ListFind(srchGroup,pgID)> selected</cfif>>#pgTitle#</option>
+											</cfloop>
 										</select>
 									</td>
 								</tr>
@@ -213,7 +228,7 @@
 											<cfloop query="categories.QCategories">
 												<option value="#pcatID#"<cfif ListFind(srchCategory,pcatID)> selected="selected"</cfif>>#pcatTitle#</option>
 											</cfloop>
-										</select>									
+										</select>
 									</td>
 								</tr>
 								<tr>
@@ -588,6 +603,42 @@
 											</table>
 										</cfoutput>
 									</cfif>
+								</cfcase>
+								<cfcase value="5">
+									<cfset stocklist=stock.SalesPerformance(parm)>
+									<cfif stocklist.recCount GT 0>
+										<cfset colspan=7>
+										<cfoutput>
+											<p><strong>#stocklist.recCount# products</strong></p>
+											<table width="100%" class="tableList" border="1">
+												<tr>
+													<th>Reference</th>
+													<th>Category</th>
+													<th>Product</th>
+													<th>First Sale</th>
+													<th>Last Sale</th>
+													<th>Days</th>
+													<th>Last Sold</th>
+													<th>No. Sold</th>
+													<th>Average</th>
+												</tr>
+												<cfloop query="stocklist.qstock">
+													<tr>
+														<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodRef#</a></td>
+														<td>#pcattitle#</td>
+														<td>#prodtitle#</td>
+														<td>#DateFormat(firstsale)#</td>
+														<td>#DateFormat(lastsale)#</td>
+														<td align="center">#days#</td>
+														<td align="center">#lastsold#</td>
+														<th align="center">#productssold#</th>
+														<td align="center">#averageSold#</td>
+													</tr>												
+												</cfloop>
+											</table>
+										</cfoutput>
+									</cfif>
+									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
 								</cfcase>
 								<cfdefaultcase>
 									No Report selected.

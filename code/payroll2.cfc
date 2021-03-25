@@ -314,8 +314,8 @@
 						#val(loc.item.rate)#,
 						'#loc.item.weekday#',
 						#val(loc.item.gross)#,
-						#val(loc.item.hours)#,
-						#val(loc.item.hours)#,
+						<cfif !loc.item.holiday>#val(loc.item.hours)#<cfelse>0</cfif>,
+						<cfif loc.item.holiday>#val(loc.item.hours)#<cfelse>0</cfif>,
 						'#loc.item.holiday#'
 					)<cfif loc.counter neq ArrayLen(args.form.items)>,</cfif>
 				</cfloop>

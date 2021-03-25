@@ -164,10 +164,36 @@
 			
 			<cfset ArrayAppend(loc.result, loc.subResult)>
 		</cfloop>
-		
-
 		<cfreturn loc.result>
 	</cffunction>
+	
+	<cffunction name="LoadHolidayReportByDate" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QHoliday" datasource="#args.datasource#" result="loc.QQueryResult">
+				SELECT empID,empFirstName,empLastName, AVG(piRate) AS Rate, YEAR(phDate) AS YYYY, SUM( piHours ) AS Work, 
+					SUM( piHolHours ) AS Holiday, SUM(piHours) * 0.1207 AS Entitlement
+				FROM tblpayitems
+				INNER JOIN tblPayHeader ON piParent = phID
+				INNER JOIN tblEmployee ON phEmployee = empID
+				WHERE phDate BETWEEN '#args.form.from#' AND '#args.form.to#'
+				<cfif len(args.form.employee)>AND empID IN (#args.form.employee#)</cfif>
+				GROUP BY empID, YYYY
+				ORDER BY empLastName,empID, YYYY
+			</cfquery>
+			<cfset loc.result.QHoliday = loc.QHoliday>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
 	<cffunction name="LoadReport" access="public" returntype="array">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

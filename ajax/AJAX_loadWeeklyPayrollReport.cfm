@@ -76,9 +76,11 @@
 								<cfloop from="1" to="7" index="i">
 									<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 										<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
-										<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#">
-											<cfif dayItem.piHours gt 0>
+										<td class="pr2_item" align="center" width="75" data-day="#DayOfWeekAsString(i)#">
+											<cfif dayItem.piHours neq 0>
 												#dayItem.piHours#
+											<cfelseif dayItem.piHolHours neq 0>
+												#dayItem.piHolHours#
 											</cfif>
 										</td>
 									<cfelse>
@@ -228,8 +230,8 @@
 									</tr>
 									<tr>
 										<th align="left">Take Home</th>
-										<td data-role="gross" align="right"><strong>&pound;#DecimalFormat(record.totals.npSum-record.totals.LotterySum)#</strong></td>
-										<td data-role="netpay" align="right"><strong>&pound;#DecimalFormat(record.header.phNP-record.header.phLotterySubs)#</strong></td>
+										<td data-role="gross" align="right"><strong>&pound;#DecimalFormat(val(record.totals.npSum) - val(record.totals.LotterySum))#</strong></td>
+										<td data-role="netpay" align="right"><strong>&pound;#DecimalFormat(val(record.header.phNP) - val(record.header.phLotterySubs))#</strong></td>
 									</tr>
 								</table>
 							</td>
@@ -245,6 +247,6 @@
 </cfoutput>
 
 <cfcatch type="any">
-	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
+	<cfdump var="#cfcatch#" label="Payslips" expand="no">
 </cfcatch>
 </cftry>

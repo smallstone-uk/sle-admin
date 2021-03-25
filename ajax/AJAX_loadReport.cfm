@@ -14,6 +14,8 @@
 	<cfset Report = pr.LoadEmployeeReport(parm)>
 <cfelseif parm.form.sort eq "date_minimal">
 	<cfset Report = pr.LoadMinimalPayrollReportByDate(parm)>
+<cfelseif parm.form.sort eq "holiday">
+	<cfset Report = pr.LoadHolidayReportByDate(parm)>
 <cfelse>
 	<cfset Report = pr.LoadPayrollReportByDate(parm)>
 </cfif>
@@ -274,6 +276,74 @@
 			</table>
 		</cfoutput>
 	</cfsavecontent>
+	
+<cfelseif parm.form.sort eq "holiday">
+	<cfoutput>
+	<table class="tableList" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<th width="200">Name</th>
+			<th width="100" align="right">Year</th>
+			<th width="100" align="right">Work<br />Hours</th>
+			<th width="100" align="right">Holiday<br />Entitlement</th>
+			<th width="100" align="right">Holiday<br />Taken</th>
+			<th width="100" align="right">Remaining</th>
+			<th width="100" align="right">Avg Rate</th>
+			<th width="100" align="right">Value</th>
+		</tr>
+		<cfset employeeID = 0>
+		<cfset t.work = 0>
+		<cfset t.Entitlement = 0>
+		<cfset t.Holiday = 0>
+		<cfset t.Difference = 0>
+		<cfset t.Value = 0>
+		<cfloop query="Report.QHoliday">
+			<cfset diff = (Round(Entitlement * 100) / 100) - Holiday>
+			<cfset value = diff * Rate>
+			<cfif employeeID gt 0 AND empID neq employeeID>
+				<tr>
+					<th colspan="2">Totals</th>
+					<th align="right">#DecimalFormat(t.work)#</th>
+					<th align="right">#DecimalFormat(t.Entitlement)#</th>
+					<th align="right">#DecimalFormat(t.Holiday)#</th>
+					<th align="right">#DecimalFormat(t.Difference)#</th>
+					<th></th>
+					<th align="right">#DecimalFormat(t.Value)#</th>
+				</tr>
+				<cfset t.work = 0>
+				<cfset t.Entitlement = 0>
+				<cfset t.Holiday = 0>
+				<cfset t.Difference = 0>
+				<cfset t.Value = 0>
+			</cfif>
+			<tr>
+				<td>#empfirstname# #emplastname#</td>
+				<td align="right">#YYYY#</td>
+				<td align="right">#DecimalFormat(Work)#</td>
+				<td align="right">#DecimalFormat(Entitlement)#</td>
+				<td align="right">#DecimalFormat(Holiday)#</td>
+				<td align="right">#DecimalFormat(diff)#</td>
+				<td align="right">#DecimalFormat(Rate)#</td>
+				<td align="right">#DecimalFormat(value)#</td>
+			</tr>
+			<cfset employeeID = empID>
+			<cfset t.work += work>
+			<cfset t.Entitlement += Entitlement>
+			<cfset t.Holiday += Holiday>
+			<cfset t.Difference += diff>
+			<cfset t.Value += value>
+		</cfloop>
+		<tr>
+			<th colspan="2">Totals</th>
+			<th align="right">#DecimalFormat(t.work)#</th>
+			<th align="right">#DecimalFormat(t.Entitlement)#</th>
+			<th align="right">#DecimalFormat(t.Holiday)#</th>
+			<th align="right">#DecimalFormat(t.Difference)#</th>
+			<th></th>
+			<th align="right">#DecimalFormat(t.Value)#</th>
+		</tr>
+	</table>
+	</cfoutput>
+
 <cfelseif parm.form.sort eq "postTrans">
 	<cfdump var="#Report#" label="Report" expand="false">
 	<cfoutput>
@@ -310,7 +380,7 @@
 	</cfoutput>
 </cfif>
 
-<cfif parm.form.sort neq "postTrans">
+<cfif parm.form.sort neq "postTrans" AND StructKeyExists(variables,"sReport")>
 	<script>
 		$(document).ready(function(e) {
 			<cfoutput>

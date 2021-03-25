@@ -436,11 +436,11 @@
 					<cfif loc.item.employee.ServicePrd GT 11>
 						<cfset loc.item.totals.annual = val(loc.item.totals.WorkAvg) * 52 * 0.1207>
 						<cfset loc.item.totals.accrued = 0>
-						<cfset loc.item.totals.remain = loc.item.totals.annual - loc.item.totals.HolSum>
+						<cfset loc.item.totals.remain = val(loc.item.totals.annual) - val(loc.item.totals.HolSum)>
 					<cfelse>
 						<cfset loc.item.totals.annual = 0>
 						<cfset loc.item.totals.accrued = val(loc.item.totals.WorkSum) * 0.1207>
-						<cfset loc.item.totals.remain = loc.item.totals.accrued - loc.item.totals.HolSum>
+						<cfset loc.item.totals.remain = val(loc.item.totals.accrued) - val(loc.item.totals.HolSum)>
 					</cfif>
 
 					<cfquery name="loc.items" datasource="#args.datasource#">
@@ -458,10 +458,8 @@
 			<cfelse>
 				<cfset loc.item.items = {}>
 			</cfif>
-
 			<cfset ArrayAppend(loc.result, loc.item)>
 		</cfloop>
-
 		<cfreturn loc.result>
 	</cffunction>
 

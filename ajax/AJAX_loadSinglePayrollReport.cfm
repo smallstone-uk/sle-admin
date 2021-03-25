@@ -9,14 +9,11 @@
 <cfset record = pr2.LoadPayrollRecord(parm)>
 
 <cfoutput>
-	<script>
-		$(document).ready(function(e) {});
-	</script>
 	<style type="text/css">
 		body {margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
 		table[border="0"] {border: none !important;}
 		.tableList {border-spacing: 0px;border-collapse: collapse;border: 1px solid ##BDC9DD;font-size: 11px;border-color:##BDC9DD;}
-		.tableList th {padding:4px 5px;background: ##EFF3F7;border-color: ##BDC9DD;color: ##18315C;}
+		.tableList th {padding:2px 3px;background: ##EFF3F7;border-color: ##BDC9DD;color: ##18315C;}
 		.tableList td {padding:2px 5px;border-color: ##BDC9DD;}
 		.tableList.trhover tr:hover {background: ##EFF3F7;}
 		.tableList.trhover tr.active:hover {background:##0F5E8B;}
@@ -51,7 +48,9 @@
 				<th width="75">#DayOfWeekAsString(i)#</th>
 			</cfloop>
 		</tr>
+		<cfset deptCount = 0>
 		<cfloop array="#record.employee.depts#" index="dept">
+			<cfset deptCount++>
 			<cfif StructKeyExists(record.items, dept.depName)>
 				<cfset deptItems = StructFind(record.items, dept.depName)>
 				<cfif StructCount(deptItems) gt 0>
@@ -71,14 +70,29 @@
 				<cfloop from="1" to="7" index="i">
 					<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 						<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
-						<td class="pr2_item" width="75" align="center" data-day="#DayOfWeekAsString(i)#">
+						<td class="pr2_item" align="center" width="75" data-day="#DayOfWeekAsString(i)#">
 							<cfif dayItem.piHours neq 0>
 								#dayItem.piHours#
+							<cfelseif dayItem.piHolHours neq 0>
+								#dayItem.piHolHours#
 							</cfif>
 						</td>
 					<cfelse>
 						<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#"></td>
 					</cfif>
+				</cfloop>
+				<cfloop from="#deptCount+1#" to="7" index="deptRow">	<!--- pad area to same depth --->
+					<tr class="pr2_depts">
+						<th class="pr2_dept" align="left">&nbsp;</th>
+						<td width="75" align="center"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+						<td class="pr2_item" width="75"></td>
+					</tr>
 				</cfloop>
 			</tr>
 		</cfloop>
@@ -90,29 +104,29 @@
 				<table class="tableList pr2_hour_totals" border="1">
 					<tr>
 						<th width="150">(Week #record.totals.recs#)</th>
-						<th width="80">This Period</th>
 						<th width="80">This Year</th>
+						<th width="80">This Period</th>
 					</tr>
 					<tr>
 						<th align="left">Work Hours</th>
-						<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 						<td data-role="holiday" align="right">#record.totals.workSum#</td>
+						<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 					</tr>
 					<cfif record.employee.empPaySlip IS "detailed">
 					<tr>
 						<th align="left">Holiday Entitlement</th>
-						<td></td>
 						<td data-role="holiday" align="right">#DecimalFormat(record.totals.annual)#</td>
+						<td></td>
 					</tr>				
 					<tr>
 						<th align="left">Holiday Taken</th>
-						<td align="right">#record.header.phHolHours#</td>
 						<td data-role="holiday" align="right">#record.totals.holSum#</td>
+						<td align="right">#record.header.phHolHours#</td>
 					</tr>				
 					<tr>
 						<th align="left">Holiday Remaining</th>
-						<td></td>
 						<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
+						<td></td>
 					</tr>
 					</cfif>		
 				</table>
@@ -207,6 +221,11 @@
 						<th align="left">Net Pay</th>
 						<td data-role="gross" align="right">&pound;#DecimalFormat(record.totals.npSum)#</td>
 						<td data-role="netpay" align="right">&pound;#record.header.phNP#</td>
+					</tr>
+					<tr>
+						<th align="left">Take Home</th>
+						<td data-role="gross" align="right"><strong>&pound;#DecimalFormat(val(record.totals.npSum) - val(record.totals.LotterySum))#</strong></td>
+						<td data-role="netpay" align="right"><strong>&pound;#DecimalFormat(val(record.header.phNP) - val(record.header.phLotterySubs))#</strong></td>
 					</tr>
 				</table>
 			</td>

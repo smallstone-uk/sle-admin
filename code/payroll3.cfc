@@ -180,7 +180,8 @@
 				INNER JOIN tblPayHeader ON piParent = phID
 				INNER JOIN tblEmployee ON phEmployee = empID
 				WHERE phDate BETWEEN '#args.form.from#' AND '#args.form.to#'
-				<cfif len(args.form.employee)>AND empID IN (#args.form.employee#)</cfif>
+				<cfif StructKeyExists(args.form,"employee") AND len(args.form.employee)>AND empID IN (#args.form.employee#)</cfif>
+				AND empRate = 0
 				GROUP BY empID, YYYY
 				ORDER BY empLastName,empID, YYYY
 			</cfquery>

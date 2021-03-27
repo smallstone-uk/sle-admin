@@ -288,7 +288,9 @@
 			<th width="100" align="right">Holiday<br />Taken</th>
 			<th width="100" align="right">Remaining</th>
 			<th width="100" align="right">Avg Rate</th>
-			<th width="100" align="right">Value</th>
+			<th width="100" align="right">Debit</th>
+			<th width="100" align="right">Credit</th>
+			<th width="100" align="right">Balance</th>
 		</tr>
 		<cfset employeeID = 0>
 		<cfset t.work = 0>
@@ -296,6 +298,10 @@
 		<cfset t.Holiday = 0>
 		<cfset t.Difference = 0>
 		<cfset t.Value = 0>
+		<cfset t.credit = 0>
+		<cfset t.debit = 0>
+		<cfset t.totcredit = 0>
+		<cfset t.totdebit = 0>
 		<cfloop query="Report.QHoliday">
 			<cfset diff = (Round(Entitlement * 100) / 100) - Holiday>
 			<cfset value = diff * Rate>
@@ -307,13 +313,17 @@
 					<th align="right">#DecimalFormat(t.Holiday)#</th>
 					<th align="right">#DecimalFormat(t.Difference)#</th>
 					<th></th>
-					<th align="right">#DecimalFormat(t.Value)#</th>
+					<th align="right">#DecimalFormat(t.debit)#</th>
+					<th align="right">#DecimalFormat(t.credit)#</th>
+					<th align="right">#DecimalFormat(t.debit + t.credit)#</th>
 				</tr>
 				<cfset t.work = 0>
 				<cfset t.Entitlement = 0>
 				<cfset t.Holiday = 0>
 				<cfset t.Difference = 0>
 				<cfset t.Value = 0>
+				<cfset t.credit = 0>
+				<cfset t.debit = 0>
 			</cfif>
 			<tr>
 				<td>#empfirstname# #emplastname#</td>
@@ -323,7 +333,8 @@
 				<td align="right">#DecimalFormat(Holiday)#</td>
 				<td align="right">#DecimalFormat(diff)#</td>
 				<td align="right">#DecimalFormat(Rate)#</td>
-				<td align="right">#DecimalFormat(value)#</td>
+				<td align="right"><cfif value gt 0>#DecimalFormat(value)#</cfif></td>
+				<td align="right"><cfif value lt 0>#DecimalFormat(value)#</cfif></td>
 			</tr>
 			<cfset employeeID = empID>
 			<cfset t.work += work>
@@ -331,6 +342,13 @@
 			<cfset t.Holiday += Holiday>
 			<cfset t.Difference += diff>
 			<cfset t.Value += value>
+			<cfif value gt 0>
+				<cfset t.debit += value>
+				<cfset t.totdebit += value>
+			<cfelse>
+				<cfset t.credit += value>
+				<cfset t.totcredit += value>
+			</cfif>
 		</cfloop>
 		<tr>
 			<th colspan="2">Totals</th>
@@ -339,13 +357,25 @@
 			<th align="right">#DecimalFormat(t.Holiday)#</th>
 			<th align="right">#DecimalFormat(t.Difference)#</th>
 			<th></th>
-			<th align="right">#DecimalFormat(t.Value)#</th>
+			<th align="right"><cfif t.value gte 0>#DecimalFormat(t.debit)#</cfif></th>
+			<th align="right"><cfif t.value lt 0>#DecimalFormat(t.credit)#</cfif></th>
+			<th align="right">#DecimalFormat(t.debit + t.credit)#</th>
+		</tr>
+		<tr>
+			<th colspan="2">Grand Total</th>
+			<th align="right"></th>
+			<th align="right"></th>
+			<th align="right"></th>
+			<th align="right"></th>
+			<th></th>
+			<th align="right">#DecimalFormat(t.totdebit)#</th>
+			<th align="right">#DecimalFormat(t.totcredit)#</th>
+			<th align="right">#DecimalFormat(t.totdebit + t.totcredit)#</th>
 		</tr>
 	</table>
 	</cfoutput>
 
 <cfelseif parm.form.sort eq "postTrans">
-	<cfdump var="#Report#" label="Report" expand="false">
 	<cfoutput>
 	<table class="tableList" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>

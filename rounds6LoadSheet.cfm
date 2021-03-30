@@ -282,7 +282,7 @@
 		<div class="summary" style="page-break-before:always;">
 			<table border="1" class="tableList" width="700" style="font-size: 18px;">
 				<tr>
-					<th colspan="8" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
+					<th colspan="9" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
 				</tr>
 				<tr>
 					<th>Publication</th>
@@ -338,6 +338,7 @@
 			</h3>
 		</div>
 		
+	<div>
 		<!--- include shop stock sheet if all rounds printed--->
 		<cfif roundcount eq ArrayLen(roundList.rounds)>
 			<cfinclude template="pubNewsPrices.cfm">
@@ -346,10 +347,12 @@
 			<p>All rounds must be included in the print run for this report to be included.</p>
 		</cfif>
 		<cfset dayNo=DayofWeek(parm.roundDate)-1>
+<!---
 		<cfif dayNo eq 0>
 			<div style="page-break-before:always;"></div>
 			<cfinclude template="rounds5ShopSaveSheet.cfm">
 		</cfif>
+--->
 		</div>
 	</div>
 	</cfoutput>

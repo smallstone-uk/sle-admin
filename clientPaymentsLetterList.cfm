@@ -5,19 +5,19 @@
 <cfset parm={}>
 <cfset parm.clientRef=userID>
 <cfset parm.datasource=application.site.datasource1>
-<cfset client=func.LoadClientByRef(parm)>
+<cfset clientData=func.LoadClientByRef(parm)>
 <cfset letters=func.LoadLetters(parm)>
 <cfset firstDay = CreateDate(Year(Now()),Month(Now()),1)>
 <cfset dateFrom = DateAdd("m",-4,firstDay)>
-<cfparam name="srchDateFrom" default="#DateFormat(dateFrom,'yyyy-mm-dd')#">
+<!---<cfparam name="srchStatementFrom" default="#DateFormat(dateFrom,'yyyy-mm-dd')#">--->
 
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#statement').click(function () {
 			var allTrans=$('#allTrans').prop("checked");
 			var dateFrom=$('#srchDateFrom').val();
-			var client="<cfoutput>#parm.clientRef#</cfoutput>";
-			window.open("checkClient.cfm?client="+client+'&allTrans='+allTrans+'&dateFrom='+dateFrom+'&print=true', '_blank');
+			var clientRef="<cfoutput>#parm.clientRef#</cfoutput>";
+			window.open("checkClient.cfm?clientRef="+clientRef+'&allTrans='+allTrans+'&dateFrom='+dateFrom+'&print=true', '_blank');
 			return false;
 		});
 		$('#letterMenu').click(function(event) {
@@ -55,14 +55,14 @@
 		<div id="letters-inner">
 			<ul>
 				<cfloop array="#letters#" index="i">
-					<li><a href="##" class="openletter" data-id="#i.ID#" data-user="#client.ID#">#i.Title#</a></li>
+					<li><a href="##" class="openletter" data-id="#i.ID#" data-user="#clientData.ID#">#i.Title#</a></li>
 				</cfloop>
 			</ul>
 		</div>
 	</div>
-	<a href="##" id="letterMenu" class="button" style="float: left;padding: 0;width: 80px;height: 30px;text-align: center;line-height: 30px;" data-user="#client.ID#">Letters</a>
-	<a href="##" id="statement" class="button" style="float:left;" data-user="#client.ID#">View Statement</a>
-	&nbsp;Brought Forward from: <input type="text" name="srchDateFrom" id="srchDateFrom" value="" size="15" class="datepicker" /><!---#srchDateFrom#--->
+	<a href="##" id="letterMenu" class="button" style="float: left;padding: 0;width: 80px;height: 30px;text-align: center;line-height: 30px;" data-user="#clientData.ID#">Letters</a>
+	<a href="##" id="statement" class="button" style="float:left;" data-user="#clientData.ID#">View Statement</a>
+	<!---&nbsp;Brought Forward from: <input type="text" name="srchStatementFrom" id="srchStatementFrom" value="" size="15" class="datepicker" />#srchDateFrom#--->
 	<div class="clear"></div>
 </div>
 </cfoutput>

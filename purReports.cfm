@@ -607,7 +607,7 @@
 								</cfcase>
 								<cfcase value="5">
 									<cfset trans=pur.NomTranSummary(parms)>
-									<cfdump var="#trans#" label="trans" expand="no">
+									<!---<cfdump var="#trans#" label="trans" expand="no">--->
 									<table border="1" class="tableList">
 										<tr>
 											<th width="50">Ledger</th>
@@ -617,6 +617,7 @@
 											<th width="150">TITLE</th>
 											<th width="70" align="right">DR</th>
 											<th width="70" align="right">CR</th>
+											<th width="70" align="right">BFWD</th>
 										</tr>
 									<cfset rec.drTotal=0>
 									<cfset rec.crTotal=0>
@@ -644,6 +645,7 @@
 													<td>&nbsp;</td>
 													<td>&nbsp;</td>
 												</cfif>
+												<td>#item.bfwd#</td>
 											</tr>
 										</cfloop>
 									</cfloop>

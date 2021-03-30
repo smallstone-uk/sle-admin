@@ -39,10 +39,10 @@
 			$('#searchMsg').fadeOut();
 			$('#clientResult').fadeIn();
 			var dateFrom = $('#srchDateFrom').val()
-			var client=document.getElementById('clientRef').value;
+			var clientRef=document.getElementById('clientRef').value;
 			var allTrans=document.getElementById('allTrans').checked;
 			$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
-			$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans+'&dateFrom='+dateFrom, function (response, status, xhr) {
+			$('#clientResult').load('checkClient.cfm?clientRef='+clientRef+'&allTrans='+allTrans+'&dateFrom='+dateFrom, function (response, status, xhr) {
 				$('#loadingDiv').html("").fadeOut();
 				if (response.indexOf('Reference') == -1) {
 					var msg=$.trim($("#clientResult").text());
@@ -54,16 +54,16 @@
 					$('#pay').fadeIn();
 				}
 			});
-			$('#cltDetailsLink').attr("href", "clientDetails.cfm?row=0&ref="+client).fadeIn();
+			$('#cltDetailsLink').attr("href", "clientDetails.cfm?row=0&ref="+clientRef).fadeIn();
 			LoadLettersList();
 		}
 		function NextClient(direction) {
 			$('#pay').fadeOut();
 			$('#clientResult').fadeOut();
-			var client=document.getElementById('clientRef').value;
+			var clientRef=document.getElementById('clientRef').value;
 			var allTrans=document.getElementById('allTrans').checked;
 			$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading transactions...").fadeIn();
-			$('#clientResult').load('checkClient.cfm?client='+client+'&allTrans='+allTrans+'&'+direction+'=true', function (response, status, xhr) {
+			$('#clientResult').load('checkClient.cfm?clientRef='+clientRef+'&allTrans='+allTrans+'&'+direction+'=true', function (response, status, xhr) {
 				var key=$('#clientKey').html();
 				document.getElementById('clientRef').value=key;
 				$('#loadingDiv').html("").fadeOut();
@@ -172,8 +172,8 @@
 			}
 		});
 		$('#letter').click(function () {
-			var client=document.getElementById('clientRef').value;
-			window.open("clientLetter.cfm?client="+client, '_blank');
+			var clientRef=document.getElementById('clientRef').value;
+			window.open("clientLetter.cfm?clientRef="+clientRef, '_blank');
 			return false;
 		});
 		$(":submit").click(function () { $("#btnClicked").val(this.name);});
@@ -187,10 +187,10 @@
 						$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Saving...").fadeIn();
 					},
 					success:function(data){
-						var client=$('#clientRef').val();
+						var clientRef=$('#clientRef').val();
 						$('#loadingDiv').html("").fadeOut();
 						$('#payForm')[0].reset();
-						$('#clientRef').val(client);
+						$('#clientRef').val(clientRef);
 						$('#clientRef').focus();
 						$('#payResult').html(data);
 						CheckClient();
@@ -240,15 +240,6 @@
 <cfset parm = {}>
 <cfset parm.database = application.site.datasource1>
 <cfset parm.datasource = application.site.datasource1>
-<!---<cfset fundList = acc.LoadFundList(parm)>--->
-<!---<style type="text/css">
-	#LoadPrint {position:fixed;left:-9999px;}
-	#letters {position: fixed;width: 200px;background: #FFF;z-index: 99;border-radius: 2px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);border: 1px solid #AAA;height: auto;}
-	#letters ul {list-style:none;margin:0;padding:0;}
-	#letters ul li {padding:0;}
-	#letters ul li a {display: block;padding: 5px 0;text-decoration: none;}
-	#letters ul li a:hover {text-decoration: underline;}
-</style>--->
 </head>
 
 <cfoutput>
@@ -271,10 +262,6 @@
 					<form name="payForm" id="payForm" method="post"><!--- onSubmit="return checkForm(this)"--->
 						<div class="form-header">
 							Customer Payments
-							<!---<span style="display:none;">
-								<input type="button" onClick="NextClient('next')" value="Next" />
-								<input type="button" onClick="NextClient('prev')" value="Previous" />
-							</span>--->
 						</div>
 						<input type="hidden" size="10" name="btnClicked" id="btnClicked" />
 						<div class="form-bar">
@@ -284,8 +271,11 @@
 								<tr>
 									<td width="120">Client Reference</td>
 									<td>
-										<input type="text" class="inputfield" name="clientRef" id="clientRef" value="<cfif StructKeyExists(URL,"rec")>#val(url.rec)#</cfif>" size="40" maxlength="20" onBlur="CheckClient()" />
-										<label style="padding:0 0 0 10px;"><input type="checkbox" name="allTrans" id="allTrans" onClick="CheckClient()" />&nbsp;All transactions from: </label><input type="text" name="srchDateFrom" id="srchDateFrom" value="" size="15" class="datepicker" />
+										<input type="text" class="inputfield" name="clientRef" id="clientRef"
+											value="<cfif StructKeyExists(URL,"rec")>#val(url.rec)#</cfif>" size="40" maxlength="20" onBlur="CheckClient()" />
+										<label style="padding:0 0 0 10px;"><input type="checkbox" name="allTrans" id="allTrans" onClick="CheckClient()" />
+											&nbsp;All transactions from: </label>
+											<input type="text" name="srchDateFrom" id="srchDateFrom" value="" size="15" class="datepicker" onChange="CheckClient()" />
 									</td>
 								</tr>
 							</table>
@@ -336,17 +326,12 @@
 													</select><br>
 												</td>
 											</tr>
-											<!---<tr id="selPayAcc">
-												<td align="left">Fund Source</td>
+											<tr>
+												<td align="right">Description</td>
 												<td>
-													<select name="paymentAccounts" tabindex="13" id="selPayAccField">
-														<option value="null">Select payment...</option>
-														<cfloop query="fundList.FundAccts">
-															<option value="#nomID#">#nomTitle#</option>
-														</cfloop>
-													</select>
+													<input type="text" class="inputfield" name="trnDesc" id="trnDesc" value="" size="40" maxlength="80" />
 												</td>
-											</tr>--->
+											</tr>
 										</table>
 									</div>
 									<div class="form-col2">

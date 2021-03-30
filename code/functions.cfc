@@ -4042,6 +4042,12 @@
 		<cfset var skipZeros=StructKeyExists(args.form,"srchSkipZeros")>
 		<cfset var minVal=0>
 		<cftry>	
+			<cfif StructKeyExists(args.form,"srchDateTo") AND ISDate(args.form.srchDateTo)>
+				<cfset result.dateTo = args.form.srchDateTo>
+			<cfelse>
+				<cfset result.dateTo = Now()>
+			</cfif>
+
 			<cfset result.clients=[]>		
 			<cfset result.balances=[]>		
 			<cfquery name="QClients" datasource="#args.datasource#" result="QResult">
@@ -4082,21 +4088,23 @@
 				<cfset item.balance2=0>
 				<cfset item.balance3=0>
 				<cfset item.balance4=0>
-				<cfset item.date1=DateAdd("d",-28,Now())>
+				<cfset item.date1=DateAdd("d",-28,result.dateTo)>
 				<cfquery name="QTrans" datasource="#args.datasource#">
 					SELECT *
 					FROM tblTrans
 					WHERE trnClientRef=#val(item.ref)#
 					<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc=0</cfif>
+					<cfif StructKeyExists(args.form,"srchDateTo")>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 					ORDER BY trnDate
 				</cfquery>
+				<!---<cfdump var="#QTrans#" label="QTrans" expand="false">--->
 				<cfloop query="QTrans">
 					<cfset item.balance0=item.balance0+trnAmnt1>
-					<cfif DateCompare(trnDate,DateAdd("d",-28,Now())) gt 0>
+					<cfif DateCompare(trnDate,DateAdd("d",-28,result.dateTo)) gt 0>
 						<cfset item.balance1=item.balance1+trnAmnt1>
-					<cfelseif DateCompare(trnDate,DateAdd("d",-56,Now())) gt 0>
+					<cfelseif DateCompare(trnDate,DateAdd("d",-56,result.dateTo)) gt 0>
 						<cfset item.balance2=item.balance2+trnAmnt1>
-					<cfelseif DateCompare(trnDate,DateAdd("d",-84,Now())) gt 0>
+					<cfelseif DateCompare(trnDate,DateAdd("d",-84,result.dateTo)) gt 0>
 						<cfset item.balance3=item.balance3+trnAmnt1>
 					<cfelse>
 						<cfset item.balance4=item.balance4+trnAmnt1>
@@ -4128,6 +4136,9 @@
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				</cfif>
+				
+				<!---<cfif currentrow gt 10><cfbreak></cfif>--->
+				
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>
 		<cfcatch type="any">

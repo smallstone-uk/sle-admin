@@ -94,6 +94,10 @@
 											<td><input type="text" name="To" value="#LSDateFormat(endMonth,'yyyy-mm-dd')#" class="datepicker" /></td>
 										</tr>
 										<tr>
+											<td>Options</td>
+											<td><input type="checkbox" name="active" value="1" />Current employees only</td>
+										</tr>
+										<tr>
 											<td>Report type</td>
 											<td>
 												<select name="Sort">

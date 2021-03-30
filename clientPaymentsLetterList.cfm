@@ -62,6 +62,7 @@
 	</div>
 	<a href="##" id="letterMenu" class="button" style="float: left;padding: 0;width: 80px;height: 30px;text-align: center;line-height: 30px;" data-user="#clientData.ID#">Letters</a>
 	<a href="##" id="statement" class="button" style="float:left;" data-user="#clientData.ID#">View Statement</a>
+	<input value="Export" type="button" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">
 	<!---&nbsp;Brought Forward from: <input type="text" name="srchStatementFrom" id="srchStatementFrom" value="" size="15" class="datepicker" />#srchDateFrom#--->
 	<div class="clear"></div>
 </div>

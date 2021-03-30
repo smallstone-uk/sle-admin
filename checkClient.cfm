@@ -1,5 +1,27 @@
 <!--- AJAX call - check client do not show debug data at all --->
+
+<cffunction name="tranType" access="public" returntype="string">
+	<cfargument name="arg" type="string" required="yes">
+	<cfset var result="">
+	<cfswitch expression="#arg#">
+		<cfcase value="inv">
+			<cfset result = "Invoice">
+		</cfcase>
+		<cfcase value="crn">
+			<cfset result = "Credit">
+		</cfcase>
+		<cfcase value="pay">
+			<cfset result = "Payment">
+		</cfcase>
+		<cfcase value="jnl">
+			<cfset result = "Adjustment">
+		</cfcase>
+	</cfswitch>	
+	<cfreturn result>
+</cffunction>
 	
+
+<script src="scripts/html2csv.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#selectAll').click(function(e) {   
@@ -121,12 +143,12 @@
 					<span style="float:right;">Chase Level: <b<cfif QClient.cltChase neq 0> style="color:red;"</cfif>>#QClient.cltChase#</b></span>
 				</div>
 			</cfif>
-			<table class="tableList" border="1">
+			<table id="tranTable" class="tableList" border="1">
 				<tr>
 					<cfif NOT print><th>ID</th></cfif>
-					<th width="50">Reference</th>
+					<th width="40">Reference</th>
 					<th width="150">Description</th>
-					<th width="80">Date</th>
+					<th width="90">Date</th>
 					<th width="60">Type</th>
 					<th width="60">Method</th>
 					<th width="80" align="right">Debits<br />(invoices)</th>
@@ -139,9 +161,11 @@
 				</tr>
 				<cfif bfwd neq 0>
 					<tr>
-						<td colspan="4"></td>
-						<td colspan="3" align="right"><strong>Brought Forward from #DateFormat(dateFrom,'dd-mmm-yyyy')#</strong></td>
+						<cfif NOT print><td>&nbsp;</td></cfif>
+						<td colspan="3" height="30"></td>
+						<td colspan="4" align="right"><strong>Brought Forward from #DateFormat(dateFrom,'dd-mmm-yyyy')#</strong></td>
 						<td align="right"><strong>#bfwd#</strong></td>
+						<td>&nbsp;</td>
 					</tr>
 				</cfif>
 				<cfset balance=bfwd>
@@ -154,33 +178,18 @@
 						<td>#trnRef#</td>
 						<td>#trnDesc#</td>
 						<td>#DateFormat(trnDate,"dd-mmm-yyyy")#</td>
-						<td>
-							<cfswitch expression="#trnType#">
-								<cfcase value="inv">
-									Invoice
-								</cfcase>
-								<cfcase value="crn">
-									Credit
-								</cfcase>
-								<cfcase value="pay">
-									Payment
-								</cfcase>
-								<cfcase value="jnl">
-									Adjustment
-								</cfcase>
-							</cfswitch>
-						</td>
+						<td>#trantype(trnType)#</td>
 						<td class="centre"><cfif trnMethod  eq "sv">VOUCHERS<cfelse>#trnMethod#</cfif></td>
 						<cfif trnAmnt1 gt 0>
 							<cfset totalDebit=totalDebit+trnAmnt1>
-							<td align="right">&pound;#DecimalFormat(trnAmnt1)#</td>
+							<td align="right">#DecimalFormat(trnAmnt1)#</td>
 							<td>&nbsp;</td>
 						<cfelse>
 							<cfset totalCredit=totalCredit+trnAmnt1>
 							<td>&nbsp;</td>
-							<td align="right" style="color:##FF0000">&pound;#DecimalFormat(trnAmnt1)#</td>
+							<td align="right" style="color:##FF0000">#DecimalFormat(trnAmnt1)#</td>
 						</cfif>
-						<td align="right">&pound;#DecimalFormat(balance)#</td>
+						<td align="right">#DecimalFormat(balance)#</td>
 						<cfif print>
 							<td class="centre"><cfif trnAlloc>*</cfif></td>									
 						<cfelse>
@@ -200,7 +209,7 @@
 						</td>
 						<td height="40" colspan="2" class="amountTotal">
 							<cfif balance lt 0>Account in Credit<br />(nothing to pay)<cfelse>Balance Now Due</cfif></td>
-						<td class="amountTotal-box">&pound;#DecimalFormat(balance)#</td>
+						<td class="amountTotal-box">#DecimalFormat(balance)#</td>
 						<td></td>
 					</tr>
 					<tr>

@@ -193,7 +193,7 @@
 						<cfif print>
 							<td class="centre"><cfif trnAlloc>*</cfif></td>									
 						<cfelse>
-							<td class="centre">
+							<td class="centre">#trnAlloc#
 								<input type="hidden" name="amnt#currentrow#" value="#trnAmnt1#" />
 								<input type="checkbox" name="tick#currentrow#" id="tick#currentrow#" class="trans" onClick="checkTotal('payForm');" 
 									value="#trnID#"<cfif trnAlloc> checked="checked"</cfif> />

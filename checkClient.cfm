@@ -183,10 +183,10 @@
 						<cfif trnAmnt1 gt 0>
 							<cfset totalDebit=totalDebit+trnAmnt1>
 							<td align="right">#DecimalFormat(trnAmnt1)#</td>
-							<td>&nbsp;</td>
+							<td></td>
 						<cfelse>
 							<cfset totalCredit=totalCredit+trnAmnt1>
-							<td>&nbsp;</td>
+							<td></td>
 							<td align="right" style="color:##FF0000">#DecimalFormat(trnAmnt1)#</td>
 						</cfif>
 						<td align="right">#DecimalFormat(balance)#</td>

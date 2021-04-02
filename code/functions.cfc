@@ -4094,10 +4094,10 @@
 					FROM tblTrans
 					WHERE trnClientRef=#val(item.ref)#
 					<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc=0</cfif>
-					<cfif StructKeyExists(args.form,"srchDateTo")>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+					<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 					ORDER BY trnDate
 				</cfquery>
-				<!---<cfdump var="#QTrans#" label="QTrans" expand="false">--->
+				
 				<cfloop query="QTrans">
 					<cfset item.balance0=item.balance0+trnAmnt1>
 					<cfif DateCompare(trnDate,DateAdd("d",-28,result.dateTo)) gt 0>

@@ -292,7 +292,7 @@
 				<th align="left" width="200">Employee</th>
 				<td width="250">#record.employee.FirstName# #record.employee.LastName#</td>
 				<th align="left" width="200">Week Ending</th>
-				<td width="250">#DateFormat(parm.form.weekending, "dd/mm/yyyy")#</td>
+				<td width="250">[#record.header.phID#] #DateFormat(parm.form.weekending, "dd/mm/yyyy")#</td>
 			</tr>
 			<tr>
 				<th align="left" width="200">Pay Method</th>
@@ -342,10 +342,12 @@
 							<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 								<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
 								<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#">
-									<cfif dayItem.piHours neq 0>
-										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" value="#dayItem.piHours#">
+									<cfif dayItem.piHours + dayItem.piHolHours neq 0>
+										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" 
+											value="#dayItem.piHours + dayItem.piHolHours#">
 									<cfelse>
-										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" value="">
+										<input type="text" data-item="true" data-holid="#dept.depID#-#i#" data-holvalue="" class="pr2_item_field" 
+											value="">
 									</cfif>
 								</td>
 							<cfelse>

@@ -292,7 +292,7 @@
 				<th align="left" width="200">Employee</th>
 				<td width="250">#record.employee.FirstName# #record.employee.LastName#</td>
 				<th align="left" width="200">Week Ending</th>
-				<td width="250">[#record.header.phID#] #DateFormat(parm.form.weekending, "dd/mm/yyyy")#</td>
+				<td width="250">#DateFormat(parm.form.weekending, "dd/mm/yyyy")#</td>
 			</tr>
 			<tr>
 				<th align="left" width="200">Pay Method</th>

@@ -347,7 +347,9 @@
 						LIMIT 1;
 					</cfquery>
 					<cfset loc.result.QProduct = loc.QProduct>
-					<cfset loc.result.days = DateDiff("d",loc.QProduct.soDate,header.orderDate)>
+					<cfif IsDate(loc.QProduct.soDate)>
+						<cfset loc.result.days = DateDiff("d",loc.QProduct.soDate,header.orderDate)>
+					</cfif>
 					<cfif loc.result.days lt 8>
 						<cfset loc.result.lastQty = val(loc.QProduct.siQtyPacks)>
 						<cfset loc.result.qty1 = args.qty1 - loc.result.lastQty>

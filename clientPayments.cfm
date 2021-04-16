@@ -313,6 +313,8 @@
 														<option disabled>-----------------</option>
 														<option value="coll" title="money collected by drivers">Cash Collected</option>
 														<option value="chq" title="cheque collected or posted">Cheque</option>
+														<option value="chqx" title="cheque returned from bank">Returned Cheque</option>
+														<option disabled>-----------------</option>
 														<option value="phone" title="card payment taken over the phone">Card by Phone</option>
 														<option value="ib" title="direct payment from customer">Internet Banking</option>
 														<option value="acct" title="money held on account in till">Shop Credit Account</option>

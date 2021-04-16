@@ -2695,6 +2695,13 @@
 					<cfset result.tickList=ListAppend(result.tickList,StructFind(args.form,"tick#i#"),",")>
 				</cfif>
 			</cfloop>
+			<cfif args.form.trnMethod eq "chqx">
+				<cfset loc.amnt1 = val(args.form.trnAmnt1)>
+				<cfset loc.amnt2 = val(args.form.trnAmnt2)>
+			<cfelse>
+				<cfset loc.amnt1 = -val(args.form.trnAmnt1)>
+				<cfset loc.amnt2 = -val(args.form.trnAmnt2)>
+			</cfif>
 			<cfset result.preticked=ListLen(result.tickList,",")>
 			<cfif StructKeyExists(args.form,"btnClicked") AND args.form.btnClicked eq "btnSavePayment">
 				<cfquery name="QTrans" datasource="#args.datasource#" result="loc.QResult">
@@ -2718,8 +2725,8 @@
 						<cfif args.form.trnType eq 'pay'>'#args.form.trnMethod#'<cfelse>''</cfif>,
 						'#args.form.trnType#',
 						#int(result.preticked gt 0)#,
-						#-val(args.form.trnAmnt1)#,
-						#-val(args.form.trnAmnt2)#
+						#loc.amnt1#,
+						#loc.amnt2#
 					)
 				</cfquery>
 				

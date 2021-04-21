@@ -139,6 +139,8 @@
 					<cfset itemData = StructFind(rec,key)>
 					<cfif IsNumeric(itemData)>
 						<cfset sqlStr = "#sqlStr##itemData#,">
+					<cfelseif IsDate(itemData)>
+						<cfset sqlStr = "#sqlStr#'#DateFormat(itemData,"yyyy-mm-dd")#',">
 					<cfelse>
 						<cfset sqlStr = "#sqlStr#'#itemData#',">
 					</cfif>

@@ -82,7 +82,7 @@
 			</cfif>
 			<tr class="#rowStyle#">
 				<td align="right">#diID#</td>
-				<td align="right">#diDate#</td>
+				<td align="right">#DateFormat(diDate,'ddd dd-mmm-yy')#</td>
 				<td align="right">#diOrderID#</td>
 				<td>#diClientID##diOrderID##diPubID#</td>
 				<td>#cltName#</td>

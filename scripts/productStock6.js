@@ -553,6 +553,19 @@ function PrintLabels(form,result) {
 	});
 }
 
+function ExportList(form,result) {
+	$.ajax({
+		type: 'POST',
+		url: 'exportStockList.cfm',
+		data: $(form).serialize(),
+		success:function(data){
+			$(result).html(data).fadeIn(function() {
+			//	window.print();
+			});
+		}
+	});
+}
+
 function MarkStockItems(form,result) {
 	$.ajax({
 		type: 'POST',

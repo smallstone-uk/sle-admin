@@ -54,6 +54,7 @@
 	#bcode {padding:6px; font-size:18px; color:#999999; border:solid 1px #cccccc; float:left;}
 	.was {text-decoration:line-through; color:#ff0000}
 	.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
+	.tiny {font-size:9px}
 </style>
 </head>
 
@@ -97,6 +98,10 @@
 									$('##wrapper').addClass("noPrint");
 									$('##print-area').removeClass("noPrint");
 									PrintLabels("##listForm","##LoadPrint");
+									event.preventDefault();
+								});
+								$('##btnExportList').click(function(event) {
+									ExportList("##listForm","##LoadPrint");
 									event.preventDefault();
 								});
 								$('##btnSaveList').click(function(event) {
@@ -178,6 +183,7 @@
 							<a href="##" id="btnPrintList" class="button">Print List</a>
 							<a href="##" id="btnPrintLabels" class="button">Print Labels</a>
 							<a href="##" id="btnSaveList" class="button">Update List</a>
+							<a href="##" id="btnExportList" class="button">Export List</a>
 						</div>
 						<div class="module">
 							<form method="post" id="listForm">
@@ -186,29 +192,39 @@
 										<th class="noprint" width="10">
 											<input type="checkbox" name="selectAllOnList" class="selectAllOnList" checked="checked" style="width:20px; height:20px;"></th>
 										<th>ID</th>
+										<th>Barcode</th>
 										<th width="250">Description</th>
 										<th width="100">Unit Size</th>
 										<th>RRP</th>
 										<th>Our Price</th>
 										<th class="noprint">Pack Qty</th>
+										<th class="noprint">WSP</th>
 										<th class="noprint">Last Purchased/<br>Ordered</th>
 									</tr>
+									<cfset wspTotal = 0>
 									<cfloop query="stocklist.stockItems">
+										<cfset wspTotal += siWSP>
 										<cfif siRRP neq siOurPrice><cfset rrpStyle = "was"><cfelse><cfset rrpStyle = ""></cfif>
 										<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
 											<td class="noprint">
-												<input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" value="#prodID#" checked="checked"></td>
+												<input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" 
+													value="#prodID#" checked="checked"></td>
 											<td><a href="ProductStock6.cfm?product=#prodID#" target="stockItem">#prodID#</a></td>
-											<!---<td><a href="stockItems.cfm?ref=#prodID#" target="stockItem">#prodRef#</a></td>--->
+											<td>#barcode#</td>
 											<td class="sod_title" data-id="#prodID#">#prodTitle#</td>
 											<td>#siUnitSize#</td>
 											<td class="#rrpStyle#">#siRRP#</td>
-											<td class="ourPrice">&pound;#siOurPrice# #GetToken(" ,PM",prodPriceMarked+1,",")#</td>
+											<td class="ourPrice">&pound;#siOurPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 											<td class="noprint">#siPackQty#</td>
+											<td class="noprint" align="right">#siWSP#</td>
 											<td class="noprint">#LSDateFormat(siBookedIn,"ddd dd-mmm yy")#</td>
-											<!---<td class="noprint">#LSDateFormat(prodValidTo,"ddd dd-mmm")#</td>--->
 										</tr>
 									</cfloop>
+									<tr>
+										<th colspan="8">Totals</th>
+										<th align="right">#DecimalFormat(wspTotal)#</th>
+										<th></th>
+									</tr>
 								</table>
 							</form>
 						</div>

@@ -318,13 +318,14 @@
 		<cfset loc.result = {}>
 		
 		<cfquery name="loc.stockItems" datasource="#args.datasource#" result="loc.stockResult">
-			SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
+			SELECT 	pcatTitle,prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
 					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,
 					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
 					barcode,soDate
 			FROM tblProducts
 			LEFT JOIN tblStockItem ON prodID = siProduct
 			INNER JOIN tblStockOrder ON soID = siOrder
+			INNER JOIN tblProductCats ON prodCatID = pcatID
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )
 				FROM tblStockItem
@@ -336,7 +337,7 @@
 				FROM tblBarcodes
 				WHERE prodID = barProdID )
 			WHERE prodID IN (#args.stockList#)
-			ORDER BY prodCatID, prodTitle
+			ORDER BY pcatTitle, prodTitle
 		</cfquery>		
 		<cfset loc.result.recordcount = loc.stockItems.recordcount>
 		<cfset loc.result.stockItems = loc.stockItems>

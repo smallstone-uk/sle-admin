@@ -193,6 +193,7 @@
 											<input type="checkbox" name="selectAllOnList" class="selectAllOnList" checked="checked" style="width:20px; height:20px;"></th>
 										<th>ID</th>
 										<th>Barcode</th>
+										<th width="200">Category</th>
 										<th width="250">Description</th>
 										<th width="100">Unit Size</th>
 										<th>RRP</th>
@@ -211,17 +212,18 @@
 													value="#prodID#" checked="checked"></td>
 											<td><a href="ProductStock6.cfm?product=#prodID#" target="stockItem">#prodID#</a></td>
 											<td>#barcode#</td>
+											<td>#pcatTitle#</td>
 											<td class="sod_title" data-id="#prodID#">#prodTitle#</td>
 											<td>#siUnitSize#</td>
 											<td class="#rrpStyle#">#siRRP#</td>
 											<td class="ourPrice">&pound;#siOurPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
-											<td class="noprint">#siPackQty#</td>
+											<td class="noprint" align="center">#siPackQty#</td>
 											<td class="noprint" align="right">#siWSP#</td>
 											<td class="noprint">#LSDateFormat(siBookedIn,"ddd dd-mmm yy")#</td>
 										</tr>
 									</cfloop>
 									<tr>
-										<th colspan="8">Totals</th>
+										<th colspan="9">Totals</th>
 										<th align="right">#DecimalFormat(wspTotal)#</th>
 										<th></th>
 									</tr>

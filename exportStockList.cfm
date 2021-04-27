@@ -24,49 +24,66 @@
 <cfset parm.stocklist = getStockListFromDB.ctlStockList>
 
 <cfquery name="QBarcodes" datasource="#parm.datasource#">
-			SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
-					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,prodReorder,
-					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
-					barcode,soDate
-			FROM tblProducts
-			LEFT JOIN tblStockItem ON prodID = siProduct
-			INNER JOIN tblStockOrder ON soID = siOrder
-			AND tblStockItem.siID = (
-				SELECT MAX( siID )
-				FROM tblStockItem
-				WHERE prodID = siProduct
-				AND siStatus NOT IN ("returned","inactive")  )
-			LEFT JOIN tblBarcodes ON prodID = barProdID
-			AND tblBarcodes.barID = (
-				SELECT MAX(barID)
-				FROM tblBarcodes
-				WHERE prodID = barProdID )
-			WHERE prodID IN (#parm.stockList#)
-			ORDER BY prodCatID, prodTitle
+	SELECT 	pcatTitle,prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
+			prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,prodReorder,
+			siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+			barcode,soDate
+	FROM tblProducts
+	LEFT JOIN tblStockItem ON prodID = siProduct
+	INNER JOIN tblStockOrder ON soID = siOrder
+	INNER JOIN tblProductCats ON pcatID = prodCatID
+	AND tblStockItem.siID = (
+		SELECT MAX( siID )
+		FROM tblStockItem
+		WHERE prodID = siProduct
+		AND siStatus NOT IN ("returned","inactive")  )
+	LEFT JOIN tblBarcodes ON prodID = barProdID
+	AND tblBarcodes.barID = (
+		SELECT MAX(barID)
+		FROM tblBarcodes
+		WHERE prodID = barProdID )
+	WHERE prodID IN (#parm.stockList#)
+	ORDER BY pcatTitle, prodTitle
 </cfquery>
-<cfif FileExists(parm.outFile)>
-	<cffile action="delete" file="#parm.outFile#">
-</cfif>
+
+<cftry>
+	<cfif FileExists(parm.outFile)>
+		<cffile action="delete" file="#parm.outFile#">
+	</cfif>
+	<cffile action="append" file="#parm.outFile#" addnewline="yes"
+		output="Barcode,Reference,Category,Product,UnitSize,WSP,RRP,PackQty,Cases">
+<cfcatch type="any">
+	<cfoutput><h1>File: #parm.outFile# is currently in use. Please close it first</h1></cfoutput>
+	<cfabort>
+</cfcatch>
+</cftry>
+
 <cfif QBarcodes.recordcount gt 0>
 	<cfoutput>
-		<table width="700" class="tableList" border="1">
+		<table width="900" class="tableList" border="1">
 			<tr>
 				<th>Barcode</th>
 				<th>Product Ref</th>
+				<th>Category</th>
 				<th>Product Title</th>
 				<th>Size</th>
+				<th>RRP</th>
+				<th>WSP</th>
 				<th>Qty</th>
 				<th>Cases</th>
 			</tr>
 		<cfloop query="QBarcodes">
 			<cffile action="append" file="#parm.outFile#" addnewline="yes"
-				output="'#barcode#','#prodRef#','#prodTitle#','#siUnitSize#',#siWSP#,#siRRP#,#siQtyItems#,#siQtyPacks#">
+				output="'#barcode#','#prodRef#','#pcatTitle#','#prodTitle#','#siUnitSize#',#siWSP#,#siRRP#,#siPackQty#,#siQtyPacks#">
 			<tr>
 				<td>#barcode#</td>
 				<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodRef#</a></td>
+				<td>#pcatTitle#</td>
 				<td>#prodTitle#</td>
 				<td>#siUnitSize#</td>
-				<td align="center">#siQtyItems#</td>
+				<td>#siRRP#</td>
+				<td>#siWSP#</td>
+				<td align="center">#siPackQty#</td>
 				<td align="center">#siQtyPacks#</td>
 			</tr>
 		</cfloop>

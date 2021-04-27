@@ -53,7 +53,7 @@
 	<cffile action="append" file="#parm.outFile#" addnewline="yes"
 		output="Barcode,Reference,Category,Product,UnitSize,WSP,RRP,PackQty,Cases">
 <cfcatch type="any">
-	<cfoutput><h1>File: #parm.outFile# is currently in use. Please close it first</h1></cfoutput>
+	<cfoutput><h1>File: #parm.outFile# is currently in use. Please close it first.</h1></cfoutput>
 	<cfabort>
 </cfcatch>
 </cftry>

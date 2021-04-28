@@ -23,7 +23,7 @@
 </cfquery>
 <cfset parm.stocklist = getStockListFromDB.ctlStockList>
 
-<cfquery name="QBarcodes" datasource="#parm.datasource#">
+<cfquery name="QProdStock" datasource="#parm.datasource#">
 	SELECT 	pcatTitle,prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
 			prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,prodReorder,
 			siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
@@ -51,14 +51,14 @@
 		<cffile action="delete" file="#parm.outFile#">
 	</cfif>
 	<cffile action="append" file="#parm.outFile#" addnewline="yes"
-		output="Barcode,Reference,Category,Product,UnitSize,WSP,RRP,PackQty,Cases">
+		output="ID,Barcode,Reference,Category,Product,UnitSize,WSP,RRP,PackQty,Cases">
 <cfcatch type="any">
 	<cfoutput><h1>File: #parm.outFile# is currently in use. Please close it first.</h1></cfoutput>
 	<cfabort>
 </cfcatch>
 </cftry>
 
-<cfif QBarcodes.recordcount gt 0>
+<cfif QProdStock.recordcount gt 0>
 	<cfoutput>
 		<table width="900" class="tableList" border="1">
 			<tr>
@@ -72,10 +72,11 @@
 				<th>Qty</th>
 				<th>Cases</th>
 			</tr>
-		<cfloop query="QBarcodes">
+		<cfloop query="QProdStock">
 			<cffile action="append" file="#parm.outFile#" addnewline="yes"
-				output="'#barcode#','#prodRef#','#pcatTitle#','#prodTitle#','#siUnitSize#',#siWSP#,#siRRP#,#siPackQty#,#siQtyPacks#">
+				output="'#prodID#,#barcode#','#prodRef#','#pcatTitle#','#prodTitle#','#siUnitSize#',#siWSP#,#siRRP#,#siPackQty#,#siQtyPacks#">
 			<tr>
+				<td>#prodID#</td>
 				<td>#barcode#</td>
 				<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodRef#</a></td>
 				<td>#pcatTitle#</td>

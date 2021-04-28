@@ -104,6 +104,10 @@
 									ExportList("##listForm","##LoadPrint");
 									event.preventDefault();
 								});
+								$('##btnImportOrder').click(function(event) {
+									ImportOrder("##listForm","##LoadPrint");
+									event.preventDefault();
+								});
 								$('##btnSaveList').click(function(event) {
 									var list = [];
 									$('.selectitem').each(function(i, e) {
@@ -184,6 +188,7 @@
 							<a href="##" id="btnPrintLabels" class="button">Print Labels</a>
 							<a href="##" id="btnSaveList" class="button">Update List</a>
 							<a href="##" id="btnExportList" class="button">Export List</a>
+							<a href="##" id="btnImportOrder" class="button">Import Order</a>
 						</div>
 						<div class="module">
 							<form method="post" id="listForm">
@@ -235,6 +240,7 @@
 			</div>
 		</div>
 	</div>
+	<div style="clear:both"></div>
 	<div id="print-area"><div id="LoadPrint"></div></div>
 </body>
 </html>

@@ -142,19 +142,19 @@
 					) VALUES (
 						#args.supplierID#,
 						'#loc.orderRef#',
-						#loc.orderDate#,
+						'#loc.orderDate#',
 						<cfif len(loc.validTo)>#loc.validTo#,</cfif>
-						#Now()#
+						'#DateFormat(Now(),'yyyy-mm-dd')#'
 					)
 				</cfquery>
 				<cfset loc.stockOrderID = loc.QStockOrderResult.generatedKey>
 			</cfif>
-			<cfreturn loc>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
+		<cfreturn loc>
 	</cffunction>
 
 	<cffunction name="UpdateRecord" access="public" returntype="struct" hint="Inserts category, product, barcode and stock item if not found">

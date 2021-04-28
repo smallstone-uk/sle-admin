@@ -566,6 +566,17 @@ function ExportList(form,result) {
 	});
 }
 
+function ImportOrder(form,result) {
+	$.ajax({
+		type: 'POST',
+		url: 'stockImportManual.cfm',
+		data: $(form).serialize(),
+		success:function(data){
+			$(result).html(data);
+		}
+	});
+}
+
 function MarkStockItems(form,result) {
 	$.ajax({
 		type: 'POST',

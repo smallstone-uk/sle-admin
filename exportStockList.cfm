@@ -6,6 +6,7 @@
 	<title>Export StockList</title>
 </head>
 
+<body>
 <cfset parm = {}>
 <cfset parm.outFile = "#application.site.dir_data#stock\stocklist.txt">
 <cfset parm.datasource = application.site.datasource1>
@@ -93,6 +94,5 @@
 <cfelse>
 	No records found to export.
 </cfif>
-<body>
 </body>
 </html>

@@ -103,6 +103,7 @@
 		<cfset loc.validTo = "">
 
 		<cftry>
+			<cfset loc.scandate = DateFormat(Now(),'yyyy-mm-dd')>
 			<cfset loc.orderDate = args.orderDate>
 			<cfif !IsDate(args.orderDate)>
 				<cfset loc.orderDate = createdate(mid(args.orderDate,1,2),mid(args.orderDate,3,2),mid(args.orderDate,5,2))>
@@ -124,7 +125,6 @@
 
 			<cfif loc.QStockOrder.recordcount eq 1>
 				<cfset loc.stockOrderID = loc.QStockOrder.soID>
-				<cfset loc.scandate = DateFormat(Now(),'yyyy-mm-dd')>
 				<cfquery name="loc.QStockOrder" datasource="#application.site.datasource1#">
 					UPDATE tblstockOrder
 					SET soScanned = #Now()#,
@@ -143,8 +143,8 @@
 					) VALUES (
 						#args.supplierID#,
 						'#loc.orderRef#',
-						'#loc.orderDate#',
-						<cfif len(loc.validTo)>#loc.validTo#,</cfif>
+						'#DateFormat(loc.orderDate,'yyyy-mm-dd')#',
+						<cfif len(loc.validTo)>'#loc.validTo#',</cfif>
 						'#loc.scandate#'
 					)
 				</cfquery>

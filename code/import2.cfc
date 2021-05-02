@@ -124,6 +124,7 @@
 
 			<cfif loc.QStockOrder.recordcount eq 1>
 				<cfset loc.stockOrderID = loc.QStockOrder.soID>
+				<cfset loc.scandate = DateFormat(Now(),'yyyy-mm-dd')>
 				<cfquery name="loc.QStockOrder" datasource="#application.site.datasource1#">
 					UPDATE tblstockOrder
 					SET soScanned = #Now()#,
@@ -144,7 +145,7 @@
 						'#loc.orderRef#',
 						'#loc.orderDate#',
 						<cfif len(loc.validTo)>#loc.validTo#,</cfif>
-						'#DateFormat(Now(),'yyyy-mm-dd')#'
+						'#loc.scandate#'
 					)
 				</cfquery>
 				<cfset loc.stockOrderID = loc.QStockOrderResult.generatedKey>

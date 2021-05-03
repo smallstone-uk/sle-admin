@@ -130,6 +130,7 @@
 				<cfset rec.diDateStamp = DateFormat(Now(),'yyyy-mm-dd')>
 				<cfset rec.diCharge = -rec.diCharge>
 				<cfset rec.diReason = "Duplicated 07-Mar">
+				<cfset rec.diInvoiceID = 0>
 				<cfset rec.diID = 0>
 				<cfset sqlStr = "INSERT INTO tbldelitems (">
 				<cfloop list="#QSrcRecResult.columnlist#" index="key"><cfset sqlStr = "#sqlStr##key#,"></cfloop>

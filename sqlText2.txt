@@ -289,6 +289,22 @@ AND trnDesc LIKE '%SLE STORE%'
 group by niNomID
 
 
+// Shop wages paid for the year by any method
+SELECT CONCAT(empFirstName, ' ', empLastName) AS NAME,
+SUM(phGross) AS Gross,
+SUM(phPAYE) AS PAYE,
+SUM(phNI) AS NI,
+SUM(phNP) AS NP,
+SUM(phTotalHours) AS TotalHours,
+SUM(phWorkHours) AS WorkHours,
+SUM(phHolHours) AS HolHours
+FROM `tblpayheader`
+INNER JOIN tblEmployee ON empID=phEmployee
+WHERE phDate BETWEEN '2019-02-01' AND '2020-01-31'
+GROUP BY empID
+ORDER BY empFirstName
+
+
 // bunnery hours by day
 SELECT piday, sum( piHours ) AS hours
 FROM `tblpayitems`
@@ -334,3 +350,24 @@ SELECT empFirstName,empLastName,empDOB,empStart, CONCAT(LPAD(DAY(empDOB),2,'0'),
 FROM `tblemployee` 
 WHERE `empStatus` = 'active' 
 ORDER BY empFirstName ASC
+
+// list mismatched prices between till and website
+SELECT siID, siProduct, siOurPrice, prodID, prodtitle, prodOurPrice
+FROM tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+WHERE prodOurPrice != siOurPrice
+
+
+// sync prices between till and website
+UPDATE tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+SET prodOurPrice = siOurPrice
+WHERE prodOurPrice != siOurPrice

@@ -126,7 +126,6 @@
 					<cfset charge.Charge=QCharges.diCharge>
 					<cfset charge.Voucher=QCharges.diVoucher>
 					<cfset charge.Test=QCharges.diTest>
-										
 					<cfif charge.type is "debit">
 						<cfset item.debittotal=item.debittotal+(charge.Price*charge.Qty)>
 						<cfset item.debitchargetotal=item.debitchargetotal+charge.Charge>
@@ -336,8 +335,8 @@
 				<cfset charge.Type=QCharges.diType>
 				<cfset charge.Date=LSDateFormat(QCharges.diDate,"DD/MM/YYYY")>
 				<cfset charge.Qty=QCharges.diQty>
-				<cfset charge.Price=Abs(QCharges.diPrice)>
-				<cfset charge.Charge=Abs(QCharges.diCharge)>
+				<cfset charge.Price=QCharges.diPrice>
+				<cfset charge.Charge=QCharges.diCharge>
 				<cfset charge.Voucher=val(QCharges.diVoucher)>
 				<cfset charge.Test=QCharges.diTest>
 				<cfset charge.Reason=QCharges.diReason>
@@ -452,7 +451,7 @@
 							<cfset StructInsert(result.creditGroup,pubID,set)>
 						</cfif>
 						<cfset result.credittotal=result.credittotal+(charge.Price*charge.Qty)>
-						<cfif QDebit.recordcount is QCredit.recordcount>
+						<cfif QDebit.recordcount is QCredit.recordcount OR Find("Duplicated",QCredit.diReason,1)>
 							<cfset result.creditchargetotal=result.creditchargetotal+charge.Charge>
 						</cfif>
 						
@@ -525,7 +524,7 @@
 						
 			<cfset result.NetDisc=-result.TotalNet*result.Discount>			<!--- discount amount calculated on products only (not delivery) --->
 			<cfset result.TotalNet=result.TotalNet+result.NetDisc>			<!--- net total after discount --->
-			<cfset result.delChargeTotal=result.debitchargetotal-result.creditchargetotal>	<!--- total delivery charges --->
+			<cfset result.delChargeTotal=result.debitchargetotal+result.creditchargetotal>	<!--- total delivery charges --->
 			<cfset result.TotalNet=result.TotalNet+result.delChargeTotal>	<!--- discounted total plus delivery charges --->
 			<cfset result.total=result.TotalNet+result.TotalVAT>			<!--- invoice gross total --->
 			<cfset result.grandtotal=result.total-result.vouchertotal>

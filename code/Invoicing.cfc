@@ -138,7 +138,6 @@
 				</cfloop>
 				
 				<cfset item.grandtotal=item.debittotal+item.credittotal+item.debitchargetotal+item.creditchargetotal>
-				
 				<cfif item.grandtotal neq 0 AND ArrayLen(item.debit) OR ArrayLen(item.credit)>
 					<cfif item.InvDeliver neq "none">
 						<cfif item.InvDeliver is "deliver">

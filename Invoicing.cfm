@@ -179,12 +179,10 @@
 						<div style="float:right">
 							<table width="400">
 								<tr><td><strong>Notes</strong></td></tr>
-								<tr><td>Claim Vouchers for 1144 Duchy IFA before invoicing.</td></tr>
-								<tr><td>EMail copy of invoice to Crea Brooks.</td></tr>
 								<tr><td>NOTE: Transactions posted on the invoicing date will not be included in statements</td></tr>
 							</table>
 						</div>
-					<div class="clear"></div>
+						<div class="clear"></div>
 					</div>
 					<div class="clear"></div>
 					<div id="InvoiceList"></div>

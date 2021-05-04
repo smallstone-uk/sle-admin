@@ -60,7 +60,7 @@
 				<cfset set.TransType=invoice.TransType>
 				<cfset set.vouchers=invoice.vouchertotal>
 				<cfset set.testmode=testmode>
-				<cfset preTot=invoice.total-invoice.vouchertotal>
+				<cfset preTot = invoice.debitTotal + invoice.debitChargeTotal + invoice.creditTotal + invoice.creditChargeTotal - invoice.vouchertotal>
 				<cfset grandtotal=grandtotal+preTot>
 				<cfif parm.form.createPDF is 1>
 					<cfset create=inv.CreateInvoice(set)>

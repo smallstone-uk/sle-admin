@@ -27,7 +27,7 @@
 	<cfset parm.invDate=url.invDate>
 	
 	<cfset invoice=inv.LoadInvoice(parm)>
-	
+
 	<cfset parm.cltID=invoice.ID>
 	<cfset parm.cltRef=invoice.Ref>
 	<cfset parm.orderID=invoice.ordID>
@@ -480,7 +480,7 @@
 					</td>
 					<td width="50%" valign="top">	<!--- right --->
 						<h2>Invoice Summary</h2>
-						<cfset totalToPay = invoice.debittotal - invoice.credittotal - invoice.vouchertotal + invoice.DelChargeTotal>
+						<cfset totalToPay = invoice.debittotal + invoice.credittotal - invoice.vouchertotal + invoice.DelChargeTotal>
 						<table border="0" cellspacing="0" class="tableList" width="100%">
 							<tr>
 								<th width="250" align="left" valign="middle"> Publications Total</th>

@@ -344,7 +344,6 @@
 				<cfset charge.VAT=charge.Price-charge.Net>
 				
 				<cfif charge.Group is "Magazine"><cfset charge.Group="xx"&charge.Group></cfif>
-						
 				<cfset pubID=charge.Group & charge.PubID & charge.Price & charge.VATRate & charge.Reason>
 				<cfset set={}>
 				<cfset set.sort=charge.Group & charge.Pub>
@@ -454,17 +453,17 @@
 							<cfset result.creditchargetotal=result.creditchargetotal+charge.Charge>
 						</cfif>
 						
-						<cfset result.TotalNet=result.TotalNet-(charge.Net*charge.Qty)>
-						<cfset result.TotalVAT=result.TotalVAT-(charge.VAT*charge.Qty)>
+						<cfset result.TotalNet=result.TotalNet+(charge.Net*charge.Qty)>
+						<cfset result.TotalVAT=result.TotalVAT+(charge.VAT*charge.Qty)>
 						<cfif charge.VATRate is 0.2>
-							<cfset result.net20=result.net20-(charge.Net*charge.Qty)>
-							<cfset result.vat20=result.vat20-(charge.VAT*charge.Qty)>
+							<cfset result.net20=result.net20+(charge.Net*charge.Qty)>
+							<cfset result.vat20=result.vat20+(charge.VAT*charge.Qty)>
 						<cfelseif charge.VATRate is 0.05>
-							<cfset result.net5=result.net5-(charge.Net*charge.Qty)>
-							<cfset result.vat5=result.vat5-(charge.VAT*charge.Qty)>
+							<cfset result.net5=result.net5+(charge.Net*charge.Qty)>
+							<cfset result.vat5=result.vat5+(charge.VAT*charge.Qty)>
 						<cfelse>
-							<cfset result.net0=result.net0-(charge.Net*charge.Qty)>
-							<cfset result.vat0=result.vat0-(charge.VAT*charge.Qty)>
+							<cfset result.net0=result.net0+(charge.Net*charge.Qty)>
+							<cfset result.vat0=result.vat0+(charge.VAT*charge.Qty)>
 						</cfif>
 					</cfcase>
 				</cfswitch>
@@ -498,17 +497,17 @@
 				<cfset RCpubID=re.group & re.PubID & re.Price & re.VATRate & re.reason>
 				
 				<cfset result.credittotal=result.credittotal+(re.Price*re.Qty)>
-				<cfset result.TotalNet=result.TotalNet-(re.Net*re.Qty)>
-				<cfset result.TotalVAT=result.TotalVAT-(re.VAT*re.Qty)>
+				<cfset result.TotalNet=result.TotalNet+(re.Net*re.Qty)>
+				<cfset result.TotalVAT=result.TotalVAT+(re.VAT*re.Qty)>
 				<cfif re.VATRate is 0.2>
-					<cfset result.net20=result.net20-(re.Net*re.Qty)>
-					<cfset result.vat20=result.vat20-(re.VAT*re.Qty)>
+					<cfset result.net20=result.net20+(re.Net*re.Qty)>
+					<cfset result.vat20=result.vat20+(re.VAT*re.Qty)>
 				<cfelseif charge.VATRate is 0.05>
-					<cfset result.net5=result.net5-(re.Net*re.Qty)>
-					<cfset result.vat5=result.vat5-(re.VAT*re.Qty)>
+					<cfset result.net5=result.net5+(re.Net*re.Qty)>
+					<cfset result.vat5=result.vat5+(re.VAT*re.Qty)>
 				<cfelse>
-					<cfset result.net0=result.net0-(re.Net*re.Qty)>
-					<cfset result.vat0=result.vat0-(re.VAT*re.Qty)>
+					<cfset result.net0=result.net0+(re.Net*re.Qty)>
+					<cfset result.vat0=result.vat0+(re.VAT*re.Qty)>
 				</cfif>
 				
 				<cfif StructKeyExists(result.creditGroup,RCpubID)>

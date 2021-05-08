@@ -255,6 +255,7 @@
 			UPDATE tblAccount
 			SET accGroup = #val(args.form.Group)#,
 				accName = '#args.form.Name#',
+				accIndex = '#args.form.accIndex#',
 				accType = '#args.form.Type#',
 				accNomAcct = #val(args.form.NominalAccount)#,
 				accPayAcc = #val(args.form.FundSource)#
@@ -280,7 +281,7 @@
 		<cfquery name="loc.sources" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNominal
-			WHERE nomGroup = 'R3'
+			WHERE nomGroup IN ('R3','R4')
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.sources)>

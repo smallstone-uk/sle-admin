@@ -65,6 +65,10 @@
 						<td><input type="text" name="Name" value="#account.accName#" /></td>
 					</tr>
 					<tr>
+						<td align="right">Bank Ref</td>
+						<td><input type="text" name="accIndex" value="#account.accIndex#" /></td>
+					</tr>
+					<tr>
 						<td align="right">Type</td>
 						<td>
 							<select name="Type" class="NAFType">

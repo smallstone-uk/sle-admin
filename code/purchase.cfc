@@ -47,6 +47,8 @@
 				ORDER BY accCode
 			<cfelseif srchSort eq "accName">
 				ORDER BY accName
+			<cfelse>
+				ORDER BY accID
 			</cfif>
 		</cfquery>
 		<cfif loc.QSuppliers.recordcount GT 0>

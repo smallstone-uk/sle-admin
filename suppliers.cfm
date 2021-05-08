@@ -36,6 +36,7 @@
 <cfparam name="srchGroup" default="">
 <cfparam name="srchPayType" default="">
 <cfparam name="srchAllocated" default="">
+<cfparam name="srchSort" default="">
 
 <cfquery name="QGroups" datasource="#application.site.datasource1#">
 	SELECT ttlValue,ttlTitle FROM tblATitles WHERE ttlType=1 ORDER BY ttlOrder
@@ -119,9 +120,9 @@
 									<td><b>Sort By</b></td>
 									<td>
 										<select name="srchSort">
-											<option value="">Any order</option>
-											<option value="accCode">Reference</option>
-											<option value="accName">Name</option>
+											<option value="accID"<cfif srchSort eq "accID"> selected="selected"</cfif>>Record order</option>
+											<option value="accCode"<cfif srchSort eq "accCode"> selected="selected"</cfif>>Reference</option>
+											<option value="accName"<cfif srchSort eq "accName"> selected="selected"</cfif>>Name</option>
 										</select>
 									</td>
 								</tr>

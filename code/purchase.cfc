@@ -43,7 +43,11 @@
 			<cfif len(StructFind(args.form,"srchLedger"))>AND accType="#args.form.srchLedger#"</cfif>
 			<cfif len(StructFind(args.form,"srchGroup"))>AND accGroup=#val(args.form.srchGroup)#</cfif>
 			<cfif len(StructFind(args.form,"srchPayType"))>AND accPayType=#val(args.form.srchPayType)#</cfif>
-			ORDER BY accCode
+			<cfif srchSort eq "accCode">
+				ORDER BY accCode
+			<cfelseif srchSort eq "accName">
+				ORDER BY accName
+			</cfif>
 		</cfquery>
 		<cfif loc.QSuppliers.recordcount GT 0>
 			<cfloop query="loc.QSuppliers">
@@ -673,6 +677,7 @@
 			<cfif len(args.form.srchRange)>
 				<cfif Left(args.form.srchRange,2) eq 'FY'>
 					<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
+					<cfset args.form.srchDateFrom = loc.fyDate.start>
 					AND trnDate >= '#loc.fyDate.start#'
 					AND trnDate <= '#loc.fyDate.end#'				
 				</cfif>
@@ -693,6 +698,7 @@
 			<cfset rec.nomCode=nomCode>
 			<cfset rec.nomTitle=nomTitle>
 			<cfset rec.nomTotal=nomTotal>
+			<cfset rec.nomBFwd=nomBFwd>
 			
 			<cfif nomBFwd>
 				<cfquery name="loc.QBalance" datasource="#args.datasource#">

@@ -34,6 +34,8 @@
 </cffunction>
 --->
 <cfparam name="sendMsgs" default="false">
+<cfparam name="attachLetter" default="Newspaper charges-2021.pdf">
+<cfset attachFile1="#application.site.dir_invoices#letters/#attachLetter#">
 <cftry>
 	<cfobject component="code/clients" name="cust">
 	<cfset parms={}>
@@ -42,6 +44,8 @@
 	<cfset emailList=cust.EmailLatestInvoice(parms)>
 	<cfoutput>
 		<h1>Current invoice date: #emailList.invDate#</h1>
+		Attach Letter: #attachFile1#
+		<cfif FileExists(attachFile1)>...Found</cfif><br />
 		<form enctype="multipart/form-data" method="post">
 			
 			<table class="tableList">
@@ -65,7 +69,7 @@
 						<td><a href="#msg.url#" target="_blank"><img src="images/pdfIcon.gif" /></a></td>
 						<cfif sendMsgs AND ListFind(form.sendMe,msg.cltRef,",")>
 							<cfif StructKeyExists(form,"testMsgs")>
-								<cfset sendTo="steven@kcc-design.co.uk">
+								<cfset sendTo="steven@shortlanesendstore.co.uk">
 							<cfelse><cfset sendTo=msg.email></cfif>
 							<cfset msgText = "Dear #msg.name#,<br />#ParagraphFormat(msg.text)#">
 							<cfmail 
@@ -74,11 +78,15 @@
 								from="#application.siteclient.cltMailOffice#"
 								server="#application.siteclient.cltMailServer#"
 								username="#application.siteclient.cltMailAccount#"
-								password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
+								password="rNUy5XBXuZfxkdw"
+								<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
 								subject="#msg.subject# - #application.siteclient.cltCompanyName#">
 								<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>
 								<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 								<cfmailparam type="application/pdf" disposition="attachment" file="#msg.attach#"></cfmailparam>
+								<cfif len(attachLetter)>
+									<cfmailparam type="application/pdf" disposition="attachment" file="#attachFile1#"></cfmailparam>								
+								</cfif>
 							</cfmail>
 							<cffile action="append" addnewline="yes" 
 								file="D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\logs\email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"

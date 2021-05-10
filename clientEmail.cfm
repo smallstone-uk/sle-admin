@@ -34,7 +34,7 @@
 </cffunction>
 --->
 <cfparam name="sendMsgs" default="false">
-<cfparam name="attachLetter" default="Newspaper charges-2021.pdf">
+<cfparam name="attachLetter" default="Charges-2021.pdf">	<!--- no spaces in name please --->
 <cfset attachFile1="#application.site.dir_invoices#letters/#attachLetter#">
 <cftry>
 	<cfobject component="code/clients" name="cust">

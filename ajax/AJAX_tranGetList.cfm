@@ -202,7 +202,7 @@
 						<th align="right">Gross</th>
 						<th align="right">Balance</th>
 						<th class="center">Allocated<br>
-							<span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" style="width:20px; height:20px;"></span>
+							<span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" tabindex="-1" style="width:20px; height:20px;"></span>
 						</th>
 					</tr>
 					<cfset balance=trans.bfwd>
@@ -238,7 +238,7 @@
 							<td id="trnItem_Balance" class="#amountClass#">#DecimalFormat(totAmnt1 + totAmnt2)#</td>
 							<td id="trnItem_Alloc" align="center">
 								<span class="noPrint">
-									<input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
+									<input type="checkbox" name="selectitem" class="selectitem" tabindex="-1" data-amount="#val(item.trnAmnt1) + val(item.trnAmnt2)#" 
 										value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
 								</span>
 								<cfif item.trnAllocID gt 0>

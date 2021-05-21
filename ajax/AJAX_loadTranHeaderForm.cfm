@@ -133,7 +133,7 @@
 					<th width="100" align="left">Trans Ref</th>
 					<td><input type="text" name="trnRef" value="#trans.trnRef#" id="Ref" tabindex="9"></td>
 					<th width="100" align="left">Gross Total</th>
-					<td><input type="text" name="trnTotal" value="#abs(trans.trnAmnt1 + trans.trnAmnt2)#" id="GrossTotal" style="text-align:right;" disabled="disabled" tabindex="13"></td>
+					<td><input type="text" name="trnTotal" value="#abs(trans.trnAmnt1 + trans.trnAmnt2)#" id="GrossTotal" style="text-align:right;" disabled="disabled"></td>
 				</tr>
 				<tr>
 					<th width="100" align="left">Description</th>
@@ -150,14 +150,14 @@
 							<option value="jnl" <cfif trans.trnType eq "jnl">selected="selected"</cfif>>Credit Journal</option>
 							<option value="dbt" <cfif trans.trnType eq "dbt">selected="selected"</cfif>>Debit Journal</option>
 						</select>
-						&nbsp; <input type="checkbox" name="trnAlloc" <cfif trans.trnAlloc> checked="checked"</cfif> /> Allocated
+						&nbsp; <input type="checkbox" name="trnAlloc" tabindex="15" <cfif trans.trnAlloc> checked="checked"</cfif> /> Allocated
 					</td>
 				</tr>
 				<tr id="selPayAcc" <cfif trans.trnType neq "pay" AND trans.trnType neq "rfd">style="display:none;"</cfif>>
 					<th colspan="2"></th>
 					<th align="left">Fund Source</th>
 					<td>
-						<select name="paymentAccounts" tabindex="15" id="selPayAccField">
+						<select name="paymentAccounts" tabindex="16" id="selPayAccField">
 							<option value="null">Select payment...</option>
 							<cfloop query="fundList.FundAccts">
 								<option value="#nomID#">#nomTitle#</option>

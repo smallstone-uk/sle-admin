@@ -59,13 +59,13 @@
 			if (selectAccount > 0) {
 				$('##account').find('option').each(function(i, e) { $(e).removeAttr("selected"); });
 				$('##account').find('option[value="' + selectAccount + '"]').prop("selected", true);
-				$('##srchRange').find('option[value="2"]').prop("selected", true);
+			//	$('##srchRange').find('option[value="2"]').prop("selected", true);
 				$('##srchAllocChk').prop("checked", false);
 				setTimeout(function() {
 					$('##account-form').submit();
 					setTimeout(function() {
 						$('.trnIDLink[data-id="' + selectTran + '"]').click();
-						toggleTranList();
+					//	toggleTranList();
 					}, 250);
 				}, 250);
 			}
@@ -307,9 +307,9 @@
 		<div class="element">
 			Date Range:
 			<select name="srchRange" data-placeholder="Select..." id="srchRange" tabindex="3">
-				<option value="0">All Records</option>
+				<option value="0" selected>All Records</option>
 				<option value="1">Last 7 Days</option>
-				<option value="2" selected>This Month</option>
+				<option value="2">This Month</option>
 				<option value="3">From Last Month</option>
 				<option value="4">From Previous Month</option>
 				<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>

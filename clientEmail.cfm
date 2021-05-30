@@ -22,7 +22,7 @@
 
 </head>
 
-<!---<cffunction name="textMessage" access="public" returntype="string" hint="Converts an html email message into a nicely formatted with line breaks plain text message">
+<!---<cffunction name="textMessage" access="public" returntype="string" hint="Converts an html email message into a nicely formatted plain text message with line breaks">
     <cfargument name="string" required="true" type="string">
     <cfscript>
         var pattern = "<br />";
@@ -45,7 +45,14 @@
 	<cfoutput>
 		<h1>Current invoice date: #emailList.invDate#</h1>
 		Attach Letter: #attachFile1#
-		<cfif FileExists(attachFile1)>...Found</cfif><br />
+		<cfif FileExists(attachFile1)>
+			<cfset attachment = true>
+			...Found
+		<cfelse>
+			<cfset attachment = false>
+			...NOT Found
+		</cfif><br />
+			
 		<form enctype="multipart/form-data" method="post">
 			
 			<table class="tableList">
@@ -84,7 +91,7 @@
 								<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>
 								<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 								<cfmailparam type="application/pdf" disposition="attachment" file="#msg.attach#"></cfmailparam>
-								<cfif len(attachLetter)>
+								<cfif len(attachLetter) AND attachment>
 									<cfmailparam type="application/pdf" disposition="attachment" file="#attachFile1#"></cfmailparam>								
 								</cfif>
 							</cfmail>

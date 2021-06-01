@@ -43,5 +43,11 @@
 				<td width="80">#item.paidin#</td>
 			</tr>
 		</cfloop>
+		<tr>
+			<td colspan="5" align="right">Totals</td>
+			<td align="right">&pound;#DecimalFormat(totalDebit)#</td>
+			<td align="right">&pound;#DecimalFormat(totalCredit)#</td>
+			<td colspan="3"></td>
+		</tr>
 	</table>
 </cfoutput>

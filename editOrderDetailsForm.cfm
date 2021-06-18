@@ -28,6 +28,7 @@
 				$("##ordCity").val($("##delCity").val());
 				$("##ordPostcode").val($("##delPostcode").val());
 				$("##ordDeliveryCode").val($("##delCode").val());
+				$("##ordDelCodeNew").val($("##ordDelCodeNew").val());
 				$("##ordStreetCode").trigger("chosen:updated");
 				$("##ordDeliveryCode").trigger("chosen:updated");
 			} else {
@@ -124,13 +125,26 @@
 			<td><input type="text" name="ordNote" value="#order.Note#" id="ordNote" style="width:95%;" /></td>
 		</tr>
 		<tr>
-			<td width="25%" align="right"><strong>Delivery Charge</strong></td>
+			<td width="25%" align="right"><strong>Current Delivery Charge</strong></td>
 			<td>
 				<select name="ordDeliveryCode" data-placeholder="Choose a charge..." id="ordDeliveryCode">
 					<option value=""></option>
 					<cfif ArrayLen(charges)>
 						<cfloop array="#charges#" index="i">
-							<option value="#i.Code#"<cfif order.DeliveryCode eq i.Code> selected="selected"</cfif>>#i.Code# - £#i.Price1#</option>
+							<option value="#i.Code#"<cfif order.DeliveryCode eq i.Code> selected="selected"</cfif>>#i.Code# - &pound;#i.Price1#</option>
+						</cfloop>
+					</cfif>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td width="25%" align="right"><strong>New Delivery Charge</strong></td>
+			<td>
+				<select name="ordDelCodeNew" data-placeholder="Choose a charge..." id="ordDelCodeNew">
+					<option value=""></option>
+					<cfif ArrayLen(charges)>
+						<cfloop array="#charges#" index="i">
+							<option value="#i.Code#"<cfif order.DelCodeNew eq i.Code> selected="selected"</cfif>>#i.Code# - &pound;#i.Price1#</option>
 						</cfloop>
 					</cfif>
 				</select>

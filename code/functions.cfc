@@ -1583,6 +1583,7 @@
 				<cfset item.Type=QOrders.ordType>
 				<cfset item.Contact=QOrders.ordContact>
 				<cfset item.DeliveryCode=QOrders.ordDeliveryCode>
+				<cfset item.DelCodeNew=QOrders.ordDelCodeNew>
 				<cfset item.HouseName=QOrders.ordHouseName>
 				<cfset item.HouseNumber=QOrders.ordHouseNumber>
 				<cfset item.StreetCode=QOrders.ordStreetCode>
@@ -2009,6 +2010,7 @@
 			<cfset result.City=QGetOrder.ordCity>
 			<cfset result.Postcode=QGetOrder.ordPostcode>
 			<cfset result.DeliveryCode=QGetOrder.ordDeliveryCode>
+			<cfset result.DelCodeNew=QGetOrder.ordDelCodeNew>
 			<cfset result.Type=QGetOrder.ordType>
 			<cfset result.ordRef=QGetOrder.ordRef>
 			<cfset result.ordContact=QGetOrder.ordContact>
@@ -2153,6 +2155,7 @@
 						ordRef,
 						ordContact,
 						ordDeliveryCode,
+						ordDelCodeNew,
 						ordHouseName,
 						ordHouseNumber,
 						ordStreetCode,
@@ -2167,6 +2170,7 @@
 						'#args.form.ordRef#',
 						'#args.form.ordContact#',
 						#args.form.ordDeliveryCode#,
+						#args.form.ordDelCodeNew#,
 						'#args.form.ordHouseName#',
 						'#args.form.ordHouseNumber#',
 						#args.form.ordStreetCode#,
@@ -2214,6 +2218,7 @@
 					ordRef='#args.form.ordRef#',
 					ordContact='#args.form.ordContact#',
 					ordDeliveryCode=#args.form.ordDeliveryCode#,
+					ordDelCodeNew=#args.form.ordDelCodeNew#,
 					ordHouseName='#args.form.ordHouseName#',
 					ordHouseNumber='#args.form.ordHouseNumber#',
 					ordStreetCode=#args.form.ordStreetCode#,

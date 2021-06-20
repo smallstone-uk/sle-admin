@@ -57,6 +57,7 @@
 --->
 <cftry>
 	<cfparam name="showTrans" default="0">
+	<cfparam name="showDumps" default="0">
 	<cfparam name="useNewCode" default="0">
 	<cfparam name="useSamples" default="0">
 	<cfparam name="DeliveryCode" default="">
@@ -96,6 +97,7 @@
 				<cfoutput>
 					<form name="roundForm" id="roundForm" method="post">
 						<input name="showTrans" type="checkbox" value="1"<cfif showTrans> checked</cfif> /> Show Transactions?<br>
+						<input name="showDumps" type="checkbox" value="1"<cfif showDumps> checked</cfif> /> Show Dumps?<br>
 						<input name="useNewCode" type="checkbox" value="1"<cfif useNewCode> checked</cfif> /> Use New Delivery Code?<br>
 						<input name="useSamples" type="checkbox" value="1"<cfif useSamples> checked</cfif> /> Use Sample Data?<br>
 						Select a delivery code to view:-
@@ -147,7 +149,7 @@
 							AND riDay = 'thu'
 							ORDER BY rndRef,riOrder,ordID,pubTitle
 					</cfquery>
-					<!---<cfdump var="#QData#" label="QData" expand="false">--->
+					<cfif showDumps><cfdump var="#QData#" label="QData" expand="false"></cfif>
 					<cfset roundID = 0>
 					<cfset orderID = 0>
 					<cfset roundData = {}>
@@ -208,7 +210,7 @@
 						<cfset orderID = ordID>
 						<cfset roundID = rndID>
 					</cfloop>
-					<!---<cfdump var="#roundData#" label="roundData 1st pass" expand="false">--->
+					<cfif showDumps><cfdump var="#roundData#" label="roundData 1st pass" expand="false"></cfif>
 					<cfoutput>
 						<table class="roundList" border="1">
 							<cfloop collection="#roundData#" item="key">
@@ -229,7 +231,8 @@
 								</cfloop>
 								<cfif showTrans>
 									<tr>
-										<th colspan="17" class="rndheader">#item.roundTitle#</th>
+										<th class="rndheader">#key#</th>
+										<th colspan="16" class="rndheader">#item.roundTitle#</th>
 									</tr>
 									<tr>
 										<th width="10"></th>
@@ -459,8 +462,9 @@
 								</cfloop>
 								<cfif showTrans>
 									<tr class="rndfooter">
-										<td align="right">#ArrayLen(item.drops)#</td>
-										<td align="right" colspan="11">#item.roundTitle# Totals</td>
+										<td align="center">#ArrayLen(item.drops)#</td>
+										<td>drops</td>
+										<td align="right" colspan="10">#item.roundTitle# Totals</td>
 										<td align="right">#DecimalFormat(item.pubRetail)#</td>
 										<td align="right">#DecimalFormat(item.pubTrade)#</td>
 										<td align="right">#DecimalFormat(item.pubProfit)#</td>
@@ -471,7 +475,7 @@
 							</cfloop>
 						</table>
 							
-						<!---<cfdump var="#roundData#" label="roundData end" expand="false">--->
+						<cfif showDumps><cfdump var="#roundData#" label="roundData end" expand="false"></cfif>
 						
 						<table class="roundList" width="900" style="margin:10px">
 							<tr>
@@ -678,7 +682,7 @@
 						</table>
 						<table>
 							<tr>
-								<td>
+								<td valign="top">
 									<table class="summaryList" style="margin:10px">
 										<tr>
 											<th colspan="3">Original Delivery Charge Counter</th>
@@ -702,7 +706,7 @@
 										</tr>
 									</table>
 								</td>
-								<td>
+								<td valign="top">
 									<table class="summaryList" style="margin:10px">
 										<tr>
 											<th colspan="3">New Delivery Charge Counter</th>
@@ -730,7 +734,7 @@
 						</table>
 					</cfoutput>
 				</cfif>
-				<!---<cfdump var="#roundData#" label="roundData end" expand="false">--->
+				<cfif showDumps><cfdump var="#roundData#" label="roundData end" expand="false"></cfif>
 			</div>
 		</div>
 	</div>

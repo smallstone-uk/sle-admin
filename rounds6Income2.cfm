@@ -213,7 +213,8 @@
 					<cfif showDumps><cfdump var="#roundData#" label="roundData 1st pass" expand="false"></cfif>
 					<cfoutput>
 						<table class="roundList" border="1">
-							<cfloop collection="#roundData#" item="key">
+							<cfset iKeys = ListSort(StructKeyList(roundData,","),"text","asc")>
+							<cfloop list="#iKeys#" index="key">
 								<cfset item = StructFind(roundData,key)>
 								<cfset item.pubRetail = 0>
 								<cfset item.pubTrade = 0>
@@ -576,7 +577,8 @@
 								</tr>
 						</table>
 						<table class="summaryList" style="margin:10px">
-							<cfloop collection="#roundData#" item="key">
+							<cfset iKeys = ListSort(StructKeyList(roundData,","),"text","asc")>
+							<cfloop list="#iKeys#" index="key">
 								<cfset rnd = StructFind(roundData,key)>
 								<tr>
 									<th colspan="9" class="rndheader">#rnd.roundTitle#</th>

@@ -508,7 +508,8 @@
 								<cfset tot.iFuel = 0>
 								<cfset tot.income = 0>
 								<cfset tot.netProfit = 0>
-								<cfloop collection="#roundData#" item="key">
+								<cfset iKeys = ListSort(StructKeyList(roundData,","),"text","asc")>
+								<cfloop list="#iKeys#" index="key">
 									<cfset rnd = StructFind(roundData,key)>
 									<cfset tot.dropQty += rnd.dropQty>
 									<cfset tot.pubQty += rnd.pubQty>

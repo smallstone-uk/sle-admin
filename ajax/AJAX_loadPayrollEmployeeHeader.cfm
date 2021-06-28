@@ -259,6 +259,12 @@
 				event.preventDefault();
 			});
 
+			$('.pr2_emailWeekBtn').click(function(event) {
+				var win = window.open("#parm.url#ajax/AJAX_loadWeeklyPayrollEmail.cfm?weekending=#parm.form.weekending#", '_blank');
+				win.focus();
+				event.preventDefault();
+			});
+
 			$('.pr2_printSingleBtn').click(function(event) {
 				var win = window.open("#parm.url#ajax/AJAX_loadSinglePayrollReport.cfm?emp=#parm.form.employee#&weekending=#parm.form.weekending#", '_blank');
 				win.focus();
@@ -554,6 +560,7 @@
 		<div style="padding:5px 0;"></div>
 		<button class="pr2_saveBtn">Save</button>
 		<button class="pr2_printWeekBtn">Print Week</button>
+		<button class="pr2_emailWeekBtn">Email Week</button>
 		<button class="pr2_printSingleBtn">Print Single</button>
 	</div>
 </cfoutput>

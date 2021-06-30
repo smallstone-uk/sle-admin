@@ -480,6 +480,8 @@
 		<cfset loc.result.ID = loc.employee.empID>
 		<cfset loc.result.FirstName = loc.employee.empFirstName>
 		<cfset loc.result.LastName = loc.employee.empLastName>
+		<cfset loc.result.empEmail = loc.employee.empEmail>
+		<cfset loc.result.empPIN = loc.employee.empPIN>
 		<cfset loc.result.DOB = loc.employee.empDOB>
 		<cfset loc.result.Start = loc.employee.empStart>
 		<cfif IsDate(loc.result.Start)>

@@ -168,6 +168,25 @@
 		<cfreturn result>
 	</cffunction>
 	
+	<cffunction name="VerifyEncryptedString" access="public" returntype="boolean">
+		<cfargument name="stringToTest" type="string" required="yes">
+		<cfargument name="originalString" type="binary" required="yes">
+		<cfset var loc = {}>
+		<cftry>
+		
+		<cfquery name="loc.enc" datasource="#application.site.datasource1#">
+			SELECT (DES_ENCRYPT("#stringToTest#")) AS encryptedString
+		</cfquery>
+		<cfset loc.result = (ToString(loc.enc.encryptedString) eq ToString(originalString)) ? true : false>
+
+		<cfcatch type="any">
+			 <cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			 	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
 	<cffunction name="EncryptStr" output="false" returntype="string">
 		<cfargument name="pwdStr" type="string" required="false">
 		<cfargument name="encStr" type="string" required="false">

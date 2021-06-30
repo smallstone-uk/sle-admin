@@ -4,14 +4,22 @@
 	<cfset parm = {}>
 	<cfset parm.datasource = application.site.datasource1>
 	<cfset parm.url = application.site.normal>
+	<cfset parm.emailPDF = StructKeyExists(form,"emailPDF")>
 	<cfif StructKeyExists(form,"weekending")>
 		<cfset parm.weekending = form.weekending>
-	<cfelse><cfset parm.weekending = url.weekending></cfif>
-	<cfset records = pr2.LoadWeeklyPayrollRecords(parm)>
-	<cfdump var="#records#" label="records" expand="false">
-	<cfdump var="#form#" label="form" expand="false">
+	<cfelseif StructKeyExists(url,"weekending")>
+		<cfset parm.weekending = url.weekending>
+	<cfelse>
+		<cfset parm.weekending = "">
+	</cfif>
+	<cfif IsDate(parm.weekending)>
+		<cfset records = pr2.LoadWeeklyPayrollRecords(parm)>
+	<cfelse>
+		<p>Please provide a week ending date.</p>
+		<cfexit>
+	</cfif>
 	<cfoutput>
-	
+		<p>Pay Records for week Ending #DateFormat(parm.weekending,"ddd dd-mmm-yyyy")#</p>
 		<table width="600">
 			<form method="post">
 				<input type="hidden" name="weekending" value="#parm.weekending#" />
@@ -26,18 +34,23 @@
 				</tr>
 			</cfloop>
 				<tr>
+					<td colspan="4"><input type="checkbox" name="emailPDF" />Email the payslips?</td>
+				</tr>
+				<tr>
 					<td colspan="4"><input type="submit" name="btnGo" value="Send" /></td>
 				</tr>
 			</form>
 		</table>
 
-		<cfif len(checkList)>
+		<cfif len(checkList)><cfdump var="#form#" label="form" expand="false">
 				<cfset rowCount=0>
 				<cfloop list="#checkList#" index="slip">
 					<cfset record = records[slip]>
-					<cfif !StructIsEmpty(record.header)>
+					<cfif StructIsEmpty(record.header)>
+						No pay data found for #record.employee.FirstName# #record.employee.LastName#.<br />
+					<cfelse>
 						<cfset filename = "pay-#record.employee.LastName#-#DateFormat(parm.weekending,"yymmdd")#.pdf">
-						#filename#<br />
+						#record.employee.FirstName# #record.employee.LastName# - #filename#<br />
 						<cfdocument
 							permissions="allowcopy,AllowPrinting" 
 							orientation="portrait" 
@@ -295,6 +308,10 @@
 								</body>
 							</html>
 						</cfdocument>
+						<cfif parm.emailPDF>
+							<cfset attachment = filename>
+							<cfinclude template="AJAX_sendWeeklyPayrollEmail.cfm">
+						</cfif>
 					</cfif>
 				</cfloop>
 		</cfif>

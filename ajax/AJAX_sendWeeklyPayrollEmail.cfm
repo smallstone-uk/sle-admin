@@ -8,14 +8,15 @@
 	<cfset filePath = "#application.site.dir_data#payslips\">
 	<!---  steven@shortlanesendstore.co.uk #sendTo#--->
 		<!---to="#sendTo#"--->
-	<cfmail 
+	<cfmail		debug="yes"
 		to="#sendTo#"
-		from="accounts@shortlanesendstore.co.uk"
+		from="#application.siteclient.cltMailAccount#"
 		server="#application.siteclient.cltMailServer#"
 		username="#application.siteclient.cltMailAccount#"
-		password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
+		password="rNUy5XBXuZfxkdw"
+		<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
 		subject="#application.siteclient.cltCompanyName# - Payslip">
-		<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>	<!--- always put plain first --->
+		<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>	 <!---always put plain first --->
 		<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 		<cfif len(attachment)><cfmailparam type="application/pdf" disposition="attachment" file="#filePath##attachment#"></cfmailparam></cfif>
 	</cfmail>

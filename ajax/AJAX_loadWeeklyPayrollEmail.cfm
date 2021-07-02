@@ -42,7 +42,7 @@
 			</form>
 		</table>
 
-		<cfif len(checkList)><cfdump var="#form#" label="form" expand="false">
+		<cfif len(checkList)>
 				<cfset rowCount=0>
 				<cfloop list="#checkList#" index="slip">
 					<cfset record = records[slip]>
@@ -50,7 +50,7 @@
 						No pay data found for #record.employee.FirstName# #record.employee.LastName#.<br />
 					<cfelse>
 						<cfset filename = "pay-#record.employee.LastName#-#DateFormat(parm.weekending,"yymmdd")#.pdf">
-						#record.employee.FirstName# #record.employee.LastName# - #filename#<br />
+						#record.employee.FirstName# #record.employee.LastName# - #filename# - #record.employee.empEMail#<br />
 						<cfdocument
 							permissions="allowcopy,AllowPrinting" 
 							orientation="portrait" 
@@ -310,6 +310,7 @@
 						</cfdocument>
 						<cfif parm.emailPDF>
 							<cfset attachment = filename>
+							<cfset sendTo = "#record.employee.empEMail#">
 							<cfinclude template="AJAX_sendWeeklyPayrollEmail.cfm">
 						</cfif>
 					</cfif>

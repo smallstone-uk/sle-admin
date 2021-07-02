@@ -31,6 +31,7 @@
 					<td>#iCount#</td>
 					<td>#record.employee.ID#</td>
 					<td>#record.employee.FirstName# #record.employee.LastName#</td>
+					<td>#record.employee.empEMail#</td>
 				</tr>
 			</cfloop>
 				<tr>

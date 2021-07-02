@@ -10,6 +10,7 @@
 		<!---to="#sendTo#"--->
 	<cfmail		debug="yes"
 		to="#sendTo#"
+		cc="steven@shortlanesendstore.co.uk"
 		from="#application.siteclient.cltMailAccount#"
 		server="#application.siteclient.cltMailServer#"
 		username="#application.siteclient.cltMailAccount#"

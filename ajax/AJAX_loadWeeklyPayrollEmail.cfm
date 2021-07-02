@@ -1,3 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pay Slips</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="../css/main3.css" rel="stylesheet" type="text/css">
+<script src="../scripts/jquery-1.9.1.js"></script>
+<script src="../scripts/jquery-ui.js"></script>
+</head>
+<body>
+
 <cftry>
 	<cfparam name="checkList" default="">
 	<cfobject component="code/payroll2" name="pr2">
@@ -19,15 +30,35 @@
 		<cfexit>
 	</cfif>
 	<cfoutput>
+		<script>
+			$(document).ready(function(e) {
+				$('.selectAllOnList').click(function(event) {
+					if (this.checked) {
+						$('.selectitem').prop({checked: true});
+						$('.selectAllOnList').prop({checked: true});
+					} else {
+						$('.selectitem').prop({checked: false});
+						$('.selectAllOnList').prop({checked: false});
+					}
+				});
+			});
+		</script>
 		<p>Pay Records for week Ending #DateFormat(parm.weekending,"ddd dd-mmm-yyyy")#</p>
-		<table width="600">
+		<table class="tableList" width="600">
 			<form method="post">
 				<input type="hidden" name="weekending" value="#parm.weekending#" />
 			<cfset iCount = 0>
+			<tr>
+				<th><span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" tabindex="-1"></span></th>
+				<th>##</th>
+				<th>ID</th>
+				<th>Name</th>
+				<th>EMail</th>
+			</tr>
 			<cfloop array="#records#" index="record">
 				<cfset iCount++>
 				<tr>
-					<td><input type="checkbox" name="checkList" value="#iCount#"<cfif ListFind(checkList,iCount)> checked="checked"</cfif> /></td>
+					<td><input type="checkbox" name="checkList" class="selectitem" value="#iCount#"<cfif ListFind(checkList,iCount)> checked="checked"</cfif> /></td>
 					<td>#iCount#</td>
 					<td>#record.employee.ID#</td>
 					<td>#record.employee.FirstName# #record.employee.LastName#</td>
@@ -323,3 +354,6 @@
 	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
 </cfcatch>
 </cftry>
+
+</body>
+</html>

@@ -82,7 +82,7 @@
 						No pay data found for #record.employee.FirstName# #record.employee.LastName#.<br />
 					<cfelse>
 						<cfset filename = "pay-#record.employee.LastName#-#DateFormat(parm.weekending,"yymmdd")#.pdf">
-						#record.employee.FirstName# #record.employee.LastName# - #filename# - #record.employee.empEMail#<br />
+						#record.employee.FirstName# #record.employee.LastName# - #filename#
 						<cfdocument
 							permissions="allowcopy,AllowPrinting" 
 							orientation="portrait" 
@@ -343,9 +343,11 @@
 						<cfif parm.emailPDF>
 							<cfset attachment = filename>
 							<cfset sendTo = "#record.employee.empEMail#">
+							<cfset person = "#record.employee.FirstName#">
 							<cfinclude template="AJAX_sendWeeklyPayrollEmail.cfm">
 						</cfif>
 					</cfif>
+					<br />
 				</cfloop>
 		</cfif>
 	</cfoutput>

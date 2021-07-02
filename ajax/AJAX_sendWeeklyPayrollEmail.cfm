@@ -8,23 +8,25 @@
 	<cfset filePath = "#application.site.dir_data#payslips\">
 	<!---  steven@shortlanesendstore.co.uk #sendTo#--->
 		<!---to="#sendTo#"--->
-	<cfmail		debug="yes"
-		to="#sendTo#"
-		cc="steven@shortlanesendstore.co.uk"
-		from="#application.siteclient.cltMailAccount#"
-		server="#application.siteclient.cltMailServer#"
-		username="#application.siteclient.cltMailAccount#"
-		password="rNUy5XBXuZfxkdw"
-		<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
-		subject="#application.siteclient.cltCompanyName# - Payslip">
-		<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>	 <!---always put plain first --->
-		<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
-		<cfif len(attachment)><cfmailparam type="application/pdf" disposition="attachment" file="#filePath##attachment#"></cfmailparam></cfif>
-	</cfmail>
-	
-	<cfoutput>
-		File was sent to = "#sendTo#" <br>
-	</cfoutput>
+	<cfif len(sendTo)>
+		<cfmail		
+			debug="yes"
+			to="#sendTo#"
+			<!---cc="steven@shortlanesendstore.co.uk"--->
+			from="#application.siteclient.cltMailAccount#"
+			server="#application.siteclient.cltMailServer#"
+			username="#application.siteclient.cltMailAccount#"
+			password="rNUy5XBXuZfxkdw"
+			<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
+			subject="#application.siteclient.cltCompanyName# - Payslip">
+			<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>	 <!---always put plain first --->
+			<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
+			<cfif len(attachment)><cfmailparam type="application/pdf" disposition="attachment" file="#filePath##attachment#"></cfmailparam></cfif>
+		</cfmail>
+		<cfoutput>File was sent to = "#sendTo#"</cfoutput>
+	<cfelse>
+		<cfoutput>No email address for #person#</cfoutput>
+	</cfif>
 
 <cfcatch type="any">
 	<cfoutput>

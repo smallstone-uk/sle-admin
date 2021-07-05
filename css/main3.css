@@ -493,7 +493,7 @@ background: -linear-gradient(bottom, #DFDFDF 00%, #F0F0F0 100%);
 .FCFlyoutSouth_White {  position: absolute; background-image: url(../images/flyout-south-white.png);    background-position: center center; background-repeat: no-repeat;   height: 9px;}
 .FCFlyoutEast_White {   position: absolute; background-image: url(../images/flyout-east-white.png); background-position: center center; background-repeat: no-repeat;   width: 9px;}
 .FCFlyoutWest_White {   position: absolute; background-image: url(../images/flyout-west-white.png); background-position: center center; background-repeat: no-repeat;   width: 9px;}
-input.selectitem {
+input.selectitem, input.selectAllOnList {
     width: 20px !important;
     height: 20px !important;
 }

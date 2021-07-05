@@ -121,7 +121,7 @@ input[type="button"]:active, input[type="submit"]:active, button:active, .button
 .loadingGif {float: left;margin: 0 10px;opacity: 0.25;}
 
 
-.tableList {border-spacing: 0px;border-collapse: collapse;border: 1px solid #BDC9DD;font-size: 12px;border-color:#BDC9DD;}
+.tableList {border-spacing: 0px;border-collapse: collapse;border: 1px solid #BDC9DD;font-size: 14px;border-color:#BDC9DD;}
 .tableList th {padding:4px 5px;background: #EFF3F7;border-color: #BDC9DD;color: #18315C;}
 .tableList td {padding:2px 5px;border-color: #BDC9DD;}
 .tableList.morespace {font-size: 12px;}

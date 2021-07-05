@@ -347,7 +347,8 @@
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
-									<cfset colspan=10>
+									<!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
+									<cfset colspan=11>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -358,8 +359,9 @@
 													<th>Reference</th>
 													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
 													<th>Product<br>Status</th>
-													<th>Unit Size</th>
+													<th>Size</th>
 													<th>Our Price</th>
+													<th>Discountable</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>
 													<th>Reorder</th>
@@ -386,6 +388,7 @@
 													<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
 													<td>#siUnitSize#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
+													<td align="center">#prodStaffDiscount#</td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>#prodReorder#</td>

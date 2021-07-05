@@ -76,7 +76,9 @@
 				<cfset loc.GroupTitle = loc.group.pgTitle>
 			</cfif>
 			<cfquery name="loc.productList" datasource="#args.datasource#">
-				SELECT pgID,pgTitle, pcatID,pcatTitle, prodID,prodTitle,prodCountDate,prodStockLevel,prodPriceMarked,prodStatus,prodVATRate, siUnitSize,siOurPrice, siUnitTrade
+				SELECT 
+					pgID,pgTitle, pcatID,pcatTitle, 
+					prodID,prodRef,prodTitle,prodCountDate,prodStockLevel,prodPriceMarked,prodStatus,prodVATRate, siUnitSize,siOurPrice, siUnitTrade
 				FROM tblProducts
 				LEFT JOIN tblStockItem ON prodID = siProduct
 				AND tblStockItem.siID = (

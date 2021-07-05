@@ -15,6 +15,7 @@
 		.stkOK {font-size:16px; font-weight:bold}
 		.footnote {font-size:11px}
 		.tiny {font-size:9px}
+		.sod_status {background-color:#9CF; padding:2px; margin:2px; height:20px}
 		@media print {
 			.no-print {display: none !important;}
 		}
@@ -51,6 +52,21 @@
 				});
 			});
 			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2018, 10 - 1, 29)});
+			$('.sod_status').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductStatus.cfm",
+					data: {"status": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
 		});
 	</script>
 </head>
@@ -128,7 +144,7 @@
 				<th colspan="21" align="left">as at: #LSDateFormat(now(),"dd-mmm-yyyy")# #LSTimeFormat(now(),'HH:MM')#</th>
 			</tr>
 			<tr>
-				<th>Product<br />Code</th>
+				<th width="60">Product<br />Code</th>
 				<th>Description</th>
 				<th>Size</th>
 				<th width="26">Open<br />Stock</th>
@@ -193,7 +209,9 @@
 					<cfset categoryID = pcatID>
 				</cfif>
 				<tr class="product-line">
-					<td>#prodID#<br /><span class="tiny">#prodStatus#</span></td>
+					<td>#prodRef#<br />
+						<span class="sod_status disable-select" data-id="#prodID#">#prodStatus#</span>
+					</td>
 					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
 					<cfif val(siOurPrice) eq 0>
 						<cfset class = "priceErr">
@@ -241,7 +259,7 @@
 						<span class="purch">#pData.total#</span>
 					</td>
 					<td width="50" align="right">
-						<span class="sale">#val(sData.BFwd) + sData.total#<br /></span>
+						<span class="sale">#val(sData.BFwd) + sData.total#</span><br />
 						<span class="purch">#prodStockLevel + val(pData.BFwd) + pData.total#</span>
 					</td>
 					<cfset closeStock = openStock + val(pData.total) - val(sData.total)>

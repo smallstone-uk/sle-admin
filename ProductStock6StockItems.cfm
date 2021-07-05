@@ -120,8 +120,10 @@
 						<th class="headleft">Order</th>
 						<th class="headleft">Reference</th>
 						<th class="headleft">Date</th>
-						<th class="headleft">No. Packs</th>
-						<th class="headleft">Unit Size</th>
+						<th class="headleft">Cases</th>
+						<th class="headleft">Items</th>
+						<th class="headleft">Total</th>
+						<th class="headleft">Size</th>
 						<th class="headright">WSP</th>
 						<th class="headright">Unit</th>
 						<th class="headright">RRP</th>
@@ -129,7 +131,9 @@
 						<th class="headright">POR</th>
 						<th class="headright">Item <br />Status</th>
 					</tr>
+					<cfset totalItems = 0>
 					<cfloop query="records.stockItems">
+						<cfset totalItems += siQtyItems>
 					<tr>
 						<td align="center">#currentrow#</td>
 						<td><a href="?id=#siID#&barcode=#parm.barcode#" class="deleteItem" data-id="#siID#" data-barcode="#parm.barcode#">
@@ -142,6 +146,8 @@
 						<td>#siRef#</td>
 						<td>#LSDateFormat(soDate)#</td>
 						<td align="center">#siQtyPacks#</td>
+						<td align="center">#siQtyItems#</td>
+						<td align="center">#totalItems#</td>
 						<td align="center">#siUnitSize#</td>
 						<td align="right">#siWSP#</td>
 						<td align="right">#siUnitTrade#</td>
@@ -151,6 +157,11 @@
 						<td align="right">#siStatus#</td>
 					</tr>
 					</cfloop>
+					<tr>
+						<th colspan="9"></th>
+						<th align="center">#totalItems#</th>
+						<th colspan="8"></th>
+					</tr>
 				</table>
 			<cfelse>
 				<div style="clear:both"></div>

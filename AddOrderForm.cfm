@@ -51,6 +51,7 @@
 	<input type="hidden" name="cltDelCity" value="#clientInfo.info[1].cltDelCity#" id="delCity" />
 	<input type="hidden" name="cltDelPostcode" value="#clientInfo.info[1].cltDelPostcode#" id="delPostcode" />
 	<input type="hidden" name="cltDelCode" value="#clientInfo.info[1].cltDelCode#" id="delCode" />
+	<input type="hidden" name="ordDelCodeNew" value="0" />
 	<table border="0" width="450">
 		<tr>
 			<td width="25%" align="right"><input type="checkbox" name="ordSameAsBilling" value="1" id="autoFill" /></td>

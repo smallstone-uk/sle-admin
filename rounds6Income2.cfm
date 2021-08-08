@@ -120,7 +120,7 @@
 							ordID,ordHouseName,ordHouseNumber,
 							stName,
 							delCode,delPrice1,delPrice2,delPrice3,
-							pubTitle,pubPrice,pubTradePrice,pubActive,
+							pubTitle,pubPrice,pubTradePrice,pubActive,pubGroup,
 							ordSun,ordMon,ordTue,ordWed,ordThu,ordFri,ordSat,
 							oiSun,oiMon,oiTue,oiWed,oiThu,oiFri,oiSat,
 							riOrder
@@ -196,6 +196,7 @@
 						<cfset recn.delCode = delCode>
 						<cfset ArrayAppend(recn.pubs, {
 							pubTitle = pubTitle,
+							pubGroup = pubGroup,
 							pubPrice = pubPrice,
 							pubTradePrice = pubTradePrice,
 							pubProfit = pubPrice - pubTradePrice,
@@ -289,6 +290,17 @@
 										<cfset item.pubRetail += ipubRetail>
 										<cfset item.pubTrade += ipubTrade>
 										<cfset item.pubProfit += ipubProfit>
+										
+										<cfif pub.pubGroup eq 'magazine'>	<!--- magazines are delivered the following day --->
+											<cfset iSaveSat = pub.oiSat>
+											<cfset pub.oiSat = pub.oiFri>
+											<cfset pub.oiFri = pub.oiThu>
+											<cfset pub.oiThu = pub.oiWed>
+											<cfset pub.oiWed = pub.oiTue>
+											<cfset pub.oiTue = pub.oiMon>
+											<cfset pub.oiMon = pub.oiSun>
+											<cfset pub.oiSun = iSaveSat>
+										</cfif>
 										
 										<cfif pub.oiSun neq 0>
 											<cfset iDay = StructFind(item.days,"Sun")>

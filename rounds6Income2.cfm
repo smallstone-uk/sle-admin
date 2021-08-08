@@ -594,7 +594,8 @@
 							<cfloop list="#iKeys#" index="key">
 								<cfset rnd = StructFind(roundData,key)>
 								<tr>
-									<th colspan="9" class="rndheader">#rnd.roundTitle#</th>
+									<th colspan="6" class="rndheader">#rnd.roundTitle#</th>
+									<th colspan="3" class="rndheader">as at #DateFormat(Now(),'dd-mmm-yy')#</th>
 								</tr>
 								<tr>
 									<th></th>

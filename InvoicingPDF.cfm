@@ -486,7 +486,8 @@
 							</tr>
 							</cfif>
 							<tr>
-								<th width="250" align="left" valign="middle">Delivery Charges @ &pound;#invoice.delPrice# per day</th>
+								<th width="250" align="left" valign="middle">Delivery Charges
+									<cfif invoice.delPrice gt 0> @ &pound;#invoice.delPrice# per day</cfif></th>
 								<td align="right" valign="middle">&pound;#DecimalFormat(invoice.DelChargeTotal)#</td>
 							</tr>
 							<tr>

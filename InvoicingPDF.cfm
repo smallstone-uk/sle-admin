@@ -55,8 +55,9 @@
 		WHERE ctlID=1
 		LIMIT 1;
 	</cfquery>
-<!---	<cfdump var="#invoice#" label="invoice" expand="yes" format="html" 
-	output="#application.site.dir_logs#inv-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+<!---
+	<cfdump var="#invoice#" label="invoice" expand="yes" format="html" 
+		output="#application.site.dir_logs#inv-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 --->
 	<cfoutput>
 	<cfif NOT DirectoryExists("#application.site.dir_invoices##DateFormat(parm.invDate,'yy-mm-dd')#")>
@@ -485,7 +486,7 @@
 							</tr>
 							</cfif>
 							<tr>
-								<th width="250" align="left" valign="middle">Delivery Charge</th>
+								<th width="250" align="left" valign="middle">Delivery Charges @ &pound;#invoice.delPrice# per day</th>
 								<td align="right" valign="middle">&pound;#DecimalFormat(invoice.DelChargeTotal)#</td>
 							</tr>
 							<tr>

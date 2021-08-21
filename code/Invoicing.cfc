@@ -289,15 +289,17 @@
 			
 			<cfquery name="QOrders" datasource="#args.datasource#">
 				SELECT *
-				FROM tblOrder, tblStreets2
+				FROM tblOrder
+				INNER JOIN tbldelcharges ON delCode = ordDeliveryCode
+				INNER JOIN tblstreets2 ON stID = ordStreetCode
 				WHERE ordID = #args.ordID#
-				AND ordStreetCode=stID
 				AND ordActive=1
 				LIMIT 1;
 			</cfquery>
 			<cfset result.ordID=args.ordID>
 			<cfset result.ordRef=QOrders.ordRef>
 			<cfset result.ordContact=QOrders.ordContact>
+			<cfset result.delPrice = QOrders.delPrice1>
 			<cfif QOrders.ordDifferent>
 				<cfset result.deliverTo="To: #QOrders.ordHouseName# #QOrders.ordHouseNumber# #QOrders.stName#">
 			<cfelse><cfset result.deliverTo=""></cfif>

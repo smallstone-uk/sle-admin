@@ -20,7 +20,7 @@
 	<table class="tableList" border="1">
 		<tr>
 			<td colspan="3"><h1>#result.pubTitle#</h1></td> 
-			<td colspan="4"><h1>#result.pubGroup#</h1></td>
+			<td colspan="5"><h1>#result.pubGroup#</h1></td>
 		</tr>
 		<tr>
 			<th align="left">Client Ref</th>
@@ -36,6 +36,9 @@
 		<cfset totalValue=0>
 		<cfloop query="result.QCustomers">
 			<cfset rowQty=oiSun+oiMon+oiTue+oiWed+oiThu+oiFri+oiSat>
+			<cfif ListFind("H,N",cltaccounttype) OR oistatus eq 'inactive'>
+				<cfset rowQty = 0>
+			</cfif>
 			<cfset rowValue=rowQty*pubPrice>
 			<cfset totalQty += rowQty>
 			<cfset totalValue += rowValue>
@@ -47,11 +50,11 @@
 				<td>#cltaccounttype#</td>
 				<td>#oistatus#</td>
 				<td align="center">#rowQty#</td>
-				<td align="right">#DecimalFormat(rowValue)#</td>
+				<td align="right"><cfif rowValue neq 0>#DecimalFormat(rowValue)#</cfif></td>
 			</tr>
 		</cfloop>
 		<tr>
-			<td colspan="5"></td>
+			<td colspan="6"></td>
 			<td align="center">#totalQty#</td>
 			<td align="right">#DecimalFormat(totalValue)#</td>
 		</tr>

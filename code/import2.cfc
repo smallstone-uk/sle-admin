@@ -215,7 +215,20 @@
 			
 			<!--- sanitize data --->
 			<cfset args.packQty = Iif(val(args.packQty) eq 0,1,val(args.packQty))>
-
+			<cfif Find(args.packsize,args.description,0)>
+				<cfset args.description = Replace(args.description,args.packsize,"")>
+			</cfif>
+			<cfif Find("RRP",args.description,0)>	<!--- remove RRP --->
+				<cfset args.description = Replace(args.description,"RRP","")>
+			</cfif>
+			<cfif Find("£",args.description) gt 0>	<!--- remove price e.g. £3.49 --->
+				<cfset args.description = ReReplace(args.description,"£\d\.?\d*","")>
+			</cfif>
+			<cfif ReFind("PM[P]?\d*",args.description) gt 0>	<!--- remove PM or PMP --->
+				<cfset args.description = ReReplace(args.description,"PM[P]?\d*","")>
+				<cfset args.pm = true>
+			</cfif>
+			
 			<!--- calculate price --->
 			<cfset loc.result.netUnitPrice = RoundDec(args.WSP / val(args.packQty))>
 			<cfset loc.result.grossUnitPrice = RoundDec(loc.result.netUnitPrice * (1 + args.VAT / 100))>
@@ -262,7 +275,7 @@
 							#loc.categoryID#,
 							'#args.code#',
 							'#args.description#',
-							'#args.description#',
+							'#Left(args.description,40)#',
 							#int(args.pm)#,
 							#args.packQty#,
 							'#args.packsize#',
@@ -285,7 +298,9 @@
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#">
 						UPDATE tblProducts
 						SET prodPriceMarked = #int(args.pm)#,
-							prodOurPrice = #loc.result.ourPrice#
+							prodOurPrice = #loc.result.ourPrice#,
+							prodRecordTitle = '#args.description#',
+							prodTitle = '#Left(args.description,40)#'
 						WHERE prodID = #loc.result.productID#
 					</cfquery>
 					<cfset loc.result.action = "#loc.result.action#Product Updated<br>">

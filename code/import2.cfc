@@ -228,6 +228,21 @@
 				<cfset args.description = ReReplace(args.description,"PM[P]?\d*","")>
 				<cfset args.pm = true>
 			</cfif>
+			<cfif FindNoCase("Happy Shopper",args.description) gt 0>	<!--- remove long text --->
+				<cfset args.description = ReplaceNoCase(args.description,"Happy Shopper","HS")>
+			</cfif>
+			<cfif FindNoCase("Euro Shopper",args.description) gt 0>	<!--- remove long text --->
+				<cfset args.description = ReplaceNoCase(args.description,"Euro Shopper","ES")>
+			</cfif>
+			<cfif FindNoCase("Cadbury Dairy Milk",args.description) gt 0>	<!--- remove long text --->
+				<cfset args.description = ReplaceNoCase(args.description,"Cadbury Dairy Milk","CDM")>
+			</cfif>
+			<cfif FindNoCase("Discover The Choice",args.description) gt 0>	<!--- remove long text --->
+				<cfset args.description = ReplaceNoCase(args.description,"Discover The Choice","DTC")>
+			</cfif>
+			<cfif FindNoCase("Delicatessen Fine Eating",args.description) gt 0>	<!--- remove long text --->
+				<cfset args.description = ReplaceNoCase(args.description,"Delicatessen Fine Eating","DFE")>
+			</cfif>
 			
 			<!--- calculate price --->
 			<cfset loc.result.netUnitPrice = RoundDec(args.WSP / val(args.packQty))>

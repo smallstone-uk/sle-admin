@@ -2238,6 +2238,41 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="SalesDuplicates" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cfquery name="loc.QTrans" datasource="#args.datasource#">
+			SELECT trnID,trnDate,trnAmnt1,trnAmnt2, COUNT(niID) AS Items
+			FROM tbltrans mto
+			LEFT JOIN tblNomItems ON niTranID=trnID
+			WHERE trnLedger = '#args.nomType#'
+			AND trnAccountID = #args.accountID#
+			AND EXISTS (
+					SELECT 1
+					FROM tbltrans mti
+					WHERE trnLedger = '#args.nomType#'
+					AND trnAccountID = #args.accountID#
+					AND mti.trnDate = mto.trnDate
+					LIMIT 1, 1
+				)
+			GROUP BY trnID
+		</cfquery>
+		<cfset loc.result.trans = QueryToArrayOfStruct(loc.QTrans)>
+		<cfset loc.result.dupes = []>
+		<cfloop query="loc.QTrans">
+			<cfset ArrayAppend(loc.result.dupes,{
+				trnID = trnID,
+				trnDate = trnDate,
+				trnAmnt1 = trnAmnt1,
+				trnAmnt2 = trnAmnt2,
+				Items = Items
+			})>			
+		</cfloop>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="TranSummary" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>

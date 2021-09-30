@@ -17,6 +17,8 @@
 <cfset parm.accountID=#url.account#>
 <cfset parm.datasource=application.site.datasource1>
 <cfset suppData=supp.TranList(parm)>
+<cfset SalesDuplicates=supp.SalesDuplicates(parm)>
+
 <body>
 	<cfoutput>
 		<table width="800">
@@ -71,6 +73,28 @@
 					<td colspan="8">#suppData.msg#</td>
 				</tr>
 			</cfif>
+		</table>
+		<h1>Data Exceptions</h1>
+		<table width="500">
+			<tr>
+				<th>ID</th>
+				<th>Date</th>
+				<th>Net</th>
+				<th>VAT</th>
+			</tr>
+			<cfset currDate = "">
+			<cfloop array="#SalesDuplicates.dupes#" index="item">
+				<cfif currDate neq item.trnDate>
+					<tr><td>&nbsp;</td></tr>
+				</cfif>
+				<tr>
+					<td align="right">#item.trnID#</td>
+					<td align="right">#LSDateFormat(item.trnDate,"dd-mmm-yyyy")#</td>
+					<td align="right">#item.trnAmnt1#</td>
+					<td align="right">#item.trnAmnt2#</td>
+				</tr>
+				<cfset currDate = item.trnDate>
+			</cfloop>
 		</table>
 	</cfoutput>
 </body>

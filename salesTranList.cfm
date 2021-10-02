@@ -13,11 +13,14 @@
 <cfobject component="code/accounts" name="supp">
 <cfset parm={}>
 <!---<cfset parm.nomGroup=2>--->
-<cfset parm.nomType="sales">
-<cfset parm.accountID=#url.account#>
-<cfset parm.datasource=application.site.datasource1>
-<cfset suppData=supp.TranList(parm)>
-<cfset SalesDuplicates=supp.SalesDuplicates(parm)>
+
+<cfset parm.nomType = "sales">
+<cfset parm.accountID = url.account>
+<cfset parm.fromDate = url.fromDate>
+<cfset parm.datasource = application.site.datasource1>
+<cfset suppData = supp.TranList(parm)>
+<cfset SalesDuplicates = supp.SalesDuplicates(parm)>
+<cfset SalesMissing = supp.SalesMissing(parm)>
 
 <body>
 	<cfoutput>
@@ -31,7 +34,7 @@
 				<td>#suppData.supplier.accGroup#</td>
 			</tr>
 		</table>
-		<table width="800">
+		<table width="800" class="tableList">
 			<tr>
 				<th>ID</th>
 				<th>Date</th>
@@ -74,13 +77,14 @@
 				</tr>
 			</cfif>
 		</table>
-		<h1>Data Exceptions</h1>
-		<table width="500">
+		<h1>Data Duplicates</h1>
+		<table width="500" class="tableList">
 			<tr>
 				<th>ID</th>
 				<th>Date</th>
 				<th>Net</th>
 				<th>VAT</th>
+				<th>Items</th>
 			</tr>
 			<cfset currDate = "">
 			<cfloop array="#SalesDuplicates.dupes#" index="item">
@@ -88,12 +92,21 @@
 					<tr><td>&nbsp;</td></tr>
 				</cfif>
 				<tr>
-					<td align="right">#item.trnID#</td>
+					<td><a href="#application.site.normal#salesMain3.cfm?acc=1&tran=#item.trnID#" target="#item.trnID#">#item.trnID#</a></td>
 					<td align="right">#LSDateFormat(item.trnDate,"dd-mmm-yyyy")#</td>
 					<td align="right">#item.trnAmnt1#</td>
 					<td align="right">#item.trnAmnt2#</td>
+					<td align="right">#item.items#</td>
 				</tr>
 				<cfset currDate = item.trnDate>
+			</cfloop>
+		</table>
+		<h1>Data Missing</h1>
+		<table width="500" class="tableList">
+			<cfloop array="#SalesMissing#" index="thisDate">
+			<tr>
+				<td>#thisDate#</td>
+			</tr>
 			</cfloop>
 		</table>
 	</cfoutput>

@@ -2227,6 +2227,7 @@
 			FROM tblTrans 
 			WHERE trnLedger='#args.nomType#'
 			AND trnAccountID=#args.accountID#
+			AND trnDate >= '#args.fromDate#'
 			ORDER by trnDate
 			<!---LIMIT 0,50;--->
 		</cfquery>
@@ -2236,6 +2237,25 @@
 			<cfset result.msg="No transactions found.">
 		</cfif>
 		<cfreturn result>
+	</cffunction>
+
+	<cffunction name="SalesMissing" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = []>
+
+		<cfloop from="#args.fromDate#" to="#NOW()#" index="thisDate">
+			<cfquery name="loc.QTrans" datasource="#args.datasource#">
+				SELECT trnID FROM tbltrans 
+				WHERE trnLedger = '#args.nomType#'
+				AND trnAccountID = #args.accountID#
+				AND trnDate = '#DateFormat(thisDate,"yyyy-mm-dd")#'
+			</cfquery>
+			<cfif loc.QTrans.recordCount IS 0>
+				<cfset ArrayAppend(loc.result,DateFormat(thisDate,"ddd dd-mmm-yy"))>
+			</cfif>
+		</cfloop>
+		<cfreturn loc.result>
 	</cffunction>
 
 	<cffunction name="SalesDuplicates" access="public" returntype="struct">
@@ -2249,6 +2269,7 @@
 			LEFT JOIN tblNomItems ON niTranID=trnID
 			WHERE trnLedger = '#args.nomType#'
 			AND trnAccountID = #args.accountID#
+			AND trnDate >= '#args.fromDate#'
 			AND EXISTS (
 					SELECT 1
 					FROM tbltrans mti

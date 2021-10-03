@@ -2223,11 +2223,13 @@
 		</cfquery>
 		<cfset result.supplier=QueryToStruct(QAccount)>
 		<cfquery name="QTrans" datasource="#args.datasource#">
-			SELECT *
+			SELECT tblTrans.*, COUNT(niID) AS nomRecs
 			FROM tblTrans 
+			LEFT JOIN tblNomItems ON niTranID=trnID
 			WHERE trnLedger='#args.nomType#'
 			AND trnAccountID=#args.accountID#
 			AND trnDate >= '#args.fromDate#'
+			GROUP BY trnID
 			ORDER by trnDate
 			<!---LIMIT 0,50;--->
 		</cfquery>

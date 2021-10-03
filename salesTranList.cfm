@@ -7,6 +7,13 @@
 <link href="css/chosen.css" rel="stylesheet" type="text/css">
 <link href="css/tabs.css" rel="stylesheet" type="text/css">
 <title>Transaction List</title>
+	<style>
+		.noItems {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D47FAA !Important}
+		.different {color:#553FFF; font-size:16px; font-weight:bold; background-color:#FFCCFF !Important}
+		.changed {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D4FF55 !Important}
+		.ourPrice {color:#553FFF; font-size:16px; font-weight:bold !Important}
+		.noBarcode {color:#FF0000; font-weight:bold}
+	</style>
 </head>
 
 <cftry>
@@ -44,6 +51,7 @@
 				<th>VAT/Disc</th>
 				<th>Gross</th>
 				<th>Balance</th>
+				<th>Items</th>
 				<th>Allocated</th>
 			</tr>
 			<cfif StructKeyExists(suppData,"trans")>
@@ -52,6 +60,8 @@
 				<cfloop array="#suppData.trans#" index="item">
 					<cfset total1=total1+item.trnAmnt1>
 					<cfset total2=total2+item.trnAmnt2>
+					<cfif item.nomRecs IS 0><cfset classItems = "noItems">
+						<cfelse><cfset classItems = ""></cfif>
 					<tr>
 						<td><a href="#application.site.normal#salesMain3.cfm?acc=1&tran=#item.trnID#" target="#item.trnID#">#item.trnID#</a></td>
 						<td align="right">#LSDateFormat(item.trnDate,"dd-mmm-yyyy")#</td>
@@ -61,6 +71,7 @@
 						<td align="right">#item.trnAmnt2#</td>
 						<td align="right">#DecimalFormat(item.trnAmnt1+item.trnAmnt2)#</td>
 						<td align="right">#DecimalFormat(total1+total2)#</td>
+						<td align="center" class="#classItems#">#item.nomRecs#</td>
 						<td align="center">#item.trnAlloc#</td>
 					</tr>
 				</cfloop> 

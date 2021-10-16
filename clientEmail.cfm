@@ -80,7 +80,7 @@
 							<cfelse><cfset sendTo=msg.email></cfif>
 							<cfset msgText = "Dear #msg.name#,<br />#ParagraphFormat(msg.text)#">
 							<cfmail 
-								to="#sendTo#" 
+								to="#sendTo#,#application.siteclient.cltMailOffice#" 
 								bcc="#application.siteclient.cltMailOffice#"
 								from="#application.siteclient.cltMailOffice#"
 								server="#application.siteclient.cltMailServer#"

@@ -1054,7 +1054,7 @@
 			</cfsavecontent>
 			<cfsavecontent variable="logit">
 				to="#args.email#" 
-				from="cfmail@shortlanesendstore.co.uk" 
+				from="news@shortlanesendstore.co.uk" 
 				bcc="news@shortlanesendstore.co.uk" 
 				server="mail.shortlanesendstore.co.uk" 
 				username="cfmail@shortlanesendstore.co.uk" 
@@ -1073,7 +1073,7 @@
 			<cflog text="#logit#">
 			<cfmail 
 				to="#args.email#" 
-				from="cfmail@shortlanesendstore.co.uk" 
+				from="news@shortlanesendstore.co.uk" 
 				bcc="news@shortlanesendstore.co.uk" 
 				server="mail.shortlanesendstore.co.uk" 
 				username="cfmail@shortlanesendstore.co.uk" 

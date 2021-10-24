@@ -1052,14 +1052,33 @@
 					</html>
 				</cfoutput>
 			</cfsavecontent>
-			<cfmail 
+			<cfsavecontent variable="logit">
 				to="#args.email#" 
-				from="news@shortlanesendstore.co.uk" 
+				from="cfmail@shortlanesendstore.co.uk" 
 				bcc="news@shortlanesendstore.co.uk" 
 				server="mail.shortlanesendstore.co.uk" 
-				username="steven@shortlanesendstore.co.uk" 
+				username="cfmail@shortlanesendstore.co.uk" 
 				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
-				subject="#args.subject# - Shortlanesend Store">
+				subject="#args.subject# - Shortlanesend Store X">
+				cfmailpart type="plain">
+					Hello #args.name#,
+					#args.subject#
+					#args.text#
+					If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+				/cfmailpart>
+				cfmailpart type="html">
+					#content#
+				/cfmailpart>
+			</cfsavecontent>
+			<cflog text="#logit#">
+			<cfmail 
+				to="#args.email#" 
+				from="cfmail@shortlanesendstore.co.uk" 
+				bcc="news@shortlanesendstore.co.uk" 
+				server="mail.shortlanesendstore.co.uk" 
+				username="cfmail@shortlanesendstore.co.uk" 
+				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
+				subject="#args.subject# - Shortlanesend Store X">
 				<cfmailpart type="plain">
 					Hello #args.name#,
 					#args.subject#

@@ -71,23 +71,21 @@
 						<td>#msg.cltRef#</td>
 						<td>#msg.name#</td>
 						<td>#msg.email#</td>
-						
 						<td>#msg.trnRef#</td>
 						<td><a href="#msg.url#" target="_blank"><img src="images/pdfIcon.gif" /></a></td>
 						<cfif sendMsgs AND ListFind(form.sendMe,msg.cltRef,",")>
 							<cfif StructKeyExists(form,"testMsgs")>
-								<cfset sendTo="steven@shortlanesendstore.co.uk">
+								<cfset sendTo="news@shortlanesendstore.co.uk">
 							<cfelse><cfset sendTo=msg.email></cfif>
 							<cfset msgText = "Dear #msg.name#,<br />#ParagraphFormat(msg.text)#">
 							<cfmail 
-								to="#sendTo#,#application.siteclient.cltMailOffice#" 
+								to="#sendTo#" 
 								bcc="#application.siteclient.cltMailOffice#"
 								from="#application.siteclient.cltMailOffice#"
 								server="#application.siteclient.cltMailServer#"
 								username="#application.siteclient.cltMailAccount#"
-								password="rNUy5XBXuZfxkdw"
-								<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
-								subject="#msg.subject# - #application.siteclient.cltCompanyName#">
+								password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
+								subject="#msg.subject# - #application.siteclient.cltCompanyName# cm">
 								<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>
 								<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>
 								<cfmailparam type="application/pdf" disposition="attachment" file="#msg.attach#"></cfmailparam>
@@ -97,7 +95,7 @@
 							</cfmail>
 							<cffile action="append" addnewline="yes" 
 								file="D:\HostingSpaces\SLE-Production\sle-admin.co.uk\data\logs\email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
-								output="Message sent to: #sendTo# - #msg.subject# #msg.cltRef#">
+								output="Message sent to: #sendTo# - #msg.subject# #msg.cltRef# #application.siteclient.cltMailAccount#">
 							<td>sent to #sendTo#</td>
 						<cfelse>
 							<td>not sent</td>

@@ -2,7 +2,7 @@
 <!--- send remittance --->
 <cftry>
 	<cfobject component="code/clients" name="cust">
-	<cfparam name="sendTo" default="steven@shortlanesendstore.co.uk">
+	<cfparam name="sendTo" default="accounts@shortlanesendstore.co.uk">
 	<cfparam name="msgText" default="Please see attached document">
 	<cfparam name="attachment" default="sample.txt">
 	<cfset filePath = "#application.site.dir_data#remittances\">
@@ -10,7 +10,7 @@
 		<!---to="#sendTo#"--->
 	<cfmail 
 		to="#sendTo#"
-		bcc="steven@shortlanesendstore.co.uk"
+		bcc="accounts@shortlanesendstore.co.uk"
 		from="accounts@shortlanesendstore.co.uk"
 		server="#application.siteclient.cltMailServer#"
 		username="#application.siteclient.cltMailAccount#"

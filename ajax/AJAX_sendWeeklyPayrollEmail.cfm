@@ -12,12 +12,11 @@
 		<cfmail		
 			debug="yes"
 			to="#sendTo#"
-			<!---cc="steven@shortlanesendstore.co.uk"--->
+			cc="admin@shortlanesendstore.co.uk"
 			from="#application.siteclient.cltMailAccount#"
 			server="#application.siteclient.cltMailServer#"
 			username="#application.siteclient.cltMailAccount#"
-			password="rNUy5XBXuZfxkdw"
-			<!---password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"--->
+			password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
 			subject="#application.siteclient.cltCompanyName# - Payslip">
 			<cfmailpart charset="utf-8" type="text/plain">#cust.textMessage(msgText)#</cfmailpart>	 <!---always put plain first --->
 			<cfmailpart charset="utf-8" type="text/html">#msgText#</cfmailpart>

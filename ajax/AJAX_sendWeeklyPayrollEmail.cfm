@@ -12,8 +12,8 @@
 		<cfmail		
 			debug="yes"
 			to="#sendTo#"
-			cc="admin@shortlanesendstore.co.uk"
-			from="#application.siteclient.cltMailAccount#"
+			bcc="#application.siteclient.cltMailSupport#"
+			from="#application.siteclient.cltMailSupport#"
 			server="#application.siteclient.cltMailServer#"
 			username="#application.siteclient.cltMailAccount#"
 			password="#cust.DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"

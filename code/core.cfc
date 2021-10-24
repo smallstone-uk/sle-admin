@@ -1078,7 +1078,7 @@
 				server="mail.shortlanesendstore.co.uk" 
 				username="cfmail@shortlanesendstore.co.uk" 
 				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
-				subject="#args.subject# - Shortlanesend Store X">
+				subject="#args.subject# - Shortlanesend Store">
 				<cfmailpart type="plain">
 					Hello #args.name#,
 					#args.subject#

@@ -174,13 +174,15 @@
 
 		<cftry>
 			<cfquery name="loc.QHoliday" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT empID,empFirstName,empLastName, AVG(piRate) AS Rate, YEAR(phDate) AS YYYY, SUM( piHours ) AS Work, 
-					SUM( piHolHours ) AS Holiday, SUM(piHours) * 0.1207 AS Entitlement
+				SELECT empID,empFirstName,empLastName,empDOB, AVG(piRate) AS Rate, YEAR(phDate) AS YYYY, SUM( piHours ) AS Work, 
+					SUM( piHolHours ) AS Holiday, DATEDIFF(phDate,empDOB) / 365 AS Age,
+					SUM(IF(DATEDIFF(phDate,empDOB) < 5840,0,piHours * 0.1207)) AS Entitlement
 				FROM tblpayitems
 				INNER JOIN tblPayHeader ON piParent = phID
 				INNER JOIN tblEmployee ON phEmployee = empID
 				WHERE phDate BETWEEN '#args.form.from#' AND '#args.form.to#'
 				<cfif StructKeyExists(args.form,"employee") AND len(args.form.employee)>AND empID IN (#args.form.employee#)</cfif>
+				<cfif StructKeyExists(args.form,"active")>AND empStatus = 'active'</cfif>
 				AND empRate = 0
 				GROUP BY empID, YYYY
 				ORDER BY empLastName,empID, YYYY

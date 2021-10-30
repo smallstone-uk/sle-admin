@@ -283,6 +283,7 @@
 		<tr>
 			<th width="200">Name</th>
 			<th width="100" align="right">Year</th>
+			<th width="100" align="right">Age</th>
 			<th width="100" align="right">Work<br />Hours</th>
 			<th width="100" align="right">Holiday<br />Entitlement</th>
 			<th width="100" align="right">Holiday<br />Taken</th>
@@ -293,6 +294,7 @@
 			<th width="100" align="right">Balance</th>
 		</tr>
 		<cfset employeeID = 0>
+		<cfset dob = "">
 		<cfset t.work = 0>
 		<cfset t.Entitlement = 0>
 		<cfset t.Holiday = 0>
@@ -305,8 +307,10 @@
 		<cfloop query="Report.QHoliday">
 			<cfset diff = (Round(Entitlement * 100) / 100) - Holiday>
 			<cfset value = diff * Rate>
+			<cfset age = 0>
 			<cfif employeeID gt 0 AND empID neq employeeID>
 				<tr>
+					<th align="left">(#LSDateFormat(dob)#)</th>
 					<th colspan="2">Totals</th>
 					<th align="right">#DecimalFormat(t.work)#</th>
 					<th align="right">#DecimalFormat(t.Entitlement)#</th>
@@ -328,6 +332,7 @@
 			<tr>
 				<td>#empfirstname# #emplastname#</td>
 				<td align="right">#YYYY#</td>
+				<td align="right">#DecimalFormat(age)#</td>
 				<td align="right">#DecimalFormat(Work)#</td>
 				<td align="right">#DecimalFormat(Entitlement)#</td>
 				<td align="right">#DecimalFormat(Holiday)#</td>
@@ -337,6 +342,7 @@
 				<td align="right"><cfif value lt 0>#DecimalFormat(value)#</cfif></td>
 			</tr>
 			<cfset employeeID = empID>
+			<cfset dob = empDOB>
 			<cfset t.work += work>
 			<cfset t.Entitlement += Entitlement>
 			<cfset t.Holiday += Holiday>
@@ -351,6 +357,7 @@
 			</cfif>
 		</cfloop>
 		<tr>
+			<th align="left">(#LSDateFormat(dob)#)</th>
 			<th colspan="2">Totals</th>
 			<th align="right">#DecimalFormat(t.work)#</th>
 			<th align="right">#DecimalFormat(t.Entitlement)#</th>
@@ -362,7 +369,7 @@
 			<th align="right">#DecimalFormat(t.debit + t.credit)#</th>
 		</tr>
 		<tr>
-			<th colspan="2">Grand Total</th>
+			<th colspan="3">Grand Total</th>
 			<th align="right"></th>
 			<th align="right"></th>
 			<th align="right"></th>

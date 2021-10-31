@@ -4056,8 +4056,10 @@
 			<cfset result.clients=[]>		
 			<cfset result.balances=[]>		
 			<cfquery name="QClients" datasource="#args.datasource#" result="QResult">
-				SELECT cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltAccountType,cltPayType,cltPayMethod,cltChase,cltChaseDate
+				SELECT cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltAccountType,cltPayType,cltPayMethod,cltChase,cltChaseDate,
+					ordHouseName,ordHouseNumber,ordActive
 				FROM tblClients
+				INNER JOIN tblOrder ON ordClientID=cltID
 				WHERE true
 				<cfif len(StructFind(args.form,"srchType"))>
 					<cfif args.form.srchType eq 'notN'>
@@ -4069,8 +4071,11 @@
 				<!---<cfif len(StructFind(args.form,"srchType"))>AND cltAccountType="#args.form.srchType#"</cfif>--->
 				<cfif len(StructFind(args.form,"srchPayType"))>AND cltPayType="#args.form.srchPayType#"</cfif>
 				<cfif len(StructFind(args.form,"srchMethod"))>AND cltPayMethod="#args.form.srchMethod#"</cfif>
-				<cfif len(StructFind(args.form,"srchName"))>AND (cltName LIKE "%#args.form.srchName#%" OR cltCompanyName LIKE "%#args.form.srchName#%")</cfif>
+				<cfif len(StructFind(args.form,"srchName"))>AND (cltName LIKE "%#args.form.srchName#%" 
+					OR cltCompanyName LIKE "%#args.form.srchName#%" 
+					OR ordHouseName LIKE "%#args.form.srchName#%")</cfif>
 				<cfif StructKeyExists(args.form,"srchSkipInactive")>AND cltAccountType <> "N"</cfif>
+				<cfif StructKeyExists(args.form,"srchActive")>AND ordActive = 1</cfif>
 				<cfif len(args.form.srchSort)>ORDER BY #args.form.srchSort#</cfif>
 			</cfquery>
 			<cfif val(args.form.srchMin) gt 0><cfset minVal=val(args.form.srchMin)>
@@ -4088,6 +4093,9 @@
 				<cfset item.methodKey=cltPayMethod>
 				<cfset item.cltChase=cltChase>
 				<cfset item.cltChaseDate=cltChaseDate>
+				<cfset item.ordHouseName=ordHouseName>
+				<cfset item.ordHouseNumber=ordHouseNumber>
+				<cfset item.ordActive=ordActive>
 				<cfset item.balance0=0>
 				<cfset item.balance1=0>
 				<cfset item.balance2=0>

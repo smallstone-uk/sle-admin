@@ -38,6 +38,7 @@
 <cfparam name="srchSort" default="">
 <cfparam name="srchSkipAllocated" default="true">
 <cfparam name="srchSkipZeros" default="true">
+<cfparam name="srchActive" default="true">
 <body>
 	<cfoutput>
 	<div id="wrapper">
@@ -130,6 +131,10 @@
 								<td><input type="checkbox" name="srchSkipZeros" value="1"<cfif StructKeyExists(form,"srchSkipZeros")> checked="checked"</cfif> /></td>
 							</tr>
 							<tr>
+								<td>Active Orders Only</td>
+								<td><input type="checkbox" name="srchActive" value="1"<cfif StructKeyExists(form,"srchActive")> checked="checked"</cfif> /></td>
+							</tr>
+							<tr>
 								<td>Sort By</td>
 								<td>
 									<select name="srchSort">
@@ -177,6 +182,8 @@
 				<tr>
 					<th height="24" align="right">Ref</th>
 					<th>Name</th>
+					<th>Address</th>
+					<th>Active</th>
 					<th>Type</th>
 					<th>Pay Type</th>
 					<th>Method</th>
@@ -212,6 +219,8 @@
 						<tr>
 							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
+							<td align="center">#item.ordHouseName# #item.ordHouseNumber#</td>
+							<td align="center">#item.ordActive#</td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>
@@ -246,6 +255,8 @@
 						<tr>
 							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
+							<td align="center">#item.ordHouseName# #item.ordHouseNumber#</td>
+							<td align="center">#item.ordActive#</td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>
@@ -261,8 +272,8 @@
 				</cfif>
 				<cfif debitCount gt 0>
 					<tr>
-						<td colspan="2">#debitCount# in debit</td>
-						<td colspan="3">Debit Totals</td>
+						<td colspan="3">#debitCount# in debit</td>
+						<td colspan="4">Debit Totals</td>
 						<td class="amountTotal">#showNum(totals[1])#</td>
 						<td class="amountTotal">#showNum(totals[2])#</td>
 						<td class="amountTotal">#showNum(totals[3])#</td>
@@ -273,8 +284,8 @@
 				</cfif>
 				<cfif creditCount gt 0>
 					<tr>
-						<td colspan="2">#creditCount# in credit</td>
-						<td colspan="3">Credit Totals</td>
+						<td colspan="3">#creditCount# in credit</td>
+						<td colspan="4">Credit Totals</td>
 						<td class="amountTotal">#showNum(credits[1])#</td>
 						<td class="amountTotal">#showNum(credits[2])#</td>
 						<td class="amountTotal">#showNum(credits[3])#</td>

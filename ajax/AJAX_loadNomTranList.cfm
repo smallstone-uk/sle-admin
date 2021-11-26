@@ -73,17 +73,30 @@
 			<cfset balance=transactions.bfwd>
 			<cfif balance NEQ 0>
 				<tr>
-					<td colspan="8" align="right"><strong>Brought Forward</strong>&nbsp;</td>
+					<td colspan="9" align="right"><strong>Brought Forward</strong>&nbsp;</td>
 					<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
 				</tr>
 			</cfif>
 			<cfset tranCount = 0>
 			<cfset drTotal = 0>
 			<cfset crTotal = 0>
+			<cfset lastDate = -1>
+			<cfset changeCounter = 0>
 			<cfloop array="#transactions.tranList#" index="item">
 				<cfset tranCount++>
 				<cfset accID = val(item.trnAccountID)>
-				<tr>
+				<cfif lastDate neq item.trnDate>
+					<cfset changeCounter++>
+				</cfif>
+				<cfset dayMod = changeCounter MOD 2>
+				<cfif dayMod eq 1>
+					<cfset shade = "##cccccc">
+				<cfelse>
+					<cfset shade = "##ffffff">
+				</cfif>
+				<cfset lastDate = item.trnDate>
+
+				<tr bgcolor="#shade#">
 					<td width="10" align="center">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>

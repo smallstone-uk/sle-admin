@@ -154,7 +154,7 @@
 			<cfif len(args.form.nominal_ref)>
 				AND trnDesc LIKE '%#args.form.nominal_ref#%'
 			</cfif>
-			ORDER BY trnDate ASC, trnID ASC
+			ORDER BY trnDate ASC, trnType, trnID ASC
 		</cfquery>
 		<cfset loc.startdate=DateFormat(loc.trans.trnDate[1],"yyyy-mm-dd")>
 		<cfset loc.filter="AND trnDate < '#loc.startdate#'">

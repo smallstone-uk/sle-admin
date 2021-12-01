@@ -24,7 +24,8 @@
 <cfset parm.nomType = "sales">
 <cfset parm.accountID = url.account>
 <cfset parm.fromDate = url.fromDate>
-<cfset parm.toDate = url.toDate>
+<cfif StructKeyExists(url,"toDate")><cfset parm.toDate = url.toDate>
+	<cfelse><cfset parm.toDate = ""></cfif>
 <cfset parm.datasource = application.site.datasource1>
 <cfset suppData = supp.TranList(parm)>
 <cfset SalesDuplicates = supp.SalesDuplicates(parm)>

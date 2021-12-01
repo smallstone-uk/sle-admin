@@ -2221,6 +2221,11 @@
 			WHERE accID=#val(args.accountID)#
 			LIMIT 1;
 		</cfquery>
+		<cfif IsDate(args.toDate)>
+			<cfset loc.toDate = args.toDate>
+		<cfelse>
+			<cfset loc.toDate = DateFormat(now(),'yyyy-mm-dd')>
+		</cfif>
 		<cfset result.supplier=QueryToStruct(QAccount)>
 		<cfquery name="QTrans" datasource="#args.datasource#">
 			SELECT tblTrans.*, COUNT(niID) AS nomRecs
@@ -2229,7 +2234,7 @@
 			WHERE trnLedger='#args.nomType#'
 			AND trnAccountID=#args.accountID#
 			AND trnDate >= '#args.fromDate#'
-			AND trnDate <= '#args.toDate#'
+			AND trnDate <= '#loc.toDate#'
 			GROUP BY trnID
 			ORDER by trnDate
 			<!---LIMIT 0,50;--->
@@ -2246,8 +2251,12 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = []>
-
-		<cfloop from="#args.fromDate#" to="#NOW()#" index="thisDate">
+		<cfif IsDate(args.toDate)>
+			<cfset loc.toDate = args.toDate>
+		<cfelse>
+			<cfset loc.toDate = DateFormat(now(),'yyyy-mm-dd')>
+		</cfif>
+		<cfloop from="#args.fromDate#" to="#loc.toDate#" index="thisDate">
 			<cfquery name="loc.QTrans" datasource="#args.datasource#">
 				SELECT trnID FROM tbltrans 
 				WHERE trnLedger = '#args.nomType#'
@@ -2265,6 +2274,11 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfif IsDate(args.toDate)>
+			<cfset loc.toDate = args.toDate>
+		<cfelse>
+			<cfset loc.toDate = DateFormat(now(),'yyyy-mm-dd')>
+		</cfif>
 
 		<cfquery name="loc.QTrans" datasource="#args.datasource#">
 			SELECT trnID,trnDate,trnAmnt1,trnAmnt2, COUNT(niID) AS Items
@@ -2273,6 +2287,7 @@
 			WHERE trnLedger = '#args.nomType#'
 			AND trnAccountID = #args.accountID#
 			AND trnDate >= '#args.fromDate#'
+			AND trnDate <= '#loc.toDate#'
 			AND EXISTS (
 					SELECT 1
 					FROM tbltrans mti

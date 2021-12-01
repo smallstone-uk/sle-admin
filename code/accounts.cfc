@@ -2229,6 +2229,7 @@
 			WHERE trnLedger='#args.nomType#'
 			AND trnAccountID=#args.accountID#
 			AND trnDate >= '#args.fromDate#'
+			AND trnDate <= '#args.toDate#'
 			GROUP BY trnID
 			ORDER by trnDate
 			<!---LIMIT 0,50;--->

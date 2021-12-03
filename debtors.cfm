@@ -81,6 +81,7 @@
 										<option value=""<cfif srchType eq ""> selected="selected"</cfif>>Any Type</option>
 										<option value="M"<cfif srchType eq "M"> selected="selected"</cfif>>Monthly</option>
 										<option value="W"<cfif srchType eq "W"> selected="selected"</cfif>>Weekly</option>
+										<option value="H"<cfif srchType eq "H"> selected="selected"</cfif>>On Hold</option>
 										<option value="N"<cfif srchType eq "N"> selected="selected"</cfif>>No Credit</option>
 										<option value="C"<cfif srchType eq "C"> selected="selected"</cfif>>A/c Collect</option>
 										<option value="X"<cfif srchType eq "X"> selected="selected"</cfif>>Special</option>

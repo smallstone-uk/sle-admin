@@ -1097,6 +1097,34 @@
 		</cfcatch>
 		</cftry>
 	</cffunction>
+	
+	<cffunction name="DateRangeOptions" access="public" returntype="string" hint="builds the menu items for searching by date">
+		<cfsavecontent variable="content">
+			<cfoutput>
+				<option value="0">All Records</option>
+				<option value="1">Last 7 Days</option>
+				<option value="2" selected>This Month</option>
+				<option value="3">From Last Month</option>
+				<option value="4">From Previous Month</option>
+				<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>
+				<cfloop list="#dateKeys#" index="key">
+					<cfset item=StructFind(application.site.FYDates,key)>
+					<option value="FY-#item.key#">Year #item.title#</option>
+				</cfloop>
+				<cfloop from="#year(Now())#" to="2013" step="-1" index="yearNum">
+					<option value="YEAR-#yearNum#">#yearNum# Jan-Dec</option>
+					<cfloop from="12" to="1" step="-1" index="i">
+						<cfif yearNum eq Year(Now()) AND i gt Month(Now())>
+						<cfelse>
+							<option value="#yearNum#-#NumberFormat(i,"00")#">#yearNum#-#NumberFormat(i,"00")#</option>
+						</cfif>
+					</cfloop>
+				</cfloop>
+			</cfoutput>
+		</cfsavecontent>
+		<cfreturn content>
+	</cffunction>
+
 </cfcomponent>
 
 

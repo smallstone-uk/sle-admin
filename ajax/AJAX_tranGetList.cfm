@@ -13,7 +13,6 @@
 	<cfset parm.account = acctData.account>
 	<cfif StructKeyExists(acctData.account, "accID") gt 0>
 		<cfset trans = accts.LoadTransactionList(parm)>
-		<!---<cfdump var="#trans#" label="trans" expand="no">--->
 		<cfoutput>
 			<script>
 				$(document).ready(function(e) {
@@ -193,14 +192,14 @@
 					<tr>
 						<th width="10" class="noPrint"></th>
 						<th align="left">ID</th>
-						<th align="right" width="100">Date</th>
+						<th align="right">Date</th>
 						<th>Type</th>
 						<th align="left">Ref</th>
 						<th align="left">Description</th>
-						<th align="right">Net</th>
-						<th align="right">VAT/<br />Disc</th>
-						<th align="right">Gross</th>
-						<th align="right">Balance</th>
+						<th align="right" width="70">Net</th>
+						<th align="right" width="70">VAT/<br />Disc</th>
+						<th align="right" width="70">Gross</th>
+						<th align="right" width="70">Balance</th>
 						<th class="center">Allocated<br>
 							<span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" tabindex="-1" style="width:20px; height:20px;"></span>
 						</th>
@@ -228,7 +227,7 @@
 						<tr id="trnItem_#item.trnID#">
 							<td class="noPrint"><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
 							<td id="trnItem_ID"><a href="javascript:void(0)" class="trnIDLink" data-id="#item.trnID#" data-type="#item.trnType#" tabindex="-1">#item.trnID#</a></td>
-							<td id="trnItem_Date" align="right">#LSDateFormat(item.trnDate,"ddd dd/mm/yyyy")#</td>
+							<td id="trnItem_Date" align="right">#LSDateFormat(item.trnDate,"ddd dd/mm/yy")#</td>
 							<td id="trnItem_Type" align="center">#item.trnType#</td>
 							<td id="trnItem_Ref">#item.trnRef#</td>
 							<td id="trnItem_Desc">#item.trnDesc#</td>

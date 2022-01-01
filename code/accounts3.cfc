@@ -146,6 +146,12 @@
 							<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
 							AND trnDate >= '#loc.fyDate.start#'
 							AND trnDate <= '#loc.fyDate.end#'
+						<cfelseif Left(args.form.srchRange,4) eq 'YEAR'>
+							<cfset loc.thisYear = ListRest(args.form.srchRange,"-")>
+							<cfset loc.fromYear = CreateDate(loc.thisYear,1,1)>
+							<cfset loc.toYear = CreateDate(loc.thisYear,12,31)>
+							AND trnDate >= '#LSDateFormat(loc.fromYear,"yyyy-mm-dd")#' 
+							AND trnDate <= '#LSDateFormat(loc.toYear,"yyyy-mm-dd")#'
 						<cfelse>
 							AND trnDate >= '#args.form.srchRange#-01'
 							AND trnDate <= '#args.form.srchRange#-31'
@@ -1723,6 +1729,12 @@
 							<cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
 							AND trnDate >= '#loc.fyDate.start#'
 							AND trnDate <= '#loc.fyDate.end#'
+						<cfelseif Left(args.form.srchRange,4) eq 'YEAR'>
+							<cfset loc.thisYear = ListRest(args.form.srchRange,"-")>
+							<cfset loc.fromYear = CreateDate(loc.thisYear,1,1)>
+							<cfset loc.toYear = CreateDate(loc.thisYear,12,31)>
+							AND trnDate >= '#LSDateFormat(loc.fromYear,"yyyy-mm-dd")#' 
+							AND trnDate <= '#LSDateFormat(loc.toYear,"yyyy-mm-dd")#'
 						<cfelse>
 							AND trnDate >= '#args.form.srchRange#-01'
 							AND trnDate <= '#args.form.srchRange#-31'

@@ -45,25 +45,7 @@
 				</select>
 				&nbsp;&nbsp;Records
 				<select name="srchRange" data-placeholder="Select..." id="srchRange" tabindex="4">
-					<option value="0">All Records</option>
-					<option value="1">Last 7 Days</option>
-					<option value="2" selected>This Month</option>
-					<option value="3">From Last Month</option>
-					<option value="4">From Previous Month</option>
-					<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>
-					<cfloop list="#dateKeys#" index="key">
-						<cfset item=StructFind(application.site.FYDates,key)>
-						<option value="FY-#item.key#">Year #item.title#</option>
-					</cfloop>
-					<cfloop from="#year(Now())#" to="2013" step="-1" index="yearNum">
-						<option disabled>#yearNum#</option>
-						<cfloop from="12" to="1" step="-1" index="i">
-							<cfif yearNum eq Year(Now()) AND i gt Month(Now())>
-							<cfelse>
-								<option value="#yearNum#-#i#">#yearNum#-#NumberFormat(i,"00")#</option>
-							</cfif>
-						</cfloop>
-					</cfloop>
+					#acc.DateRangeOptions()#
 				</select>
 				<label>
 					<input type="checkbox" name="nominal_alloc" value="1" checked="checked" style="display:none;">

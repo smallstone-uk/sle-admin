@@ -33,19 +33,20 @@
 		<cfset dupeCount++>
 	</cfif>
 </cfloop>
+
 <cfoutput>
 	<table width="300">
-		<cfset findBank = 0>
-		<cfset findOnline = 0>
 		<cfloop from="#startDate#" to="#endDate#" index="today">
+			<cfset findBank = 0>
+			<cfset findOnline = 0>
 			<tr>
 				<td>
 					<cfset today = DateFormat(today,'yyyy-mm-dd')>
 					<cfset findDay = StructKeyExists(totStruct,today)>
 					<cfif findDay>
 						<cfset dayKeys = StructFind(totStruct,today)>
-						<cfset findBank = StructKeyExists(dayKeys,"BANKXFR")>
-						<cfset findOnline = StructKeyExists(dayKeys,"ONLINE")>
+						<cfset findBank = StructKeyExists(dayKeys,"BANKXFR")>findBank = #findBank#<br />
+						<cfset findOnline = StructKeyExists(dayKeys,"ONLINE")>findOnline = #findOnline#<br />
 					<cfelse>
 						#today# : #findDay#<br />
 					</cfif>

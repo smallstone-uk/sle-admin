@@ -81,19 +81,19 @@
 						<td class="pr2_item" width="75" data-day="#DayOfWeekAsString(i)#"></td>
 					</cfif>
 				</cfloop>
-				<cfloop from="#deptCount+1#" to="7" index="deptRow">	<!--- pad area to same depth --->
-					<tr class="pr2_depts">
-						<th class="pr2_dept" align="left">&nbsp;</th>
-						<td width="75" align="center"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-						<td class="pr2_item" width="75"></td>
-					</tr>
-				</cfloop>
+			</tr>
+		</cfloop>
+		<cfloop from="#deptCount+1#" to="7" index="deptRow">	<!--- pad area to same depth --->
+			<tr class="pr2_depts">
+				<th class="pr2_dept" align="left">&nbsp;</th>
+				<td width="75" align="center"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
+				<td class="pr2_item" width="75"></td>
 			</tr>
 		</cfloop>
 	</table>
@@ -114,7 +114,7 @@
 					</tr>
 					<cfif record.employee.empPaySlip IS "detailed">
 					<tr>
-						<th align="left">Holiday Entitlement</th>
+						<th align="left">Annual Holiday Entitlement</th>
 						<td data-role="holiday" align="right">#DecimalFormat(record.totals.annual)#</td>
 						<td></td>
 					</tr>				
@@ -124,7 +124,7 @@
 						<td align="right">#record.header.phHolHours#</td>
 					</tr>				
 					<tr>
-						<th align="left">Holiday Remaining</th>
+						<th align="left">Annual Holiday Remaining</th>
 						<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
 						<td></td>
 					</tr>

@@ -120,7 +120,7 @@
 									</tr>
 									<cfif record.employee.empPaySlip IS "detailed">	
 									<tr>
-										<th align="left">Holiday Entitlement</th>
+										<th align="left">Annual Holiday Entitlement</th>
 										<td data-role="holiday" align="right">#DecimalFormat(record.totals.annual)#</td>
 										<td></td>
 									</tr>				
@@ -130,7 +130,7 @@
 										<td align="right">#record.header.phHolHours#</td>
 									</tr>				
 									<tr>
-										<th align="left">Holiday Remaining</th>
+										<th align="left">Annual Holiday Remaining</th>
 										<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
 										<td></td>
 									</tr>

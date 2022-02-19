@@ -32,6 +32,10 @@
 		<cfset loc.result={}>
 		<cfset loc.result.suppliers=[]>
 		<cfset loc.result.QTransResult="">
+		<cfset loc.result.firstWeek = 203053>
+		<cfset loc.result.lastWeek = 0>
+		<cfset loc.result.thisWeek = Week(Now())>
+		<cfset loc.result.weekArray = []>
 		<cfset loc.skipZeros=StructKeyExists(args.form,"srchIgnoreZero")>
 		<cfset loc.gross=StructKeyExists(args.form,"srchGrossFigures")>
 		
@@ -58,6 +62,7 @@
 				<cfset loc.item.ref=accCode>
 				<cfset loc.item.name=accName>
 				<cfset loc.item.type=accType>
+				<cfset loc.item.accPayType=accPayType>
 				<cfset loc.item.balance0=0>
 				<cfset loc.item.balance1=0>
 				<cfset loc.item.balance2=0>
@@ -71,6 +76,7 @@
 				<cfset loc.item.balance10=0>
 				<cfset loc.item.balance11=0>
 				<cfset loc.item.balance12=0>
+				<cfset loc.item.weeks = {}>
 				<cfquery name="loc.QTrans" datasource="#args.datasource#" result="loc.result.QTransResult">
 					SELECT trnAccountID,trnDate,trnType,TRUNCATE(trnAmnt1,2) AS amount1,TRUNCATE(trnAmnt2,2) AS amount2
 					FROM tblTrans
@@ -106,11 +112,26 @@
 						<cfcase value="11"><cfset loc.item.balance11=precisionEvaluate(loc.item.balance11+loc.amount)></cfcase>
 						<cfcase value="12"><cfset loc.item.balance12=precisionEvaluate(loc.item.balance12+loc.amount)></cfcase>
 					</cfswitch>
+<!---
+					<cfset loc.tranWeek = Week(trnDate)>
+					<cfset loc.tranYYWW = Year(trnDate) * 100 + loc.tranWeek>
+					<cfif NOT ArrayFind(loc.result.weekArray,loc.tranYYWW)><cfset ArrayAppend(loc.result.weekArray,loc.tranYYWW)></cfif>
+					<cfif loc.tranYYWW lt loc.result.firstWeek><cfset loc.result.firstWeek = loc.tranYYWW></cfif>
+					<cfif loc.tranYYWW gt loc.result.lastWeek><cfset loc.result.lastWeek = loc.tranYYWW></cfif>
+					<cfif StructKeyExists(loc.item.weeks,loc.tranYYWW)>
+						<cfset loc.thisWeekBalance = StructFind(loc.item.weeks,loc.tranYYWW)>
+						<cfset loc.thisWeekBalance += loc.amount>
+						<cfset StructUpdate(loc.item.weeks,loc.tranYYWW,loc.thisWeekBalance)>
+					<cfelse>
+						<cfset StructInsert(loc.item.weeks,loc.tranYYWW,loc.amount)>
+					</cfif>
+--->
 				</cfloop>
 				<cfif loc.item.balance0 neq 0 OR NOT loc.skipZeros>
 					<cfset ArrayAppend(loc.result.suppliers,loc.item)>
 				</cfif>
 			</cfloop>
+			<cfset ArraySort(loc.result.weekArray,"numeric")>
 		</cfif>
 		<cfreturn loc.result>
 	</cffunction>
@@ -488,6 +509,13 @@
 				<cfif StructKeyExists(args.form, "srchTranType") AND len(args.form.srchTranType)>
 					AND trnType IN ('#REReplaceNoCase(args.form.srchTranType, ",", "','", "all")#')
 				</cfif>
+				<cfif StructKeyExists(args.form, "srchStatus") AND len(args.form.srchStatus)>
+					<cfif srchStatus eq 'allocated'>
+						AND trnAlloc > 0
+					<cfelseif srchStatus eq 'notalloc'>
+						AND trnAlloc = 0
+					</cfif>
+				</cfif>
 				
 				<cfif args.form.srchSort eq 'trnAccountID'>
 					ORDER BY accName ASC, trnDate ASC
@@ -686,7 +714,8 @@
 			<cfelseif len(args.form.srchDateFrom)>
 				AND trnDate BETWEEN <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateFrom#"> 
 				AND <cfqueryparam cfsqltype="cf_sql_date" value="#args.form.srchDateTo#"></cfif>
-			GROUP BY trnLedger,nomGroup,nomCode
+			GROUP BY trnLedger,nomGroup,nomClass,nomCode
+			ORDER BY trnLedger,nomGroup,nomClass,nomCode
 		</cfquery>
 
 		<cfif len(args.form.srchDateFrom)>
@@ -720,7 +749,7 @@
 				<cfset result.ledgers="#result.ledgers#,#nomType#">
 			</cfif>
 			<cfset nomAcc=StructFind(result,nomType)>
-			<cfset grpCode = "#nomGroup#-#nomCode#">
+			<cfset grpCode = "#nomGroup#-#nomClass#-#nomCode#">
 			<cfif StructKeyExists(nomAcc,grpCode)>
 				<cfset rec=StructFind(nomAcc,grpCode)>
 				<cfset rec.nomTotal=rec.nomTotal+nomTotal>

@@ -219,10 +219,21 @@
 					</cfif>
 					<cfset totAmnt1 = balance>
 					<cfset totAmnt2 = 0>
+					<cfset weekTotals = {}>
 					<cfloop array="#trans.tranList#" index="item">
 						<cfset totAmnt1 += val(item.trnAmnt1)>
 						<cfset totAmnt2 += val(item.trnAmnt2)>
+						<cfset invGross = val(item.trnAmnt1) + val(item.trnAmnt2)>
 						<cfset amountClass="amount">
+						<cfset weekNo = Year(item.trnDate) * 100 + Week(item.trnDate)>
+						<cfif ListFind('inv,crn',item.trnType,',')>
+							<cfif StructKeyExists(weekTotals,weekNo)>
+								<cfset thisWeek = StructFind(weekTotals,weekNo)>
+								<cfset thisWeek.total += invGross>
+							<cfelse>
+								<cfset StructInsert(weekTotals,weekNo,{"Date" = item.trnDate, "total" = invGross})>
+							</cfif>
+						</cfif>
 						<cfif ListFind("crn,pay,jnl",item.trnType,",")><cfset amountClass="creditAmount"></cfif>
 						<tr id="trnItem_#item.trnID#">
 							<td class="noPrint"><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
@@ -259,6 +270,31 @@
 						<td colspan="3" align="right">Page Total</td>
 						<td>#DecimalFormat(totAmnt1+totAmnt2-balance)#</td>
 						<td colspan="2" class="noPrint"></td>
+				</table>
+				<!---<cfdump var="#weekTotals#" label="weekTotals" expand="false">--->
+				<table width="300">
+					<tr>
+						<td colspan="2"><h2>Summary</h2></td>
+					</tr>
+					<cfset grossTotal = 0>
+					<cfset keys = ListSort(StructKeyList(weekTotals,","),"numeric")>
+					<cfset keyCount = ListLen(keys)>
+					<cfloop list="#keys#" delimiters="," index="item">
+						<cfset thisWeek = StructFind(weekTotals,item)>
+						<cfset grossTotal += thisWeek.total>
+						<tr>
+							<td align="right">#DateFormat(thisWeek.date,'ddd dd-mmm-yy')#</td>
+							<td align="right">#DecimalFormat(thisWeek.total)#</td>
+						</tr>
+					</cfloop>
+					<tr>
+						<td align="right">Total</td>
+						<td align="right">#DecimalFormat(grossTotal)#</td>
+					</tr>
+					<tr>
+						<td align="right">Average (#keyCount#)</td>
+						<td align="right">#DecimalFormat(grossTotal / keyCount)#</td>
+					</tr>
 				</table>
 			<cfelse>
 				No records.

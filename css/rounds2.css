@@ -57,6 +57,15 @@ h1 {line-height: 22px !important;font-size: 20px !important;margin: 10px 0 0 0 !
     background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);  
 }
 
+.clientMsgNormal {
+	clear:both;
+	border:solid 1px red;
+	margin:3px;
+	padding:3px;
+	font-size:22px;
+	font-weight:bold;
+	font-style:italic;
+}
 /*    @media screen {
         div.divFooter {
             display: none;

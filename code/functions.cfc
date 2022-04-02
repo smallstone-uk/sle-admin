@@ -641,6 +641,52 @@
 		<cfreturn result>
 	</cffunction>
 	
+	<cffunction name="LoadMsg" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var result={}>
+		<cfset var QMsgs=0>
+		
+		<cfquery name="QMsg" datasource="#args.datasource#">
+			SELECT *
+			FROM tblNotification
+			WHERE notID = #args.form.noteID#
+		</cfquery>
+		<cfset result.QMsg = QMsg>
+		<cfreturn result>
+	</cffunction>
+	
+	<cffunction name="SaveMsg" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cftry>
+			<cfquery name="QMsg" datasource="#args.datasource#">
+				UPDATE tblNotification
+				SET
+					notType = '#args.form.notType#',
+					notText = '#args.form.notText#',
+					notStatus = '#args.form.notStatus#',
+					notUrgent = <cfif StructKeyExists(args.form,"notUrgent")>1<cfelse>0</cfif>,
+					notImportant = <cfif StructKeyExists(args.form,"notImportant")>1<cfelse>0</cfif>,
+					<cfif len(args.form.notStart)>notStart = '#args.form.notStart#',<cfelse>notStart = null,</cfif>
+					<cfif len(args.form.notEnd)>notEnd = '#args.form.notEnd#',<cfelse>notEnd = null,</cfif>
+					notSun = <cfif StructKeyExists(args.form,"notSun")>1<cfelse>0</cfif>,
+					notMon = <cfif StructKeyExists(args.form,"notMon")>1<cfelse>0</cfif>,
+					notTue = <cfif StructKeyExists(args.form,"notTue")>1<cfelse>0</cfif>,
+					notWed = <cfif StructKeyExists(args.form,"notWed")>1<cfelse>0</cfif>,
+					notThu = <cfif StructKeyExists(args.form,"notThu")>1<cfelse>0</cfif>,
+					notFri = <cfif StructKeyExists(args.form,"notFri")>1<cfelse>0</cfif>,
+					notSat = <cfif StructKeyExists(args.form,"notSat")>1<cfelse>0</cfif>
+					
+				WHERE notID = #val(args.form.notID)#
+			</cfquery>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="SaveMsg" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc>
+	</cffunction>
+	
 	<cffunction name="AddMsg" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
@@ -655,7 +701,16 @@
 				notText, 
 				notUrgent,
 				notImportant,
-				notStatus
+				notStatus,
+				<cfif StructKeyExists(args.form,"notSun")>notSun,</cfif>
+				<cfif StructKeyExists(args.form,"notMon")>notMon,</cfif>
+				<cfif StructKeyExists(args.form,"notTue")>notTue,</cfif>
+				<cfif StructKeyExists(args.form,"notWed")>notWed,</cfif>
+				<cfif StructKeyExists(args.form,"notThu")>notThu,</cfif>
+				<cfif StructKeyExists(args.form,"notFri")>notFri,</cfif>
+				<cfif StructKeyExists(args.form,"notSat")>notSat,</cfif>
+				notStart,
+				notEnd
 			) VALUES (
 				#args.form.notClientID#,
 				Now(),
@@ -663,7 +718,16 @@
 				'#args.form.notText#',
 				<cfif StructKeyExists(args.form,"notUrgent")>1<cfelse>0</cfif>,
 				<cfif StructKeyExists(args.form,"notImportant")>#val(args.form.notImportant)#<cfelse>0</cfif>,
-				'#args.form.notStatus#'
+				'#args.form.notStatus#',
+				<cfif StructKeyExists(args.form,"notSun")>'#args.form.notSun#',</cfif>
+				<cfif StructKeyExists(args.form,"notMon")>'#args.form.notMon#',</cfif>
+				<cfif StructKeyExists(args.form,"notTue")>'#args.form.notTue#',</cfif>
+				<cfif StructKeyExists(args.form,"notWed")>'#args.form.notWed#',</cfif>
+				<cfif StructKeyExists(args.form,"notThu")>'#args.form.notThu#',</cfif>
+				<cfif StructKeyExists(args.form,"notFri")>'#args.form.notFri#',</cfif>
+				<cfif StructKeyExists(args.form,"notSat")>'#args.form.notSat#',</cfif>
+				'#args.form.notStart#',
+				'#args.form.notEnd#'
 			)
 		</cfquery>
 		<cfset result.msg="Message has been added">

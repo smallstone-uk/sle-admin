@@ -1,0 +1,21 @@
+
+// Payroll SQL
+
+//
+SELECT empFirstName, empLastName, phDate, tblpayitems . *
+FROM `tblpayitems`
+INNER JOIN tblPayHeader ON piParent = phID
+INNER JOIN tblEmployee ON phEmployee = empID
+WHERE phDate
+BETWEEN '2021-01-01'
+AND '2021-12-31'
+
+// Holiday entitlement taken.
+SELECT empFirstName, empLastName, phDate, SUM( piHours ) AS Hours, SUM( piHolHours ) AS Holiday, ROUND( SUM( piHours ) * 0.1207 ) AS Entitlement
+FROM `tblpayitems`
+INNER JOIN tblPayHeader ON piParent = phID
+INNER JOIN tblEmployee ON phEmployee = empID
+WHERE phDate
+BETWEEN '2020-01-01'
+AND '2020-12-31'
+GROUP BY phEmployee

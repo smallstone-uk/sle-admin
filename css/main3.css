@@ -530,3 +530,14 @@ input.selectitem, input.selectAllOnList {
     label:active {box-shadow: none;}
 }
 .tiny {font-size:9px}
+
+/* copied from accounts.css 12/02/22 */
+.pencil_edit {
+    background-image: url(../images/icons/edit_black.png);
+    float: left;
+    width: 16px;
+    height: 16px;
+    background-size: 16px;
+    background-position: center;
+    background-repeat: no-repeat;
+}

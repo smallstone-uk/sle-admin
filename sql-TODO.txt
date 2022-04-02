@@ -1,0 +1,40 @@
+JOBS TO DO
+==========
+
+1.	Amending invoices May 2020
+	When a customer provides vouchers late we have to assign them to their account then regenerate the affected invoices, 
+	effectively applying the vouchers credits to the invoice. This process appears to have some flaws:-
+	
+		1. The nominal items do not appear to get updated to match the revised figures.
+		2. The transaction total sometimes appear higher than it should be.
+
+2.	Supplier Transactions June 2020
+	The transaction analysis needs a simplified list of nominal codes to select from. Too many errors creep in here with items being allocated to the wrong code.
+	e.g. Prima Bakeries only needs the "Bread & Cakes" option. Smiths only needs the news options, etc.
+	
+
+3.	EPOS Supplier transactions Jan 2021
+	Supplier account id not being stored in accID field.
+	
+	An alternative field is required to store the supplier ID. The accID field store the EPOS_Account ID which is a different table.
+	
+	Add eiSuppID to tblepos_items table related to accID in tblAccounts.
+	
+
+4.	EPOS - Pricemark flag not set correctly. Feb 2021
+	This is due to Booker changing their product list report and removing the flag.
+
+
+5.	News Charging
+	Qty and price fields need changing to properly reflect stock quantities.
+
+6.	28/04/2021 - Restriction reminders for the following:-
+	Alcohol
+	Tobacco
+	Lottery
+	Medicines
+
+7.	EPOS Deals
+	If our price is higher than the retail price, make sure a half price deal works out the difference correctly to avoid corrupting the balance written to the transaction.
+	
+	

@@ -80,6 +80,7 @@
 				$.ajax({
 					type: "POST",
 					url: "#parm.url#ajax/AJAX_tranGetList.cfm",
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 					data: $('##account-form').serialize(),
 					beforeSend:function(){
 						$('##loading').loading(true);
@@ -291,6 +292,7 @@
 							<div id="orderOverlayForm-inner"></div>
 						</div>
 					</div>
+					
 	<div id="wrapper" class="noPrint">
 		<form method="post" enctype="multipart/form-data" id="account-form">
 		<div class="element">
@@ -307,25 +309,7 @@
 		<div class="element">
 			Date Range:
 			<select name="srchRange" data-placeholder="Select..." id="srchRange" tabindex="3">
-				<option value="0" selected>All Records</option>
-				<option value="1">Last 7 Days</option>
-				<option value="2">This Month</option>
-				<option value="3">From Last Month</option>
-				<option value="4">From Previous Month</option>
-				<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>
-				<cfloop list="#dateKeys#" index="key">
-					<cfset item=StructFind(application.site.FYDates,key)>
-					<option value="FY-#item.key#">Year #item.title#</option>
-				</cfloop>
-				<cfloop from="#year(Now())#" to="2013" step="-1" index="yearNum">
-					<option disabled>#yearNum#</option>
-					<cfloop from="12" to="1" step="-1" index="i">
-						<cfif yearNum eq Year(Now()) AND i gt Month(Now())>
-						<cfelse>
-							<option value="#yearNum#-#i#">#yearNum#-#NumberFormat(i,"00")#</option>
-						</cfif>
-					</cfloop>
-				</cfloop>
+				#accts.DateRangeOptions()#
 			</select>
 			<br />
 			Tran Types:
@@ -355,8 +339,12 @@
 		<div class="clear"></div>
 		</form>
 	</div>
+<!---	<cfoutput>
+		<select name="test">
+			#accts.DateRangeOptions()#
+		</select>
+	</cfoutput>
 
-<!---
 					<form method="post" enctype="multipart/form-data" id="account-form">
 						<div class="form-header" id="tranMainHeader">
 							Account Transactions

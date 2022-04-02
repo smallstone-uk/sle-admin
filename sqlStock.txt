@@ -1,0 +1,40 @@
+
+// STOCK SQL
+
+// Find products where product "our price" does not match stock "our price" if pricemarked
+SELECT  prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodLastBought,prodMinPrice,
+		prodPriceMarked,prodVATRate,prodStatus,prodUnitSize,
+		siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siRRP,siOurPrice,prodOurPrice
+FROM tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+WHERE prodOurPrice != siOurPrice
+AND prodPriceMarked = 1
+
+
+// Fix products where product "our price" does not match stock "our price" if pricemarked
+UPDATE tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+SET prodOurPrice = siOurPrice
+WHERE prodOurPrice != siOurPrice
+AND prodPriceMarked = 1
+
+
+// Find products not discountable where group record says it is
+// Include only recent active products
+SELECT *  
+FROM `tblproducts` 
+INNER JOIN tblProductCats ON prodCatID = pcatID
+INNER JOIN tblProductGroups ON pgID = pcatGroup
+WHERE `prodStaffDiscount` = 'No' 
+AND `prodLastBought` > '2020-01-01' 
+AND `prodStatus` = 'active'
+AND pgDiscount = 1
+

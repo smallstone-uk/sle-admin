@@ -81,3 +81,216 @@ WHERE `diDate` >= '2017-09-01'
 GROUP BY pubTitle,diDate
 ORDER BY pubTitle,diType,diIssue
 
+
+// Select duplicate del items for specific day
+SELECT *  
+FROM `tbldelitems` 
+WHERE `diDate` = '2021-01-30' 
+group by diClientID, diOrderID, diPubID
+having count(*) > 1 
+ORDER BY `diClientID` ASC
+
+
+// delete specific magazine records for specified day
+SELECT diID, pubTitle
+FROM `tbldelitems`
+INNER JOIN tblPublication ON pubID=diPubID
+WHERE `diDate` = '2021-01-27' 
+AND pubGroup = 'Magazine'
+ORDER BY diClientID, diOrderID, diPubID, diID ASC
+
+
+// Uninvoiced items from last invoice date to end of year
+SELECT SUM(diPrice + diCharge) AS Total
+FROM `tbldelitems` 
+WHERE `diDate` BETWEEN '2020-01-12' AND '2020-01-31'
+
+
+// News transactions where nominal analysis does not match tran value
+SELECT cltName, trnID, trnRef, trnDate, trnType, trnClientRef, trnAmnt1, Sum( - niAmount ) AS Total, COUNT(*) AS Num
+FROM tbltrans
+INNER JOIN tblNomItems ON niTranID = trnID
+INNER JOIN tblClients ON trnClientID = cltID
+WHERE niNomID !=1
+AND trnDate
+BETWEEN '2019-02-01'
+AND '2020-01-31'
+AND trnType
+IN (
+'inv', 'crn'
+)
+GROUP BY trnID
+HAVING Total <> trnAmnt1
+
+
+// News transactions with the nomItems that are incorrect - see above
+SELECT cltName, trnID, trnRef, trnDate, trnType, trnClientRef, trnAmnt1, niID, niAmount
+FROM tblNomItems
+INNER JOIN tbltrans ON niTranID = trnID
+INNER JOIN tblClients ON trnClientID = cltID
+WHERE niNomID !=1
+AND trnAmnt1 != -niAmount
+AND niAmount != 0
+AND trnDate
+BETWEEN '2019-02-01'
+AND '2020-01-31'
+AND trnType
+IN (
+'inv', 'crn'
+)
+
+
+// assess delivery charges for active accounts by band
+SELECT DelCode, Count(*) AS Num,
+ SUM(ordMon * delPrice1 + ordTue * delPrice1 + ordWed * delPrice1 + ordThu * delPrice1 + ordFri * delPrice1 + ordSat * delPrice2 + ordSun * delPrice3) AS delCharges,
+ SUM(IF (delPrice2 = 0, ordSat * delPrice1,ordSat * delPrice2)) AS delSat,
+ SUM(IF (delPrice3 = 0, ordSun * delPrice1,ordSun * delPrice3)) AS delSun 
+FROM `tblorder`
+INNER JOIN tblClients ON ordClientID = cltID
+INNER JOIN tbldelcharges ON ordDeliveryCode = delCode
+WHERE `ordActive` = 1
+AND ordStreetCode != 1
+AND cltAccountType != 'N'
+GROUP BY delCode
+
+
+// delivery round drops
+SELECT rndTitle, ordHouseName,ordHouseNumber,ordContact,ordDeliveryCode, stName, ordTown,ordPostCode, cltRef,cltName
+FROM `tblrounditems` 
+INNER JOIN tblorder ON riOrderID = ordID
+INNER JOIN tblclients ON cltID = ordClientID
+INNER JOIN tblrounds ON rndID = riRoundID
+INNER JOIN tblStreets2 ON ordStreetCode = stID
+WHERE cltAccountType NOT IN ('H','N')
+AND riDay = 'thu'
+AND ordActive = 1
+ORDER BY riRoundID, riOrder
+
+
+// Delivery charges matrix
+SELECT cltName,ordHouseName,ordHouseNumber,stName, DelCode,delPrice1,delPrice2,delPrice3,
+ SUM(ordMon * delPrice1 + ordTue * delPrice1 + ordWed * delPrice1 + ordThu * delPrice1 + ordFri * delPrice1 + ordSat * delPrice2 + ordSun * delPrice3) AS delCharges,
+ordMon +ordTue +ordWed +ordThu +ordFri +ordSat +ordSun AS visits,
+ SUM(IF (delPrice2 = 0, ordSat * delPrice1,ordSat * delPrice2)) AS delSat,
+ SUM(IF (delPrice3 = 0, ordSun * delPrice1,ordSun * delPrice3)) AS delSun 
+FROM `tblorder`
+INNER JOIN tblClients ON ordClientID = cltID
+INNER JOIN tbldelcharges ON ordDeliveryCode = delCode
+INNER JOIN tblStreets2 ON stID=ordStreetCode
+WHERE `ordActive` = 1
+AND ordStreetCode != 1
+AND cltAccountType != 'N'
+GROUP BY ordID
+
+
+// Delivery Charge Income
+SELECT rndTitle,cltName,cltCompanyName,cltAccountType ,ordHouseName,ordHouseNumber,stName,oiSun,oiMon,oiTue,oiWed,oiThu,oiFri,oiSat,delCode,delPrice1,delPrice2,delPrice3,
+oiMon +oiTue +oiWed +oiThu +oiFri +oiSat +oiSun AS visits,
+oiMon * delPrice1 + oiTue * delPrice1 + oiWed * delPrice1 + oiThu * delPrice1 + oiFri * delPrice1 + oiSat * delPrice2 + oiSun * delPrice3 AS delCharges,
+IF (delPrice2 = 0, oiSat * delPrice1,oiSat * delPrice2) AS delSat,
+IF (delPrice3 = 0, oiSun * delPrice1,oiSun * delPrice3) AS delSun
+FROM `tblorderitem`
+INNER JOIN tblOrder ON ordID=oiOrderID
+INNER JOIN tblClients ON cltID=ordClientID
+INNER JOIN tblStreets2 ON ordStreetCode=stID
+INNER JOIN tblPublication ON pubID=oiPubID
+INNER JOIN tblDelCharges ON ordDeliveryCode=delCode
+INNER JOIN tblrounditems ON riOrderID=ordID
+INNER JOIN tblRounds ON riRoundID=rndID
+WHERE ordID<200
+AND oiStatus='active'
+AND cltAccountType != 'N'
+AND ordStreetCode != 1
+Group By ordID
+Order By rndID,riOrder
+
+
+// Delivery Charge Income (new version)
+SELECT rndID,rndTitle,cltName,cltCompanyName,cltAccountType, ordID,ordHouseName,ordHouseNumber,stName,delCode,delPrice1,delPrice2,delPrice3,
+pubTitle,pubPrice,pubTradePrice,pubActive,
+oiSun,oiMon,oiTue,oiWed,oiThu,oiFri,oiSat
+FROM tblorderitem
+INNER JOIN tblOrder ON ordID=oiOrderID
+INNER JOIN tblClients ON cltID=ordClientID
+INNER JOIN tblStreets2 ON ordStreetCode=stID
+INNER JOIN tblPublication ON pubID=oiPubID
+INNER JOIN tblDelCharges ON ordDeliveryCode=delCode
+INNER JOIN tblrounditems ON riOrderID=ordID
+INNER JOIN tblRounds ON riRoundID=rndID
+WHERE ordID<200
+AND oiStatus='active'
+AND pubActive
+AND cltAccountType != 'N'
+AND ordStreetCode != 1
+AND riDayEnum='mon'
+Order By rndID,riOrder
+
+
+// Monthly charges
+SELECT DATE_FORMAT( diDate, '%Y/%m' ) AS YYMM, SUM( diPrice ) AS value, SUM( diCharge ) AS Charges, Count( * ) AS records
+FROM `tbldelitems`
+WHERE `diDate`
+BETWEEN '2020-01-01'
+AND '2021-10-16'
+GROUP BY yymm
+
+
+// Most recent delivery item per client
+SELECT cltName, diDate
+FROM tblClients
+LEFT JOIN tblDelItems ON diClientID=cltID
+AND tblDelItems.diID = (
+    SELECT MAX(diID)
+    FROM tblDelItems
+    WHERE diClientID=cltID)
+WHERE cltID=1111
+
+// Customers lost in last 90 days
+SELECT cltRef,cltName,cltCompanyName,cltAccountType , diDate
+FROM tblClients
+LEFT JOIN tblDelItems ON diClientID=cltID
+AND tblDelItems.diID = (
+    SELECT MAX(diID)
+    FROM tblDelItems
+    WHERE diClientID=cltID)
+WHERE cltAccountType IN ( 'N','H')
+AND diDate > DATE_ADD(NOW(), INTERVAL -90 DAY)
+ORDER BY diDate
+
+
+// Name and address of clients lost in last year
+SELECT cltRef,cltName,cltCompanyName,cltAccountType, diDate, ordHouseNumber,ordHouseName,stName,ordTown
+FROM tblClients
+INNER JOIN tblorder ON ordClientID = cltID
+INNER JOIN tblstreets2 ON ordStreetCode=stID
+LEFT JOIN tblDelItems ON diClientID=cltID
+AND tblDelItems.diID = (
+    SELECT MAX(diID)
+    FROM tblDelItems
+    WHERE diClientID=cltID)
+WHERE cltAccountType IN ( 'N','H')
+AND diDate > DATE_ADD(NOW(), INTERVAL -365 DAY)
+ORDER BY diDate
+
+
+// Customers gained  in last year
+SELECT cltRef,cltName,cltCompanyName,cltAccountType, diDate, ordHouseNumber,ordHouseName,stName,ordTown
+FROM tblClients
+INNER JOIN tblorder ON ordClientID = cltID
+INNER JOIN tblstreets2 ON ordStreetCode=stID
+LEFT JOIN tblDelItems ON diClientID=cltID
+AND tblDelItems.diID = (
+    SELECT MIN(diID)
+    FROM tblDelItems
+    WHERE diClientID=cltID)
+WHERE cltAccountType IN ( 'M','W')
+AND diDate > DATE_ADD(NOW(), INTERVAL -365 DAY)
+ORDER BY diDate
+
+
+// News payment totals through till by day
+SELECT DATE(eiTimeStamp) AS yymmdd, SUM(eiNet) AS Total
+FROM `tblepos_items` 
+WHERE eiProdID=10
+AND eiTimeStamp > '2021-11-01'
+GROUP BY yymmdd

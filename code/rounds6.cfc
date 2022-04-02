@@ -65,6 +65,8 @@
 		<cfset var dayName=DateFormat(args.roundDate,"DDD")>
 		<cfset var dayDate=DateFormat(args.roundDate,"yyyy-mm-dd")>
 		<cfset var dayYest=DateFormat(DateAdd("d",-1,args.roundDate),"yyyy-mm-dd")>
+		<cfset loc.dayNum = DayofWeek(args.roundDate)>
+		<cfset loc.dayFields = "notSun,notMon,notTue,notWed,notThu,notFri,notSat">
 		<cfset result.GrandTotalQty={}>
 		<cfset result.dispatch=[]>
 		<cfset result.charge=[]>
@@ -133,6 +135,7 @@
 						<cfif LSDateFormat(QRoundItems.cltEntered,"yyyy-mm-dd") gte DateAdd("d",-7,dayDate)><cfset house.new=true><cfelse><cfset house.new=false></cfif>
 						<cfset house.OrderID=QRoundItems.ordID>
 						<cfset house.OrderType=QRoundItems.ordType>
+						<cfset house.Group=QRoundItems.ordGroup>
 						<cfif QRoundItems.cltAccountType is "C"><cfset house.pay="Pay Collect"><cfelse><cfset house.pay=""></cfif>
 						<cfif r.roundView is "name">
 							<cfset house.number="">
@@ -154,6 +157,20 @@
 						<cfset house.Note=QRoundItems.ordNote>
 						<cfset house.items=[]>
 
+						<!--- Get round messages --->
+						<cfset loc.dayField = ListGetAt(loc.dayFields,loc.dayNum,",")>
+						<cfquery name="loc.QMsgItems" datasource="#args.datasource#" result="loc.QMsgItemsResult">
+							SELECT *
+							FROM tblnotification
+							WHERE notClientID = #val(house.ClientID)#
+							AND notStart <= '#DateFormat(args.roundDate,"yyyy-mm-dd")#'
+							AND (notEnd > '#DateFormat(args.roundDate,"yyyy-mm-dd")#' OR notEnd IS NULL)
+							AND #loc.dayField# = 1
+							AND notStatus = 'open'
+						</cfquery>
+						<cfset house.msgs = loc.QMsgItems>
+						<cfset house.loc = loc>
+						
 						<cfquery name="QOrderItems" datasource="#args.datasource#">
 							SELECT *
 							FROM tblOrderItem,tblPublication
@@ -749,10 +766,29 @@
 				</cfloop>
 			</cfif>
 		</cfif>
-
-		<cfset result=rounds>
-		
+		<cfset result=rounds>	
 		<cfreturn result>
+	</cffunction>
+
+	<cffunction name="LoadDelNotes" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = []>
+		<cftry>
+			<cfquery name="QDispatch" datasource="#args.datasource#">
+				SELECT cltName,cltCompanyName,cltDelHouseNumber, tblOrder.*
+				FROM tblOrder
+				INNER JOIN tblClients ON ordClientID=cltID
+				WHERE ordGroup > 0
+				AND ordActive
+				ORDER BY ordGroup
+			</cfquery>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadDelNotes" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>	
+		<cfreturn loc.result>
 	</cffunction>
 
 	<cffunction name="LoadDispatchNotes" access="public" returntype="array">

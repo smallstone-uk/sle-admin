@@ -25,7 +25,7 @@
 	<cfset parm.showDumps=StructKeyExists(form,"showDumps")>
 	
 	<cfset roundList=rounds.LoadRoundList(parm)>
-	<cfset drops=rounds.LoadRoundDrops(parm)>
+	<cfset drops=rounds.LoadRoundDrops(parm)><!---<cfdump var="#drops#" label="drops" expand="false">--->
 	<cfset session.rounds.parms=parm>
 	<cfset session.rounds.charges=drops.charge>
 	<cfset grid = {}>
@@ -37,11 +37,17 @@
 				e.preventDefault();
 			});
 			$('#btnChargeRound').click(function(e) {
-				var status=$(this).attr("data-status");
-				if (status == "enabled") {
-					ChargeRounds();
+				$("#btnChargeRound").prop('disabled', true);
+				if (confirm("Are you sure you want to run out the rounds now?")) {
+					console.log("running");
+					var status=$(this).attr("data-status");
+					if (status == "enabled") {
+						ChargeRounds();
+					}
+					e.preventDefault();
+				} else {
+					console.log("NOT running");
 				}
-				e.preventDefault();
 			});
 			$(function() {
 				var $sidebar   = $(".round-btn"), 
@@ -184,6 +190,11 @@
 													</li>
 												</cfloop>											
 											</ul>
+											<cfif house.msgs.recordCount gt 0>
+												<cfloop query="house.msgs">
+													<div class="clientMsgNormal">#Replace((house.msgs.notText),"#chr(10)#","<br />")#</div>
+												</cfloop>
+											</cfif>
 										</div>
 										
 									</div>

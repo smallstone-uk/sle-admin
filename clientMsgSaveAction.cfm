@@ -7,7 +7,7 @@
 <cfset parm = {}>
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.form = form>
-<cfset result = cust.AddMsg(parm)>
+<cfset result = cust.SaveMsg(parm)>
 
 <cfoutput>
 	<cfif StructKeyExists(result,"msg")>#result.msg#</cfif>

@@ -325,3 +325,38 @@ AND trnType='pay'
 AND trnDate BETWEEN '2016-02-01' AND '2017-01-31'
 AND accPayAcc IN (131,181)
 GROUP BY accName,trnDate
+
+
+// count nominal items connected to sales tran
+SELECT trnID, trnDate, Count(*) AS Total
+FROM tblnomitems
+INNER JOIN tblTrans ON niTranID=trnID
+WHERE trnDate BETWEEN '2019-02-01' AND '2020-01-31'
+AND trnAccountID=1
+GROUP BY niTranID
+ORDER BY trnDate
+
+
+// Net sales totals by group, code and year
+SELECT nomGroup, nomTitle, SUM( - niAmount ) AS total, DATE_FORMAT( trnDate, '%Y%M' ) AS YYMM
+FROM tblnomitems
+INNER JOIN tblNominal ON niNomID = nomID
+INNER JOIN tblTrans ON niTranID = trnID
+WHERE nomType = 'sales'
+AND niAmount !=0
+AND trnDate BETWEEN '2013-01-01' AND '2020-12-31'
+GROUP BY nomGroup, nomCode, YYMM
+ORDER BY nomGroup, nomCode, trnDate
+
+
+// Net sales totals by group, code, year & month
+SELECT nomGroup, nomTitle, SUM( - niAmount ) AS total, DATE_FORMAT( trnDate, '%Y' ) AS YYYY, DATE_FORMAT( trnDate, '%m' ) AS MM
+FROM tblnomitems
+INNER JOIN tblNominal ON niNomID = nomID
+INNER JOIN tblTrans ON niTranID = trnID
+WHERE nomType = 'sales'
+AND niAmount !=0
+AND trnDate BETWEEN '2013-01-01' AND '2021-12-31'
+GROUP BY nomGroup, nomCode, YYYY, MM
+ORDER BY nomGroup, nomCode, trnDate
+

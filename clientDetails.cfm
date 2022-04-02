@@ -4,6 +4,7 @@
 <title>Client Details</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link href="css/main3.css" rel="stylesheet" type="text/css">
+<link href="css/main4.css" rel="stylesheet" type="text/css">
 <link href="css/chosen.css" rel="stylesheet" type="text/css">
 <link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
 <script src="common/scripts/common.js"></script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Purchase Report</title>
+<title>Tran Reports</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link href="css/main3.css" rel="stylesheet" type="text/css">
 <link href="css/chosen.css" rel="stylesheet" type="text/css">
@@ -29,14 +29,15 @@
 <cfparam name="srchName" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
-<cfparam name="srchLedger" default="">
+<cfparam name="srchLedger" default="purch">
 <cfparam name="srchMin" default="">
-<cfparam name="srchGrossFigures" default="">
 <cfparam name="srchType" default="">
 <cfparam name="srchGroup" default="">
 <cfparam name="srchPayType" default="">
-<cfparam name="srchAllocated" default="">
-<cfparam name="srchSort" default="">
+<cfparam name="srchAllocated" default="1">
+<cfparam name="srchIgnoreZero" default="1">
+<cfparam name="srchGrossFigures" default="1">
+<cfparam name="srchSort" default="accName">
 
 <cfquery name="QGroups" datasource="#application.site.datasource1#">
 	SELECT ttlValue,ttlTitle FROM tblATitles WHERE ttlType=1 ORDER BY ttlOrder
@@ -53,89 +54,89 @@
 				<div class="form-wrap">
 					<form method="post">
 						<div class="form-header">
-							Search Supplier Reports
+							Transaction Reports
 							<span><input type="submit" name="btnSearch" value="Search" /></span>
 						</div>
 						<table border="0">
-								<tr>
-									<td><b>Search by Name</b></td>
-									<td><input type="text" name="srchName" value="#srchName#" size="20" /></td>
-								</tr>
-								<tr>
-									<td><b>Date From</b></td>
-									<td>
-										<input type="text" name="srchDateFrom" value="#srchDateFrom#" class="datepicker" />
-									</td>
-								</tr>
-								<tr>
-									<td><b>Date To</b></td>
-									<td>
-										<input type="text" name="srchDateTo" value="#srchDateTo#" class="datepicker" />
-									</td>
-								</tr>
-								<tr>
-									<td><b>Search by Ledger Type</b></td>
-									<td>
-										<select name="srchLedger">
-											<option value=""<cfif srchLedger eq ""> selected="selected"</cfif>>Any Type</option>
-											<option value="sales"<cfif srchLedger eq "sales"> selected="selected"</cfif>>Sales</option>
-											<option value="purch"<cfif srchLedger eq "purch"> selected="selected"</cfif>>Purchase</option>
-											<option value="nom"<cfif srchLedger eq "nom"> selected="selected"</cfif>>Nominal</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td><b>Search by Transaction Types</b></td>
-									<td>
-										<select name="srchType">
-											<option value=""<cfif srchType eq ""> selected="selected"</cfif>>All transactions</option>
-											<option value="debits"<cfif srchType eq "debits"> selected="selected"</cfif>>Invoices &amp; Credit Notes</option>
-											<option value="credits"<cfif srchType eq "credits"> selected="selected"</cfif>>Payments &amp; Journals</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td><b>Ledger Group Types</b></td>
-									<td>
-										<select name="srchGroup">
-											<option value=""<cfif srchGroup eq ""> selected="selected"</cfif>>Any Group</option>
-											<cfloop query="QGroups">
-												<option value="#ttlValue#"<cfif srchGroup eq ttlValue> selected="selected"</cfif>>#ttlTitle#</option>
-											</cfloop>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td><b>Account Pay Types</b></td>
-									<td>
-										<select name="srchPayType">
-											<option value=""<cfif srchPayType eq ""> selected="selected"</cfif>>Any Pay Types</option>
-											<cfloop query="QPayTypes">
-												<option value="#ttlValue#"<cfif srchPayType eq ttlValue> selected="selected"</cfif>>#ttlTitle#</option>
-											</cfloop>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td><b>Sort By</b></td>
-									<td>
-										<select name="srchSort">
-											<option value="accID"<cfif srchSort eq "accID"> selected="selected"</cfif>>Record order</option>
-											<option value="accCode"<cfif srchSort eq "accCode"> selected="selected"</cfif>>Reference</option>
-											<option value="accName"<cfif srchSort eq "accName"> selected="selected"</cfif>>Name</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td><b>Options</b></td>
-									<td><input type="checkbox" name="srchIgnoreZero" value="1"<cfif StructKeyExists(form,"srchIgnoreZero")> checked="checked"</cfif> />
-										Ignore zero balances?<br>
-										<input type="checkbox" name="srchAllocated" value="1"<cfif StructKeyExists(form,"srchAllocated")> checked="checked"</cfif> />
-										Ignore Allocated Transactions?<br>
-										<input type="checkbox" name="srchGrossFigures" value="1"<cfif StructKeyExists(form,"srchGrossFigures")> checked="checked"</cfif> />
-										Show Gross Figures?
-									</td>
-								</tr>
+							<tr>
+								<td><b>Search by Name</b></td>
+								<td><input type="text" name="srchName" value="#srchName#" size="20" /></td>
+							</tr>
+							<tr>
+								<td><b>Date From</b></td>
+								<td>
+									<input type="text" name="srchDateFrom" value="#srchDateFrom#" class="datepicker" />
+								</td>
+							</tr>
+							<tr>
+								<td><b>Date To</b></td>
+								<td>
+									<input type="text" name="srchDateTo" value="#srchDateTo#" class="datepicker" />
+								</td>
+							</tr>
+							<tr>
+								<td><b>Search by Ledger Type</b></td>
+								<td>
+									<select name="srchLedger">
+										<option value=""<cfif srchLedger eq ""> selected="selected"</cfif>>Any Type</option>
+										<option value="sales"<cfif srchLedger eq "sales"> selected="selected"</cfif>>Sales</option>
+										<option value="purch"<cfif srchLedger eq "purch"> selected="selected"</cfif>>Purchase</option>
+										<option value="nom"<cfif srchLedger eq "nom"> selected="selected"</cfif>>Nominal</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td><b>Search by Transaction Types</b></td>
+								<td>
+									<select name="srchType">
+										<option value=""<cfif srchType eq ""> selected="selected"</cfif>>All transactions</option>
+										<option value="debits"<cfif srchType eq "debits"> selected="selected"</cfif>>Invoices &amp; Credit Notes</option>
+										<option value="credits"<cfif srchType eq "credits"> selected="selected"</cfif>>Payments &amp; Journals</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td><b>Ledger Group Types</b></td>
+								<td>
+									<select name="srchGroup">
+										<option value=""<cfif srchGroup eq ""> selected="selected"</cfif>>Any Group</option>
+										<cfloop query="QGroups">
+											<option value="#ttlValue#"<cfif srchGroup eq ttlValue> selected="selected"</cfif>>#ttlTitle#</option>
+										</cfloop>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td><b>Account Pay Types</b></td>
+								<td>
+									<select name="srchPayType">
+										<option value=""<cfif srchPayType eq ""> selected="selected"</cfif>>Any Pay Types</option>
+										<cfloop query="QPayTypes">
+											<option value="#ttlValue#"<cfif srchPayType eq ttlValue> selected="selected"</cfif>>#ttlTitle#</option>
+										</cfloop>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td><b>Sort By</b></td>
+								<td>
+									<select name="srchSort">
+										<option value="accID"<cfif srchSort eq "accID"> selected="selected"</cfif>>Record order</option>
+										<option value="accCode"<cfif srchSort eq "accCode"> selected="selected"</cfif>>Reference</option>
+										<option value="accName"<cfif srchSort eq "accName"> selected="selected"</cfif>>Name</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td><b>Options</b></td>
+								<td><input type="checkbox" name="srchIgnoreZero" value="1"<cfif srchIgnoreZero> checked="checked"</cfif> />
+									Ignore zero balances?<br>
+									<input type="checkbox" name="srchAllocated" value="1"<cfif srchAllocated> checked="checked"</cfif> />
+									Ignore Allocated Transactions?<br>
+									<input type="checkbox" name="srchGrossFigures" value="1"<cfif srchGrossFigures> checked="checked"</cfif> />
+									Show Gross Figures?
+								</td>
+							</tr>
 						</table>
 					</form>
 				</div>
@@ -148,6 +149,7 @@
 				<cfset parms.form=form>
 				<cfobject component="code/purchase" name="purch">
 				<cfset result=purch.PurchReport(parms)>
+				<!---<cfdump var="#result#" label="result" expand="false">--->
 				<cfset totals=[0,0,0,0,0,0,0,0,0,0,0,0,0]>
 				<cfset debitCount=0>
 
@@ -156,6 +158,7 @@
 					<tr>
 						<th height="24">Ref</th>
 						<th>Name</th>
+						<th>Pay Type</th>
 						<th width="50" align="right">Feb</th>
 						<th width="50" align="right">Mar</th>
 						<th width="50" align="right">Apr</th>
@@ -189,6 +192,7 @@
 						<tr>
 							<td class="title"><a href="tranmain2.cfm?acc=#item.ID#" target="_new">#item.ref#</a></td>
 							<td class="title">#item.name#</td>
+							<td class="title">#item.accPayType#</td>
 							<cfif item.balance2 lt 0><cfset style="crAmount"><cfelse><cfset style="drAmount"></cfif>
 							<td class="#style#"><cfif item.balance2 neq 0>#DecimalFormat(item.balance2)#</cfif></td>
 							<cfif item.balance3 lt 0><cfset style="crAmount"><cfelse><cfset style="drAmount"></cfif>
@@ -254,11 +258,6 @@
 		</div>
 		<cfinclude template="sleFooter.cfm">
 	</div>
-	<cfif application.site.showdumps>
-		<cfdump var="#session#" label="session" expand="no">
-		<cfdump var="#application#" label="application" expand="no">
-		<cfdump var="#variables#" label="variables" expand="no">
-	</cfif>
 </body>
 </cfoutput>
 </html>

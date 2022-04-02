@@ -701,7 +701,6 @@
 				notText, 
 				notUrgent,
 				notImportant,
-				notStatus,
 				<cfif StructKeyExists(args.form,"notSun")>notSun,</cfif>
 				<cfif StructKeyExists(args.form,"notMon")>notMon,</cfif>
 				<cfif StructKeyExists(args.form,"notTue")>notTue,</cfif>
@@ -709,8 +708,9 @@
 				<cfif StructKeyExists(args.form,"notThu")>notThu,</cfif>
 				<cfif StructKeyExists(args.form,"notFri")>notFri,</cfif>
 				<cfif StructKeyExists(args.form,"notSat")>notSat,</cfif>
-				notStart,
-				notEnd
+				<cfif len(args.form.notStart)>notStart,</cfif>
+				<cfif len(args.form.notEnd)>notEnd,</cfif>
+				notStatus
 			) VALUES (
 				#args.form.notClientID#,
 				Now(),
@@ -718,7 +718,6 @@
 				'#args.form.notText#',
 				<cfif StructKeyExists(args.form,"notUrgent")>1<cfelse>0</cfif>,
 				<cfif StructKeyExists(args.form,"notImportant")>#val(args.form.notImportant)#<cfelse>0</cfif>,
-				'#args.form.notStatus#',
 				<cfif StructKeyExists(args.form,"notSun")>'#args.form.notSun#',</cfif>
 				<cfif StructKeyExists(args.form,"notMon")>'#args.form.notMon#',</cfif>
 				<cfif StructKeyExists(args.form,"notTue")>'#args.form.notTue#',</cfif>
@@ -726,8 +725,9 @@
 				<cfif StructKeyExists(args.form,"notThu")>'#args.form.notThu#',</cfif>
 				<cfif StructKeyExists(args.form,"notFri")>'#args.form.notFri#',</cfif>
 				<cfif StructKeyExists(args.form,"notSat")>'#args.form.notSat#',</cfif>
-				'#args.form.notStart#',
-				'#args.form.notEnd#'
+				<cfif len(args.form.notStart)>'#args.form.notStart#',</cfif>
+				<cfif len(args.form.notEnd)>'#args.form.notEnd#',</cfif>
+				'#args.form.notStatus#'
 			)
 		</cfquery>
 		<cfset result.msg="Message has been added">

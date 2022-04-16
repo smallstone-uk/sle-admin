@@ -754,7 +754,7 @@
 						</tr>
 					</cfloop>
 					</table>
-					<p>Any shortages, please contact the office on #application.company.telephone# before 10am. Thank you.</p>
+					<p>Any shortages, please contact the office on #application.company.telephone# before 10am.<br>Thank you.</p>
 					<div class="bigGap"></div>
 					<h2>PICK LIST</h2>
 					<table class="delTableList" border="1" width="400">

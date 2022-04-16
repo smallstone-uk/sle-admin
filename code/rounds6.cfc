@@ -666,7 +666,7 @@
 								<cfset ArrayAppend(r.list,street)>
 							</cfif>
 							<cfset ArrayAppend(street.houses,house)>
-							<cfif ordGroup neq 0>
+							<cfif ordGroup gt 1>
 								<cfset ArrayAppend(street.houseGroup,house)>
 							</cfif>
 						</cfif>
@@ -884,7 +884,7 @@
 				SELECT cltName,cltCompanyName,cltDelHouseNumber, tblOrder.*
 				FROM tblOrder
 				INNER JOIN tblClients ON ordClientID=cltID
-				WHERE ordGroup > 0
+				WHERE ordGroup > 1
 				AND ordActive
 				ORDER BY ordGroup
 			</cfquery>

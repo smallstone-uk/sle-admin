@@ -777,7 +777,7 @@
 			<cfset result.orders=[]>
 			<cfquery name="QRoundItems" datasource="#args.datasource#">
 				SELECT tblRoundItems.*, cltID,cltRef,cltName,cltDelHouse,cltDelAddr,cltDelCode,cltStreetCode,cltDelPostcode,stName
-				FROM tblRoundItems,tblClients, tblStreets
+				FROM tblRoundItems,tblClients, tblStreets2
 				WHERE riRoundRef=#QRound.rndRef#
 				AND stRef=cltStreetCode
 				AND cltID=riClientID
@@ -827,7 +827,7 @@
 			<cfset this.roundTitleCount=0>
 			<cfquery name="QRoundItems" datasource="#args.datasource#">
 				SELECT tblRoundItems.*, cltID,cltRef,cltName,cltDelHouse,cltDelAddr,cltDelCode,cltStreetCode,cltDelPostcode,stName,stRef
-				FROM tblRoundItems,tblClients, tblStreets
+				FROM tblRoundItems,tblClients, tblStreets2
 				WHERE riRoundID=#QRound.rndID#
 				AND stRef=cltStreetCode
 				AND cltID=riClientID
@@ -885,7 +885,7 @@
 							<!--- untidy! --->
 			<cfquery name="QAddress" datasource="#args.datasource#">
 				SELECT *
-				FROM tblClients, tblStreets
+				FROM tblClients, tblStreets2
 				WHERE cltID=#args.clientID#
 				AND stRef=cltStreetCode
 			</cfquery>
@@ -2087,6 +2087,7 @@
 			<cfset result.ordFri=QGetOrder.ordFri>
 			<cfset result.ordSat=QGetOrder.ordSat>
 			<cfset result.ordSun=QGetOrder.ordSun>
+			<cfset result.ordGroup = QGetOrder.ordGroup>
 			<cfset result.Note=QGetOrder.ordNote>
 			<cfset result.Date=DateFormat(QGetOrder.ordDate,"DDDD DD MMM YYYY")>
 			
@@ -2097,6 +2098,26 @@
 		</cftry>
 		
 		<cfreturn result>
+	</cffunction>
+	
+	<cffunction name="LoadOrderGroups" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cftry>
+			<cfquery name="loc.QGetOrderGroups" datasource="#args.datasource#">
+				SELECT *
+				FROM tblOrderGroups
+				WHERE 1
+				ORDER BY ogName
+			</cfquery>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="LoadOrderGroups" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		
+		<cfreturn loc>
 	</cffunction>
 	
 	<cffunction name="LoadOrderPubs" access="public" returntype="struct">
@@ -2290,6 +2311,7 @@
 					ordCity='#args.form.ordCity#',
 					ordPostcode='#args.form.ordPostcode#',
 					ordActive=#args.form.ordActive#,
+					ordGroup = #args.form.ordGroup#,
 					<cfif StructKeyExists(args.form,"ordMon")>ordMon=1,<cfelse>ordMon=0,</cfif>
 					<cfif StructKeyExists(args.form,"ordTue")>ordTue=1,<cfelse>ordTue=0,</cfif>
 					<cfif StructKeyExists(args.form,"ordWed")>ordWed=1,<cfelse>ordWed=0,</cfif>
@@ -2482,7 +2504,7 @@
 		
 		<cfquery name="QCheckClient" datasource="#args.datasource#">
 			SELECT cltID,cltName,cltDelHouse,cltStreetCode,stName
-			FROM tblClients, tblStreets
+			FROM tblClients, tblStreets2
 			WHERE stRef=cltStreetCode
 			AND cltRef=#val(args.clientRef)#
 			LIMIT 1;
@@ -4425,7 +4447,7 @@
 		<cftry>
 			<cfquery name="QClient" datasource="#args.datasource#">
 				SELECT *
-				FROM tblRoundItems,tblClients,tblStreets
+				FROM tblRoundItems,tblClients,tblStreets2
 				WHERE 1
 				<cfif len(args.form.type)>AND cltAccountType='#args.form.type#'</cfif>
 				<cfif len(args.form.roundID)>AND riRoundRef=#args.form.roundID#</cfif>

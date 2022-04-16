@@ -135,7 +135,8 @@
 						<cfif LSDateFormat(QRoundItems.cltEntered,"yyyy-mm-dd") gte DateAdd("d",-7,dayDate)><cfset house.new=true><cfelse><cfset house.new=false></cfif>
 						<cfset house.OrderID=QRoundItems.ordID>
 						<cfset house.OrderType=QRoundItems.ordType>
-						<cfset house.Group=QRoundItems.ordGroup>
+						<cfset house.ordGroup = ordGroup>
+						
 						<cfif QRoundItems.cltAccountType is "C"><cfset house.pay="Pay Collect"><cfelse><cfset house.pay=""></cfif>
 						<cfif r.roundView is "name">
 							<cfset house.number="">
@@ -167,6 +168,7 @@
 							AND (notEnd > '#DateFormat(args.roundDate,"yyyy-mm-dd")#' OR notEnd IS NULL)
 							AND #loc.dayField# = 1
 							AND notStatus = 'open'
+							AND notType = 'msg'
 						</cfquery>
 						<cfset house.msgs = loc.QMsgItems>
 						<cfset house.loc = loc>
@@ -643,9 +645,7 @@
 										</cfif>
 									</cfif>
 								</cfif>
-								
 							</cfif>
-							
 						</cfloop>
 						
 						<!--- Assign Street --->
@@ -662,9 +662,13 @@
 								<cfset street.StreetName=QGetStreet.stName>
 								<cfset streetCode=QRoundItems.ordStreetCode>
 								<cfset street.houses=[]>
+								<cfset street.houseGroup=[]>
 								<cfset ArrayAppend(r.list,street)>
 							</cfif>
 							<cfset ArrayAppend(street.houses,house)>
+							<cfif ordGroup neq 0>
+								<cfset ArrayAppend(street.houseGroup,house)>
+							</cfif>
 						</cfif>
 					</cfloop>
 					
@@ -683,6 +687,107 @@
 		</cftry>
 
 		<cfreturn result>
+	</cffunction>
+
+	<cffunction name="NewDeliveryNotes" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<!---<cfdump var="#args#" label="NewDeliveryNotes" expand="false">--->
+			<div style="page-break-before:always;"></div>				
+			<cfoutput>
+				<cfloop array="#args.delNotes#" index="loc.customer">
+					<cfset loc.orderCount = 0>
+					<cfset loc.pickList = {}>
+					<cfloop array="#loc.customer#" index="loc.order">
+						<cfset loc.orderCount++>
+						<cfif loc.orderCount eq 1>
+							<cfquery name="loc.getGroup" datasource="#args.datasource#">
+								SELECT * FROM tblordergroups WHERE ogID = #loc.order.ordGroup#
+							</cfquery>
+							<h1>#application.company.companyName#</h1>
+							<h2>DELIVERY NOTE #DateFormat(args.roundDate,"ddd DD/MM/YYYY")#</h2>
+							<table class="delTableList" border="1">
+							<tr>
+								<th colspan="2"><strong>#loc.getGroup.ogName#</strong></th>
+							</tr>
+							<tr>
+								<th width="300">Name</th>
+								<th width="400">Deliveries</th>
+							</tr>
+						</cfif>
+						<tr>
+							<td>#loc.order.number#</td>
+							<td>
+								<div class="house-items">
+									<ul>
+									<cfloop array="#loc.order.items#" index="loc.item">
+										<cfset loc.class = "">
+										<cfset loc.holidayText = "">
+										<cfif loc.item.holiday>
+											<cfset loc.class = "holiday">
+											<cfif len(loc.item.holidayStart)><cfset loc.holidayText = "Cancelled until #loc.item.holidayStart#.">
+												<cfelse><cfset loc.holidayText = "Cancelled until further notice."></cfif>
+										<cfelse>
+											<cfif StructKeyExists(loc.pickList,loc.item.sort)>
+												<cfset loc.pick = StructFind(loc.pickList,loc.item.sort)>
+												<cfset loc.pick.qty = loc.pick.qty + loc.item.qty>
+											<cfelse>
+												<cfset StructInsert(loc.pickList,loc.item.sort,{"qty" = loc.item.qty, "title" = loc.item.title})>
+											</cfif>
+										</cfif>
+										<cfif len(loc.item.Title) gt 15>
+											<cfset loc.cellWidth="220px">
+										<cfelse>
+											<cfset loc.cellWidth="168px">
+										</cfif>
+										<li class="#loc.class# #LCase(loc.item.HolidayAction)#" style="width:#loc.cellWidth#">
+											#loc.item.title# <cfif loc.item.qty gt 1>(#loc.item.qty#)</cfif>
+											#loc.holidayText#
+										</li>
+									</cfloop>
+									</ul>
+								</div>
+							</td>
+						</tr>
+					</cfloop>
+					</table>
+					<p>Any shortages, please contact the office on #application.company.telephone# before 10am. Thank you.</p>
+					<div class="bigGap"></div>
+					<h2>PICK LIST</h2>
+					<table class="delTableList" border="1" width="400">
+						<tr>
+							<th>TITLE</th>
+							<th align="center">QUANTITY</th>
+						</tr>
+						<cfset loc.pickCount = 0>
+						<cfset loc.pickKeys = ListSort(StructKeyList(loc.pickList,","),"text")>
+						<cfloop list="#loc.pickKeys#" index="loc.pickKey">
+							<cfset loc.pick = StructFind(loc.pickList,loc.pickKey)>
+							<cfset loc.pickCount += loc.pick.qty>
+							<tr>
+								<td>#loc.pick.title#</td>
+								<td align="center">#loc.pick.qty#</td>
+							</tr>
+						</cfloop>
+						<tr>
+							<td><strong>Total Publications</strong></td>
+							<td align="center"><strong>#loc.pickCount#</strong></td>
+						</tr>
+					</table>
+					<div style="page-break-before:always;"></div>				
+				</cfloop>
+			</cfoutput>
+			<cfcatch type="any">
+				<cfdump var="#cfcatch#" label="NewDeliveryNotes" expand="yes" format="html" 
+					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+				<cfset loc.result.error = cfcatch>
+			</cfcatch>
+		</cftry>
+		
+		<cfreturn loc.result>
 	</cffunction>
 
 	<cffunction name="ProcessChargedItems" access="public" returntype="struct">

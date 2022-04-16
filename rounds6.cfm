@@ -66,8 +66,8 @@
 				<div class="form-wrap no-print">
 					<form method="post" id="roundForm">
 						<div class="form-header">
-							Rounds <span style="float:right;font-size:12px;color:##666;margin: 16px 0 0 0;">Version 6.0</span>
-							<span><div id="loading" class="loading" style="float: right;margin: 11px 19px 0px 0px;"></div></span>
+							Rounds <p style="float:right;font-size:12px;color:##666;margin: 16px 0 0 0;">Version 6.0</p>
+							<div id="loading" class="loading" style="float: right;margin: 11px 19px 0px 0px;"></div>
 						</div>
 						<div class="module">
 							<table border="0">
@@ -79,7 +79,7 @@
 								<tr>
 									<td width="80"></td>
 									<td width="120" valign="top"><b>Rounds</b></td>
-									<td width="250" valign="bottom"><b>Despatch Notes</b></td>
+									<td width="250" valign="bottom"><b>Despatch Notes (NOT USED)</b></td>
 									<td width="200" valign="bottom"><b>Options</b></td>
 								</tr>
 								<tr>
@@ -91,7 +91,7 @@
 									</td>
 									<td valign="top">
 										<cfloop array="#clients#" index="i">
-											<label><input type="checkbox" name="dispatchTicked" value="#i.ID#" class="checkbox dispatchtick" checked="checked" />
+											<label><input type="checkbox" name="dispatchTicked" value="#i.ID#" class="checkbox dispatchtick" />
 											&nbsp;#i.ClientName#</label><br>
 										</cfloop>
 									</td>
@@ -99,7 +99,9 @@
 										<label><input type="checkbox" name="showSummaries" id="showSummaries" value="1" class="checkbox" />&nbsp;Show Round Summaries</label><br>
 										<label><input type="checkbox" name="showOverallSummary" value="1" class="checkbox" />&nbsp;Show Overall Summary</label><br>
 										<label><input type="checkbox" name="showRoundOrder" id="showRoundOrder" value="1" class="checkbox" checked="checked" />&nbsp;Show in Round Order</label><br>
-										<label id="priorityLink" style="display:none;"><a href="rounds5PriorityOrdering.cfm" target="_blank" style="display:block;padding:5px 0 0 24px;">Sort Priority Order</a></label><br>
+										<label id="priorityLink" style="display:none;">
+											<a href="rounds5PriorityOrdering.cfm" target="_blank" style="display:block;padding:5px 0 0 24px;">Sort Priority Order</a>
+										</label><br>
 									</td>
 								</tr>
 								<tr><td colspan="4">&nbsp;</td></tr>

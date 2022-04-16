@@ -66,6 +66,15 @@ h1 {line-height: 22px !important;font-size: 20px !important;margin: 10px 0 0 0 !
 	font-weight:bold;
 	font-style:italic;
 }
+.hideEntry {display:none}
+.seeDelivery {
+	padding: 4px 0 0 10px; margin-left:10px; font-size: 18px; font-weight:bold;
+}
+.delTableList {border-spacing: 0px;border-collapse: collapse;border: 1px solid #BDC9DD;font-size: 18px;border-color:#BDC9DD;}
+.delTableList th {padding:4px 5px;background: #EFF3F7;border-color: #BDC9DD;color: #18315C;}
+.delTableList td {padding:2px 5px;border-color: #BDC9DD;}
+.bigGap {width:100%; height:80px;}
+
 /*    @media screen {
         div.divFooter {
             display: none;

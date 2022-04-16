@@ -12,6 +12,7 @@
 <cfset street=cust.LoadStreets(parm)>
 <cfset charges=cust.LoadDeliveryCharges(parm)>
 <cfset order=cust.LoadOrder(parm)>
+<cfset orderGroups = cust.LoadOrderGroups(parm)>
 
 <cfoutput>
 <script type="text/javascript">
@@ -147,6 +148,16 @@
 							<option value="#i.Code#"<cfif order.DelCodeNew eq i.Code> selected="selected"</cfif>>#i.Code# - &pound;#i.Price1#</option>
 						</cfloop>
 					</cfif>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td width="25%" align="right"><strong>Order Group</strong></td>
+			<td>
+				<select name="ordGroup">
+					<cfloop query="orderGroups.QGetOrderGroups">
+						<option value="#ogID#"<cfif order.ordGroup eq ogID> selected="selected"</cfif>>#ogName#</option>
+					</cfloop>
 				</select>
 			</td>
 		</tr>

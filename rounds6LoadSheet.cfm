@@ -89,11 +89,12 @@
 		<div class="clear"></div>
 	</div>
 	<div id="print-area">
-		<cfloop array="#drops.rounds#" index="rounds">
+		<cfset deliveryNotes = []>
+		<cfloop array="#drops.rounds#" index="rnd">
 			
 			<!--- Round Setup --->
 			<cfset count=0>
-			<cfset view=rounds.roundview>
+			<cfset view=rnd.roundview>
 			<cfset roundcount=roundcount+1>
 			<cfif view is "name">
 				<cfset holWord="Hand Out">
@@ -113,35 +114,45 @@
 			<!---<cfif roundPage gt 0><div style="page-break-before:always;"></div><cfset roundPage++></cfif>--->
 			<!---<div id="pageFooter"></div>--->
 			<div class="round-header">#DateFormat(parm.roundDate,"DDDD")# - #DateFormat(parm.roundDate,"DD/MM/YYYY")#</div>
-			<h1>#rounds.roundTitle#</h1>
+			<h1>#rnd.roundTitle#</h1>
 			<div style="clear:left;"></div>
-			
-			<cfif ArrayLen(rounds.list)>
-				<cfloop array="#rounds.list#" index="street">
+			<cfif ArrayLen(rnd.list)>
+				<cfloop array="#rnd.list#" index="street">
 					<div class="street-wrap">
-					
+					<!---<cfdump var="#street#" label="street" expand="false">--->
+						<cfset hideGroup = "">
+						<cfset showOnce = 1>
 						<!--- Street Header --->
 						<div class="street-title"><cfif view is "street">#street.StreetName#</cfif></div>
 						<div class="street">
-						
 							<!--- Loop Drops --->
 							<cfloop array="#street.houses#" index="house">
 								<cfset count=count+1>
 								<cfset GrandTotalDrops=GrandTotalDrops+1>
 								<cfset countback=false>
-								<div class="houses">
+								<div class="houses #hideGroup#">	<!--- hide this group if del note to be printed --->
 									<div id="row#house.ID#" class="house<cfif house.New> new</cfif>">
-										<!--- Drop Title --->
-										<div class="house-title">
-											<cfif len(house.pay)><span class="pay">#house.pay#</span></cfif>
-											<a href="clientDetails.cfm?row=0&ref=#house.ClientRef#" target="_blank">
-												<cfif len(house.Name) AND len(house.Number)>#house.Name#, #house.Number#<cfelse>#house.Name##house.Number#</cfif>
-											</a>
-											<cfif len(house.Note)><span style="display:block;font-size:12px;color:##444;">#house.Note#</span></cfif>
-										</div>
+										<cfif ArrayLen(street.houseGroup) gt 0>
+											<cfset hideGroup = "hideEntry">
+											<cfif showOnce>
+												<cfset ArrayAppend(deliveryNotes,street.houseGroup)>
+												<div class="house-title">#street.houseGroup[1].name#</div>
+												<div class="house-items"><ul><li><div class="seeDelivery">SEE DELIVERY SHEET</div></li></ul></div>
+											</cfif>
+											<cfset showOnce = 0>
+										<cfelse>
+											<!--- Drop Title --->
+											<div class="house-title #hideGroup#">
+												<cfif len(house.pay)><span class="pay">#house.pay#</span></cfif>
+												<a href="clientDetails.cfm?row=0&ref=#house.ClientRef#" target="_blank">
+													<cfif len(house.Name) AND len(house.Number)>#house.Name#, #house.Number#<cfelse>#house.Name##house.Number#</cfif>
+												</a>
+												<cfif len(house.Note)><span style="display:block;font-size:12px;color:##444;">#house.Note#</span></cfif>
+											</div>
+										</cfif>								
 										
 										<!--- Drop Items --->
-										<div class="house-items">
+										<div class="house-items #hideGroup#">
 											<ul class="<cfif ArrayLen(house.items) gt 3>vlist</cfif>">
 												<cfloop array="#house.items#" index="i">
 													<cfif len(i.Title) gt 15>
@@ -212,7 +223,7 @@
 			<!--- Round Summary --->
 			<div class="clear"></div>
 			<div class="summary" style="page-break-inside:avoid;<cfif NOT parm.showSummaries> display:none;</cfif>">
-				<h1>#rounds.roundTitle# Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</h1>
+				<h1>#rnd.roundTitle# Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</h1>
 				<div class="clear"></div>
 				<div class="pubTotalQty" style="text-align:center;">
 					<table border="1" class="tableList minimal" width="500" style="font-size: 16px;">
@@ -221,9 +232,9 @@
 							<th align="left">Title</th>
 						</tr>
 						<cfset totalQty=0>
-						<cfset sumList=StructSort(rounds.TotalQty,"textnocase", "asc", "sort")>
+						<cfset sumList=StructSort(rnd.TotalQty,"textnocase", "asc", "sort")>
 						<cfloop array="#sumList#" index="index">
-							<cfset i=StructFind(rounds.TotalQty,index)>
+							<cfset i=StructFind(rnd.TotalQty,index)>
 							<cfset totalQty=totalQty+i.Qty>
 							<tr>
 								<td align="center">#i.Qty#</td>
@@ -243,12 +254,16 @@
 					</table>
 				</div>
 			</div>
-			<cfset rounds.dropTotal = count>
-			<cfset rounds.pubTotal = totalQty>
+			<cfset rnd.dropTotal = count>
+			<cfset rnd.pubTotal = totalQty>
 			<div style="page-break-before:always;"></div><cfif parm.showSummaries></cfif>
 			<!--- Round End --->
 		</cfloop>
-
+		
+		<!--- new delivery notes --->
+		<cfset parm.delNotes = deliveryNotes>
+		<cfset temp = rounds.NewDeliveryNotes(parm)>
+		
 		<!--- Overall Summary --->
 		<!---<div style="page-break-before:always;"></div>--->
 		<div class="summary" style="page-break-inside:avoid;<cfif NOT parm.showOverallSummary> display:none;</cfif>">
@@ -293,12 +308,12 @@
 		<div class="summary" style="page-break-before:always;">
 			<table border="1" class="tableList" width="700" style="font-size: 18px;">
 				<tr>
-					<th colspan="9" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
+					<th colspan="10" align="center">Publication Summary  #DateFormat(parm.roundDate,"ddd DD/MM/YYYY")#</th>
 				</tr>
 				<tr>
 					<th>Publication</th>
-					<cfloop array="#drops.rounds#" index="round">
-						<th align="center">#round.roundTitle#</th>
+					<cfloop array="#drops.rounds#" index="rnd">
+						<th align="center">#rnd.roundTitle#</th>
 					</cfloop>
 					<th>Total</th>
 					<th>Round<br />Shortages</th>
@@ -306,11 +321,11 @@
 				<cfloop array="#pubArray#" index="pub">
 					<cfset pubID = ListLast(pub,"_")>
 					<tr>
-						<td height="30">#ListFirst(ListRest(pub,"_"),"_")#</td><!---#ListFirst(ListRest(pub,"_"),"_")#--->
-						<cfloop array="#drops.rounds#" index="round">
-							<cfset rndPub = "#round.roundID#-#pubID#">
-							<cfif StructKeyExists(round.totalQty,rndPub)>
-								<cfset pubQty = StructFind(round.totalQty,rndPub).qty>
+						<td height="30">#ListFirst(ListRest(pub,"_"),"_")#</td>
+						<cfloop array="#drops.rounds#" index="rnd">
+							<cfset rndPub = "#rnd.roundID#-#pubID#">
+							<cfif StructKeyExists(rnd.totalQty,rndPub)>
+								<cfset pubQty = StructFind(rnd.totalQty,rndPub).qty>
 							<cfelse><cfset pubQty = ""></cfif>
 							<td align="center">#pubQty#</td>
 						</cfloop>
@@ -325,18 +340,18 @@
 				<cfset grandTotDrops = 0>
 				<tr>
 					<th>Total Publications</th>
-					<cfloop array="#drops.rounds#" index="round">
-						<cfset grandTotPubs += round.pubTotal>
-						<th align="center">#round.pubTotal#</th>
+					<cfloop array="#drops.rounds#" index="rnd">
+						<cfset grandTotPubs += rnd.pubTotal>
+						<th align="center">#rnd.pubTotal#</th>
 					</cfloop>
 					<th>#grandTotPubs#</th>
 					<th></th>
 				</tr>
 				<tr>
 					<th>Total Drops</th>
-					<cfloop array="#drops.rounds#" index="round">
-						<cfset grandTotDrops += round.droptotal>
-						<th align="center">#round.droptotal#</th>
+					<cfloop array="#drops.rounds#" index="rnd">
+						<cfset grandTotDrops += rnd.droptotal>
+						<th align="center">#rnd.droptotal#</th>
 					</cfloop>
 					<th>#grandTotDrops#</th>
 					<th></th>

@@ -73,14 +73,15 @@
 							<table border="0">
 								<tr>
 									<td><b>Day</b></td>
-									<td colspan="3"><input type="text" name="roundDate" class="datepicker" value="#parm.roundDate#"></td>
+									<td colspan="4"><input type="text" name="roundDate" class="datepicker" value="#parm.roundDate#"></td>
 								</tr>
 								<tr><td colspan="4">&nbsp;</td></tr>
 								<tr>
 									<td width="80"></td>
 									<td width="120" valign="top"><b>Rounds</b></td>
-									<td width="250" valign="bottom"><b>Despatch Notes (NOT USED)</b></td>
+									<!---<td width="250" valign="bottom"><b>Despatch Notes (NOT USED)</b></td>--->
 									<td width="200" valign="bottom"><b>Options</b></td>
+									<td width="300" valign="bottom"><b>Info</b></td>
 								</tr>
 								<tr>
 									<td></td>
@@ -89,12 +90,14 @@
 											<label><input type="checkbox" name="roundsTicked" value="#item.ID#" class="checkbox roundstick" checked="checked" />#item.Title#</label>
 										</cfloop>
 									</td>
+<!---
 									<td valign="top">
 										<cfloop array="#clients#" index="i">
 											<label><input type="checkbox" name="dispatchTicked" value="#i.ID#" class="checkbox dispatchtick" />
 											&nbsp;#i.ClientName#</label><br>
 										</cfloop>
 									</td>
+--->
 									<td valign="top">
 										<label><input type="checkbox" name="showSummaries" id="showSummaries" value="1" class="checkbox" />&nbsp;Show Round Summaries</label><br>
 										<label><input type="checkbox" name="showOverallSummary" value="1" class="checkbox" />&nbsp;Show Overall Summary</label><br>
@@ -102,6 +105,10 @@
 										<label id="priorityLink" style="display:none;">
 											<a href="rounds5PriorityOrdering.cfm" target="_blank" style="display:block;padding:5px 0 0 24px;">Sort Priority Order</a>
 										</label><br>
+									</td>
+									<td valign="top">
+										To move a customer into a care home; change their Order Group to the relevant home then move their account into the same round
+										position as other residents for each day. Also, change the House/Flat number to the person's name in the Order Details.
 									</td>
 								</tr>
 								<tr><td colspan="4">&nbsp;</td></tr>

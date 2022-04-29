@@ -24,7 +24,8 @@
 				<cfif StructKeyExists(args.form,"client") AND val(args.form.client) neq 0>
 					AND cltID IN (#args.form.client#)
 				<cfelse>
-					AND (cltAccountType='M' OR cltAccountType='W') <!--- Only Monthly and Weekly will get an invoice --->
+					AND cltAccountType IN ('M','H','W') <!--- Only Monthly, Weekly or On Hold will get an invoice --->
+					<!--- AND (cltAccountType='M' OR cltAccountType='W') Only Monthly and Weekly will get an invoice --->
 				</cfif>
 				AND ordClientID=cltID
 				AND ordStreetCode=stID

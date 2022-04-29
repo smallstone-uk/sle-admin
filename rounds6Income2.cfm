@@ -62,7 +62,7 @@
 	<cfparam name="useSamples" default="0">
 	<cfparam name="DeliveryCode" default="">
 	<cfparam name="driverRate" default="0.65">
-	<cfparam name="fuelRate" default="0.30">
+	<cfparam name="fuelRate" default="0.40">
 	
 	<cfquery name="QDelRates" datasource="#application.site.datasource1#">
 		SELECT * FROM tbldelcharges

@@ -154,7 +154,7 @@
 				<cfset debitCount=0>
 
 				<table class="tableList" border="1">
-					<tr><td colspan="15"><cfif IsStruct(result.QTransResult)>#result.QTransResult.sql#</cfif></td></tr>
+					<!---<tr><td colspan="15"><cfif IsStruct(result.QTransResult)>#result.QTransResult.sql#</cfif></td></tr>--->
 					<tr>
 						<th height="24">Ref</th>
 						<th>Name</th>
@@ -225,6 +225,7 @@
 						<cfset style="drAmountTotal">
 						<td height="30">#debitCount# Suppliers</td>
 						<td>Totals</td>
+						<td></td>
 						<cfif totals[2] lt 0><cfset style="crAmountTotal"><cfelse><cfset style="drAmountTotal"></cfif>
 						<td class="#style#">#DecimalFormat(totals[2])#</td>
 						<cfif totals[3] lt 0><cfset style="crAmountTotal"><cfelse><cfset style="drAmountTotal"></cfif>

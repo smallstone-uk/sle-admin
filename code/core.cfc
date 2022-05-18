@@ -1101,11 +1101,13 @@
 	<cffunction name="DateRangeOptions" access="public" returntype="string" hint="builds the menu items for searching by date">
 		<cfsavecontent variable="content">
 			<cfoutput>
-				<option value="0">All Records</option>
+				<option value="0" selected>All Records</option>
 				<option value="1">Last 7 Days</option>
-				<option value="2" selected>This Month</option>
+				<option value="2">This Month</option>
 				<option value="3">From Last Month</option>
 				<option value="4">From Previous Month</option>
+				<option value="5">Previous Quarter</option>
+				<option value="6">Last 6 Months</option>
 				<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>
 				<cfloop list="#dateKeys#" index="key">
 					<cfset item=StructFind(application.site.FYDates,key)>

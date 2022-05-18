@@ -1715,6 +1715,12 @@
 				<cfcase value="4">
 					AND trnDate >= '#LSDateFormat(DateAdd("m",-2,loc.thisMonth),"yyyy-mm-dd")#'
 				</cfcase>
+				<cfcase value="5">
+					AND trnDate >= '#LSDateFormat(DateAdd("m",-3,loc.thisMonth),"yyyy-mm-dd")#'
+				</cfcase>
+				<cfcase value="6">
+					AND trnDate >= '#LSDateFormat(DateAdd("m",-6,loc.thisMonth),"yyyy-mm-dd")#'
+				</cfcase>
 				<cfdefaultcase>
 					<cfif len(args.form.srchRange)>
 						<cfif Left(args.form.srchRange,2) eq 'FY'>
@@ -2240,7 +2246,7 @@
 		</cfif>
 		<cfset result.supplier=QueryToStruct(QAccount)>
 		<cfquery name="QTrans" datasource="#args.datasource#">
-			SELECT tblTrans.*, COUNT(niID) AS nomRecs
+			SELECT tblTrans.*, COUNT(niID) AS nomRecs, SUM( niAmount) AS Total
 			FROM tblTrans 
 			LEFT JOIN tblNomItems ON niTranID=trnID
 			WHERE trnLedger='#args.nomType#'

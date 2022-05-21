@@ -262,6 +262,15 @@
 			<cfset loc.result.class = "ourPrice">
 			<cfset loc.result.classQty = "">
 			<cfif loc.result.ourPrice neq args.retail><cfset loc.result.class = "different"></cfif>
+			<cfset loc.lastDigit = (loc.result.ourPrice * 100) MOD 10>
+			<cfif loc.lastDigit neq 0>
+				<cfif loc.lastDigit lt 6>
+					<cfset loc.lastDigit = 5>
+				<cfelse>
+					<cfset loc.lastDigit = 9>
+				</cfif>
+				<cfset loc.result.ourPrice = (int(loc.result.ourPrice * 10) * 10 + loc.lastDigit) / 100>
+			</cfif>
 
 			<!--- product record --->
 			<cfif NOT loc.doUpdate>
@@ -390,7 +399,7 @@
 						<cfset loc.result.qty1 = 1>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
-					<cfdump var="#loc#" label="qty" expand="yes" format="html" 
+					<cfdump var="#loc#" label="qty #loc.QProduct.prodTitle#" expand="yes" format="html" 
 						output="#application.site.dir_logs#qty-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 				</cfif>
 				

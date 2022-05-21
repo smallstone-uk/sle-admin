@@ -364,10 +364,16 @@ function checkPrice(target) {
 	var ourPrice = $('#siOurPrice').val();	// get current value
 	var prodMinPrice = $('#prodMinPrice').val();	// get current value
 	// console.log("min price " + prodMinPrice);
-	var unitGross = unitPrice * (1 + vatrate); // gross trade price per unit
+	var unitGross = (unitPrice * (1 + vatrate)).toFixed(2); // gross trade price per unit
 	var pricemarked = $('#prodPriceMarked').prop('checked');
 	if (target == 0) target = 0.43;
 	var suggPrice = (unitGross * (1 + target)).toFixed(2);	// calc price at 30% POR
+	var lastDigit = suggPrice.toString().slice(-1);
+	if (lastDigit != 0) {
+		if (lastDigit < 6) {lastDigit = 5}
+			else {lastDigit = 9}
+		suggPrice = (parseInt(suggPrice*10)*10+lastDigit)/100;
+	}
 	$('div.err').remove();
 	$('#unitPrice').val(unitGross);	// show value
 	$('#suggPrice').val(suggPrice);	// show value

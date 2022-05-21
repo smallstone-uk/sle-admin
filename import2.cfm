@@ -72,7 +72,7 @@
 				<th width="40">Cases</th>
 				<th width="40">VAT</th>
 				<th width="50">Our Price</th>
-				<th width="40">Profit / POR</th>
+				<th width="40">Profit / POR%</th>
 				<th width="80">WSP</th>
 				<th width="50">Retail Net</th>
 				<th width="50">Total Profit</th>

@@ -95,25 +95,25 @@
 								<td width="180">Stock Ref</td>
 								<td width="270"><input type="text" name="siRef" size="15" class="field" value="#siRef#" tabindex="2" /></td>
 								<td width="180">VAT Rate</td>
-								<td width="270">#record.product.prodVATRate#</td>
+								<td width="270">#record.product.prodVATRate#%</td>
 							</tr>
 							<tr>
 								<td>Unit Size</td><td><input type="text" name="siUnitSize" size="10" class="field" value="#siUnitSize#" tabindex="3" /></td>
-								<td>Pack Price</td><td><input type="text" name="siWSP" id="siWSP" size="10" class="price numbersOnly" value="#siWSP#" tabindex="8" /></td>
+								<td>Pack Price</td><td><input type="text" name="siWSP" id="siWSP" size="6" class="price numbersOnly" value="#siWSP#" tabindex="8" /></td>
 							</tr>
 							<tr>
-								<td>Units per Pack</td>
+								<td>Units per Case</td>
 								<td><input type="text" name="siPackQty" id="siPackQty" class="itemcount numbersOnly" size="3" maxlength="3" value="#siPackQty#" tabindex="4" /></td>
-								<td>Unit Gross</td><td><input type="text" name="unitPrice" id="unitPrice" size="10" class="numbersOnly" value="#siUnitTrade#" disabled="disabled" /></td>
+								<td>Unit Gross</td><td><input type="text" name="unitPrice" id="unitPrice" size="6" class="numbersOnly" value="#siUnitTrade#" disabled="disabled" /></td>
 							</tr>
 							<tr>
-								<td>No. Outer Packs</td><td>
+								<td>Number of Cases</td><td>
 									<input type="text" name="siQtyPacks" id="siQtyPacks" class="itemcount numbersOnly" size="3" maxlength="3" value="#siQtyPacks#" tabindex="5" />
 									<input type="text" name="siQtyItems" id="siQtyItems" disabled="disabled" class="itemcount" size="5" maxlength="3" value="#siQtyItems#" />
 								</td>
 								<td>RRP</td>
 								<td>
-									<input type="text" name="siRRP" id="siRRP" size="10" class="price numbersOnly" value="#siRRP#" tabindex="9" />
+									<input type="text" name="siRRP" id="siRRP" size="6" class="price numbersOnly" value="#siRRP#" tabindex="9" />
 									<label id="prodPriceMarkedLabel" for="prodPriceMarked">#record.product.PriceMarked#</label>
 								</td>
 							</tr>
@@ -121,12 +121,13 @@
 								<td>Purchase Date</td>
 								<td><input type="text" name="soDate" id="soDate" size="10" class="datepicker" value="#LSDateFormat(soDate,'dd-mmm-yyyy')#" tabindex="6" /></td>
 								<td>Suggested Price</td>
-								<td><input type="text" name="suggPrice" id="suggPrice" class="price numbersOnly" disabled="disabled" size="10" value="" tabindex="11" />
-									#record.product.pgTarget * 100#%</td>
+								<td><input type="text" name="suggPrice" id="suggPrice" class="price numbersOnly" disabled="disabled" size="6" value="" tabindex="11" />
+									<span class="tiny">#record.product.pgTarget * 100#% (markup)</span>
+								</td>
 							</tr>
 							<tr>
 								<td>Expiry Date</td><td><input type="text" name="siExpires" size="10" class="datepickerTo" value="#LSDateFormat(siExpires,'dd-mmm-yyyy')#" tabindex="7" /></td>
-								<td>Our Price</td><td><input type="text" name="siOurPrice" id="siOurPrice" class="price numbersOnly" size="10" value="#siOurPrice#" tabindex="10" /></td>
+								<td>Our Price</td><td><input type="text" name="siOurPrice" id="siOurPrice" class="price numbersOnly" size="6" value="#siOurPrice#" tabindex="10" /></td>
 							</tr>
 							<tr>
 								<td>Status</td><td>
@@ -139,7 +140,7 @@
 										<option value="inactive"<cfif siStatus eq "inactive"> selected="selected"</cfif>>Inactive</option>
 									</select>
 								</td>
-								<td>POR</td><td><input type="text" name="POR" id="POR" disabled="disabled" size="10" value="" /></td>
+								<td>POR</td><td><input type="text" name="POR" id="POR" disabled="disabled" size="6" value="" /></td>
 							</tr>
 						</table>
 						<span class="FCPDIControls">#siID#

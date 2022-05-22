@@ -10,6 +10,8 @@
 		.changed {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D4FF55 !Important}
 		.ourPrice {color:#553FFF; font-size:16px; font-weight:bold !Important}
 		.noBarcode {color:#FF0000; font-weight:bold}
+		.pricemarked {color:#FF00ff; font-size:16px; font-weight:bold !Important}
+		.pricemarkdiff {color:#FF00ff; background-color:#6633FF; font-size:16px; font-weight:bold !Important}
 	</style>
 </head>
 
@@ -92,6 +94,8 @@
 					</tr>
 --->
 				<cfset lineCount++>
+				<cfset pmClass = "">
+				<cfset pmClassDiff = "">
 				<cfset totWSP += rec.wsp>
 				<cfset totRetail += recResult.netTotalValue>
 				<cfif rec.category neq category>
@@ -100,6 +104,8 @@
 					</tr>
 					<cfset category=rec.category>
 				</cfif>
+				<cfif rec.pm><cfset pmClass = "pricemarked"></cfif>
+				<cfif int(rec.pm) neq recResult.prevPM><cfset pmClassDiff = "pricemarkdiff"></cfif>
 				<tr>
 					<td align="center">#lineCount#</td>
 					<td>
@@ -110,7 +116,7 @@
 					<td><a href="productStock6.cfm?product=#recResult.productID#" target="_blank">#rec.code#</a></td>
 					<td>#rec.description#</td>
 					<td>#rec.packsize#</td>
-					<td align="center">#rec.pm#<br />#recResult.prevPM#</td>
+					<td align="center" class="#pmClass# #pmClassDiff#">#int(rec.pm)# = #recResult.prevPM#</td>
 					<td align="center">#rec.packQty#</td>
 					<td align="right">&pound;#rec.retail#</td>
 					<td align="center" class="#recResult.classQty#">#recResult.qty1#</td>

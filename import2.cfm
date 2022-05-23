@@ -109,7 +109,7 @@
 				<tr>
 					<td align="center">#lineCount#</td>
 					<td>
-						<cfif len(recResult.barcode)>
+						<cfif StructKeyExists(recResult,"barcode")>
 							<a href="https://www.booker.co.uk/products/product-list?keywords=#recResult.barcode#" target="_blank">#recResult.barcode#</a>
 						<cfelse><span class="noBarcode">NO BARCODE</span><cfset noBarcodeCount ++></cfif>
 					</td>

@@ -164,7 +164,7 @@
 		<cfset var loc={}>
 		<cfset loc.result={}>
 		<cfset loc.result.action="">
-		<cfset loc.doUpdate = true>
+		<cfset loc.doUpdate = true>		<!--- DO NOT USE - does not work --->
 
 		<cftry>		
 			<!--- category record --->
@@ -250,7 +250,7 @@
 			<cfset loc.netRetailPrice = RoundDec(loc.result.netUnitPrice * (1 + loc.target / 100))>
 			<cfset loc.grossRetailPrice = RoundDec(loc.netRetailPrice * (1 + args.VAT / 100))>
 			<cfset loc.result.profit = loc.netRetailPrice - loc.result.netUnitPrice>
-			<cfif args.pm OR (loc.grossRetailPrice - args.retail) lt 0.03>
+			<cfif args.pm OR (loc.grossRetailPrice - args.retail) lt 0.03>	<!--- if our price < retail --->
 				<cfset loc.grossRetailPrice = args.retail>
 				<cfset loc.netRetailPrice = RoundDec(loc.grossRetailPrice / (1 + args.VAT / 100))>
 			</cfif>
@@ -271,6 +271,8 @@
 				</cfif>
 				<cfset loc.result.ourPrice = (int(loc.result.ourPrice * 10) * 10 + loc.lastDigit) / 100>
 			</cfif>
+			<cfset loc.result.profit = loc.result.ourPrice - loc.result.grossUnitPrice>
+			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.result.ourPrice) * 100)>
 
 			<!--- product record --->
 			<cfif NOT loc.doUpdate>
@@ -399,8 +401,8 @@
 						<cfset loc.result.qty1 = 1>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
-					<cfdump var="#loc#" label="qty #loc.QProduct.prodTitle#" expand="yes" format="html" 
-						output="#application.site.dir_logs#qty-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+					<!---<cfdump var="#loc#" label="qty #loc.QProduct.prodTitle#" expand="yes" format="html" 
+						output="#application.site.dir_logs#qty-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">--->
 				</cfif>
 				
 				<!--- stock item record --->

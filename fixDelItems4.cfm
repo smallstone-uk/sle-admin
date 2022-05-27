@@ -19,8 +19,9 @@
 	AND c.diOrderID = a.ordID
 	AND a.ordActive = 1
 	AND diDate BETWEEN '2022-05-01' AND '2022-05-28'
+	ORDER BY ordClientID, diDate
 </cfquery>
-<table width="600">
+<table width="700">
 <cfoutput>
 	<cfloop query="QDelItems">
 		<cfset loopCount++>
@@ -30,7 +31,7 @@
 		<tr>
 			<td>#ordHouseName#</td>
 			<td>#ordhouseNumber#</td>
-			<td>#diDate#</td>
+			<td>#LSDateFormat(diDate)#</td>
 			<td>#ordDeliveryCode#</td>
 			<td>#diCharge#</td>
 			<td>#ordDelCodeNew#</td>

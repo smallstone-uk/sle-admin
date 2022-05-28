@@ -7,10 +7,11 @@
 </head>
 
 <body>
-<p>This function updates del. charges based on newly assigned delivery codes.</p>
+<p>This function updates del. charges based on newly assigned delivery codes for a specified date range.</p>
 
 <cfparam name="doUpdate" default="false">
 <cfflush interval="200">
+<cfsetting requesttimeout="900">
 <cfset loopCount = 0>
 <cfset oldTotal = 0>
 <cfset newTotal = 0>
@@ -24,7 +25,7 @@
 	AND diCharge != 0
 	ORDER BY diDate, diID
 </cfquery>
-<table class="tableList" border="1" width="800">
+<table class="tableList" border="1" width="850">
 		<tr>
 			<th>diID</th>
 			<th>House Name</th>

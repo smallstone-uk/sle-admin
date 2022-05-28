@@ -19,6 +19,7 @@
 	AND c.diOrderID = a.ordID
 	AND a.ordActive = 1
 	AND diDate BETWEEN '2022-05-01' AND '2022-05-28'
+	AND diCharge != 0
 	ORDER BY ordClientID, diDate
 </cfquery>
 <table width="700">
@@ -39,7 +40,8 @@
 		</tr>
 	</cfloop>
 	<tr>
-		<td colspan="4">#loopcount#</td>
+		<td colspan="2">#loopcount#</td>
+		<td colspan="2">#newTotal - oldTotal#</td>
 		<td>#oldTotal#</td>
 		<td></td>
 		<td>#newTotal#</td>

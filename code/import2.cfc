@@ -201,7 +201,7 @@
 			<!--- get existing product if any --->
 			<cfset loc.result.prevPM = false>
 			<cfquery name="loc.prodExists" datasource="#application.site.datasource1#">
-				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked
+				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked,prodLocked
 				FROM tblProducts
 				WHERE prodRef='#args.code#'
 				LIMIT 1;
@@ -321,15 +321,19 @@
 					<cfif loc.prodExists.prodMinPrice gt loc.result.ourPrice>
 						<cfset loc.result.ourPrice = loc.prodExists.prodMinPrice>
 					</cfif>
-					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#">
-						UPDATE tblProducts
-						SET prodPriceMarked = #int(args.pm)#,
-							prodOurPrice = #loc.result.ourPrice#,
-							prodRecordTitle = '#args.description#',
-							prodTitle = '#Left(args.description,40)#'
-						WHERE prodID = #loc.result.productID#
-					</cfquery>
-					<cfset loc.result.action = "#loc.result.action#Product Updated<br>">
+					<cfif loc.prodExists.prodLocked eq 0>
+						<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#">
+							UPDATE tblProducts
+							SET prodPriceMarked = #int(args.pm)#,
+								prodOurPrice = #loc.result.ourPrice#,
+								prodRecordTitle = '#args.description#',
+								prodTitle = '#Left(args.description,40)#'
+							WHERE prodID = #loc.result.productID#
+						</cfquery>
+						<cfset loc.result.action = "#loc.result.action#Product Update 1<br>">
+					<cfelse>
+						<cfset loc.result.action = "#loc.result.action#Product UNCHANGED<br>">				
+					</cfif>
 				</cfif>
 			
 				<!--- barcode record (remove leading zeroes --->
@@ -441,7 +445,8 @@
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>
-				<cfif loc.prodExists.prodLastBought LT header.orderDate>
+				<!---<cfset loc.result.action="#loc.result.action##loc.prodExists.prodLastBought# LTE #header.orderDate# AND NOT #loc.prodExists.prodLocked#<br>">--->
+				<cfif loc.prodExists.prodLastBought LTE header.orderDate AND NOT loc.prodExists.prodLocked>
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#" result="loc.QUpdateProductResult">
 						UPDATE tblProducts
 						SET
@@ -461,7 +466,7 @@
 						WHERE
 							prodID=#loc.result.productID#
 					</cfquery>
-					<cfset loc.result.action="#loc.result.action#prod updated<br>">
+					<cfset loc.result.action="#loc.result.action#Product update 2<br>">
 				</cfif>
 
 			</cfif>

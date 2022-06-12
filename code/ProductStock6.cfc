@@ -126,7 +126,7 @@
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
-							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,prodLocked,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
@@ -164,6 +164,7 @@
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
 						<cfset loc.rec.prodStatus = prodStatus>
 						<cfset loc.rec.prodReorder = prodReorder>
+						<cfset loc.rec.prodLocked = prodLocked>
 						<cfset loc.rec.prodUnitSize = prodUnitSize>
 						
 						<cfset loc.stockItem = {}>
@@ -398,6 +399,7 @@
 					prodMinPrice,
 					prodOurPrice,
 					prodVATRate,
+					prodStaffDiscount,
 					prodEposCatID
 				) VALUES (
 					'#args.form.prodRef#',
@@ -408,6 +410,7 @@
 					#val(args.form.prodMinPrice)#,
 					#val(args.form.prodOurPrice)#,
 					#args.form.prodVATRate#,
+					'#StructKeyExists(args.form,"prodStaffDiscount")#',
 					#val(args.form.prodEposCatID)#
 				)
 			</cfquery>
@@ -452,6 +455,7 @@
 
 	<cffunction name="AmendProduct" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
+
 		<cfset var loc = {}>
 		<cfset loc.resultStr = "An error occurred updating the record.">
 		<cftry>
@@ -469,6 +473,7 @@
 					prodVATRate = #args.form.prodVATRate#,
 					prodEposCatID = #val(args.form.prodEposCatID)#,
 					prodStaffDiscount = '#StructKeyExists(args.form,"prodStaffDiscount")#',
+					prodLocked = '#int(StructKeyExists(args.form,"prodLocked"))#',
 					prodStatus = '#args.form.prodStatus#',
 					prodUnitSize = '#args.form.prodUnitSize#',
 					prodReorder = '#args.form.prodReorder#'

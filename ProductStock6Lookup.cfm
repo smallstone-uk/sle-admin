@@ -166,6 +166,7 @@
 					<tr><td>Price Description</td><td>#lookup.product.prodUnitSize#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
+					<tr><td>Locked</td><td>#YesNoFormat(lookup.product.prodLocked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
 					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate# &nbsp; Check Level #lookup.product.prodStockLevel#</td></tr>
 					<tr><td>Status</td><td>#lookup.product.prodStatus# &nbsp; Reorder #lookup.product.prodReorder#</td></tr>
@@ -260,6 +261,8 @@
 							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />
 							Price Marked
 							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> />
+							Locked
+							<input type="checkbox" name="prodLocked" id="prodLocked"<cfif lookup.product.prodLocked> checked="checked"</cfif> />
 						</td></tr>
 						<tr>
 							<td>VAT Rate</td>

@@ -33,17 +33,19 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.print').click(function(e) {
-				Print();
-				e.preventDefault();
+				if (confirm("Izabelle said: This option will NOT charge the customers. Only use this option if you are re-printing rounds already charged. Are you sure you want to continue?")) {
+					Print();
+					e.preventDefault();
+				}
 			});
 			$('#btnChargeRound').click(function(e) {
-				$("#btnChargeRound").prop('disabled', true);
 				if (confirm("Are you sure you want to run out the rounds now?")) {
 					console.log("running");
 					var status=$(this).attr("data-status");
 					if (status == "enabled") {
 						ChargeRounds();
 					}
+					$("#btnChargeRound").prop('disabled', true);
 					e.preventDefault();
 				} else {
 					console.log("NOT running");

@@ -112,7 +112,7 @@
 										<option value="card"<cfif srchMethod eq "card"> selected="selected"</cfif>>Card Payment</option>
 										<option disabled>-----------------</option>
 										<option value="coll"<cfif srchMethod eq "coll"> selected="selected"</cfif>>Cash Collected</option>
-										<option value="phone"<cfif srchMethod eq "phone"> selected="selected"</cfif>>Card by Phone</option>
+										<option value="phone"<cfif srchMethod eq "phone"> selected="selected"</cfif>>Card Online</option>
 										<option value="ib"<cfif srchMethod eq "ib"> selected="selected"</cfif>>Internet Banking</option>
 										<option value="acct"<cfif srchMethod eq "acct"> selected="selected"</cfif>>Shop Credit Account</option>
 										<option value="qs"<cfif srchMethod eq "qs"> selected="selected"</cfif>>Paid via Quickstop</option>
@@ -132,15 +132,12 @@
 								<td><input type="checkbox" name="srchSkipZeros" value="1"<cfif StructKeyExists(form,"srchSkipZeros")> checked="checked"</cfif> /></td>
 							</tr>
 							<tr>
-								<td>Active Orders Only</td>
-								<td><input type="checkbox" name="srchActive" value="1"<cfif StructKeyExists(form,"srchActive")> checked="checked"</cfif> /></td>
-							</tr>
-							<tr>
 								<td>Sort By</td>
 								<td>
 									<select name="srchSort">
 										<option value="cltRef"<cfif srchSort eq "cltRef"> selected="selected"</cfif>>Reference</option>
 										<option value="cltName"<cfif srchSort eq "cltName"> selected="selected"</cfif>>Name</option>
+										<option value="address"<cfif srchSort eq "address"> selected="selected"</cfif>>Address</option>
 										<option value="cltBalance"<cfif srchSort eq "cltBalance"> selected="selected"</cfif>>Balance</option>
 										<option value="cltChaseDate"<cfif srchSort eq "cltChaseDate"> selected="selected"</cfif>>Date Chased</option>
 									</select>
@@ -184,7 +181,6 @@
 					<th height="24" align="right">Ref</th>
 					<th>Name</th>
 					<th>Address</th>
-					<th>Active</th>
 					<th>Type</th>
 					<th>Pay Type</th>
 					<th>Method</th>
@@ -220,8 +216,7 @@
 						<tr>
 							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
-							<td align="center">#item.ordHouseName# #item.ordHouseNumber#</td>
-							<td align="center">#item.ordActive#</td>
+							<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>
@@ -256,8 +251,7 @@
 						<tr>
 							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
-							<td align="center">#item.ordHouseName# #item.ordHouseNumber#</td>
-							<td align="center">#item.ordActive#</td>
+							<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 							<td align="center">#item.type#</td>
 							<td align="center">#item.cltPayType#</td>
 							<td align="center">#item.methodKey#</td>
@@ -274,7 +268,7 @@
 				<cfif debitCount gt 0>
 					<tr>
 						<td colspan="3">#debitCount# in debit</td>
-						<td colspan="4">Debit Totals</td>
+						<td colspan="3">Debit Totals</td>
 						<td class="amountTotal">#showNum(totals[1])#</td>
 						<td class="amountTotal">#showNum(totals[2])#</td>
 						<td class="amountTotal">#showNum(totals[3])#</td>
@@ -286,7 +280,7 @@
 				<cfif creditCount gt 0>
 					<tr>
 						<td colspan="3">#creditCount# in credit</td>
-						<td colspan="4">Credit Totals</td>
+						<td colspan="3">Credit Totals</td>
 						<td class="amountTotal">#showNum(credits[1])#</td>
 						<td class="amountTotal">#showNum(credits[2])#</td>
 						<td class="amountTotal">#showNum(credits[3])#</td>

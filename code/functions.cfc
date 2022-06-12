@@ -4143,9 +4143,9 @@
 			<cfset result.balances=[]>		
 			<cfquery name="QClients" datasource="#args.datasource#" result="QResult">
 				SELECT cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltAccountType,cltPayType,cltPayMethod,cltChase,cltChaseDate,
-					ordHouseName,ordHouseNumber,ordActive
+					cltDelHouseNumber,cltDelHouseName, stName
 				FROM tblClients
-				INNER JOIN tblOrder ON ordClientID=cltID
+				INNER JOIN tblStreets2 ON stID = cltStreetCode
 				WHERE true
 				<cfif len(StructFind(args.form,"srchType"))>
 					<cfif args.form.srchType eq 'notN'>
@@ -4158,11 +4158,15 @@
 				<cfif len(StructFind(args.form,"srchPayType"))>AND cltPayType="#args.form.srchPayType#"</cfif>
 				<cfif len(StructFind(args.form,"srchMethod"))>AND cltPayMethod="#args.form.srchMethod#"</cfif>
 				<cfif len(StructFind(args.form,"srchName"))>AND (cltName LIKE "%#args.form.srchName#%" 
-					OR cltCompanyName LIKE "%#args.form.srchName#%" 
-					OR ordHouseName LIKE "%#args.form.srchName#%")</cfif>
+					OR cltCompanyName LIKE "%#args.form.srchName#%")</cfif>
 				<cfif StructKeyExists(args.form,"srchSkipInactive")>AND cltAccountType <> "N"</cfif>
-				<cfif StructKeyExists(args.form,"srchActive")>AND ordActive = 1</cfif>
-				<cfif len(args.form.srchSort)>ORDER BY #args.form.srchSort#</cfif>
+				<cfif len(args.form.srchSort)>
+					<cfif args.form.srchSort eq "address">
+						ORDER BY cltDelHouseName,cltName
+					<cfelse>
+						ORDER BY #args.form.srchSort#
+					</cfif>
+				</cfif>
 			</cfquery>
 			<cfif val(args.form.srchMin) gt 0><cfset minVal=val(args.form.srchMin)>
 				<cfelse><cfset minVal=0></cfif>
@@ -4179,9 +4183,9 @@
 				<cfset item.methodKey=cltPayMethod>
 				<cfset item.cltChase=cltChase>
 				<cfset item.cltChaseDate=cltChaseDate>
-				<cfset item.ordHouseName=ordHouseName>
-				<cfset item.ordHouseNumber=ordHouseNumber>
-				<cfset item.ordActive=ordActive>
+				<cfset item.cltDelHouseNumber=cltDelHouseNumber>
+				<cfset item.cltDelHouseName=cltDelHouseName>
+				<cfset item.stName=stName>
 				<cfset item.balance0=0>
 				<cfset item.balance1=0>
 				<cfset item.balance2=0>

@@ -221,8 +221,9 @@
 			<cfif Find("RRP",args.description,0)>	<!--- remove RRP --->
 				<cfset args.description = Replace(args.description,"RRP","")>
 			</cfif>
-			<cfif Find("£",args.description,1) gt 0>	<!--- remove price in pounds e.g. £3.49 assume price marked --->
-				<cfset args.description = ReReplace(args.description,"£\d+\.?\d*","X")>
+			<cfif Find("#chr(163)#",args.description,1) gt 0>	<!--- remove price in pounds e.g. £3.49 assume price marked --->
+				<cfset args.description = ReReplace(args.description,"#chr(163)#\d+\.?\d*","X")>
+				<cfset args.description = "#args.description# ooo">
 				<cfset args.pm = true>
 			</cfif>
 			<cfif ReFind("\d+p",args.description) gt 0>	<!--- remove price in pence e.g. 49p assume price marked --->

@@ -37,7 +37,7 @@
 							} else if (loc.j eq 1){ // product code
 								StructInsert(loc.record,"code",loc.cell);
 							} else if (loc.j eq 2){ // description
-								loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("£",loc.cell) gt 0);	// contains price mark e.g. PM159
+								loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
 								StructInsert(loc.record,"description",loc.cell);
 								StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
 							} else if (loc.j eq 3) { // qty field	e.g 12 x 100g
@@ -222,8 +222,7 @@
 				<cfset args.description = Replace(args.description,"RRP","")>
 			</cfif>
 			<cfif Find("#chr(163)#",args.description,1) gt 0>	<!--- remove price in pounds e.g. £3.49 assume price marked --->
-				<cfset args.description = ReReplace(args.description,"#chr(163)#\d+\.?\d*","X")>
-				<cfset args.description = "#args.description# ooo">
+				<cfset args.description = ReReplace(args.description,"#chr(163)#\d+\.?\d*","")>
 				<cfset args.pm = true>
 			</cfif>
 			<cfif ReFind("\d+p",args.description) gt 0>	<!--- remove price in pence e.g. 49p assume price marked --->

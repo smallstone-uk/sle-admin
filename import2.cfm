@@ -110,10 +110,10 @@
 					<td align="center">#lineCount#</td>
 					<td>
 						<cfif StructKeyExists(recResult,"barcode")>
-							<a href="https://www.booker.co.uk/products/product-list?keywords=#recResult.barcode#" target="_blank">#recResult.barcode#</a>
+							<a href="https://www.booker.co.uk/products/product-list?keywords=#recResult.barcode#" target="booker">#recResult.barcode#</a>
 						<cfelse><span class="noBarcode">NO BARCODE</span><cfset noBarcodeCount ++></cfif>
 					</td>
-					<td><a href="productStock6.cfm?product=#recResult.productID#" target="_blank">#rec.code#</a></td>
+					<td><a href="productStock6.cfm?product=#recResult.productID#" target="product">#rec.code#</a></td>
 					<td>#rec.description#</td>
 					<td>#rec.packsize#</td>
 					<td align="center" class="#pmClass# #pmClassDiff#">#int(rec.pm)# = #recResult.prevPM#</td>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Product Stock</title>
+<title>Book In Stock</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link href="css/main3.css" rel="stylesheet" type="text/css">
 <link href="css/productstock.css" rel="stylesheet" type="text/css">

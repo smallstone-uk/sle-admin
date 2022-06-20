@@ -221,12 +221,26 @@
 			<cfif Find("RRP",args.description,0)>	<!--- remove RRP --->
 				<cfset args.description = Replace(args.description,"RRP","")>
 			</cfif>
-			<cfif Find("£",args.description) gt 0>	<!--- remove price e.g. £3.49 --->
-				<cfset args.description = ReReplace(args.description,"£\d\.?\d*","")>
+			<cfif Find("£",args.description) gt 0>	<!--- remove price in pounds e.g. £3.49 assume price marked --->
+				<cfset args.description = ReReplace(args.description,"£\d+\.?\d*","")>
+				<cfset args.pm = true>
 			</cfif>
-			<cfif ReFind("PM[P]?\d*",args.description) gt 0>	<!--- remove PM or PMP --->
+			<cfif ReFind("\d+p",args.description) gt 0>	<!--- remove price in pence e.g. 49p assume price marked --->
+				<cfset args.description = ReReplace(args.description,"\d+p","")>
+				<cfset args.pm = true>
+			</cfif>
+			<cfif ReFind("PM[P]?\d*",args.description) gt 0>	<!--- remove PM or PMP and numbers following --->
 				<cfset args.description = ReReplace(args.description,"PM[P]?\d*","")>
 				<cfset args.pm = true>
+			</cfif>
+			<cfif ReFind("\d+ x ",args.description) gt 0>	<!--- remove case qty --->
+				<cfset args.description = ReReplace(args.description,"\d+ x ","")>
+			</cfif>
+			<cfif ReFind("\d+\.?\d*\s?g",args.description) gt 0>	<!--- remove pack weight --->
+				<cfset args.description = ReReplace(args.description,"\d+\.?\d*\s?g","")>
+			</cfif>
+			<cfif ReFind("\(\)",args.description) gt 0>	<!--- remove empty brackets --->
+				<cfset args.description = ReReplace(args.description,"\(\)","")>
 			</cfif>
 			<cfif FindNoCase("Happy Shopper",args.description) gt 0>	<!--- remove long text --->
 				<cfset args.description = ReplaceNoCase(args.description,"Happy Shopper","HS")>
@@ -372,8 +386,8 @@
 				<cfset loc.result.days = -1>
 				<cfset loc.result.lastQty = 0>
 				<cfset loc.result.qty1 = args.qty1>
-				<cfif args.qty1 gt 1><cfset loc.result.classQty = "more"></cfif>
 				<cfif args.qty1 gt 1>	<!--- get most recent stock item --->
+					<cfset loc.result.classQty = "more">
 					<cfquery name="loc.QProduct" datasource="#application.site.datasource1#">
 						SELECT 	prodID,prodRef,prodTitle,prodLastBought,prodPriceMarked,prodVATRate,prodStatus,
 								siID,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siOurPrice,siReceived,siBookedIn,siStatus,
@@ -401,7 +415,7 @@
 						<cfset loc.result.qty1 = args.qty1 - loc.result.lastQty>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
-					<cfif loc.result.qty1 lt 0>
+					<cfif loc.result.qty1 lte 0>
 						<cfset loc.result.qty1 = 1>
 						<cfset loc.result.classQty = "changed">
 					</cfif>

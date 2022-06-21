@@ -1,3 +1,8 @@
+<!--- 
+	prodPackPrice field ignored use siWSP instead
+	maybe redundant	19/06/22
+--->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,6 +28,15 @@
 <script src="scripts/productStock.js" type="text/javascript"></script>
 <script type="text/javascript">
 	$(document).ready(function() { 
+	
+		function calc_total(){
+		  var sum = 0;
+		  $(".sod_wspTotal").each(function(){
+			sum += parseFloat($(this).text());
+		  });
+		  $('#orderTotal').text(sum);
+		}
+		
 		$('#menu').dcMegaMenu({rowItems: '3',event: 'hover',fullWidth: true});
 		$('#btnPrintLabels').click(function(e) {
 			$('#order-list').addClass("noPrint");
@@ -70,6 +84,52 @@
 				}
 			});
 		});
+		var isEditingWSP = false;
+		$('.sod_wsp').click(function(event) {
+			if (!isEditingWSP) {
+				var value = $(this).html().trim();
+				var rowID = $(this).attr("data-row");
+				var stockID = $(this).attr("data-id");
+				var ourPrice = $(this).attr("data-ourPrice");
+				var vatRate = $(this).attr("data-vatRate");
+				var packQty = $(this).attr("data-packqty");
+				var qtyPacks = $(this).attr("data-qtyPacks");
+				var htmlStr = "<input type='text' size='6' value='" + value + "' class='sod_wsp_input' data-id='" + stockID + "' data-ourPrice='" + ourPrice+ "' data-vatRate='" + vatRate + "' data-packqty='" + packQty + "' data-row='" + rowID
++ "' data-qtyPacks='" + qtyPacks + "' />";
+				$(this).html(htmlStr);
+				$(this).find('.sod_wsp_input').focus();
+			}
+			isEditingWSP = true;
+		});
+		$(document).on("blur", ".sod_wsp_input", function(event) {
+			var value = $(this).val();
+			var stockID = $(this).attr("data-id");
+			var ourPrice = $(this).attr("data-ourPrice");
+			var vatRate = $(this).attr("data-vatRate");
+			var packQty = $(this).attr("data-packqty");
+			var qtyPacks = $(this).attr("data-qtyPacks");
+			var rowID = $(this).attr("data-row");
+			var rowData = $('#' + rowID).html();
+			var myTrade = $(this).closest('tr').find(".sod_unittrade");
+			var myTradeTotal = $(this).closest('tr').find(".sod_wspTotal");
+			var myPOR = $(this).closest('tr').find(".sod_POR");
+			var cell = $(this).parent('.sod_wsp');
+			var trade = $(rowID + ' .sod_unittrade');
+			$.ajax({
+				type: "POST",
+				url: "saveProductWSP.cfm",
+				data: {"wsp": value, "stockID": stockID, "packQty": packQty, "qtyPacks": qtyPacks, "ourPrice": ourPrice, "vatRate": vatRate},
+				success: function(data) {
+					var json = $.parseJSON(data);
+					cell.html(json.wsp.trim());
+					myTrade.html(json.unitTrade.trim());
+					myTradeTotal.html(json.tradeTotal.trim());
+					myPOR.html(json.por.trim() + "%");
+					calc_total();
+					isEditingWSP = false;
+				}
+			});
+		});
 	});
 </script>
 <style type="text/css">
@@ -80,6 +140,8 @@
 	.headleft {text-align:left; font-size:12px;}
 	.headright {text-align:right; font-size:12px;}
 	.substitute {color:#FF0000; font-weight:bold;}
+	.small {font-size:10px;}
+	.sod_wsp {background-color:#9CF;}
 	@page {size:portrait;margin:40px;}
 
 	@media print {
@@ -153,7 +215,8 @@
 							<div class="module">
 							<div class="clear"></div>
 							<cfif stockSheet.count gt 0>
-								<table width="100%" class="tableList" border="1">
+								<!---<cfdump var="#stockSheet#" label="stockSheet" expand="false">--->
+								<table width="100%" id="stockTable" class="tableList" border="1">
 									<tr>
 										<td class="header" colspan="4">Reference: #stockSheet.OrderRef# (ID: #stockSheet.orderID#)</td>
 										<td class="header" colspan="6">Order Date: #stockSheet.OrderDate#</td>
@@ -167,7 +230,9 @@
 										<th class="headleft">Description</th>
 										<th class="headleft">Unit Size</th>
 										<th class="headright">WSP</th>
+										<th class="headright">Unit Price</th>
 										<th>Packs</th>
+										<th class="headright">Trade<br>Total</th>
 										<th class="headright" width="40">Our Price</th>
 										<th>PM</th>
 										<th class="headright">POR</th>
@@ -180,35 +245,15 @@
 									<cfset orderTotal=0>
 									<cfset recvdTotal=0>
 									<cfset avgPOR = 0>
+									<cfset totalTrade = 0>
 									<cfloop array="#stockSheet.items#" index="item">
-										<cfset avgPOR += item.prodPOR>
+										<cfset avgPOR += item.siPOR>
 										<cfif StructKeyExists(item,"prodRef") AND item.prodref neq "not found">
 											<cfset rowCount++>
 											<cfset itemCount++>
-											<cfif StructKeyExists(item,"prodPackPrice") AND StructKeyExists(item,"siQtyPacks")>
-												<cfset orderTotal=orderTotal+(val(item.prodPackPrice)*val(item.siQtyPacks))>
-												<cfset recvdTotal=recvdTotal+(val(item.prodPackPrice)*val(item.siReceived))>
-											</cfif>
-											<cfif rowCount is 24>
-												<cfset rowCount=0>
-												</table>
-												<div style="page-break-after:always;"></div>
-												<table width="100%" class="tableList" border="1">
-													<tr>
-														<th class="noPrint"></th>
-														<th class="headleft">##</th>
-														<th class="headleft">Barcode</th>
-														<th class="headleft">Reference</th>
-														<th class="headleft">Description</th>
-														<th class="headleft">Unit Size</th>
-														<th class="headright">WSP</th>
-														<th>Packs</th>
-														<th class="headright" width="50">Our Price</th>
-														<th>PM</th>
-														<th class="headright">POR</th>
-														<th width="40">VAT Rate</th>
-														<th width="40">Status</th>
-													</tr>
+											<cfif StructKeyExists(item,"siWSP") AND StructKeyExists(item,"siQtyPacks")>
+												<cfset orderTotal += (val(item.siWSP)*val(item.siQtyPacks))>
+												<cfset recvdTotal += (val(item.siWSP)*val(item.siReceived))>
 											</cfif>
 											<cfif item.category neq category>
 												<tr>
@@ -223,36 +268,49 @@
 											<cfif item.siSubs GT 0>
 												<cfset rowColor="#rowColor# rowGrey">
 											</cfif>
-											<tr class="#rowColor#" <cfif item.newFlag>style="background-color:##D9FFCA;"</cfif>>
-												<td class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" value="#item.prodID#" <cfif item.changedFlag OR item.newFlag>checked="checked"</cfif> /></td>
+											<cfset wspTotal = item.siQtyPacks * item.siWSP>
+											<tr id="row#rowCount#" class="#rowColor#" <cfif item.newFlag>style="background-color:##D9FFCA;"</cfif>>
+												<td class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" 
+													value="#item.prodID#" <cfif item.changedFlag OR item.newFlag>checked="checked"</cfif> /></td>
 												<td>#itemCount#</td>
 												<td width="100">
-												<script type="text/javascript">
-													$(document).ready(function() {
-														var code="#Right(item.barCode,13)#";
-														var type="ean13";
-														if (code.length == 8) {
-															type="ean8";
-														} else if (code.length == 13) {
-															type="ean13";
-														} else {
-															type="upc";
-														}
-														$(".barcode#itemCount#").barcode(code, type); //,{barWidth:2, barHeight:20}
-													});
-												</script>
-												<div class="barcode#itemCount#">#item.barCode#</div>
+													<script type="text/javascript">
+														$(document).ready(function() {
+															var code="#Right(item.barCode,13)#";
+															var type="ean13";
+															if (code.length == 8) {
+																type="ean8";
+															} else if (code.length == 13) {
+																type="ean13";
+															} else {
+																type="upc";
+															}
+															$(".barcode#itemCount#").barcode(code, type); //,{barWidth:2, barHeight:20}
+														});
+													</script>
+													<a href="https://www.booker.co.uk/products/product-list?keywords=#item.barCode#" 
+														target="booker"><div class="barcode#itemCount#">#item.barCode#</div></a>
 												</td>
 												<td><a href="ProductStock6.cfm?product=#item.prodID#" target="_blank">#item.prodRef#</a>
 													<cfif len(item.msg)><br /><span class="substitute">#item.msg#</span></cfif></td>
 												<td class="sod_title" data-id="#item.prodID#">#item.prodTitle#</td>
 												<td>#item.prodPackQty# X #item.prodUnitSize#</td>
-												<td align="right">#item.prodPackPrice# <br>(#item.prodUnitTrade#)</td>
+												<td align="right" class="sod_wsp" 
+													data-row="row#rowCount#" 
+													data-id="#item.siID#" 
+													data-ourPrice="#item.siOurPrice#"
+													data-vatRate="#item.prodVATRate#"
+													data-packqty="#item.prodPackQty#"
+													data-qtyPacks="#item.siQtyPacks#">
+													#item.siWSP#
+												</td>
+												<td align="center" class="sod_unittrade">#item.siUnitTrade#</td>
 												<td align="center">#item.siQtyPacks#</td>
+												<td align="right" class="sod_wspTotal">#DecimalFormat(wspTotal)#</td>
 												<td align="right"><strong>#item.prodOurPrice#</strong></td>
 												<td align="center">#YesNoFormat(item.prodPriceMarked)#</td>
-												<td align="right">#item.prodPOR#%</td>
-												<td align="right">#DecimalFormat(item.prodVATRate)#%</td>
+												<td align="right" class="sod_POR">#item.siPOR#%</td>
+												<td align="right" class="sod_vatRate">#DecimalFormat(item.prodVATRate)#%</td>
 												<td align="right">#item.siStatus#</td>
 											</tr>
 										</cfif>
@@ -260,8 +318,8 @@
 									<cfset avgPOR = avgPOR / itemCount>
 									<tr height="30">
 										<td class="noPrint"></td>
-										<td class="headright" colspan="6">Average POR #DecimalFormat(avgPOR)#% &nbsp; Order Value</td>
-										<td class="headright">#DecimalFormat(orderTotal)#</td>
+										<td class="headright" colspan="7">Average POR #DecimalFormat(avgPOR)#% &nbsp; Order Value</td>
+										<td class="headright" id="orderTotal">#DecimalFormat(orderTotal)#</td>
 										<td class="headright" colspan="3">Received Value</td>
 										<td class="headright">#DecimalFormat(recvdTotal)#</td>
 										<td></td>

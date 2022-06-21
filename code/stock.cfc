@@ -17,6 +17,15 @@
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>
+	<cffunction name="SaveProductLock" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblProducts
+			SET prodLocked = '#int(args.newLock)#'
+			WHERE prodID = #val(args.product)#
+		</cfquery>
+	</cffunction>
 	<cffunction name="SaveProductTitle" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -26,6 +35,33 @@
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>
+	
+	<cffunction name="SaveProductWSP" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+			<cfdump var="#args#" label="SaveProductWSP" expand="yes" format="html" 
+				output="#application.site.dir_logs#args-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		<cftry>
+			<cfset var loc = {}>
+			<cfset loc.wsp = args.newWSP>
+			<cfset loc.unitTrade = args.newWSP / args.packQty>
+			<cfset loc.profit = args.ourPrice - (loc.unitTrade * (1 + (args.vatRate / 100)))>
+			<cfset loc.POR = (loc.profit / args.ourPrice) * 100>
+			<cfset loc.tradeTotal = args.newWSP * args.qtyPacks>
+			<cfquery name="loc.save" datasource="#args.datasource#">
+				UPDATE tblStockItem
+				SET siWSP = '#loc.wsp#',
+					siUnitTrade = #loc.unitTrade#,
+					siPOR = #loc.POR#
+				WHERE siID = #val(args.stockID)#
+			</cfquery>
+			<cfreturn loc>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="SaveProductWSP" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+	</cffunction>
+	
 	<cffunction name="SaveProductStock" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -178,7 +214,12 @@
 						<cfset loc.rec.prodVATRate=prodVATRate>
 						<cfset loc.rec.prodPOR=prodPOR>
 						<cfset loc.rec.prodPriceMarked=prodPriceMarked>
+						<cfset loc.rec.siID=siID>
 						<cfset loc.rec.siQtyPacks=siQtyPacks>
+						<cfset loc.rec.siWSP=siWSP>
+						<cfset loc.rec.siUnitTrade=siUnitTrade>
+						<cfset loc.rec.siOurPrice=siOurPrice>
+						<cfset loc.rec.siPOR=siPOR>
 						<cfset loc.rec.siReceived=siReceived>
 						<cfset loc.rec.siStatus=siStatus>
 						<cfset loc.rec.siSubs=siSubs>

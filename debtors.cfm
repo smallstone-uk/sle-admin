@@ -59,6 +59,7 @@
 									<select name="srchReport">
 										<option value="">Select...</option>
 										<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Aged Debtors</option>
+										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Shop Payments Recon</option>
 									</select>
 								</td>
 							</tr>
@@ -169,128 +170,184 @@
 		<cfset parms.datasource=application.site.datasource1>
 		<cfset parms.form=form>
 		<cfobject component="code/functions" name="func">
-		<cfset debtors=func.AgedDebtors(parms)>
-
-		<cfset totals=[0,0,0,0,0]>
-		<cfset credits=[0,0,0,0,0]>
-		<cfset debitCount=0>
-		<cfset creditCount=0>
-		<cfoutput>
-			<table border="1" class="tableList">
-				<tr>
-					<th height="24" align="right">Ref</th>
-					<th>Name</th>
-					<th>Address</th>
-					<th>Type</th>
-					<th>Pay Type</th>
-					<th>Method</th>
-					<th width="60" align="right">28 days</th>
-					<th width="60" align="right">56 Days</th>
-					<th width="60" align="right">84 Days</th>
-					<th width="60" align="right">112+ Days</th>
-					<th width="60" align="right">Balance</th>
-					<th width="40" align="left">Level</th>
-					<th width="90" align="left">Chased</th>
-				</tr>
-				<cfif parms.form.srchSort eq "cltBalance">
-					<cfloop array="#debtors.balances#" index="key">
-						<cfset key = val(ListLast(key,"_"))>
-						<cfset item = debtors.clients[key]>
-						<cfif item.balance0 lt 0>	<!--- ooo that's nasty - duplicated code! --->
-							<cfset style="credit">
-							<cfset creditCount++>
-							<cfset credits[1]=credits[1]+item.balance1>
-							<cfset credits[2]=credits[2]+item.balance2>
-							<cfset credits[3]=credits[3]+item.balance3>
-							<cfset credits[4]=credits[4]+item.balance4>
-							<cfset credits[5]=credits[5]+item.balance0>
-						<cfelse>
-							<cfset style="amount">
-							<cfset debitCount++>
-							<cfset totals[1]=totals[1]+item.balance1>
-							<cfset totals[2]=totals[2]+item.balance2>
-							<cfset totals[3]=totals[3]+item.balance3>
-							<cfset totals[4]=totals[4]+item.balance4>
-							<cfset totals[5]=totals[5]+item.balance0>
-						</cfif>
-						<tr>
-							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
-							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
-							<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
-							<td align="center">#item.type#</td>
-							<td align="center">#item.cltPayType#</td>
-							<td align="center">#item.methodKey#</td>
-							<td class="#style#">#showNum(item.balance1)#</td>
-							<td class="#style#">#showNum(item.balance2)#</td>
-							<td class="#style#">#showNum(item.balance3)#</td>
-							<td class="#style#">#showNum(item.balance4)#</td>
-							<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-							<td align="center">#item.cltChase#</td>
-							<td>#LSDateFormat(item.cltChaseDate)#</td>
-						</tr>
-					</cfloop>
-				<cfelse>
-					<cfloop array="#debtors.clients#" index="item">
-						<cfif item.balance0 lt 0>
-							<cfset style="credit">
-							<cfset creditCount++>
-							<cfset credits[1]=credits[1]+item.balance1>
-							<cfset credits[2]=credits[2]+item.balance2>
-							<cfset credits[3]=credits[3]+item.balance3>
-							<cfset credits[4]=credits[4]+item.balance4>
-							<cfset credits[5]=credits[5]+item.balance0>
-						<cfelse>
-							<cfset style="amount">
-							<cfset debitCount++>
-							<cfset totals[1]=totals[1]+item.balance1>
-							<cfset totals[2]=totals[2]+item.balance2>
-							<cfset totals[3]=totals[3]+item.balance3>
-							<cfset totals[4]=totals[4]+item.balance4>
-							<cfset totals[5]=totals[5]+item.balance0>
-						</cfif>
-						<tr>
-							<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
-							<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
-							<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
-							<td align="center">#item.type#</td>
-							<td align="center">#item.cltPayType#</td>
-							<td align="center">#item.methodKey#</td>
-							<td class="#style#">#showNum(item.balance1)#</td>
-							<td class="#style#">#showNum(item.balance2)#</td>
-							<td class="#style#">#showNum(item.balance3)#</td>
-							<td class="#style#">#showNum(item.balance4)#</td>
-							<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-							<td align="center">#item.cltChase#</td>
-							<td>#LSDateFormat(item.cltChaseDate)#</td>
-						</tr>
-					</cfloop>
-				</cfif>
-				<cfif debitCount gt 0>
+		
+		<cfif form.srchReport eq 1>
+			<cfset debtors=func.AgedDebtors(parms)>
+	
+			<cfset totals=[0,0,0,0,0]>
+			<cfset credits=[0,0,0,0,0]>
+			<cfset debitCount=0>
+			<cfset creditCount=0>
+			<cfoutput>
+				<table border="1" class="tableList">
 					<tr>
-						<td colspan="3">#debitCount# in debit</td>
-						<td colspan="3">Debit Totals</td>
-						<td class="amountTotal">#showNum(totals[1])#</td>
-						<td class="amountTotal">#showNum(totals[2])#</td>
-						<td class="amountTotal">#showNum(totals[3])#</td>
-						<td class="amountTotal">#showNum(totals[4])#</td>
-						<td class="amountTotal">#showNum(totals[5])#</td>
-						<td></td>
+						<th height="24" align="right">Ref</th>
+						<th>Name</th>
+						<th>Address</th>
+						<th>Type</th>
+						<th>Pay Type</th>
+						<th>Method</th>
+						<th width="60" align="right">28 days</th>
+						<th width="60" align="right">56 Days</th>
+						<th width="60" align="right">84 Days</th>
+						<th width="60" align="right">112+ Days</th>
+						<th width="60" align="right">Balance</th>
+						<th width="40" align="left">Level</th>
+						<th width="90" align="left">Chased</th>
 					</tr>
-				</cfif>
-				<cfif creditCount gt 0>
-					<tr>
-						<td colspan="3">#creditCount# in credit</td>
-						<td colspan="3">Credit Totals</td>
-						<td class="amountTotal">#showNum(credits[1])#</td>
-						<td class="amountTotal">#showNum(credits[2])#</td>
-						<td class="amountTotal">#showNum(credits[3])#</td>
-						<td class="amountTotal">#showNum(credits[4])#</td>
-						<td class="amountTotal">#showNum(credits[5])#</td>
-						<td></td>
-					</tr>
-				</cfif>
-			</table>
-		</cfoutput>
+					<cfif parms.form.srchSort eq "cltBalance">
+						<cfloop array="#debtors.balances#" index="key">
+							<cfset key = val(ListLast(key,"_"))>
+							<cfset item = debtors.clients[key]>
+							<cfif item.balance0 lt 0>	<!--- ooo that's nasty - duplicated code! --->
+								<cfset style="credit">
+								<cfset creditCount++>
+								<cfset credits[1]=credits[1]+item.balance1>
+								<cfset credits[2]=credits[2]+item.balance2>
+								<cfset credits[3]=credits[3]+item.balance3>
+								<cfset credits[4]=credits[4]+item.balance4>
+								<cfset credits[5]=credits[5]+item.balance0>
+							<cfelse>
+								<cfset style="amount">
+								<cfset debitCount++>
+								<cfset totals[1]=totals[1]+item.balance1>
+								<cfset totals[2]=totals[2]+item.balance2>
+								<cfset totals[3]=totals[3]+item.balance3>
+								<cfset totals[4]=totals[4]+item.balance4>
+								<cfset totals[5]=totals[5]+item.balance0>
+							</cfif>
+							<tr>
+								<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
+								<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
+								<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
+								<td align="center">#item.type#</td>
+								<td align="center">#item.cltPayType#</td>
+								<td align="center">#item.methodKey#</td>
+								<td class="#style#">#showNum(item.balance1)#</td>
+								<td class="#style#">#showNum(item.balance2)#</td>
+								<td class="#style#">#showNum(item.balance3)#</td>
+								<td class="#style#">#showNum(item.balance4)#</td>
+								<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
+								<td align="center">#item.cltChase#</td>
+								<td>#LSDateFormat(item.cltChaseDate)#</td>
+							</tr>
+						</cfloop>
+					<cfelse>
+						<cfloop array="#debtors.clients#" index="item">
+							<cfif item.balance0 lt 0>
+								<cfset style="credit">
+								<cfset creditCount++>
+								<cfset credits[1]=credits[1]+item.balance1>
+								<cfset credits[2]=credits[2]+item.balance2>
+								<cfset credits[3]=credits[3]+item.balance3>
+								<cfset credits[4]=credits[4]+item.balance4>
+								<cfset credits[5]=credits[5]+item.balance0>
+							<cfelse>
+								<cfset style="amount">
+								<cfset debitCount++>
+								<cfset totals[1]=totals[1]+item.balance1>
+								<cfset totals[2]=totals[2]+item.balance2>
+								<cfset totals[3]=totals[3]+item.balance3>
+								<cfset totals[4]=totals[4]+item.balance4>
+								<cfset totals[5]=totals[5]+item.balance0>
+							</cfif>
+							<tr>
+								<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
+								<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
+								<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
+								<td align="center">#item.type#</td>
+								<td align="center">#item.cltPayType#</td>
+								<td align="center">#item.methodKey#</td>
+								<td class="#style#">#showNum(item.balance1)#</td>
+								<td class="#style#">#showNum(item.balance2)#</td>
+								<td class="#style#">#showNum(item.balance3)#</td>
+								<td class="#style#">#showNum(item.balance4)#</td>
+								<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
+								<td align="center">#item.cltChase#</td>
+								<td>#LSDateFormat(item.cltChaseDate)#</td>
+							</tr>
+						</cfloop>
+					</cfif>
+					<cfif debitCount gt 0>
+						<tr>
+							<td colspan="3">#debitCount# in debit</td>
+							<td colspan="3">Debit Totals</td>
+							<td class="amountTotal">#showNum(totals[1])#</td>
+							<td class="amountTotal">#showNum(totals[2])#</td>
+							<td class="amountTotal">#showNum(totals[3])#</td>
+							<td class="amountTotal">#showNum(totals[4])#</td>
+							<td class="amountTotal">#showNum(totals[5])#</td>
+							<td></td>
+						</tr>
+					</cfif>
+					<cfif creditCount gt 0>
+						<tr>
+							<td colspan="3">#creditCount# in credit</td>
+							<td colspan="3">Credit Totals</td>
+							<td class="amountTotal">#showNum(credits[1])#</td>
+							<td class="amountTotal">#showNum(credits[2])#</td>
+							<td class="amountTotal">#showNum(credits[3])#</td>
+							<td class="amountTotal">#showNum(credits[4])#</td>
+							<td class="amountTotal">#showNum(credits[5])#</td>
+							<td></td>
+						</tr>
+					</cfif>
+				</table>
+			</cfoutput>
+		<cfelseif form.srchReport eq 2>
+			<cfset sTrans = {}>
+			<cfset eTrans = {}>
+			<cfif IsDate(form.srchDateFrom) AND IsDate(form.srchDateTo)>
+				<cfquery name="Qtrans" datasource="#parms.datasource#">
+					SELECT trnDate AS tempDate, SUM(trnAmnt1) AS tempNet
+					FROM `tbltrans` 
+					WHERE `trnType` = 'pay' 
+					AND `trnMethod` IN ('cash','card','chqs') 
+					AND `trnDate` BETWEEN '#form.srchDateFrom#' AND '#form.srchDateTo#'
+					GROUP BY tempDate
+				</cfquery>
+				<cfloop query="Qtrans">
+					<cfset StructInsert(sTrans,tempDate,tempNet)>
+				</cfloop>
+				<cfquery name="QeTrans" datasource="#parms.datasource#">
+					SELECT DATE(eiTimestamp) AS tempDate, SUM(eiNet) as tempNet
+					FROM `tblepos_items` 
+					WHERE `eiProdID` = 10
+					AND `eiTimestamp` BETWEEN '#form.srchDateFrom#' AND '#form.srchDateTo#' 
+					GROUP BY tempDate
+				</cfquery>
+				<cfloop query="QeTrans">
+					<cfset StructInsert(eTrans,tempDate,tempNet)>
+				</cfloop>
+				<cfoutput>
+					<table width="500">
+						<tr>
+							<th align="right">Date</th>
+							<th align="right">Trans</th>
+							<th align="right">EPOS</th>
+							<th align="right">Difference</th>
+						</tr>
+						<cfloop from="#form.srchDateFrom#" to="#form.srchDateTo#" index="iDate">
+							<cfset thisDate = DateFormat(iDate,'yyyy-mm-dd')>
+							<cfset sTran = "">
+							<cfset eTran = "">
+							<cfif StructKeyExists(sTrans,thisDate)>
+								<cfset sTran = StructFind(sTrans,thisDate)>
+							</cfif>
+							<cfif StructKeyExists(eTrans,thisDate)>
+								<cfset eTran = StructFind(eTrans,thisDate)>
+							</cfif>
+							<tr>
+								<td align="right">#thisDate#</td>
+								<td align="right">#sTran#</td>
+								<td align="right">#eTran#</td>
+								<td align="right">#val(sTran) - val(eTran)#</td>
+							</tr>
+						</cfloop>
+					</table>
+				</cfoutput>
+			</cfif>
+		</cfif>
 	</cfif>
 </body>
 </html>

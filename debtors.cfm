@@ -324,8 +324,8 @@
 					<table width="500">
 						<tr>
 							<th align="right">Date</th>
-							<th align="right">Trans</th>
-							<th align="right">EPOS</th>
+							<th align="right">News Trans</th>
+							<th align="right">EPOS Payments</th>
 							<th align="right">Difference</th>
 						</tr>
 						<cfloop from="#form.srchDateFrom#" to="#form.srchDateTo#" index="iDate">
@@ -339,7 +339,7 @@
 								<cfset eTran = StructFind(eTrans,thisDate)>
 							</cfif>
 							<tr>
-								<td align="right">#thisDate#</td>
+								<td align="right">#DateFormat(thisDate,'dd-mmm-yy')#</td>
 								<td align="right">#sTran#</td>
 								<td align="right">#eTran#</td>
 								<td align="right">#val(sTran) - val(eTran)#</td>

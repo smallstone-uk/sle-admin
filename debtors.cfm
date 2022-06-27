@@ -308,7 +308,7 @@
 					GROUP BY tempDate
 				</cfquery>
 				<cfloop query="Qtrans">
-					<cfset StructInsert(sTrans,tempDate,tempNet)>
+					<cfset StructInsert(sTrans,DateFormat(tempDate,'yyyy-mm-dd'),tempNet)>
 				</cfloop><cfdump var="#sTrans#" label="sTrans" expand="false">
 				<cfquery name="QeTrans" datasource="#parms.datasource#">
 					SELECT DATE(eiTimestamp) AS tempDate, SUM(eiNet) as tempNet
@@ -318,8 +318,8 @@
 					GROUP BY tempDate
 				</cfquery>
 				<cfloop query="QeTrans">
-					<cfset StructInsert(eTrans,tempDate,tempNet)>
-				</cfloop><cfdump var="#QeTrans#" label="QeTrans" expand="false">
+					<cfset StructInsert(eTrans,DateFormat(tempDate,'yyyy-mm-dd'),tempNet)>
+				</cfloop><cfdump var="#eTrans#" label="QeTrans" expand="false">
 				<cfoutput>
 					<table width="500">
 						<tr>

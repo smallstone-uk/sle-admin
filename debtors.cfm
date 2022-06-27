@@ -59,7 +59,7 @@
 									<select name="srchReport">
 										<option value="">Select...</option>
 										<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Aged Debtors</option>
-										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Shop Payments Recon</option>
+										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Shop Payments Reconcilliation</option>
 									</select>
 								</td>
 							</tr>
@@ -309,7 +309,7 @@
 				</cfquery>
 				<cfloop query="Qtrans">
 					<cfset StructInsert(sTrans,DateFormat(tempDate,'yyyy-mm-dd'),tempNet)>
-				</cfloop><cfdump var="#sTrans#" label="sTrans" expand="false">
+				</cfloop>
 				<cfquery name="QeTrans" datasource="#parms.datasource#">
 					SELECT DATE(eiTimestamp) AS tempDate, SUM(eiNet) as tempNet
 					FROM `tblepos_items` 
@@ -319,8 +319,9 @@
 				</cfquery>
 				<cfloop query="QeTrans">
 					<cfset StructInsert(eTrans,DateFormat(tempDate,'yyyy-mm-dd'),tempNet)>
-				</cfloop><cfdump var="#eTrans#" label="QeTrans" expand="false">
+				</cfloop>
 				<cfoutput>
+					<h1>Shop Payments Reconcillation</h1>
 					<table width="500">
 						<tr>
 							<th align="right">Date</th>

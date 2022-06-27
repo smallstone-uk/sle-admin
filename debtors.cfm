@@ -294,6 +294,7 @@
 					</cfif>
 				</table>
 			</cfoutput>
+			
 		<cfelseif form.srchReport eq 2>
 			<cfset sTrans = {}>
 			<cfset eTrans = {}>
@@ -308,7 +309,7 @@
 				</cfquery>
 				<cfloop query="Qtrans">
 					<cfset StructInsert(sTrans,tempDate,tempNet)>
-				</cfloop>
+				</cfloop><cfdump var="#sTrans#" label="sTrans" expand="false">
 				<cfquery name="QeTrans" datasource="#parms.datasource#">
 					SELECT DATE(eiTimestamp) AS tempDate, SUM(eiNet) as tempNet
 					FROM `tblepos_items` 
@@ -318,7 +319,7 @@
 				</cfquery>
 				<cfloop query="QeTrans">
 					<cfset StructInsert(eTrans,tempDate,tempNet)>
-				</cfloop>
+				</cfloop><cfdump var="#QeTrans#" label="QeTrans" expand="false">
 				<cfoutput>
 					<table width="500">
 						<tr>

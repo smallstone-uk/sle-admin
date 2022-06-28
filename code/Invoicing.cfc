@@ -170,18 +170,18 @@
 		
 		<cftry>
 			<cfquery name="loc.Charges" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT DATE_FORMAT(diDatestamp,'%y%U') AS weekNo, DATE_FORMAT(diDatestamp,'%a') AS dayName,diDatestamp, sum( diPrice ) AS price, sum( diCharge ) AS charge, count(diID) AS num
+				SELECT DATE_FORMAT(diDate,'%y%U') AS weekNo, DATE_FORMAT(diDate,'%a') AS dayName,diDate, sum( diPrice ) AS price, sum( diCharge ) AS charge, count(diID) AS num
 				FROM `tbldelitems`
-				WHERE `diDatestamp`
+				WHERE `diDate`
 				BETWEEN '#args.form.fromDate#'
 				AND '#args.form.toDate#'
-				GROUP BY diDatestamp
+				GROUP BY diDate
 			</cfquery>
 			<cfset loc.result.Charges = loc.Charges>
 			<cfset loc.result.grid = {}>
 			<cfloop query="loc.Charges">
 				<cfif NOT StructKeyExists(loc.result.grid,weekNo)>
-					<cfset StructInsert(loc.result.grid,weekNo,{"theDate" = diDatestamp})>
+					<cfset StructInsert(loc.result.grid,weekNo,{"theDate" = diDate})>
 				</cfif>
 				<cfset loc.thisWeek = StructFind(loc.result.grid,weekNo)>
 				<cfset StructInsert(loc.thisWeek,dayName,{

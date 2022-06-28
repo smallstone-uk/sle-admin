@@ -8,15 +8,80 @@
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.form=form>
-<cfset invoices=inv.LoadInvoiceRun(parm)>
-
+<cfset chargeCheck = inv.CheckDaysCharged(parm)>
 <cfset row=0>
 <cfset testmode=0> <!--- DEV USE ONLY. NOT FOR FIXING INVOICES--->
 <cfset grandtotal=0>
 <cfset overalltotal=0>
-<cfset arraytotal=val(ArrayLen(invoices.list))+val(ArrayLen(invoices.post))+val(ArrayLen(invoices.email))+val(ArrayLen(invoices.weekly))>
+
 <cfoutput>
-	Clients found: #invoices.clientCount#<br />
+	<h1>Data Check</h1>
+	<cfset keys = ListSort(StructKeyList(chargeCheck.grid,","),"numeric","asc")>
+	<table width="700" class="tableList" border="1">
+		<tr>
+			<th align="right">Date</th>
+			<th></th>
+			<cfloop list="Sun,Mon,Tue,Wed,Thu,Fri,Sat" index="dayName">
+				<th align="right">#dayName#</th>
+			</cfloop>
+			<th align="right">Total</th>
+		</tr>
+		<cfset mTotal = {price = 0, charge = 0, count = 0}>
+		<cfloop list="#keys#" index="i">
+			<cfset theWeek = StructFind(chargeCheck.grid,i)>
+			<tr>
+				<td align="right">#DateFormat(theWeek.theDate,"ddd dd-mmm-yy")#</td>
+				<td align="right">
+					Media<br />
+					Charges<br />
+					Count
+				</td>
+				<cfset wTotal = {price = 0, charge = 0, count = 0}>
+				<cfloop list="Sun,Mon,Tue,Wed,Thu,Fri,Sat" index="dayName">
+					<cfif StructKeyExists(theWeek,dayName)>
+						<cfset theDay = StructFind(theWeek,dayName)>
+						<td align="right">
+							#theDay.price#<br />
+							#theDay.charge#<br />
+							#theDay.count#
+						</td>
+						<cfset wTotal.price += theDay.price>
+						<cfset wTotal.charge += theDay.charge>
+						<cfset wTotal.count += theDay.count>
+					<cfelse>
+						<td class="missing" align="center">MISSING</td>
+					</cfif>
+				</cfloop>
+				<td align="right">
+					#DecimalFormat(wTotal.price)#<br />
+					#DecimalFormat(wTotal.charge)#<br />
+					#wTotal.count#
+				</td>
+				<cfset mTotal.price += wTotal.price>
+				<cfset mTotal.charge += wTotal.charge>
+				<cfset mTotal.count += wTotal.count>
+			</tr>
+			<tr>
+				<td colspan="11">&nbsp;</td>
+			</tr>
+		</cfloop>
+		<tr>
+			<th></th>
+			<th align="right">
+				Media<br />
+				Charges<br />
+				Count
+			</th>
+			<th colspan="9" align="right">		
+				#DecimalFormat(mTotal.price)#<br />
+				#DecimalFormat(mTotal.charge)#<br />
+				#mTotal.count#
+			</th>
+		</tr>
+	</table>
+	
+<cfset invoices = inv.LoadInvoiceRun(parm)>
+<cfset arraytotal=val(ArrayLen(invoices.list))+val(ArrayLen(invoices.post))+val(ArrayLen(invoices.email))+val(ArrayLen(invoices.weekly))>
 	<cfif ArrayLen(invoices.list)>
 		<cfset grandtotal=0>
 		<h1>Deliver</h1>
@@ -430,6 +495,7 @@
 			</tr>
 		</table>
 	</cfif>
+	Clients found: #invoices.clientCount#<br />
 	
 	<script type="text/javascript">
 		<cfif parm.form.createPDF is 1 AND arraytotal is row>SpoolPDF();</cfif>		

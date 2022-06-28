@@ -85,6 +85,9 @@
 		$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 	});
 </script>
+<style>
+	.missing {background-color:#FF0000; font-weight:bold}
+</style>
 </head>
 
 

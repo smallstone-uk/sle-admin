@@ -163,6 +163,42 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="CheckDaysCharged" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.Charges" datasource="#args.datasource#" result="loc.QQueryResult">
+				SELECT DATE_FORMAT(diDatestamp,'%y%U') AS weekNo, DATE_FORMAT(diDatestamp,'%a') AS dayName,diDatestamp, sum( diPrice ) AS price, sum( diCharge ) AS charge, count(diID) AS num
+				FROM `tbldelitems`
+				WHERE `diDatestamp`
+				BETWEEN '#args.form.fromDate#'
+				AND '#args.form.toDate#'
+				GROUP BY diDatestamp
+			</cfquery>
+			<cfset loc.result.Charges = loc.Charges>
+			<cfset loc.result.grid = {}>
+			<cfloop query="loc.Charges">
+				<cfif NOT StructKeyExists(loc.result.grid,weekNo)>
+					<cfset StructInsert(loc.result.grid,weekNo,{"theDate" = diDatestamp})>
+				</cfif>
+				<cfset loc.thisWeek = StructFind(loc.result.grid,weekNo)>
+				<cfset StructInsert(loc.thisWeek,dayName,{
+					"Price" = price,
+					"Charge" = charge,
+					"Count" = num
+				})>
+			</cfloop>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="CheckDaysCharged" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="LoadStatement" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

@@ -54,7 +54,7 @@
 				FROM tblStreets2
 				WHERE stID=#QDrop.ordStreetCode#
 			<cfelse>
-				FROM tblStreets
+				FROM tblStreets2
 				WHERE stRef=#QDrop.cltStreetCode#
 			</cfif>
 		</cfquery>
@@ -125,7 +125,7 @@
 						FROM tblStreets2
 						WHERE stID=#QRounds.ordStreetCode#
 					<cfelse>
-						FROM tblStreets
+						FROM tblStreets2
 						WHERE stRef=#QRounds.cltStreetCode#
 					</cfif>
 				</cfquery>
@@ -182,7 +182,8 @@
 			</cfif>
 			
 			<cfcatch type="any">
-				<cfset result.error=cfcatch>
+				<cfdump var="#cfcatch#" label="SaveRoundOrder" expand="yes" format="html" 
+					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 			</cfcatch>
 		</cftry>
 	
@@ -868,7 +869,7 @@
 									FROM tblStreets2
 									WHERE stID=#QRoundItems.ordStreetCode#
 								<cfelse>
-									FROM tblStreets
+									FROM tblStreets2
 									WHERE stRef=#QRoundItems.cltStreetCode#
 								</cfif>
 							</cfquery>

@@ -279,22 +279,24 @@
 					<cfset grossTotal = 0>
 					<cfset keys = ListSort(StructKeyList(weekTotals,","),"numeric")>
 					<cfset keyCount = ListLen(keys)>
-					<cfloop list="#keys#" delimiters="," index="item">
-						<cfset thisWeek = StructFind(weekTotals,item)>
-						<cfset grossTotal += thisWeek.total>
+					<cfif keyCount gt 0>
+						<cfloop list="#keys#" delimiters="," index="item">
+							<cfset thisWeek = StructFind(weekTotals,item)>
+							<cfset grossTotal += thisWeek.total>
+							<tr>
+								<td align="right">#DateFormat(thisWeek.date,'ddd dd-mmm-yy')#</td>
+								<td align="right">#DecimalFormat(thisWeek.total)#</td>
+							</tr>
+						</cfloop>
 						<tr>
-							<td align="right">#DateFormat(thisWeek.date,'ddd dd-mmm-yy')#</td>
-							<td align="right">#DecimalFormat(thisWeek.total)#</td>
+							<td align="right">Total</td>
+							<td align="right">#DecimalFormat(grossTotal)#</td>
 						</tr>
-					</cfloop>
-					<tr>
-						<td align="right">Total</td>
-						<td align="right">#DecimalFormat(grossTotal)#</td>
-					</tr>
-					<tr>
-						<td align="right">Average (#keyCount#)</td>
-						<td align="right">#DecimalFormat(grossTotal / keyCount)#</td>
-					</tr>
+						<tr>
+							<td align="right">Average (#keyCount#)</td>
+							<td align="right">#DecimalFormat(grossTotal / keyCount)#</td>
+						</tr>
+					</cfif>
 				</table>
 			<cfelse>
 				No records.

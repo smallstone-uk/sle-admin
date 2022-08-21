@@ -2893,9 +2893,9 @@
 		
 		<cftry>
 			<cfif args.form.psDiscountType eq "pc">
-				<cfset trade=args.form.psRetail - (args.form.psRetail*args.form.psDiscount/100)>
+				<cfset trade = val(args.form.psRetail) - (val(args.form.psRetail) * val(args.form.psDiscount) / 100)>
 			<cfelse>
-				<cfset trade=args.form.psRetail-args.form.psDiscount>
+				<cfset trade = val(args.form.psRetail) - val(args.form.psDiscount)>
 			</cfif>
 			
 			<cfif args.form.mode is 1>
@@ -2925,13 +2925,13 @@
 						'#args.form.psSubType#',
 						'#args.form.psIssue#',
 						#args.form.psArrivalDayINT#,
-						#args.form.psQty#,
-						#args.form.psRetail#,
-						#args.form.psDiscount#,
+						#val(args.form.psQty)#,
+						#val(args.form.psRetail)#,
+						#val(args.form.psDiscount)#,
 						'#args.form.psDiscountType#',
 						#StructFind(application.site.VAT,args.form.psVat)#,
 						#args.form.psVat#,
-						#args.form.psPWRetail#,
+						#val(args.form.psPWRetail)#,
 						#args.form.psPWVat#,
 						#trade#
 					)
@@ -2947,13 +2947,13 @@
 						psSubType = '#args.form.psSubType#',
 						psIssue='#args.form.psIssue#',
 						psArrivalDay=#args.form.psArrivalDayINT#,
-						psQty=#args.form.psQty#,
-						psRetail=#args.form.psRetail#,
-						psDiscount=#args.form.psDiscount#,
+						psQty = #val(args.form.psQty)#,
+						psRetail = #val(args.form.psRetail)#,
+						psDiscount = #val(args.form.psDiscount)#,
 						psDiscountType='#args.form.psDiscountType#',
 						psVatRate=#StructFind(application.site.VAT,args.form.psVat)#,
 						psVat=#args.form.psVat#,
-						psPWRetail=#args.form.psPWRetail#,
+						psPWRetail = #val(args.form.psPWRetail)#,
 						psPWVatRate=#args.form.psPWVat#,
 						psTradePrice=#trade#
 					WHERE psID=#args.form.psID#
@@ -2990,18 +2990,18 @@
 								pubArrival=7,
 							</cfif>
 						</cfif>
-						pubDiscount=#args.form.psDiscount#,
+						pubDiscount = #val(args.form.psDiscount)#,
 						pubDiscType='#args.form.psDiscountType#',
 						pubTradePrice=#trade#,
 						pubVATCode=#args.form.psVat#,
-						pubPrice=#args.form.psRetail#,
-						pubPWPrice=#args.form.psPWRetail#,
+						pubPrice = #val(args.form.psRetail)#,
+						pubPWPrice = #val(args.form.psPWRetail)#,
 						pubPWVat=#args.form.psPWVat#
 					WHERE pubID=#args.form.psPubID#
 				</cfquery>
 			</cfif>
 
-			<cfset updatePrice=args.form.psRetail+args.form.psPWRetail>
+			<cfset updatePrice = val(args.form.psRetail) + val(args.form.psPWRetail)>
 			<cfquery name="QDelItems" datasource="#args.datasource#">
 				UPDATE tblDelItems
 				SET diPrice=#DecimalFormat(updatePrice)#

@@ -502,7 +502,7 @@
 				AND nomClass != 'exclude'
 				<!---AND nomClass<>'other'--->
 				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
-				AND niAmount<>0
+				AND niAmount != 0
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 				ORDER BY nomClass,nomCode,trnDate
 			</cfquery>

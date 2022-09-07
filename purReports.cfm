@@ -1881,13 +1881,15 @@
 										</tr>
 									</table>
 								</cfcase>
+								
 								<cfcase value="17">
 									<!--- business report --->
 									<cfset data=pur.VATTransactions(parms)>
 									<!---<cfdump var="#data#" label="data" expand="yes">--->
-									<table class="tableList" border="1">
 									<cfset nomList = ListSort(StructKeyList(data.saleRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.saletotals,","),"numeric","asc")>
+									<h1>Sales Analysis</h1>
+									<table class="tableList" border="1">
 										<tr>
 											<th>Group</th>
 											<th>Code</th>
@@ -1899,27 +1901,27 @@
 											</cfloop>
 											<th>Total</th>
 										</tr>
-									<cfloop list="#nomList#" delimiters="," index="item">
-										<cfset nom = StructFind(data.saleRows,item)>
-										<tr>
-											<td>#nom.nomGroup#</td>
-											<td>#nom.nomCode#</td>
-											<td>#nom.nomType#</td>
-											<td>#nom.nomClass#</td>
-											<td>#nom.nomTitle#</td>
-											<cfset rowTotal = 0>
-											<cfloop list="#monthList#" delimiters="," index="i">
-												<td align="right">
-													<cfif StructKeyExists(nom.nomBals,i)>
-														<cfset value = StructFind(nom.nomBals,i)>
-														<cfset rowTotal += value>
-														#DecimalFormat(value)#
-													</cfif>
-												</td>
-											</cfloop>
-											<td align="right">#DecimalFormat(rowTotal)#</td>
-										</tr>
-									</cfloop>
+										<cfloop list="#nomList#" delimiters="," index="item">
+											<cfset nom = StructFind(data.saleRows,item)>
+											<tr>
+												<td>#nom.nomGroup#</td>
+												<td>#nom.nomCode#</td>
+												<td>#nom.nomType#</td>
+												<td>#nom.nomClass#</td>
+												<td>#nom.nomTitle#</td>
+												<cfset rowTotal = 0>
+												<cfloop list="#monthList#" delimiters="," index="i">
+													<td align="right">
+														<cfif StructKeyExists(nom.nomBals,i)>
+															<cfset value = StructFind(nom.nomBals,i)>
+															<cfset rowTotal += value>
+															#DecimalFormat(value)#
+														</cfif>
+													</td>
+												</cfloop>
+												<td align="right">#DecimalFormat(rowTotal)#</td>
+											</tr>
+										</cfloop>
 										<tr>
 											<th></th>
 											<th></th>
@@ -1934,9 +1936,13 @@
 											</cfloop>
 											<th align="right">#DecimalFormat(rowTotal)#</th>
 										</tr>
-										
+									</table>
+									
+									<div style="clear:both"></div>
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
+									<h1>Purchase Analysis</h1>
+									<table class="tableList" border="1">
 										<tr>
 											<th>Group</th>
 											<th>Code</th>
@@ -1948,27 +1954,27 @@
 											</cfloop>
 											<th>Total</th>
 										</tr>
-									<cfloop list="#nomList#" delimiters="," index="item">
-										<cfset nom = StructFind(data.purRows,item)>
-										<tr>
-											<td>#nom.nomGroup#</td>
-											<td>#nom.nomCode#</td>
-											<td>#nom.nomType#</td>
-											<td>#nom.nomClass#</td>
-											<td>#nom.nomTitle#</td>
-											<cfset rowTotal = 0>
-											<cfloop list="#monthList#" delimiters="," index="i">
-												<td align="right">
-													<cfif StructKeyExists(nom.nomBals,i)>
-														<cfset value = StructFind(nom.nomBals,i)>
-														<cfset rowTotal += value>
-														#DecimalFormat(value)#
-													</cfif>
-												</td>
-											</cfloop>
-											<td align="right">#DecimalFormat(rowTotal)#</td>
-										</tr>
-									</cfloop>
+										<cfloop list="#nomList#" delimiters="," index="item">
+											<cfset nom = StructFind(data.purRows,item)>
+											<tr>
+												<td>#nom.nomGroup#</td>
+												<td>#nom.nomCode#</td>
+												<td>#nom.nomType#</td>
+												<td>#nom.nomClass#</td>
+												<td>#nom.nomTitle#</td>
+												<cfset rowTotal = 0>
+												<cfloop list="#monthList#" delimiters="," index="i">
+													<td align="right">
+														<cfif StructKeyExists(nom.nomBals,i)>
+															<cfset value = StructFind(nom.nomBals,i)>
+															<cfset rowTotal += value>
+															#DecimalFormat(value)#
+														</cfif>
+													</td>
+												</cfloop>
+												<td align="right">#DecimalFormat(rowTotal)#</td>
+											</tr>
+										</cfloop>
 										<tr>
 											<th></th>
 											<th></th>

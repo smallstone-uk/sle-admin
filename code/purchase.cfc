@@ -493,7 +493,7 @@
 		<cfset loc.result.totals = {}>
 		
 		<cftry>
-			<cfquery name="loc.QSalesTrans" datasource="#args.datasource#" result="loc.QSalesTrans">
+			<cfquery name="loc.QSalesTrans" datasource="#args.datasource#" result="loc.QSalesTransResult">
 				SELECT nomClass,nomGroup,nomType,nomCode,nomTitle,niAmount,trnID,trnDate
 				FROM ((tblNominal INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID) 
 				INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 

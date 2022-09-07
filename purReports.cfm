@@ -102,6 +102,7 @@
 											<option value="15"<cfif srchReport eq "15"> selected="selected"</cfif>>Allocation Check</option>
 											<option value="16"<cfif srchReport eq "16"> selected="selected"</cfif>>Data Check Reports</option>
 											<option value="17"<cfif srchReport eq "17"> selected="selected"</cfif>>Business Report</option>
+											
 										</select>
 									</td>
 								</tr>

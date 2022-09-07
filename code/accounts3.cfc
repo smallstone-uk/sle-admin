@@ -43,8 +43,6 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.newTranDate = LSDateFormat(args.header.trnDate, "yyyy-mm-dd")>
-		<cfdump var="#args#" label="SaveNominalTransRecord" expand="yes" format="html" 
-			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 		<cftry>
 			<!---Set flag if tran exists in database--->
@@ -1996,6 +1994,7 @@
 					FROM tblNomItems,tblNominal
 					WHERE niTranID=#val(args.tranID)#
 					AND niNomID=nomID
+					AND niNomID != 231	<!--- 07/09/22 hide vouchers from sales side --->
 					AND nomType='sales'
 					ORDER BY niID asc
 				</cfquery>
@@ -2605,7 +2604,6 @@
 		<cfset var result={}>
 		<cfset var parms={}>
 		<cfset var QTrans="">
-		<cfdump var="#args#" label="TranSearch" expand="no">
 		<cfset parms.srchDateFrom="">
 		<cfset parms.srchDateTo="">
 		<cfset parms.srchAccountID="">

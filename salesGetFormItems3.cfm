@@ -63,7 +63,7 @@
 					url: 'salesLoadItems3.cfm',
 					data : $('#account-form').serialize(),
 					beforeSend:function(){
-						$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading itemsz...").fadeIn();
+						$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading items...").fadeIn();
 					},
 					success:function(data){
 						$('#ItemsList').html(data);
@@ -262,24 +262,28 @@
 				</tr>
 				<cfif ArrayLen(tranLoad.items)>
 					<cfloop array="#tranLoad.items#" index="item">
-						<input type="hidden" name="niID" value="#item.niID#">
-						<tr>
-							<td>#item.nomCode#</td>
-							<td>#item.nomTitle#</td>
-							<td align="right"><input type="text" name="niAmount_#item.niID#" class="amount nomAmount" value="#DecimalFormat(item.niAmount)#" size="10"></td>
-						</tr>
+						<cfif item.niNomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
+							<input type="hidden" name="niID" value="#item.niID#">
+							<tr>
+								<td>#item.nomCode#</td>
+								<td>#item.nomTitle#</td>
+								<td align="right"><input type="text" name="niAmount_#item.niID#" class="amount nomAmount" value="#DecimalFormat(item.niAmount)#" size="10"></td>
+							</tr>
+						</cfif>
 					</cfloop>
 				<cfelse>
 					<cfset keys=ListSort(StructKeyList(nominals.codes,","),"text","asc",",")>
 					<cfloop list="#keys#" index="key">
 						<cfif StructKeyExists(nominals.codes,key)>
 							<cfset nom=StructFind(nominals.codes,key)>
-							<input type="hidden" name="niNomID" value="#nom.nomID#">
-							<tr>
-								<td>#nom.nomCode#</td>
-								<td>#nom.nomTitle#</td>
-								<td align="right"><input type="text" name="niAmount_#nom.nomID#" value="" class="amount nomAmount" size="10"></td>
-							</tr>
+							<cfif nom.niNomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
+								<input type="hidden" name="niNomID" value="#nom.nomID#">
+								<tr>
+									<td>#nom.nomCode#</td>
+									<td>#nom.nomTitle#</td>
+									<td align="right"><input type="text" name="niAmount_#nom.nomID#" value="" class="amount nomAmount" size="10"></td>
+								</tr>
+							</cfif>
 						</cfif>
 					</cfloop>
 				</cfif>

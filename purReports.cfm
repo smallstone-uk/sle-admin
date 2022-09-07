@@ -1888,7 +1888,7 @@
 									<!---<cfdump var="#data#" label="data" expand="yes">--->
 									<cfset nomList = ListSort(StructKeyList(data.saleRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.saletotals,","),"numeric","asc")>
-									<h1>Sales Analysis</h1>
+									<h1>Sales Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# TO #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
 											<th>Group</th>
@@ -1941,7 +1941,7 @@
 									<div style="clear:both"></div>
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
-									<h1>Purchase Analysis</h1>
+									<h1>Purchase Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# TO #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
 											<th>Group</th>

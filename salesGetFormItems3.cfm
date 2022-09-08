@@ -276,7 +276,7 @@
 					<cfloop list="#keys#" index="key">
 						<cfif StructKeyExists(nominals.codes,key)>
 							<cfset nom=StructFind(nominals.codes,key)>
-							<cfif nom.niNomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
+							<cfif nom.nomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
 								<input type="hidden" name="niNomID" value="#nom.nomID#">
 								<tr>
 									<td>#nom.nomCode#</td>

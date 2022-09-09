@@ -1941,7 +1941,7 @@
 										</tr>
 									</table>
 									
-									<div style="clear:both"></div>
+									<div style="clear:both; page-break-before:always;"></div>
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
 									<h1>Purchase Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>

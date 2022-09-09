@@ -1989,6 +1989,22 @@
 											</cfloop>
 											<th align="right">#DecimalFormat(rowTotal)#</th>
 										</tr>
+										<!--- gross profit --->
+										<tr>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th>Gross Profit</th>
+											<cfset rowTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<cfset total = StructFind(data.totally,i)>
+												<cfset profit = total.purch + total.sale>
+												<cfset rowTotal -= profit>
+												<th align="right">#DecimalFormat(-profit)#</th>
+											</cfloop>
+											<th align="right">#DecimalFormat(rowTotal)#</th>
+										</tr>
 									</table>
 								</cfcase>
 							</cfswitch>

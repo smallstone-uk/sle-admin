@@ -491,6 +491,7 @@
 		<cfset loc.result.purRows = {}>
 		<cfset loc.result.saletotals = {}>
 		<cfset loc.result.totals = {}>
+		<cfset loc.result.totally = {}>
 		
 		<cftry>
 			<cfquery name="loc.QSalesTrans" datasource="#args.datasource#" result="loc.QSalesTransResult">
@@ -519,7 +520,7 @@
 				WHERE trnClientRef=0 
 				AND trnLedger='purch' 
 				AND nomType='purch' 
-				AND nomClass != 'exclude'
+				AND nomClass NOT IN ('exclude','other')
 				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 				ORDER BY accCode,trnDate,trnID
@@ -551,6 +552,13 @@
 					<cfset loc.total = StructFind(loc.result.totals,loc.yymm)>
 					<cfset StructUpdate(loc.result.totals,loc.yymm,loc.total + niAmount)>
 				</cfif>
+				<!--- combined totals --->
+				<cfif NOT StructKeyExists(loc.result.totally,loc.yymm)>
+					<cfset StructInsert(loc.result.totally,loc.yymm,{"purch" = niAmount, "sale" = 0})>
+				<cfelse>
+					<cfset loc.total = StructFind(loc.result.totally,loc.yymm)>
+					<cfset StructUpdate(loc.result.totally,loc.yymm,{"purch" = loc.total.purch + niAmount, "sale" = loc.total.sale})>
+				</cfif>
 			</cfloop>
 			<cfloop query="loc.QSalesTrans">
 				<cfset loc.grpCode = "#nomGroup#-#nomCode#">
@@ -577,6 +585,13 @@
 				<cfelse>
 					<cfset loc.total = StructFind(loc.result.saletotals,loc.yymm)>
 					<cfset StructUpdate(loc.result.saletotals,loc.yymm,loc.total + niAmount)>
+				</cfif>
+				<!--- combined totals --->
+				<cfif NOT StructKeyExists(loc.result.totally,loc.yymm)>
+					<cfset StructInsert(loc.result.totally,loc.yymm,{"sale" = niAmount, "purch" = 0})>
+				<cfelse>
+					<cfset loc.total = StructFind(loc.result.totally,loc.yymm)>
+					<cfset StructUpdate(loc.result.totally,loc.yymm,{"sale" = loc.total.sale + niAmount, "purch" = loc.total.purch})>
 				</cfif>
 			</cfloop>
 		<cfcatch type="any">

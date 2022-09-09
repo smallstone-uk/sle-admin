@@ -500,8 +500,7 @@
 				INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
 				WHERE trnLedger='sales' 
 				AND nomType='sales'
-				AND nomClass != 'exclude'
-				<!---AND nomClass<>'other'--->
+				AND nomClass NOT IN ('exclude','ext')
 				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 				AND niAmount != 0
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'

@@ -1892,7 +1892,7 @@
 									<table class="tableList" border="1">
 										<tr>
 											<th width="50">Group</th>
-											<th width="70">Code</th>
+											<th width="80">Code</th>
 											<th width="50">Type</th>
 											<th width="50">Class</th>
 											<th width="200">Title</th>
@@ -1948,7 +1948,7 @@
 									<table class="tableList" border="1">
 										<tr>
 											<th width="50">Group</th>
-											<th width="70">Code</th>
+											<th width="80">Code</th>
 											<th width="50">Type</th>
 											<th width="50">Class</th>
 											<th width="200">Title</th>

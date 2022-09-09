@@ -1888,18 +1888,19 @@
 									<!---<cfdump var="#data#" label="data" expand="yes">--->
 									<cfset nomList = ListSort(StructKeyList(data.saleRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.saletotals,","),"numeric","asc")>
-									<h1>Sales Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# TO #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
+									<h1>Sales Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
-											<th>Group</th>
-											<th>Code</th>
-											<th>Type</th>
-											<th>Class</th>
-											<th>Title</th>
+											<th width="50">Group</th>
+											<th width="70">Code</th>
+											<th width="50">Type</th>
+											<th width="50">Class</th>
+											<th width="200">Title</th>
 											<cfloop list="#monthList#" delimiters="," index="i">
-												<th align="right">#i#</th>
+												<th width="60" align="right">#i#</th>
 											</cfloop>
-											<th>Total</th>
+											<th width="60">Total</th>
+											<th width="30"></th>
 										</tr>
 										<cfloop list="#nomList#" delimiters="," index="item">
 											<cfset nom = StructFind(data.saleRows,item)>
@@ -1909,17 +1910,18 @@
 												<td>#nom.nomType#</td>
 												<td>#nom.nomClass#</td>
 												<td>#nom.nomTitle#</td>
-												<cfset rowTotal = 0>
+												<cfset saleTotal = 0>
 												<cfloop list="#monthList#" delimiters="," index="i">
 													<td align="right">
 														<cfif StructKeyExists(nom.nomBals,i)>
 															<cfset value = StructFind(nom.nomBals,i)>
-															<cfset rowTotal += value>
-															#DecimalFormat(value)#
+															<cfset saleTotal += value>
+															#DecimalFormat(-value)#
 														</cfif>
 													</td>
 												</cfloop>
-												<td align="right">#DecimalFormat(rowTotal)#</td>
+												<td align="right">#DecimalFormat(-saleTotal)#</td>
+												<td></td>
 											</tr>
 										</cfloop>
 										<tr>
@@ -1928,31 +1930,33 @@
 											<th></th>
 											<th></th>
 											<th>Totals</th>
-											<cfset rowTotal = 0>
+											<cfset saleTotal = 0>
 											<cfloop list="#monthList#" delimiters="," index="i">
 												<cfset total = StructFind(data.saletotals,i)>
-												<cfset rowTotal += total>
-												<th align="right">#DecimalFormat(total)#</th>
+												<cfset saleTotal += total>
+												<th align="right">#DecimalFormat(-total)#</th>
 											</cfloop>
-											<th align="right">#DecimalFormat(rowTotal)#</th>
+											<th align="right">#DecimalFormat(-saleTotal)#</th>
+											<th></th>
 										</tr>
 									</table>
 									
 									<div style="clear:both"></div>
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
-									<h1>Purchase Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# TO #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
+									<h1>Purchase Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
-											<th>Group</th>
-											<th>Code</th>
-											<th>Type</th>
-											<th>Class</th>
-											<th>Title</th>
+											<th width="50">Group</th>
+											<th width="70">Code</th>
+											<th width="50">Type</th>
+											<th width="50">Class</th>
+											<th width="200">Title</th>
 											<cfloop list="#monthList#" delimiters="," index="i">
-												<th align="right">#i#</th>
+												<th width="60" align="right">#i#</th>
 											</cfloop>
-											<th>Total</th>
+											<th width="60">Total</th>
+											<th width="30"></th>
 										</tr>
 										<cfloop list="#nomList#" delimiters="," index="item">
 											<cfset nom = StructFind(data.purRows,item)>
@@ -1962,17 +1966,18 @@
 												<td>#nom.nomType#</td>
 												<td>#nom.nomClass#</td>
 												<td>#nom.nomTitle#</td>
-												<cfset rowTotal = 0>
+												<cfset purchTotal = 0>
 												<cfloop list="#monthList#" delimiters="," index="i">
 													<td align="right">
 														<cfif StructKeyExists(nom.nomBals,i)>
 															<cfset value = StructFind(nom.nomBals,i)>
-															<cfset rowTotal += value>
+															<cfset purchTotal += value>
 															#DecimalFormat(value)#
 														</cfif>
 													</td>
 												</cfloop>
-												<td align="right">#DecimalFormat(rowTotal)#</td>
+												<td align="right">#DecimalFormat(purchTotal)#</td>
+												<td></td>
 											</tr>
 										</cfloop>
 										<tr>
@@ -1981,13 +1986,14 @@
 											<th></th>
 											<th></th>
 											<th>Totals</th>
-											<cfset rowTotal = 0>
+											<cfset purchTotal = 0>
 											<cfloop list="#monthList#" delimiters="," index="i">
 												<cfset total = StructFind(data.totals,i)>
-												<cfset rowTotal += total>
+												<cfset purchTotal += total>
 												<th align="right">#DecimalFormat(total)#</th>
 											</cfloop>
-											<th align="right">#DecimalFormat(rowTotal)#</th>
+											<th align="right">#DecimalFormat(purchTotal)#</th>
+											<th></th>
 										</tr>
 										<!--- gross profit --->
 										<tr>
@@ -1996,14 +2002,16 @@
 											<th></th>
 											<th></th>
 											<th>Gross Profit</th>
-											<cfset rowTotal = 0>
+											<cfset profitTotal = 0>
 											<cfloop list="#monthList#" delimiters="," index="i">
 												<cfset total = StructFind(data.totally,i)>
 												<cfset profit = total.purch + total.sale>
-												<cfset rowTotal -= profit>
+												<cfset profitTotal -= profit>
 												<th align="right">#DecimalFormat(-profit)#</th>
 											</cfloop>
-											<th align="right">#DecimalFormat(rowTotal)#</th>
+											<cfset POR = int(((profitTotal / -saleTotal) * 100))>
+											<th align="right">#DecimalFormat(profitTotal)#</th>
+											<th>#POR#%</th>
 										</tr>
 									</table>
 								</cfcase>

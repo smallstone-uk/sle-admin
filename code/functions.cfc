@@ -3025,7 +3025,7 @@
 			<cfloop query="QSelectItems">
 				<cfquery name="QVoucherItems" datasource="#args.datasource#">
 					UPDATE tblVoucherItems
-					SET vtValue=#DecimalFormat(updatePrice)#
+					SET vtmAmount=#DecimalFormat(updatePrice)#
 					WHERE vtmID=#QSelectItems.vtmID#
 				</cfquery>
 			</cfloop>

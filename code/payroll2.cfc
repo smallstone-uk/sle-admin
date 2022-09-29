@@ -520,6 +520,7 @@
 				FROM tblPayDepartment, tblPayRates
 				WHERE rtDepartment = depID
 				AND rtEmployee = #val(args.form.employee)#
+				AND rtShow = 1;
 			</cfquery>
 			<cfset loc.result.employee.depts = QueryToArrayOfStruct(loc.depts)>
 

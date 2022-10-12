@@ -44,6 +44,7 @@
 		.vatTable td {padding: 5px; border-color: #ccc;}
 		.err {background-color:#FF0000}
 		.ok {background-color:#00DF00}
+		.summary {font-size:11px; color:#0033FF;}
 	</style>
 </head>
 
@@ -907,14 +908,18 @@
 										<cfset nCode = "">
 										<cfset nTotal = 0>
 										<cfset gTotal = 0>
+										<cfset nCount = 0>
 										<cfset account = {}>
 										<cfloop query="data.QSalesTrans">
-											<cfif len(nCode) AND nCode neq nomCode>
+											<cfset groupCode = "#nomGroup#-#nomCode#">
+											<cfif len(nCode) AND nCode neq groupCode>
 												<tr>
-													<th colspan="6">Total</th>
+													<th>#nCount#</th>
+													<th colspan="5">Total</th>
 													<th align="right">#DecimalFormat(nTotal)#</th>
 												</tr>
 												<cfset nTotal = 0>		
+												<cfset nCount = 0>
 											</cfif>
 											<tr>
 												<td>#trnID#</td>
@@ -925,14 +930,15 @@
 												<td>#nomTitle#</td>
 												<td align="right">#DecimalFormat(niAmount)#</td>
 											</tr>
-											<cfset nCode = nomCode>
+											<cfset nCode = "#nomGroup#-#nomCode#">
 											<cfset nTotal += niAmount>
 											<cfset gTotal += niAmount>
-											<cfif StructKeyExists(analysis,nomCode)>
-												<cfset nomAcct = StructFind(analysis,nomCode)>
+											<cfset nCount++>
+											<cfif StructKeyExists(analysis,nCode)>
+												<cfset nomAcct = StructFind(analysis,nCode)>
 												<cfset nomAcct.value += niAmount>
 											<cfelse>
-												<cfset StructInsert(analysis,nomCode,{"title" = nomTitle, "value" = niAmount})>
+												<cfset StructInsert(analysis,nCode,{"title" = nomTitle, "value" = niAmount})>
 											</cfif>
 											<cfif nomClass eq "ext">
 												<cfif StructKeyExists(analysis,"EXT")>
@@ -946,7 +952,8 @@
 											</cfif>
 										</cfloop>
 										<tr>
-											<th colspan="6">Total</th>
+											<th>#nCount#</th>
+											<th colspan="5">Total</th>
 											<th align="right">#DecimalFormat(nTotal)#</th>
 										</tr>
 										<tr>
@@ -954,7 +961,8 @@
 											<th align="right">#DecimalFormat(gTotal)#</th>
 										</tr>									
 									</table>
-									<table>
+									<p></p>
+									<table class="tableList" border="1">
 										<cfset account = {}>
 										<cfset pCode = "">
 										<cfset netTotal = 0>
@@ -963,10 +971,12 @@
 										<cfset GnetTotal = 0>
 										<cfset GvatTotal = 0>
 										<cfset GgrossTotal = 0>
+										<cfset nCount = 0>
 										<cfloop query="data.QPurTrans">
 											<cfif pCode neq accCode>
 												<cfif len(pCode)>
 													<tr>
+														<th>#nCount#</th>
 														<th colspan="6">Total</th>
 														<th align="right">#DecimalFormat(netTotal)#</th>
 														<th align="right">#DecimalFormat(vatTotal)#</th>
@@ -977,19 +987,19 @@
 													<cfloop list="#accKeys#" index="accKey">
 														<cfset acc = StructFind(account,accKey)>
 														<cfset subTotal += acc.value>
-														<tr>
-															<td colspan="4"></td>
+														<tr class="summary">
+															<td colspan="5"></td>
 															<td>#accKey#</td>
 															<td>#acc.title#</td>
 															<td align="right">#DecimalFormat(acc.value)#</td>
 															<td colspan="2"></td>
 														</tr>
 													</cfloop>
-													<tr>
-														<td colspan="5"></td>
+													<tr class="summary">
+														<td colspan="6"></td>
 														<td>Total</td>
 														<td align="right">#DecimalFormat(subTotal)#</td>
-														<cfif abs(netTotal - subTotal) gt 0.01><td colspan="2" class="err">Analysis not balanced</td>
+														<cfif abs(netTotal - subTotal) gt 0.01><td colspan="2" class="err">Analysis not balanced: #netTotal - subTotal#</td>
 															<cfelse><td colspan="2"></td></cfif>
 													</tr>
 													<cfset GnetTotal += netTotal>
@@ -998,14 +1008,16 @@
 													<cfset netTotal = 0>
 													<cfset vatTotal = 0>
 													<cfset grossTotal = 0>
+													<cfset nCount = 0>
 													<cfset account = {}>
 												</cfif>
 												<tr>
-													<th colspan="9">#accCode# #accName#</th>
+													<th colspan="10">#accCode# #accName#</th>
 												</tr>
 											</cfif>
 											<tr>
 												<td>#trnID#</td>
+												<td>#trnRef#</td>
 												<td>#LSDateFormat(trnDate)#</td>
 												<td>#nomType#</td>
 												<td>#nomClass#</td>
@@ -1018,18 +1030,20 @@
 											<cfset netTotal += niAmount>
 											<cfset vatTotal += vatAmnt>
 											<cfset grossTotal += (niAmount + vatAmnt)>
+											<cfset nCount++>
 											<cfset pCode = accCode>
-											<cfif StructKeyExists(account,nomCode)>
-												<cfset nomAcct = StructFind(account,nomCode)>
+											<cfset nCode = "#nomGroup#-#nomCode#">
+											<cfif StructKeyExists(account,nCode)>
+												<cfset nomAcct = StructFind(account,nCode)>
 												<cfset nomAcct.value += niAmount>
 											<cfelse>
-												<cfset StructInsert(account,nomCode,{"title" = nomTitle, "value" = niAmount})>
+												<cfset StructInsert(account,nCode,{"title" = nomTitle, "value" = niAmount})>
 											</cfif>
-											<cfif StructKeyExists(analysis,nomCode)>
-												<cfset nomAcct = StructFind(analysis,nomCode)>
+											<cfif StructKeyExists(analysis,nCode)>
+												<cfset nomAcct = StructFind(analysis,nCode)>
 												<cfset nomAcct.value += niAmount>
 											<cfelse>
-												<cfset StructInsert(analysis,nomCode,{"title" = nomTitle, "value" = niAmount})>
+												<cfset StructInsert(analysis,nCode,{"title" = nomTitle, "value" = niAmount})>
 											</cfif>
 											<cfif StructKeyExists(analysis,"VAT")>
 												<cfset nomAcct = StructFind(analysis,"VAT")>
@@ -1039,6 +1053,7 @@
 											</cfif>
 										</cfloop>
 										<tr>
+											<th>#nCount#</th>
 											<th colspan="6">Total</th>
 											<th align="right">#DecimalFormat(netTotal)#</th>
 											<th align="right">#DecimalFormat(vatTotal)#</th>
@@ -1052,26 +1067,35 @@
 										<cfloop list="#accKeys#" index="accKey">
 											<cfset acc = StructFind(account,accKey)>
 											<cfset subTotal += acc.value>
-											<tr>
-												<td colspan="4"></td>
+											<tr class="summary">
+												<td colspan="5"></td>
 												<td>#accKey#</td>
 												<td>#acc.title#</td>
 												<td align="right">#DecimalFormat(acc.value)#</td>
 												<td colspan="2"></td>
 											</tr>
 										</cfloop>
-										<tr>
+										<tr class="summary">
 											<td colspan="5"></td>
 											<td>Total</td>
 											<td align="right">#DecimalFormat(subTotal)#</td>
 											<td colspan="2"></td>
 										</tr>
 										<tr>
-											<th colspan="6">Grand Total</th>
+											<th colspan="7">Grand Total</th>
 											<th align="right">#DecimalFormat(GnetTotal)#</th>
 											<th align="right">#DecimalFormat(GvatTotal)#</th>
 											<th align="right">#DecimalFormat(GgrossTotal)#</th>
-										</tr>									
+										</tr>
+										</table>
+										<p></p>
+										<table class="tableList" border="1">
+											<tr>
+												<th>Code</th>
+												<th>Account</th>
+												<th>DR</th>
+												<th>CR</th>
+											</tr>
 										<cfset accKeys = ListSort(StructKeyList(analysis,","),"text","asc",",")>
 										<cfset crTotal = 0>
 										<cfset drTotal = 0>
@@ -1079,7 +1103,6 @@
 											<cfset acc = StructFind(analysis,accKey)>
 											<cfset subTotal += acc.value>
 											<tr>
-												<td colspan="4"></td>
 												<td>#accKey#</td>
 												<td>#acc.title#</td>
 												<cfif acc.value gt 0>
@@ -1089,26 +1112,24 @@
 												<cfelse>
 													<cfset crTotal += acc.value>
 													<td></td>
-													<td align="right">#DecimalFormat(acc.value)#</td>
+													<td align="right">#DecimalFormat(-acc.value)#</td>
 												</cfif>
-												<td></td>
 											</tr>
 										</cfloop>
 										<tr>
-											<td colspan="5"></td>
-											<td>Totals</td>
-											<td align="right">#DecimalFormat(drTotal)#</td>
-											<td align="right">#DecimalFormat(crTotal)#</td>
-											<td></td>
+											<th></th>
+											<th>Totals</th>
+											<th align="right">#DecimalFormat(drTotal)#</th>
+											<th align="right">#DecimalFormat(-crTotal)#</th>
 										</tr>
 										<tr>
-											<td colspan="5"></td>
-											<td>Gross Profit</td>
-											<td align="right"></td>
-											<td align="right">#DecimalFormat(drTotal + crTotal)#</td>
-											<td></td>
+											<th></th>
+											<th>Approximate Profit</th>
+											<th align="right"></th>
+											<th align="right">#DecimalFormat(abs(drTotal + crTotal))#</th>
 										</tr>
 									</table>
+									<p></p>						
 									<table class="tableList" border="1">
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>

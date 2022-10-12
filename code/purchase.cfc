@@ -497,16 +497,15 @@
 			WHERE trnLedger='sales' 
 			AND nomType='sales'
 			AND nomClass != 'exclude'
-			<!---AND nomClass<>'other'--->
 			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
 			AND niAmount<>0
 			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
-			ORDER BY nomClass,nomCode,trnDate
+			ORDER BY nomClass,nomCode,trnDate,trnID
 		</cfquery>
 		<cfset loc.result.QSalesTrans=loc.QSalesTrans>
 		<cfquery name="loc.QPurTrans" datasource="#args.datasource#">
 			SELECT nomID,nomClass,nomGroup,nomType,nomCode,nomTitle,nomVATCode, vatRate, niAmount,round(niAmount*vatRate/100,2) AS vatAmnt, 
-				trnID,trnDate,trnAmnt1,trnAmnt2, accID,accCode,accName
+				trnID,trnRef,trnDate,trnAmnt1,trnAmnt2, accID,accCode,accName
 			FROM tblNominal 
 			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID

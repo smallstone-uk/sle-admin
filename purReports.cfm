@@ -902,7 +902,6 @@
 								
 								<cfcase value="9">
 									<cfset data=pur.VATTransactions(parms)>
-									<!---<cfdump var="#data#" label="data" expand="yes">--->
 									<cfset analysis = {}>
 									<table class="tableList" border="1">
 										<cfset nCode = "">
@@ -1045,9 +1044,9 @@
 											<th align="right">#DecimalFormat(vatTotal)#</th>
 											<th align="right">#DecimalFormat(grossTotal)#</th>
 										</tr>
-													<cfset GnetTotal += netTotal>
-													<cfset GvatTotal += vatTotal>
-													<cfset GgrossTotal += grossTotal>
+										<cfset GnetTotal += netTotal>
+										<cfset GvatTotal += vatTotal>
+										<cfset GgrossTotal += grossTotal>
 										<cfset accKeys = ListSort(StructKeyList(account,","),"text","asc",",")>
 										<cfset subTotal = 0>
 										<cfloop list="#accKeys#" index="accKey">
@@ -1884,7 +1883,7 @@
 								
 								<cfcase value="17">
 									<!--- business report --->
-									<cfset data=pur.VATTransactions(parms)>
+									<cfset data=pur.BusReportTrans(parms)>
 									<!---<cfdump var="#data#" label="data" expand="yes">--->
 									<cfset nomList = ListSort(StructKeyList(data.saleRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.saletotals,","),"numeric","asc")>
@@ -1943,7 +1942,7 @@
 									
 									<div style="clear:both; page-break-before:always;"></div>
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
-									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
+									<cfset monthList = ListSort(StructKeyList(data.purtotals,","),"numeric","asc")>
 									<h1>Purchase Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
@@ -1988,7 +1987,7 @@
 											<th>Totals</th>
 											<cfset purchTotal = 0>
 											<cfloop list="#monthList#" delimiters="," index="i">
-												<cfset total = StructFind(data.totals,i)>
+												<cfset total = StructFind(data.purtotals,i)>
 												<cfset purchTotal += total>
 												<th align="right">#DecimalFormat(total)#</th>
 											</cfloop>
@@ -2016,8 +2015,8 @@
 									</table>
 									
 									<div style="clear:both; page-break-before:always;"></div>
-									<cfset nomList = ListSort(StructKeyList(data.nomRows,","),"text","asc")>
-									<cfset monthList = ListSort(StructKeyList(data.totally,","),"numeric","asc")>
+									<cfset nomList = ListSort(StructKeyList(data.nomRows1,","),"text","asc")>
+									<cfset monthList = ListSort(StructKeyList(data.nomtotals,","),"numeric","asc")>
 									<h1>Nominal Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 										<tr>
@@ -2033,7 +2032,7 @@
 											<th width="30"></th>
 										</tr>
 										<cfloop list="#nomList#" delimiters="," index="item">
-											<cfset nom = StructFind(data.nomRows,item)>
+											<cfset nom = StructFind(data.nomRows1,item)>
 											<tr>
 												<td>#nom.nomGroup#</td>
 												<td>#nom.nomCode#</td>
@@ -2054,6 +2053,22 @@
 												<td></td>
 											</tr>
 										</cfloop>
+										<tr>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th>Totals</th>
+											<cfset purchTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<cfset total = StructFind(data.nomtotals,i)>
+												<cfset purchTotal += total>
+												<th align="right">#DecimalFormat(total)#</th>
+											</cfloop>
+											<th align="right">#DecimalFormat(purchTotal)#</th>
+											<th></th>
+										</tr>
+									</table>
 								</cfcase>
 							</cfswitch>
 						</cfif>

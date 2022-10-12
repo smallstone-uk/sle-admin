@@ -487,11 +487,81 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.result.purRows = {}>
+		<cfset loc.result.totals = {}>
+		
+		<cfquery name="loc.QSalesTrans" datasource="#args.datasource#">
+			SELECT nomID,nomClass,nomGroup,nomType,nomCode,nomTitle,niAmount,trnID,trnDate
+			FROM ((tblNominal INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID) 
+			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
+			WHERE trnLedger='sales' 
+			AND nomType='sales'
+			AND nomClass != 'exclude'
+			<!---AND nomClass<>'other'--->
+			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
+			AND niAmount<>0
+			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
+			ORDER BY nomClass,nomCode,trnDate
+		</cfquery>
+		<cfset loc.result.QSalesTrans=loc.QSalesTrans>
+		<cfquery name="loc.QPurTrans" datasource="#args.datasource#">
+			SELECT nomID,nomClass,nomGroup,nomType,nomCode,nomTitle,nomVATCode, vatRate, niAmount,round(niAmount*vatRate/100,2) AS vatAmnt, 
+				trnID,trnDate,trnAmnt1,trnAmnt2, accID,accCode,accName
+			FROM tblNominal 
+			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID
+			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID
+			INNER JOIN tblAccount ON tblTrans.trnAccountID = tblAccount.accID
+			INNER JOIN tblVATRates ON tblNominal.nomVATCode = tblVATRates.vatCode 
+			WHERE trnClientRef=0 
+			AND trnLedger='purch' 
+			AND nomType='purch' 
+			AND nomClass != 'exclude'
+			<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
+			AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
+			ORDER BY accCode,trnDate,trnID
+		</cfquery>
+		<cfset loc.result.QPurTrans=loc.QPurTrans>
+		<cfloop query="loc.QPurTrans">
+			<cfset loc.grpCode = "#nomGroup#-#nomCode#">
+			<cfif NOT StructKeyExists(loc.result.purRows,loc.grpCode)>
+				<cfset StructInsert(loc.result.purRows,loc.grpCode,{
+					nomID = nomID,
+					nomGroup = nomGroup,
+					nomCode = nomCode,
+					nomType = nomType,
+					nomTitle = nomTitle,
+					nomBals = {}
+				})>
+			</cfif>
+			<cfset loc.yymm = Year(trnDate)*100 + Month(trnDate)>
+			<cfset loc.nomLine = StructFind(loc.result.purRows,loc.grpCode)>
+			<cfif NOT StructKeyExists(loc.nomLine.nomBals,loc.yymm)>
+				<cfset StructInsert(loc.nomLine.nomBals,loc.yymm,niAmount)>
+			<cfelse>
+				<cfset loc.bal = StructFind(loc.nomLine.nomBals,loc.yymm)>
+				<cfset StructUpdate(loc.nomLine.nomBals,loc.yymm,loc.bal + niAmount)>
+			</cfif>
+			<cfif NOT StructKeyExists(loc.result.totals,loc.yymm)>
+				<cfset StructInsert(loc.result.totals,loc.yymm,niAmount)>
+			<cfelse>
+				<cfset loc.total = StructFind(loc.result.totals,loc.yymm)>
+				<cfset StructUpdate(loc.result.totals,loc.yymm,loc.total + niAmount)>
+			</cfif>
+		</cfloop>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="BusReportTrans" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
 		<cfset loc.result.saleRows = {}>
 		<cfset loc.result.purRows = {}>
-		<cfset loc.result.nomRows = {}>
+		<cfset loc.result.nomRows1 = {}>
+		<cfset loc.result.nomRows2 = {}>
 		<cfset loc.result.saletotals = {}>
-		<cfset loc.result.totals = {}>
+		<cfset loc.result.purtotals = {}>
+		<cfset loc.result.nomtotals = {}>
 		<cfset loc.result.totally = {}>
 		
 		<cftry>
@@ -527,7 +597,7 @@
 			</cfquery>
 			<cfset loc.result.QPurTrans=loc.QPurTrans>
 			
-			<cfquery name="loc.QNomTrans" datasource="#args.datasource#">
+			<cfquery name="loc.QNomTrans1" datasource="#args.datasource#">
 				SELECT nomClass,nomGroup,nomType,nomCode,nomTitle,nomVATCode, vatRate, niAmount,round(niAmount*vatRate/100,2) AS vatAmnt, 
 					trnID,trnDate,trnAmnt1,trnAmnt2, accID,accCode,accName
 				FROM tblNominal 
@@ -537,13 +607,33 @@
 				INNER JOIN tblVATRates ON tblNominal.nomVATCode = tblVATRates.vatCode 
 				WHERE trnClientRef=0 
 				AND nomClass = 'other'
+				AND nomType = 'purch'
 				<!---AND trnLedger='nom'--->
 				<!---AND nomClass NOT IN ('exclude','other')
 				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>--->
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
-				ORDER BY accCode,trnDate,trnID
+				ORDER BY nomGroup, nomCode,trnDate,trnID
 			</cfquery>
-			<cfset loc.result.QNomTrans=loc.QNomTrans>
+			<cfset loc.result.QNomTrans1=loc.QNomTrans1>
+			
+			<cfquery name="loc.QNomTrans2" datasource="#args.datasource#">
+				SELECT nomClass,nomGroup,nomType,nomCode,nomTitle,nomVATCode, vatRate, niAmount,round(niAmount*vatRate/100,2) AS vatAmnt, 
+					trnID,trnDate,trnAmnt1,trnAmnt2, accID,accCode,accName
+				FROM tblNominal 
+				INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID
+				INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID
+				INNER JOIN tblAccount ON tblTrans.trnAccountID = tblAccount.accID
+				INNER JOIN tblVATRates ON tblNominal.nomVATCode = tblVATRates.vatCode 
+				WHERE trnClientRef=0 
+				AND nomClass = 'other'
+				AND nomType = 'nom'
+				<!---AND trnLedger='nom'--->
+				<!---AND nomClass NOT IN ('exclude','other')
+				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>--->
+				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
+				ORDER BY nomGroup, nomCode,trnDate,trnID
+			</cfquery>
+			<cfset loc.result.QNomTrans2=loc.QNomTrans2>
 			
 			<!--- PURCHASE LEDGER --->
 			<cfloop query="loc.QPurTrans">
@@ -566,11 +656,11 @@
 					<cfset loc.bal = StructFind(loc.nomLine.nomBals,loc.yymm)>
 					<cfset StructUpdate(loc.nomLine.nomBals,loc.yymm,loc.bal + niAmount)>
 				</cfif>
-				<cfif NOT StructKeyExists(loc.result.totals,loc.yymm)>
-					<cfset StructInsert(loc.result.totals,loc.yymm,niAmount)>
+				<cfif NOT StructKeyExists(loc.result.purTotals,loc.yymm)>
+					<cfset StructInsert(loc.result.purTotals,loc.yymm,niAmount)>
 				<cfelse>
-					<cfset loc.total = StructFind(loc.result.totals,loc.yymm)>
-					<cfset StructUpdate(loc.result.totals,loc.yymm,loc.total + niAmount)>
+					<cfset loc.total = StructFind(loc.result.purTotals,loc.yymm)>
+					<cfset StructUpdate(loc.result.purTotals,loc.yymm,loc.total + niAmount)>
 				</cfif>
 				<!--- combined totals --->
 				<cfif NOT StructKeyExists(loc.result.totally,loc.yymm)>
@@ -616,10 +706,10 @@
 				</cfif>
 			</cfloop>
 			<!--- NOMINAL LEDGER --->
-			<cfloop query="loc.QNomTrans">
+			<cfloop query="loc.QNomTrans1">
 				<cfset loc.grpCode = "#nomGroup#-#nomCode#">
-				<cfif NOT StructKeyExists(loc.result.nomRows,loc.grpCode)>
-					<cfset StructInsert(loc.result.nomRows,loc.grpCode,{
+				<cfif NOT StructKeyExists(loc.result.nomRows1,loc.grpCode)>
+					<cfset StructInsert(loc.result.nomRows1,loc.grpCode,{
 						nomGroup = nomGroup,
 						nomCode = nomCode,
 						nomType = nomType,
@@ -629,19 +719,19 @@
 					})>
 				</cfif>
 				<cfset loc.yymm = Year(trnDate)*100 + Month(trnDate)>
-				<cfset loc.nomLine = StructFind(loc.result.nomRows,loc.grpCode)>
+				<cfset loc.nomLine = StructFind(loc.result.nomRows1,loc.grpCode)>
 				<cfif NOT StructKeyExists(loc.nomLine.nomBals,loc.yymm)>
 					<cfset StructInsert(loc.nomLine.nomBals,loc.yymm,niAmount)>
 				<cfelse>
 					<cfset loc.bal = StructFind(loc.nomLine.nomBals,loc.yymm)>
 					<cfset StructUpdate(loc.nomLine.nomBals,loc.yymm,loc.bal + niAmount)>
 				</cfif>
-				<!---<cfif NOT StructKeyExists(loc.result.totals,loc.yymm)>
-					<cfset StructInsert(loc.result.totals,loc.yymm,niAmount)>
+				<cfif NOT StructKeyExists(loc.result.nomTotals,loc.yymm)>
+					<cfset StructInsert(loc.result.nomTotals,loc.yymm,niAmount)>
 				<cfelse>
-					<cfset loc.total = StructFind(loc.result.totals,loc.yymm)>
-					<cfset StructUpdate(loc.result.totals,loc.yymm,loc.total + niAmount)>
-				</cfif>--->
+					<cfset loc.total = StructFind(loc.result.nomTotals,loc.yymm)>
+					<cfset StructUpdate(loc.result.nomTotals,loc.yymm,loc.total + niAmount)>
+				</cfif>
 				
 				<!--- combined totals --->
 				<cfif NOT StructKeyExists(loc.result.totally,loc.yymm)>
@@ -651,6 +741,36 @@
 					<cfset StructUpdate(loc.result.totally,loc.yymm,{"nom" = loc.total.nom + niAmount, "sale" = loc.total.sale, "purch" = loc.total.purch})>
 				</cfif>
 			</cfloop>
+			<cfloop query="loc.QNomTrans2">
+				<cfset loc.grpCode = "#nomGroup#-#nomCode#">
+				<cfif NOT StructKeyExists(loc.result.nomRows2,loc.grpCode)>
+					<cfset StructInsert(loc.result.nomRows2,loc.grpCode,{
+						nomGroup = nomGroup,
+						nomCode = nomCode,
+						nomType = nomType,
+						nomClass = nomClass,
+						nomTitle = nomTitle,
+						nomBals = {}
+					})>
+				</cfif>
+				<cfset loc.yymm = Year(trnDate)*100 + Month(trnDate)>
+				<cfset loc.nomLine = StructFind(loc.result.nomRows2,loc.grpCode)>
+				<cfif NOT StructKeyExists(loc.nomLine.nomBals,loc.yymm)>
+					<cfset StructInsert(loc.nomLine.nomBals,loc.yymm,niAmount)>
+				<cfelse>
+					<cfset loc.bal = StructFind(loc.nomLine.nomBals,loc.yymm)>
+					<cfset StructUpdate(loc.nomLine.nomBals,loc.yymm,loc.bal + niAmount)>
+				</cfif>
+				
+				<!--- combined totals --->
+				<cfif NOT StructKeyExists(loc.result.totally,loc.yymm)>
+					<cfset StructInsert(loc.result.totally,loc.yymm,{"nom" = niAmount, "sale" = 0, "purch" = 0})>
+				<cfelse>
+					<cfset loc.total = StructFind(loc.result.totally,loc.yymm)>
+					<cfset StructUpdate(loc.result.totally,loc.yymm,{"nom" = loc.total.nom + niAmount, "sale" = loc.total.sale, "purch" = loc.total.purch})>
+				</cfif>
+			</cfloop>	
+	
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

@@ -50,7 +50,7 @@
 	INNER JOIN tblAccount ON accID = trnAccountID
 	INNER JOIN tblnomitems ON niTranID = trnID
 	INNER JOIN tblNominal ON niNomID = nomID
-	WHERE nomID != 11
+	WHERE nomID NOT IN (11,201)
 	AND `trnLedger` = 'purch' 
 	AND `trnType` IN ('inv', 'crn') 
 	AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
@@ -129,21 +129,42 @@
 						</tr>
 					</table>
 					<p></p>
+					<cfset totNet = 0>
+					<cfset totQty = 0>
 					<table border="1" class="tableList">
+						<tr>
+							<th>Code</th>
+							<th>Description</th>
+							<th>QTY</th>
+							<th>DR</th>
+							<th>CR</th>
+						</tr>
 						<cfloop query="QPurItems">
-							<cfset totNet += AMOUNT>
-							<cfset totQty += NUM>
-							<tr>
-								<td>#nomCode#</td>
-								<td>#nomTitle#</td>
-								<td align="center">#NUM#</td>
-								<td align="right">#AMOUNT#</td>
-							</tr>
+							<cfif nomCode neq "VAT">
+								<cfset totNet += AMOUNT>
+								<cfset totQty += NUM>
+								<tr>
+									<td>#nomCode#</td>
+									<td>#nomTitle#</td>
+									<td align="center">#NUM#</td>
+									<td align="right">#AMOUNT#</td>
+									<td align="right"></td>
+								</tr>
+							<cfelse>
+								<tr>
+									<td>#nomCode#</td>
+									<td>#nomTitle#</td>
+									<td align="center">#NUM#</td>
+									<td align="right"></td>
+									<td align="right">#AMOUNT#</td>
+								</tr>
+							</cfif>
 						</cfloop>
 						<tr>
 							<th colspan="2">TOTALS</th>
 							<th align="center">#totQty#</th>
 							<th align="right">#totNet#</th>
+							<th></th>
 						</tr>
 					</table>
 					<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->

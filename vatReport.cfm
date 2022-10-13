@@ -28,7 +28,7 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 
-<cfquery name="QItems" datasource="#parms.datasource#">
+<cfquery name="QSaleItems" datasource="#parms.datasource#">
 	SELECT ehMode, 
 	eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT,
 	pgID,pgTitle,pgNomGroup
@@ -43,6 +43,20 @@
 	GROUP BY pgNomGroup, pgTitle
 	ORDER BY pgNomGroup, pgTitle
 </cfquery>
+
+<cfquery name="QPurItems" datasource="#parms.datasource#">
+	SELECT trnDate, nomID,nomCode,nomTitle, SUM(niAmount) AS Amount, Count(*) AS Num
+	FROM `tbltrans` 
+	INNER JOIN tblAccount ON accID = trnAccountID
+	INNER JOIN tblnomitems ON niTranID = trnID
+	INNER JOIN tblNominal ON niNomID = nomID
+	WHERE nomID != 11
+	AND `trnLedger` = 'purch' 
+	AND `trnType` IN ('inv', 'crn') 
+	AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+	GROUP BY nomCode
+</cfquery>
+
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -83,7 +97,7 @@
 					</form>
 				</div>
 				<cfif StructKeyExists(form,"fieldnames")>
-					<!---<cfdump var="#QItems#" label="QItems" expand="false">--->
+					<!---<cfdump var="#QSaleItems#" label="QItems" expand="false">--->
 					<cfset totNet = 0>
 					<cfset totVAT = 0>
 					<cfset totQty = 0>
@@ -95,7 +109,7 @@
 							<th>NET</th>
 							<th>VAT</th>
 						</tr>
-						<cfloop query="QItems">
+						<cfloop query="QSaleItems">
 							<cfset totNet += NET>
 							<cfset totVAT += VAT>
 							<cfset totQty += QTY>
@@ -114,6 +128,20 @@
 							<th align="right">#totVAT#</th>
 						</tr>
 					</table>
+					<p></p>
+					<table border="1" class="tableList">
+						<cfloop query="QPurItems">
+							<cfset totNet += AMOUNT>
+							<cfset totQty += NUM>
+							<tr>
+								<td>#nomCode#</td>
+								<td>#nomTitle#</td>
+								<td align="center">#NUM#</td>
+								<td align="right">#AMOUNT#</td>
+							</tr>
+						</cfloop>
+					</table>
+					<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
 				</cfif>
 			</div>
 		</div>

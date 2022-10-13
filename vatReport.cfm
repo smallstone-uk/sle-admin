@@ -140,6 +140,11 @@
 								<td align="right">#AMOUNT#</td>
 							</tr>
 						</cfloop>
+						<tr>
+							<th colspan="2">TOTALS</th>
+							<th align="center">#totQty#</th>
+							<th align="right">#totNet#</th>
+						</tr>
 					</table>
 					<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
 				</cfif>

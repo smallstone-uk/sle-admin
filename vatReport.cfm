@@ -183,7 +183,7 @@
 								INNER JOIN tblepos_header ON eiParent=ehID
 								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#dateTo#'
 								AND eiClass = 'sale'
-								AND ehMode != 'wst'
+								<!---AND ehMode != 'wst'--->
 								GROUP BY Date(eiTimestamp), eiType
 							</cfquery>
 							<!---<cfdump var="#QSaleItems#" label="QSaleItems" expand="false">--->
@@ -196,7 +196,7 @@
 								<cfif StructKeyExists(thisKey,dateOnly)>
 									<cfset thisDate = StructFind(thisKey,dateOnly)>
 								<cfelse>
-									<cfset StructInsert(thisKey,dateOnly,net)>
+									<cfset StructInsert(thisKey,dateOnly,{"net" = net,"trade" = trade})>
 								</cfif>
 								<cfif VAT neq 0>
 									<cfif !StructKeyExists(salKeys,"VAT")>
@@ -214,66 +214,81 @@
 							<table border="1" class="tableList">
 								<tr>
 									<th>Ref</th>
+									<th></th>
 									<cfloop from="#srchDateFrom#" to="#dateTo#" index="i">
 										<th>#LSDateFormat(i,"yyyy-mm-dd")#</th>
 									</cfloop>
 									<th>TOTALS</th>
+									<th>PROFIT</th>
 								</tr>
 								<cfset keyList = ListSort(StructKeyList(salKeys,","),"text","asc")>
 								<cfloop list="#keyList#" index="key">
 									<cfset thisKey = StructFind(salKeys,key)>
 									<tr>
 										<td>#key#</td>
-										<cfset keyTotal = 0>
+										<td>Sales<br />Trade</td>
+										<cfset salesTotal = 0>
+										<cfset tradeTotal = 0>
 										<cfloop from="#srchDateFrom#" to="#dateTo#" index="i">
 											<cfset thisDay = LSDateFormat(i,"yyyy-mm-dd")>
+											
 											<cfif StructKeyExists(thisKey,thisDay)>
 												<cfset thisValue = StructFind(thisKey,thisDay)>
-												<cfset keyTotal += thisValue>
-												<td align="right">#thisValue#</td>
+												<cfif key neq "VAT">
+													<cfset salesTotal += thisValue.net>
+													<cfset tradeTotal += thisValue.trade>
+													<td align="right">#thisValue.net#<br />#thisValue.trade#</td>
+												<cfelse>
+													<cfset salesTotal += thisValue>
+													<td align="right">#thisValue#</td>
+												</cfif>
 											<cfelse>
 												<td></td>
 											</cfif>
 										</cfloop>
-										<td align="right">#keyTotal#</td>
+										<td align="right">#salesTotal#<br />#tradeTotal#</td>
+										<cfif key neq "VAT">
+											<cfset profit = -(salesTotal + tradeTotal)>
+											<cfset por = int((profit / -salesTotal) * 100)>
+											<td align="right">#profit#<br />#por#%</td>
+										</cfif>
 									</tr>
 								</cfloop>
-							<!---</table>--->
-							<tr>
-								<th>&nbsp;</th>
-							</tr>
-							<cfquery name="QPurItems" datasource="#parms.datasource#">
-								SELECT trnRef,trnDate,trnAmnt1,trnAmnt2, nomID,nomCode,nomGroup,nomTitle, SUM(niAmount) AS Amount, Count(*) AS Num
-								FROM `tbltrans` 
-								INNER JOIN tblAccount ON accID = trnAccountID
-								INNER JOIN tblnomitems ON niTranID = trnID
-								INNER JOIN tblNominal ON niNomID = nomID
-								WHERE nomID NOT IN (911,9201)
-								AND `trnLedger` = 'purch' 
-								AND `trnType` IN ('inv', 'crn') 
-								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
-								GROUP BY trnDate, nomCode
-							</cfquery>
-							<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
-							<cfloop query="QPurItems">
-								<cfset dateOnly = LSDateFormat(trnDate,"yyyy-mm-dd")>
-								<cfif !StructKeyExists(purKeys,nomCode)>
-									<cfset StructInsert(purKeys,nomCode,{})>
-								</cfif>
-								<cfset thisKey = StructFind(purKeys,nomCode)>
-								<cfif StructKeyExists(thisKey,dateOnly)>
-									<cfset thisDate = StructFind(thisKey,dateOnly)>
-								<cfelse>
-									<cfset StructInsert(thisKey,dateOnly,amount)>
-								</cfif>
-							</cfloop>
-							<!---<cfdump var="#purKeys#" label="purKeys" expand="false">--->
-							<!---<table border="1" class="tableList">--->
+								<tr>
+									<th colspan="40">&nbsp;</th>
+								</tr>
+								<cfquery name="QPurItems" datasource="#parms.datasource#">
+									SELECT trnRef,trnDate,trnAmnt1,trnAmnt2, nomID,nomCode,nomGroup,nomTitle, SUM(niAmount) AS Amount, Count(*) AS Num
+									FROM `tbltrans` 
+									INNER JOIN tblAccount ON accID = trnAccountID
+									INNER JOIN tblnomitems ON niTranID = trnID
+									INNER JOIN tblNominal ON niNomID = nomID
+									WHERE nomID NOT IN (11,201)
+									AND `trnLedger` = 'purch' 
+									AND `trnType` IN ('inv', 'crn') 
+									AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+									GROUP BY trnDate, nomCode
+								</cfquery>
+								<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
+								<cfloop query="QPurItems">
+									<cfset dateOnly = LSDateFormat(trnDate,"yyyy-mm-dd")>
+									<cfif !StructKeyExists(purKeys,nomCode)>
+										<cfset StructInsert(purKeys,nomCode,{"nomTitle" = nomTitle})>
+									</cfif>
+									<cfset thisKey = StructFind(purKeys,nomCode)>
+									<cfif StructKeyExists(thisKey,dateOnly)>
+										<cfset thisDate = StructFind(thisKey,dateOnly)>
+									<cfelse>
+										<cfset StructInsert(thisKey,dateOnly,amount)>
+									</cfif>
+								</cfloop>
+								<!---<cfdump var="#purKeys#" label="purKeys" expand="false">--->
 								<cfset keyList = ListSort(StructKeyList(purKeys,","),"text","asc")>
 								<cfloop list="#keyList#" index="key">
 									<cfset thisKey = StructFind(purKeys,key)>
 									<tr>
 										<td>#key#</td>
+										<td>#thisKey.nomTitle#</td>
 										<cfset keyTotal = 0>
 										<cfloop from="#srchDateFrom#" to="#dateTo#" index="i">
 											<cfset thisDay = LSDateFormat(i,"yyyy-mm-dd")>

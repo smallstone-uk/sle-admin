@@ -151,6 +151,36 @@
 					}
 				});
 			});
+			$('.sod_lock').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductLock.cfm",
+					data: {"lock": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
+			$('.sod_discount').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductDiscount.cfm",
+					data: {"discount": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
 		});
 	</script>
 	<style type="text/css">
@@ -348,7 +378,7 @@
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
 									<!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
-									<cfset colspan=11>
+									<cfset colspan=13>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -359,9 +389,11 @@
 													<th>Reference</th>
 													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
 													<th>Product<br>Status</th>
-													<th>Size</th>
-													<th>Our Price</th>
 													<th>Discountable</th>
+													<th>Lock</th>
+													<th>Size</th>
+													<th>Price Desc.</th>
+													<th>Our Price</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>
 													<th>Reorder</th>
@@ -386,9 +418,11 @@
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
+													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
+													<td class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
 													<td>#siUnitSize#</td>
+													<td>#prodUnitSize#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
-													<td align="center">#prodStaffDiscount#</td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>#prodReorder#</td>

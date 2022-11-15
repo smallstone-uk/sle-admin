@@ -25,6 +25,7 @@
 				AND cltAccountType<>'N'
 				ORDER BY cltName
 			</cfquery>
+			<cfset loc.result.ctlNextInvDate = loc.QControl.ctlNextInvDate>
 			<cfset loc.result.folderName=DateFormat(loc.QControl.ctlNextInvDate,"yy-mm-dd")>
 			<cfset loc.QClients=loc.QClients>
 			<cfset loc.result.invDate=DateFormat(loc.QControl.ctlNextInvDate,"ddd dd-mmm-yyyy")>

@@ -34,7 +34,7 @@
 </cffunction>
 --->
 <cfparam name="sendMsgs" default="false">
-<cfparam name="attachLetter" default="Charges-2021.pdf">	<!--- no spaces in name please --->
+<cfparam name="attachLetter" default="LatePapers.pdf">	<!--- no spaces in name please --->
 <cfset attachFile1="#application.site.dir_invoices#letters/#attachLetter#">
 <cftry>
 	<cfobject component="code/clients" name="cust">
@@ -52,7 +52,12 @@
 			<cfset attachment = false>
 			...NOT Found
 		</cfif><br />
-			
+		
+		<cfset aFewDaysAgo = DateAdd("d",-3,now())>
+		<cfif emailList.ctlNextInvDate lt aFewDaysAgo>
+			<h1 class="warning">WARNING: invoice date is too far in the past. Make sure you have selected the correct invoice date.</h1>
+		</cfif>
+		#aFewDaysAgo#
 		<form enctype="multipart/form-data" method="post">
 			
 			<table class="tableList">

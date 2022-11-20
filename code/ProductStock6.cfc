@@ -354,7 +354,7 @@
 		<cftry>
 			<cfquery name="loc.result.QProduct" datasource="#args.datasource#">
 				SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodPackQty,prodPOR,prodCountDate,prodStockLevel,prodOurMarkup,prodSuppID,
-					prodPackPrice,prodOurPrice,prodValidTo,prodLastBought,prodUnitSize,prodRRP,prodUnitTrade,prodPriceMarked,prodVATRate,prodPOR,
+					prodPackPrice,prodOurPrice,prodValidTo,prodLastBought,prodUnitSize,prodRRP,prodUnitTrade,prodPriceMarked,prodVATRate,
 					accName
 				FROM tblProducts
 				INNER JOIN tblAccount on prodSuppID = accID
@@ -708,6 +708,8 @@
 		<cfset loc.result={}>
 		<cfset loc.result.action = "">
 		<cfset loc.barcode = Trim(args.barcode)>
+		<cfset loc.lastYear = DateAdd("d",Now(),-365)>
+		<cfset loc.startDate = CreateDate(Year(loc.lastYear),Month(loc.lastYear),1)>
 
 		<cftry>
 			<cfif StructKeyExists(args,"productID") AND args.productID gt 0>
@@ -715,6 +717,7 @@
 					SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON siProduct = prodID
+					INNER JOIN tblstockorder ON soID = siOrder
 					INNER JOIN tblProductCats ON prodCatID = pcatID
 					INNER JOIN tblProductGroups ON pgID = pcatGroup
 					WHERE prodID = #val(args.productID)#
@@ -726,6 +729,7 @@
 					FROM tblProducts
 					INNER JOIN tblBarcodes on prodID = barProdID
 					LEFT JOIN tblStockItem ON siProduct = prodID
+					INNER JOIN tblstockorder ON soID = siOrder
 					INNER JOIN tblProductCats ON prodCatID = pcatID
 					INNER JOIN tblProductGroups ON pgID = pcatGroup
 					WHERE barcode = '#loc.barcode#'
@@ -754,6 +758,7 @@
 					INNER JOIN tblStockOrder ON siOrder = soID
 					INNER JOIN tblAccount on soAccountID = accID
 					WHERE siProduct = #loc.QProduct.prodID#
+					AND soDate >= #loc.startDate# 
 					ORDER BY soDate DESC, siID DESC
 				</cfquery>
 				<cfset loc.result.recordcount=loc.result.StockItems.recordcount>
@@ -1385,7 +1390,7 @@
 						siUnitTrade=#DecimalFormat(QProduct.prodUnitTrade)#,
 						siRRP=#DecimalFormat(QProduct.prodRRP)#,
 						siOurPrice=#DecimalFormat(QProduct.prodOurPrice)#,
-						siPOR=#DecimalFormat(QProduct.prodPOR)#
+						siPOR=#DecimalFormat(QProduct.prodPOR)#		<!--- TODO should be siPOR --->
 					WHERE siID=#val(args.form.siID)#
 				</cfquery>
 				<cfset parm={}>

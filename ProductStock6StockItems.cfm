@@ -167,7 +167,6 @@
 				<div style="clear:both"></div>
 				<h1>No stock records found.</h1>
 			</cfif>
-			<button id="AddStock">Add Stock</button>
 			<div id="AddStockForm">
 				<form name="StockForm" id="StockForm" method="post" enctype="multipart/form-data">
 					<input type="hidden" name="productID" id="productID" value="#records.product.prodID#" />
@@ -238,6 +237,7 @@
 				</form>
 			</div>
 		</cfif>
+		<button id="AddStock">Add Stock Item</button>
 	</cfoutput>
 	
 <cfcatch type="any">

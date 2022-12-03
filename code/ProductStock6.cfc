@@ -710,14 +710,14 @@
 		<cfset loc.barcode = Trim(args.barcode)>
 		<cfset loc.lastYear = DateAdd("d",Now(),-365)>
 		<cfset loc.startDate = CreateDate(Year(loc.lastYear),Month(loc.lastYear),1)>
-
+		<cfset loc.args = args>
 		<cftry>
 			<cfif StructKeyExists(args,"productID") AND args.productID gt 0>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON siProduct = prodID
-					INNER JOIN tblstockorder ON soID = siOrder
+					LEFT JOIN tblstockorder ON soID = siOrder
 					INNER JOIN tblProductCats ON prodCatID = pcatID
 					INNER JOIN tblProductGroups ON pgID = pcatGroup
 					WHERE prodID = #val(args.productID)#
@@ -729,7 +729,7 @@
 					FROM tblProducts
 					INNER JOIN tblBarcodes on prodID = barProdID
 					LEFT JOIN tblStockItem ON siProduct = prodID
-					INNER JOIN tblstockorder ON soID = siOrder
+					LEFT JOIN tblstockorder ON soID = siOrder
 					INNER JOIN tblProductCats ON prodCatID = pcatID
 					INNER JOIN tblProductGroups ON pgID = pcatGroup
 					WHERE barcode = '#loc.barcode#'

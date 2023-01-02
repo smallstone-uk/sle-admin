@@ -106,14 +106,14 @@
 									<th>POR%</th>
 								</tr>
 								<cfloop query="QSaleItems">
-									<cfset totNet += NET>
+									<cfset totNet += Net>
 									<cfset totVAT += VAT>
-									<cfset totQty += QTY>
+									<cfset totQty += Qty>
 									<cfset totTrd += Trade>
 									<cfset profit = -(Net + Trade)>
 									<cfset totPrf += profit>
-									<cfif totNet neq 0>
-										<cfset POR = Round((totPrf / -totNet) * 100)>
+									<cfif Net neq 0>
+										<cfset POR = Round((profit / -Net) * 100)>
 									</cfif>
 									<tr>
 										<td>#pgNomGroup#</td>

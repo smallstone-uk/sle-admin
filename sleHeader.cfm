@@ -112,6 +112,7 @@
 						<li><a href="salesMain3.cfm">Sales v3</a></li>
 						<li><a href="tranMain2.cfm">Supplier Transactions</a></li>
 						<li><a href="purReports.cfm">Transaction Reports</a></li>
+						<li><a href="vatReport.cfm">VAT Reports</a></li>
 						<li class="spacer"></li>
 						<li><a href="nomTran.cfm">Nominal Ledger</a></li>
 						<li><a href="nomManager.cfm">Nominal Manager</a></li>

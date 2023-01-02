@@ -71,10 +71,9 @@
 				<cfif StructKeyExists(form,"fieldnames")>
 					<cfswitch expression="#srchReport#">
 						<cfcase value="1">
-							
 							<cfquery name="QSaleItems" datasource="#parms.datasource#">
 								SELECT ehMode, 
-								eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT,
+								eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT, SUM(eiTrade) AS Trade,
 								pgID,pgTitle,pgNomGroup
 								FROM tblepos_items
 								INNER JOIN tblepos_header ON eiParent=ehID
@@ -89,8 +88,61 @@
 							</cfquery>
 							<!---<cfdump var="#QSaleItems#" label="QItems" expand="false">--->
 							
+							<cfset totNet = 0>
+							<cfset totVAT = 0>
+							<cfset totQty = 0>
+							<cfset totTrd = 0>
+							<cfset totPrf = 0>
+							<h1>Sales Income</h1>
+							<table border="1" class="tableList">
+								<tr>
+									<th>Group</th>
+									<th>Description</th>
+									<th>QTY</th>
+									<th>NET</th>
+									<th>VAT</th>
+									<th>Trade</th>
+									<th>Profit</th>
+									<th>POR%</th>
+								</tr>
+								<cfloop query="QSaleItems">
+									<cfset totNet += NET>
+									<cfset totVAT += VAT>
+									<cfset totQty += QTY>
+									<cfset totTrd += Trade>
+									<cfset profit = -(Net + Trade)>
+									<cfset totPrf += profit>
+									<cfif totNet neq 0>
+										<cfset POR = Round((totPrf / -totNet) * 100)>
+									</cfif>
+									<tr>
+										<td>#pgNomGroup#</td>
+										<td>#pgTitle#</td>
+										<td align="center">#Qty#</td>
+										<td align="right">#Net#</td>
+										<td align="right">#VAT#</td>
+										<td align="right">#Trade#</td>
+										<td align="right">#profit#</td>
+										<td align="right">#POR#%</td>
+									</tr>
+								</cfloop>
+								<cfif totNet neq 0>
+									<cfset POR = Round((totPrf / -totNet) * 100)>
+								</cfif>
+								<tr>
+									<th colspan="2">TOTALS</th>
+									<th align="center">#totQty#</th>
+									<th align="right">#totNet#</th>
+									<th align="right">#totVAT#</th>
+									<th align="right">#totTrd#</th>
+									<th align="right">#totPrf#</th>
+									<th>#POR#%</th>
+								</tr>
+							</table>
+							<div style="page-break-before:always"></div>
+							<h1>Purchases</h1>
 							<cfquery name="QPurItems" datasource="#parms.datasource#">
-								SELECT trnDate, nomID,nomCode,nomTitle, SUM(niAmount) AS Amount, Count(*) AS Num
+								SELECT trnDate, nomID,nomGroup,nomCode,nomTitle, SUM(niAmount) AS Amount, SUM(niVATAmount) AS VATAmount, Count(*) AS Num
 								FROM `tbltrans` 
 								INNER JOIN tblAccount ON accID = trnAccountID
 								INNER JOIN tblnomitems ON niTranID = trnID
@@ -99,7 +151,7 @@
 								AND `trnLedger` = 'purch' 
 								AND `trnType` IN ('inv', 'crn') 
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
-								GROUP BY nomCode
+								GROUP BY nomGroup, nomCode
 							</cfquery>
 							<cfset totNet = 0>
 							<cfset totVAT = 0>
@@ -107,71 +159,50 @@
 							<table border="1" class="tableList">
 								<tr>
 									<th>Group</th>
-									<th>Description</th>
-									<th>QTY</th>
-									<th>NET</th>
-									<th>VAT</th>
-								</tr>
-								<cfloop query="QSaleItems">
-									<cfset totNet += NET>
-									<cfset totVAT += VAT>
-									<cfset totQty += QTY>
-									<tr>
-										<td>#pgNomGroup#</td>
-										<td>#pgTitle#</td>
-										<td align="center">#QTY#</td>
-										<td align="right">#NET#</td>
-										<td align="right">#VAT#</td>
-									</tr>
-								</cfloop>
-								<tr>
-									<th colspan="2">TOTALS</th>
-									<th align="center">#totQty#</th>
-									<th align="right">#totNet#</th>
-									<th align="right">#totVAT#</th>
-								</tr>
-							</table>
-							<p></p>
-							<cfset totNet = 0>
-							<cfset totQty = 0>
-							<table border="1" class="tableList">
-								<tr>
 									<th>Code</th>
 									<th>Description</th>
 									<th>QTY</th>
 									<th>DR</th>
 									<th>CR</th>
+									<th>VAT</th>
 								</tr>
 								<cfloop query="QPurItems">
 									<cfif nomCode neq "VAT">
 										<cfset totNet += AMOUNT>
 										<cfset totQty += NUM>
+										<cfset totVAT += VATAmount>
 										<tr>
+											<td>#nomGroup#</td>
 											<td>#nomCode#</td>
 											<td>#nomTitle#</td>
 											<td align="center">#NUM#</td>
 											<td align="right">#AMOUNT#</td>
 											<td align="right"></td>
+											<td align="right">#VATAmount#</td>
 										</tr>
 									<cfelse>
 										<tr>
+											<td>#nomGroup#</td>
 											<td>#nomCode#</td>
 											<td>#nomTitle#</td>
 											<td align="center">#NUM#</td>
 											<td align="right"></td>
 											<td align="right">#AMOUNT#</td>
+											<td align="right"></td>
 										</tr>
 									</cfif>
 								</cfloop>
 								<tr>
-									<th colspan="2">TOTALS</th>
+									<th colspan="3">TOTALS</th>
 									<th align="center">#totQty#</th>
 									<th align="right">#totNet#</th>
 									<th></th>
+									<th align="right">#totVAT#</th>
 								</tr>
 							</table>
 							<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
 						</cfcase>
+						
 						<cfcase value="2">
 							<cfset salKeys = {}>
 							<cfset purKeys = {}>
@@ -211,7 +242,7 @@
 								</cfif>
 							</cfloop>
 							<!---<cfdump var="#salKeys#" label="salKeys" expand="false">--->
-							<table border="1" class="tableList">
+							<table border="1" class="tableList" width="100%">
 								<tr>
 									<th>Ref</th>
 									<th></th>
@@ -267,15 +298,16 @@
 									AND `trnLedger` = 'purch' 
 									AND `trnType` IN ('inv', 'crn') 
 									AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
-									GROUP BY trnDate, nomCode
+									GROUP BY trnDate, nomGroup, nomCode
 								</cfquery>
 								<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
 								<cfloop query="QPurItems">
 									<cfset dateOnly = LSDateFormat(trnDate,"yyyy-mm-dd")>
-									<cfif !StructKeyExists(purKeys,nomCode)>
-										<cfset StructInsert(purKeys,nomCode,{"nomTitle" = nomTitle})>
+									<cfset groupCode = "#nomGroup#-#nomCode#">
+									<cfif !StructKeyExists(purKeys,groupCode)>
+										<cfset StructInsert(purKeys,groupCode,{"nomTitle" = nomTitle})>
 									</cfif>
-									<cfset thisKey = StructFind(purKeys,nomCode)>
+									<cfset thisKey = StructFind(purKeys,groupCode)>
 									<cfif StructKeyExists(thisKey,dateOnly)>
 										<cfset thisDate = StructFind(thisKey,dateOnly)>
 									<cfelse>

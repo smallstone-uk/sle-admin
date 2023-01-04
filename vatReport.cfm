@@ -153,6 +153,7 @@
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								GROUP BY nomGroup, nomCode
 							</cfquery>
+							<cfset nomFlag = 1>
 							<cfset totNet = 0>
 							<cfset totVAT = 0>
 							<cfset totQty = 0>
@@ -167,6 +168,22 @@
 									<th>VAT</th>
 								</tr>
 								<cfloop query="QPurItems">
+									<cfif nomGroup gte "C" AND nomFlag eq 1>
+										<tr>
+											<th colspan="3">TOTALS</th>
+											<th align="center">#totQty#</th>
+											<th align="right">#totNet#</th>
+											<th></th>
+											<th align="right">#totVAT#</th>
+										</tr>
+										<tr>
+											<th colspan="7"><h1>Costs</h1></th>
+										</tr>
+										<cfset totNet = 0>
+										<cfset totVAT = 0>
+										<cfset totQty = 0>
+										<cfset nomFlag = 0>
+									</cfif>
 									<cfif nomCode neq "VAT">
 										<cfset totNet += AMOUNT>
 										<cfset totQty += NUM>

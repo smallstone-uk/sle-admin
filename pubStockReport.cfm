@@ -117,13 +117,25 @@
 								</td>
 							</tr>
 							<tr>
-								<td width="150">Type</td>
+								<td width="150">Report Type</td>
 								<td>
 									<select name="type" id="typeList">
 										<option value="missing credit">Missing Credits</option>
 										<option value="movement">Stock Movement</option>
 										<option value="claim">Claims</option>
 										<option value="newMissing">New Missing Credits</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td width="150">Movement Type</td>
+								<td>
+									<select name="moveType" data-placeholder="Select..." id="moveType" multiple="multiple">
+										<option value="received">Received</option>
+										<option value="returned">Returned</option>
+										<option value="credited">Credited</option>
+										<option value="claim">Claimed</option>
+										<option value="charge">Charge</option>
 									</select>
 								</td>
 							</tr>
@@ -151,6 +163,7 @@
 </cfoutput>
 <script type="text/javascript">
 	$("#pubList").chosen({width: "350px",enable_split_word_search:false,allow_single_deselect: true});
+	$("#moveType").chosen({width: "350px",enable_split_word_search:false,allow_single_deselect: true});
 	$("#typeList").chosen({width: "350px",disable_search_threshold:10});
 	$("#custList").chosen({width: "350px",disable_search_threshold:10});
 </script>

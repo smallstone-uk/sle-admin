@@ -25,8 +25,10 @@
 				<cfset loc.itemIssue=psIssue>
 				<cfset loc.itempubID=pubID>
 				<cfset loc.psTradePrice=psTradePrice>
-				<cfquery name="loc.QPubStock" datasource="#args.datasource#">
-					SELECT psID,psURN,psClaimRef,psSupID,psType,psStatus,psDate,psIssue,psArrivalDay,psQty,psRetail,psPWRetail,psTradePrice,psDiscount,psDiscountType,psVatRate,psVat,
+				<cfquery name="loc.QPubStock" datasource="#args.datasource#" result="loc.qstocky">
+					SELECT 
+						psID,psURN,psClaimRef,psSupID,psType,psStatus,psDate,psIssue,psArrivalDay,psQty,psRetail,
+						psPWRetail,psTradePrice,psDiscount,psDiscountType,psVatRate,psVat,
 						pubID,pubTitle
 					FROM tblPubStock INNER JOIN tblPublication ON psPubID=pubID
 					WHERE pubID=#loc.itempubID#
@@ -34,6 +36,7 @@
 					AND psIssue='#loc.itemIssue#'
 					AND pubPrice >= 0	<!--- no sups --->
 				</cfquery>
+
 				<cfloop query="loc.QPubStock">
 					<cfif ReFind("[a-zA-Z]",psIssue,1,false)>
 						<cfset loc.monthNo = ListFindNoCase(loc.months,Right(psIssue,3),",")>
@@ -145,6 +148,7 @@
 			<cfif len(args.form.issue)>AND psIssue = '#args.form.issue#'</cfif>
 			<cfif StructKeyExists(args.form,"pub") AND args.form.pub gt 0>AND psPubID IN (#args.form.pub#)</cfif>
 			<cfif StructKeyExists(args.form,"urn") AND len(args.form.urn)>AND psURN LIKE '%#args.form.urn#%'</cfif>
+			<cfif StructKeyExists(args.form,"moveType")> AND psType IN ('#args.form.moveType#')</cfif>
 			ORDER by pubTitle asc, psIssue asc, psDate asc, psType, psID ASC
 		</cfquery>
 

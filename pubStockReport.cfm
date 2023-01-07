@@ -120,10 +120,10 @@
 								<td width="150">Report Type</td>
 								<td>
 									<select name="type" id="typeList">
-										<option value="missing credit">Missing Credits</option>
 										<option value="movement">Stock Movement</option>
-										<option value="claim">Claims</option>
+										<option value="missing credit">Missing Credits</option>
 										<option value="newMissing">New Missing Credits</option>
+										<option value="claim">Claims</option>
 									</select>
 								</td>
 							</tr>

@@ -42,7 +42,7 @@
 							<td>#rep.employee.NI#</td>
 							<th>Tax Code</th>
 							<td>#rep.employee.taxCode#</td>
-							<th colspan="6"></th>
+							<th colspan="8"></th>
 						</tr>
 						<tr>
 							<th align="left">Employer Ref:</th>
@@ -51,7 +51,7 @@
 							<td>#DateFormat(rep.employee.start,"dd-mmm-yyyy")#</td>
 							<th>Status</th>
 							<td>#rep.employee.status#</td>
-							<th colspan="7"></th>
+							<th colspan="8"></th>
 						</tr>
 						<tr>
 							<th width="100">Date</th>
@@ -133,6 +133,9 @@
 							<th align="right">#rep.sums.hours#</th>
 							<th align="right">#rep.sums.workhours#</th>
 							<th align="right">#rep.sums.holhours#</th>
+						</tr>
+						<tr>
+							<td colspan="14">&nbsp;</td>
 						</tr>
 					</table>
 				</div>

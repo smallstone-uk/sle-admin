@@ -6,11 +6,11 @@
 <cfset parm.database = application.site.datasource1>
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.form = form>
-<cfset parm.allEmployees = true>
+<cfset parm.currentEmployees = true>
 <cfif parm.form.sort eq "employee">
 	<cfset Report = pr.LoadEmployeeReport(parm)>
 <cfelseif parm.form.sort eq "postTrans">
-	<cfset parm.allEmployees = false>
+	<cfset parm.currentEmployees = false>
 	<cfset Report = pr.LoadEmployeeReport(parm)>
 <cfelseif parm.form.sort eq "date_minimal">
 	<cfset Report = pr.LoadMinimalPayrollReportByDate(parm)>
@@ -51,11 +51,12 @@
 							<td>#DateFormat(rep.employee.start,"dd-mmm-yyyy")#</td>
 							<th>Status</th>
 							<td>#rep.employee.status#</td>
-							<th colspan="6"></th>
+							<th colspan="7"></th>
 						</tr>
 						<tr>
 							<th width="100">Date</th>
 							<th width="">Week No</th>
+							<th width="" align="right">Take Home</th>
 							<th width="" align="right">Net Pay</th>
 							<th width="" align="right">PAYE</th>
 							<th width="" align="right">NI</th>
@@ -69,6 +70,7 @@
 							<th width="" align="right">Hol Hours</th>
 						</tr>
 						<cfloop array="#rep.headers#" index="item">
+<!---
 							<cfif heighttotal gte maxheight>
 								<cfset heighttotal=0>
 								</table>
@@ -99,9 +101,11 @@
 									</tr>
 							</cfif>
 							<cfset heighttotal=heighttotal+row>
+--->
 							<tr>
 								<td align="center">#DateFormat(item.WeekEnding, "dd/mm/yyyy")#</td>
 								<td align="center">#item.WeekNo#</td>
+								<td align="right">#item.takeHome#</td>
 								<td align="right">#item.NP#</td>
 								<td align="right">#item.PAYE#</td>
 								<td align="right">#item.NI#</td>
@@ -117,6 +121,7 @@
 						</cfloop>
 						<tr>
 							<th colspan="2"></th>
+							<th align="right">#rep.sums.takeHome#</th>
 							<th align="right">#rep.sums.np#</th>
 							<th align="right">#rep.sums.paye#</th>
 							<th align="right">#rep.sums.ni#</th>
@@ -137,26 +142,25 @@
 <cfelseif parm.form.sort eq "date">
 	<cfsavecontent variable="sReport">
 		<cfoutput>
-			<table class="tableList" width="100%" border="1">
+			<table class="tableList" border="1">
 				<cfloop array="#Report#" index="item">
 					<cfset sums = {}>
 					<tr>
 						<th align="left">Week Ending</th>
-						<td colspan="10">#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
-					</tr>
-					<tr>
+						<td>#DateFormat(item.weekEnding, "dd mmmm yyyy")#</td>
 						<th align="left">Week No</th>
-						<td colspan="10">#item.weekNo#</td>
+						<td colspan="11">#item.weekNo#</td>
 					</tr>
 					<tr>
 						<th align="left">Employee</th>
 						<th>Tax Code</th>
 						<th>Method</th>
+						<th width="" align="right">Take Home</th>
 						<th align="right">Net Pay</th>
 						<th align="right">PAYE</th>
 						<th align="right">NI</th>
-						<th align="right">Employer Pension</th>
-						<th align="right">Member Pension</th>
+						<th align="right">E. Pension</th>
+						<th align="right">M. Pension</th>
 						<th align="right">Lotto</th>
 						<th align="right">Gross Pay</th>
 						<th align="right">Hours</th>
@@ -176,6 +180,7 @@
 							<td>#i.empFirstName# #i.empLastName#</td>
 							<td align="center">#i.empTaxCode#</td>
 							<td align="center">#i.phMethod#</td>
+							<td align="right"><strong>#DecimalFormat(i.phNP -i.phLotterySubs)#</strong></td>
 							<td align="right">#DecimalFormat(i.phNP)#</td>
 							<td align="right">#DecimalFormat(i.phPAYE)#</td>
 							<td align="right">#DecimalFormat(i.phNI)#</td>
@@ -184,27 +189,29 @@
 							<td align="right">#DecimalFormat(i.phLotterySubs)#</td>
 							<td align="right">#DecimalFormat(i.phGross)#</td>
 							<td align="right">#DecimalFormat(i.phTotalHours)#</td>
-							<td>#i.phMethod#</td>
 						</tr>
 						<cfif i.phMethod eq 'cash'>
-							<cfset cashTotal += i.phNP>
+							<cfset cashTotal += (i.phNP - i.phLotterySubs)>
 						<cfelse>
-							<cfset bacsTotal += i.phNP>
+							<cfset bacsTotal += (i.phNP - i.phLotterySubs)>
 						</cfif>
 					</cfloop>
 					<tr>
 						<th align="right">Totals</th>
-						<td align="center">Cash: #DecimalFormat(cashTotal)#</td>
-						<td align="center">BACS: #DecimalFormat(bacsTotal)#</td>
-						<td align="right"><strong>#DecimalFormat(sums.npSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.payeSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.niSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.EmployerPensionSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.MemberPensionSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.LottoSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.grossSum)#</strong></td>
-						<td align="right"><strong>#DecimalFormat(sums.hoursSum)#</strong></td>
-						<td></td>
+						<th align="center">Cash: #DecimalFormat(cashTotal)#</th>
+						<th align="center">BACS: #DecimalFormat(bacsTotal)#</th>
+						<th align="right">#DecimalFormat(sums.npSum - sums.LottoSum)#</th>
+						<th align="right">#DecimalFormat(sums.npSum)#</th>
+						<th align="right">#DecimalFormat(sums.payeSum)#</th>
+						<th align="right">#DecimalFormat(sums.niSum)#</th>
+						<th align="right">#DecimalFormat(sums.EmployerPensionSum)#</th>
+						<th align="right">#DecimalFormat(sums.MemberPensionSum)#</th>
+						<th align="right">#DecimalFormat(sums.LottoSum)#</th>
+						<th align="right">#DecimalFormat(sums.grossSum)#</th>
+						<th align="right">#DecimalFormat(sums.hoursSum)#</th>
+					</tr>
+					<tr>
+						<td colspan="12">&nbsp;</td>
 					</tr>
 				</cfloop>
 			</table>
@@ -212,6 +219,7 @@
 	</cfsavecontent>
 <cfelseif parm.form.sort eq "date_minimal">
 	<cfsavecontent variable="sReport">
+		<cfset totalTakeHome = 0>
 		<cfset totalNet = 0>
 		<cfset totalPAYE = 0>
 		<cfset totalNI = 0>
@@ -226,6 +234,7 @@
 				<tr>
 					<th>Date</th>
 					<th>Week No</th>
+					<th align="right">Take Home</th>
 					<th align="right">Net Pay</th>
 					<th align="right">PAYE</th>
 					<th align="right">NI</th>
@@ -237,6 +246,7 @@
 					<th align="right">Hours</th>
 				</tr>
 				<cfloop array="#Report#" index="item">
+					<cfset totalTakeHome += (item.TotalNP + item.TotalLotto)>
 					<cfset totalNet += item.TotalNP>
 					<cfset totalPAYE += item.TotalPAYE>
 					<cfset totalNI += item.TotalNI>
@@ -249,6 +259,7 @@
 					<tr>
 						<td align="center">#DateFormat(item.phDate, "dd/mm/yyyy")#</td>
 						<td align="center">#item.phWeekNo#</td>
+						<td align="right"><strong>#DecimalFormat(item.TotalNP -item.TotalLotto)#</strong></td>
 						<td align="right">#item.TotalNP#</td>
 						<td align="right">#item.TotalPAYE#</td>
 						<td align="right">#item.TotalNI#</td>
@@ -263,15 +274,16 @@
 				<tr>
 					<th></th>
 					<th>Totals</th>
-					<th align="right">#totalNet#</th>
-					<th align="right">#totalPAYE#</th>
-					<th align="right">#totalNI#</th>
-					<th align="right">#totalEmployerPension#</th>
-					<th align="right">#totalMemberPension#</th>
-					<th align="right">#totalLotto#</th>
-					<th align="right">#totalAdjustment#</th>
-					<th align="right">#totalGross#</th>
-					<th align="right">#totalHours#</th>
+					<th align="right">#DecimalFormat(totalTakeHome)#</th>
+					<th align="right">#DecimalFormat(totalNet)#</th>
+					<th align="right">#DecimalFormat(totalPAYE)#</th>
+					<th align="right">#DecimalFormat(totalNI)#</th>
+					<th align="right">#DecimalFormat(totalEmployerPension)#</th>
+					<th align="right">#DecimalFormat(totalMemberPension)#</th>
+					<th align="right">#DecimalFormat(totalLotto)#</th>
+					<th align="right">#DecimalFormat(totalAdjustment)#</th>
+					<th align="right">#DecimalFormat(totalGross)#</th>
+					<th align="right">#DecimalFormat(totalHours)#</th>
 				</tr>				
 			</table>
 		</cfoutput>

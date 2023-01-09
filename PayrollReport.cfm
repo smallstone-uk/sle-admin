@@ -95,7 +95,7 @@
 										</tr>
 										<tr>
 											<td>Options</td>
-											<td><input type="checkbox" name="active" value="1" />Current employees only</td>
+											<td><input type="checkbox" name="currentEmployees" value="1" />Current employees only</td>
 										</tr>
 										<tr>
 											<td>Report type</td>

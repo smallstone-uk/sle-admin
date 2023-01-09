@@ -89,7 +89,7 @@
 			<cfset loc.params = {}>
 			<cfset loc.params.employee = val(emp)>
 			<cfset loc.params.database = args.database>
-			<cfset loc.params.allEmployees = args.allEmployees>
+			<cfset loc.params.currentEmployees = args.currentEmployees>
 			<cfset loc.subResult.Employee = LoadEmployee(loc.params)>
 			
 			<!---GET HEADERS--->
@@ -111,7 +111,7 @@
 				INNER JOIN tblEmployee ON empID = phEmployee
 				WHERE phEmployee = #val(emp)#
 				AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#'
-				<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
+				<cfif args.currentEmployees>AND empStatus = 'active'</cfif>
 				ORDER BY phDate
 			</cfquery>
 			
@@ -132,6 +132,7 @@
 				<cfset loc.item.Hours = phTotalHours>
 				<cfset loc.item.WorkHours = phWorkHours>
 				<cfset loc.item.HolHours = phHolHours>
+				<cfset loc.item.takeHome = phNP - phLotterySubs>
 				<cfset ArrayAppend(loc.subResult.Headers, loc.item)>
 			</cfloop>
 			
@@ -147,6 +148,7 @@
 			<cfset loc.subResult.Sums.Hours = loc.headers.HoursSum>
 			<cfset loc.subResult.Sums.WorkHours = loc.headers.WorkSum>
 			<cfset loc.subResult.Sums.HolHours = loc.headers.HolSum>
+			<cfset loc.subResult.Sums.takeHome = val(loc.headers.NPSum) - val(loc.headers.LottoSum)>
 						
 			<cfset loc.subResult.hols = {}>
 			<cfset loc.subResult.hols.recs = loc.headers.recordcount>
@@ -474,7 +476,7 @@
 				(SELECT ctlEmployerRef FROM tblControl WHERE ctlID = 1) AS EmployerRef
 			FROM tblEmployee
 			WHERE empID = #val(args.employee)#
-			<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
+			<cfif args.currentEmployees>AND empStatus = 'active'</cfif>
 			ORDER BY empLastName
 		</cfquery>
 		
@@ -509,7 +511,7 @@
 			SELECT empID
 			FROM tblEmployee
 			WHERE 1
-			<cfif NOT args.allEmployees>AND empStatus = 'active'</cfif>
+			<cfif args.currentEmployees>AND empStatus = 'active'</cfif>
 		</cfquery>
 		
 		<cfloop query="loc.employees">

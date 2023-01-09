@@ -249,7 +249,6 @@
 					<th align="right">Hours</th>
 				</tr>
 				<cfloop array="#Report#" index="item">
-					<cfset totalTakeHome += (item.TotalNP + item.TotalLotto)>
 					<cfset totalNet += item.TotalNP>
 					<cfset totalPAYE += item.TotalPAYE>
 					<cfset totalNI += item.TotalNI>
@@ -262,7 +261,7 @@
 					<tr>
 						<td align="center">#DateFormat(item.phDate, "dd/mm/yyyy")#</td>
 						<td align="center">#item.phWeekNo#</td>
-						<td align="right"><strong>#DecimalFormat(item.TotalNP -item.TotalLotto)#</strong></td>
+						<td align="right"><strong>#DecimalFormat(item.TotalNP - item.TotalLotto)#</strong></td>
 						<td align="right">#item.TotalNP#</td>
 						<td align="right">#item.TotalPAYE#</td>
 						<td align="right">#item.TotalNI#</td>
@@ -277,7 +276,7 @@
 				<tr>
 					<th></th>
 					<th>Totals</th>
-					<th align="right">#DecimalFormat(totalTakeHome)#</th>
+					<th align="right">#DecimalFormat(totalNet - totalLotto)#</th>
 					<th align="right">#DecimalFormat(totalNet)#</th>
 					<th align="right">#DecimalFormat(totalPAYE)#</th>
 					<th align="right">#DecimalFormat(totalNI)#</th>

@@ -105,7 +105,7 @@
 							<tr>
 								<td align="center">#DateFormat(item.WeekEnding, "dd/mm/yyyy")#</td>
 								<td align="center">#item.WeekNo#</td>
-								<td align="right">#item.takeHome#</td>
+								<td align="right">#DecimalFormat(item.takeHome)#</td>
 								<td align="right">#item.NP#</td>
 								<td align="right">#item.PAYE#</td>
 								<td align="right">#item.NI#</td>
@@ -121,7 +121,7 @@
 						</cfloop>
 						<tr>
 							<th colspan="2"></th>
-							<th align="right">#rep.sums.takeHome#</th>
+							<th align="right">#DecimalFormat(rep.sums.takeHome)#</th>
 							<th align="right">#rep.sums.np#</th>
 							<th align="right">#rep.sums.paye#</th>
 							<th align="right">#rep.sums.ni#</th>

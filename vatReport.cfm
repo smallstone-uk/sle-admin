@@ -24,10 +24,17 @@
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
 <cfsetting requesttimeout="900">
-<cfparam name="srchReport" default="">
+<cfparam name="srchReport" default="1">
+<cfparam name="srchAccount" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 
+<cfquery name="QAccounts" datasource="#parms.datasource#">
+	SELECT eaID, eaTitle
+	FROM tblepos_account
+	WHERE 1
+	ORDER BY eaTitle
+</cfquery>
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -64,6 +71,16 @@
 										<input type="text" name="srchDateTo" value="#srchDateTo#" class="datepicker" />
 									</td>
 								</tr>
+								<tr>
+									<td><b>Excluded Accounts</b></td>
+									<td>
+										<select name="srchAccount" class="srchAccount" multiple="multiple" data-placeholder="Select...">
+											<cfloop query="QAccounts">
+												<option value="#eaID#"<cfif eaID eq srchAccount> selected="selected"</cfif>>#eaTitle#</option>
+											</cfloop>
+										</select>
+									</td>
+								</tr>
 							</table>
 						</div>
 					</form>
@@ -72,7 +89,7 @@
 					<cfswitch expression="#srchReport#">
 						<cfcase value="1">
 							<cfquery name="QSaleItems" datasource="#parms.datasource#">
-								SELECT ehMode, 
+								SELECT ehMode, ehPayAcct,
 								eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT, SUM(eiTrade) AS Trade,
 								pgID,pgTitle,pgNomGroup
 								FROM tblepos_items
@@ -83,6 +100,9 @@
 								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								AND eiClass = 'sale'
 								AND ehMode != 'wst'
+								<cfif len(srchAccount)>
+									AND ehPayAcct NOT IN ('#srchAccount#')
+								</cfif>
 								GROUP BY pgNomGroup, pgTitle
 								ORDER BY pgNomGroup, pgTitle
 							</cfquery>
@@ -93,6 +113,7 @@
 							<cfset totQty = 0>
 							<cfset totTrd = 0>
 							<cfset totPrf = 0>
+							<cfset POR = 0>
 							<h1>Sales Income</h1>
 							<table border="1" class="tableList">
 								<tr>
@@ -241,7 +262,7 @@
 							<cfset purKeys = {}>
 							<cfset dateTo = LSDateFormat(DateAdd("d",1,srchDateTo),"yyyy-mm-dd")>
 							<cfquery name="QSaleItems" datasource="#parms.datasource#">
-								SELECT ehMode, 
+								SELECT ehMode, ehPayAcct,
 								eiTimestamp,eiType,eiPayType,eiRetail, SUM(eiTrade) AS Trade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT							
 								FROM tblepos_items
 								INNER JOIN tblepos_header ON eiParent=ehID

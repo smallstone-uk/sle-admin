@@ -26,6 +26,7 @@
 <cfsetting requesttimeout="900">
 <cfparam name="srchReport" default="1">
 <cfparam name="srchAccount" default="">
+<cfparam name="srchExclude" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 
@@ -72,13 +73,19 @@
 									</td>
 								</tr>
 								<tr>
-									<td><b>Excluded Accounts</b></td>
+									<td><b>Select Accounts</b></td>
 									<td>
 										<select name="srchAccount" class="srchAccount" multiple="multiple" data-placeholder="Select...">
 											<cfloop query="QAccounts">
 												<option value="#eaID#"<cfif eaID eq srchAccount> selected="selected"</cfif>>#eaTitle#</option>
 											</cfloop>
 										</select>
+									</td>
+								</tr>
+								<tr>
+									<td><b>Options/b></td>
+									<td>
+										<input type="checkbox" name="srchExclude" value="1" /> Exclude the above accounts?
 									</td>
 								</tr>
 							</table>
@@ -88,7 +95,7 @@
 				<cfif StructKeyExists(form,"fieldnames")>
 					<cfswitch expression="#srchReport#">
 						<cfcase value="1">
-							<cfquery name="QSaleItems" datasource="#parms.datasource#">
+							<cfquery name="QSaleItems" datasource="#parms.datasource#" result="QSaleItemsResult">
 								SELECT ehMode, ehPayAcct,
 								eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, SUM(eiNet) AS Net, SUM(eiVAT) AS VAT, SUM(eiTrade) AS Trade,
 								pgID,pgTitle,pgNomGroup
@@ -99,14 +106,18 @@
 								INNER JOIN tblProductGroups ON pgID = pcatGroup
 								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								AND eiClass = 'sale'
-								AND ehMode != 'wst'
+								<!---AND ehMode != 'wst'--->
 								<cfif len(srchAccount)>
-									AND ehPayAcct NOT IN ('#srchAccount#')
+									<cfif StructKeyExists(form,"srchExclude")>
+										AND ehPayAcct NOT IN (#srchAccount#)
+									<cfelse>
+										AND ehPayAcct IN (#srchAccount#)
+									</cfif>
 								</cfif>
 								GROUP BY pgNomGroup, pgTitle
 								ORDER BY pgNomGroup, pgTitle
 							</cfquery>
-							<!---<cfdump var="#QSaleItems#" label="QItems" expand="false">--->
+							<cfdump var="#QSaleItemsResult#" label="QItems" expand="false">
 							
 							<cfset totNet = 0>
 							<cfset totVAT = 0>

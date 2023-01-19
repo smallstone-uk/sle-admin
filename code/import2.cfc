@@ -413,6 +413,7 @@
 					<cfif loc.result.days lt 8>
 						<cfset loc.result.lastQty = val(loc.QProduct.siQtyPacks)>
 						<cfset loc.result.qty1 = args.qty1 - loc.result.lastQty>
+						<cfset loc.result.qty1 = Iif(loc.result.qty1 lte 0,1,loc.result.qty1)>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
 					<cfif loc.result.qty1 lte 0>

@@ -721,40 +721,44 @@
 								<th width="400">Deliveries</th>
 							</tr>
 						</cfif>
-						<tr>
-							<td>#loc.order.number#</td>
-							<td>
-								<div class="house-items">
-									<ul>
-									<cfloop array="#loc.order.items#" index="loc.item">
-										<cfset loc.class = "">
-										<cfset loc.holidayText = "">
-										<cfif loc.item.holiday>
-											<cfset loc.class = "holiday">
-											<cfif len(loc.item.holidayStart)><cfset loc.holidayText = "Cancelled until #loc.item.holidayStart#.">
-												<cfelse><cfset loc.holidayText = "Cancelled until further notice."></cfif>
-										<cfelse>
-											<cfif StructKeyExists(loc.pickList,loc.item.sort)>
-												<cfset loc.pick = StructFind(loc.pickList,loc.item.sort)>
-												<cfset loc.pick.qty = loc.pick.qty + loc.item.qty>
+						<cfif arraylen(loc.order.items)>
+							<tr>
+								<td>#loc.order.number#</td>
+								<td>
+									<div class="house-items">
+										<ul>
+										<cfloop array="#loc.order.items#" index="loc.item">
+											<cfset loc.class = "">
+											<cfset loc.holidayText = "">
+											<cfif loc.item.holiday>
+												<cfset loc.class = "holiday">
+												<cfif len(loc.item.holidayStart)><cfset loc.holidayText = "Cancelled until #loc.item.holidayStart#.">
+													<cfelse><cfset loc.holidayText = "Cancelled until further notice."></cfif>
 											<cfelse>
-												<cfset StructInsert(loc.pickList,loc.item.sort,{"qty" = loc.item.qty, "title" = loc.item.title})>
+												<cfif StructKeyExists(loc.pickList,loc.item.sort)>
+													<cfset loc.pick = StructFind(loc.pickList,loc.item.sort)>
+													<cfset loc.pick.qty = loc.pick.qty + loc.item.qty>
+												<cfelse>
+													<cfset StructInsert(loc.pickList,loc.item.sort,{"qty" = loc.item.qty, "title" = loc.item.title})>
+												</cfif>
 											</cfif>
-										</cfif>
-										<cfif len(loc.item.Title) gt 15>
-											<cfset loc.cellWidth="220px">
-										<cfelse>
-											<cfset loc.cellWidth="168px">
-										</cfif>
-										<li class="#loc.class# #LCase(loc.item.HolidayAction)#" style="width:#loc.cellWidth#">
-											#loc.item.title# <cfif loc.item.qty gt 1>(#loc.item.qty#)</cfif>
-											<p>#loc.holidayText#</p>
-										</li>
-									</cfloop>
-									</ul>
-								</div>
-							</td>
-						</tr>
+											<cfif len(loc.holidayText)>
+												<cfset loc.cellWidth="420px">
+											<cfelseif len(loc.item.Title) gt 15>
+												<cfset loc.cellWidth="220px">
+											<cfelse>
+												<cfset loc.cellWidth="168px">
+											</cfif>
+											<li class="#loc.class# #LCase(loc.item.HolidayAction)#" style="width:#loc.cellWidth#">
+												#loc.item.title# <cfif loc.item.qty gt 1>(#loc.item.qty#)</cfif>
+												<cfif len(loc.holidayText)><p>#loc.holidayText#</p></cfif>
+											</li>
+										</cfloop>
+										</ul>
+									</div>
+								</td>
+							</tr>
+						</cfif>
 					</cfloop>
 					</table>
 					<p>Any shortages, please contact the office on #application.company.telephone# before 10am.<br>Thank you.</p>
@@ -776,8 +780,8 @@
 							</tr>
 						</cfloop>
 						<tr>
-							<td><strong>Total Publications</strong></td>
-							<td align="center"><strong>#loc.pickCount#</strong></td>
+							<th>Total Publications</th>
+							<th align="center">#loc.pickCount#</th>
 						</tr>
 					</table>
 					<div style="page-break-before:always;"></div>				

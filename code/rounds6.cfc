@@ -211,8 +211,11 @@
 							<!--- handle VAT for publication --->
 							<cfset i.vatCode = pubVATCode>
 							<cfset i.vatRate = StructFind(application.site.vat,pubVATCode)>
-							<cfset i.vatAmount = i.Price - (int(i.Price / (1 + i.vatRate) * 100) / 100)>
-							
+							<cfif i.vatRate neq 0>		<!--- 30/05/22 fix bug - 0.01 vat added to WMNs --->
+								<cfset i.vatAmount = i.Price - (int(i.Price / (1 + i.vatRate) * 100) / 100)>
+							<cfelse>
+								<cfset i.vatAmount = 0>
+							</cfif>
 							<cfif len(pubRoundTitle)>
 								<cfset i.Title=pubRoundTitle>
 							<cfelseif len(pubShortTitle)>
@@ -745,7 +748,7 @@
 										</cfif>
 										<li class="#loc.class# #LCase(loc.item.HolidayAction)#" style="width:#loc.cellWidth#">
 											#loc.item.title# <cfif loc.item.qty gt 1>(#loc.item.qty#)</cfif>
-											#loc.holidayText#
+											<p>#loc.holidayText#</p>
 										</li>
 									</cfloop>
 									</ul>
@@ -768,8 +771,8 @@
 							<cfset loc.pick = StructFind(loc.pickList,loc.pickKey)>
 							<cfset loc.pickCount += loc.pick.qty>
 							<tr>
-								<td>#loc.pick.title#</td>
-								<td align="center">#loc.pick.qty#</td>
+								<td><strong>#loc.pick.title#</strong></td>
+								<td align="center"><strong>#loc.pick.qty#</strong></td>
 							</tr>
 						</cfloop>
 						<tr>
@@ -792,86 +795,93 @@
 
 	<cffunction name="ProcessChargedItems" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
-		<cfset var result={}>
-		<cfset var batch={}>
-		<cfset var rounds={}>
-		<cfset var set={}>
-		<cfset var r={}>
-		<cfset var QInsert="">
-		<cfset var QCheckBatch="">
-		<cfset var QUpdateBatch="">
-		<cfset var row=0>
-		<cfset var array=0>
-		<cfset var drops=0>
-		
-		<cfif StructKeyExists(args,"charges")>
-			<cfset array=ArrayLen(args.charges)>
-			<cfif array neq 0>
-				<cfquery name="QInsert" datasource="#args.datasource#">
-					INSERT INTO tblDelItems (diClientID,diOrderID,diBatchID,diRoundID,diPubID,diType,diDatestamp,diDate,diIssue,diQty,diPrice,diPriceTrade,diCharge,diVATAmount,diTest,diVoucher,diInvoiceID,diHeldBack,diReason) VALUES 
-					<cfloop array="#args.charges#" index="i">
-						<cfset row=row+1>
-						<cfset drops=0>
-						(#i.ClientID#,#i.OrderID#,#i.BatchID#,#i.RoundID#,#i.PubID#,'#i.Type#','#i.Datestamp#','#i.Date#','#i.Issue#',#i.Qty#,#i.Price#,#i.PriceTrade#,#i.charge#,#i.vatAmount#,#i.test#,#i.voucher#,#i.invoice#,#i.heldback#,'#i.reason#')
-						<cfif row neq array>,</cfif>
-						<cfif NOT i.ignore>
-							<cfif StructKeyExists(rounds,i.RoundID)>
-								<cfset r=StructFind(rounds,i.RoundID)>
-								<cfif NOT StructKeyExists(r.drops,i.OrderID)>
+		<cftry>
+			<cfset var result={}>
+			<cfset var batch={}>
+			<cfset var rounds={}>
+			<cfset var set={}>
+			<cfset var r={}>
+			<cfset var QInsert="">
+			<cfset var QCheckBatch="">
+			<cfset var QUpdateBatch="">
+			<cfset var row=0>
+			<cfset var array=0>
+			<cfset var drops=0>
+			<cfif StructKeyExists(args,"charges")>
+				<cfset array=ArrayLen(args.charges)>
+				<cfif array neq 0>
+					<cfquery name="QInsert" datasource="#args.datasource#">
+						INSERT INTO tblDelItems (diClientID,diOrderID,diBatchID,diRoundID,diPubID,diType,diDatestamp,diDate,diIssue,diQty,diPrice,diPriceTrade,
+							diCharge,diVATAmount,diTest,diVoucher,diInvoiceID,diHeldBack,diReason) VALUES 
+						<cfloop array="#args.charges#" index="i">
+							<cfset row=row+1>
+							<cfset drops=0>
+							(#i.ClientID#,#i.OrderID#,#i.BatchID#,#i.RoundID#,#i.PubID#,'#i.Type#','#i.Datestamp#','#i.Date#','#i.Issue#',#i.Qty#,#i.Price#,#i.PriceTrade#,
+								#i.charge#,#i.vatAmount#,#i.test#,#i.voucher#,#i.invoice#,#i.heldback#,'#i.reason#')
+							<cfif row neq array>,</cfif>
+							<cfif NOT i.ignore>
+								<cfif StructKeyExists(rounds,i.RoundID)>
+									<cfset r=StructFind(rounds,i.RoundID)>
+									<cfif NOT StructKeyExists(r.drops,i.OrderID)>
+										<cfset StructInsert(r.drops,i.OrderID,1)>
+										<cfset drops=1>
+									</cfif>
+								<cfelse>
+									<cfset r={}>
+									<cfset r.drops={}>
 									<cfset StructInsert(r.drops,i.OrderID,1)>
+									<cfset StructInsert(rounds,i.RoundID,r)>
 									<cfset drops=1>
 								</cfif>
-							<cfelse>
-								<cfset r={}>
-								<cfset r.drops={}>
-								<cfset StructInsert(r.drops,i.OrderID,1)>
-								<cfset StructInsert(rounds,i.RoundID,r)>
-								<cfset drops=1>
+								<cfif StructKeyExists(batch,i.BatchID)>
+									<cfset b=StructFind(batch,i.BatchID)>
+									<cfset set={}>
+									<cfset set.ID=i.BatchID>
+									<cfset set.pubTotal=b.pubTotal+i.Price>
+									<cfset set.delTotal=b.delTotal+i.charge>
+									<cfset set.pubQty=b.pubQty+i.Qty>
+									<cfset set.dropQty=b.dropQty+drops>
+									<cfset set.roundExp=b.roundExp+i.PriceTrade>
+									<cfset StructUpdate(batch,i.BatchID,set)>
+								<cfelse>
+									<cfquery name="QCheckBatch" datasource="#args.datasource#">
+										SELECT *
+										FROM tblDelBatch
+										WHERE dbID=#i.BatchID#
+									</cfquery>
+									<cfset set={}>
+									<cfset set.ID=i.BatchID>
+									<cfset set.pubTotal=QCheckBatch.dbPubTotal+i.Price>
+									<cfset set.delTotal=QCheckBatch.dbDelTotal+i.charge>
+									<cfset set.pubQty=QCheckBatch.dbPubQty+i.Qty>
+									<cfset set.dropQty=QCheckBatch.dbDropQty+drops>
+									<cfset set.roundExp=QCheckBatch.dbRoundExp+i.PriceTrade>
+									<cfset StructInsert(batch,i.BatchID,set)>
+								</cfif>
 							</cfif>
-							<cfif StructKeyExists(batch,i.BatchID)>
-								<cfset b=StructFind(batch,i.BatchID)>
-								<cfset set={}>
-								<cfset set.ID=i.BatchID>
-								<cfset set.pubTotal=b.pubTotal+i.Price>
-								<cfset set.delTotal=b.delTotal+i.charge>
-								<cfset set.pubQty=b.pubQty+i.Qty>
-								<cfset set.dropQty=b.dropQty+drops>
-								<cfset set.roundExp=b.roundExp+i.PriceTrade>
-								<cfset StructUpdate(batch,i.BatchID,set)>
-							<cfelse>
-								<cfquery name="QCheckBatch" datasource="#args.datasource#">
-									SELECT *
-									FROM tblDelBatch
-									WHERE dbID=#i.BatchID#
-								</cfquery>
-								<cfset set={}>
-								<cfset set.ID=i.BatchID>
-								<cfset set.pubTotal=QCheckBatch.dbPubTotal+i.Price>
-								<cfset set.delTotal=QCheckBatch.dbDelTotal+i.charge>
-								<cfset set.pubQty=QCheckBatch.dbPubQty+i.Qty>
-								<cfset set.dropQty=QCheckBatch.dbDropQty+drops>
-								<cfset set.roundExp=QCheckBatch.dbRoundExp+i.PriceTrade>
-								<cfset StructInsert(batch,i.BatchID,set)>
-							</cfif>
-						</cfif>
-					</cfloop>
-				</cfquery>
-				<cfloop collection="#batch#" item="item">
-					<cfset bi=StructFind(batch,item)>
-					<cfquery name="QUpdateBatch" datasource="#args.datasource#">
-						UPDATE tblDelBatch
-						SET dbDate='#LSDateFormat(Now(),"yyyy-mm-dd")# #TimeFormat(Now(),"HH:mm:ss")#',
-							dbPubTotal=#bi.pubTotal#,
-							dbDelTotal=#bi.delTotal#,
-							dbPubQty=#bi.pubqty#,
-							dbDropQty=#bi.dropqty#,
-							dbRoundExp=#bi.roundExp#
-						WHERE dbID=#bi.ID#
+						</cfloop>
 					</cfquery>
-				</cfloop>
+					<cfloop collection="#batch#" item="item">
+						<cfset bi=StructFind(batch,item)>
+						<cfquery name="QUpdateBatch" datasource="#args.datasource#">
+							UPDATE tblDelBatch
+							SET dbDate='#LSDateFormat(Now(),"yyyy-mm-dd")# #TimeFormat(Now(),"HH:mm:ss")#',
+								dbPubTotal=#bi.pubTotal#,
+								dbDelTotal=#bi.delTotal#,
+								dbPubQty=#bi.pubqty#,
+								dbDropQty=#bi.dropqty#,
+								dbRoundExp=#bi.roundExp#
+							WHERE dbID=#bi.ID#
+						</cfquery>
+					</cfloop>
+				</cfif>
 			</cfif>
-		</cfif>
-		<cfset result=rounds>	
+			<cfset result=rounds>	
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="ProcessChargedItems" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
 		<cfreturn result>
 	</cffunction>
 
@@ -999,9 +1009,7 @@
 					AND pubActive
 					ORDER BY pubTitle asc
 				</cfquery>
-<!---<cfdump var="#QMagResult#" label="QMagResult" expand="yes" format="html" 
-	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
---->				
+				
 				<cfloop query="QMags">
 					<cfquery name="QCreditCheck" datasource="#args.datasource#">
 						SELECT *

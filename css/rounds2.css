@@ -30,8 +30,8 @@ h1 {line-height: 22px !important;font-size: 20px !important;margin: 10px 0 0 0 !
 .house-items ul li.holiday span.holidaytitle {padding: 0 5px;}
 .house-items ul li.holiday p {margin: 0px;}
 .house-items ul li.holiday span.holiday-action {padding: 0 5px;}
-.house-items ul li .holiday-action {display: block;font-style: italic;text-transform: capitalize;font-size: 12px;color:#000;font-weight:bold;}
-.house-items ul li .holiday-action i {font-size: 12px;color: #000;font-weight:bold;font-style:normal;}
+.house-items ul li .holiday-action {display: block;font-style: italic;text-transform: capitalize;font-size: 18px;color:#000;font-weight:bold;}
+.house-items ul li .holiday-action i {font-size: 18px;color: #000;font-weight:bold;font-style:normal;}
 .tableList {border-color: #666;border: 1px solid #666;font-size: 12px;}
 .tableList th {background:#999;border-color: #666;}
 .tableList td {border-color: #666;}

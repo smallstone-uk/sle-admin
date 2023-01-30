@@ -923,7 +923,7 @@
 											</cfif>
 											<tr>
 												<td>#trnID#</td>
-												<td>#LSDateFormat(trnDate)#</td>
+												<td>#LSDateFormat(trnDate,'ddd dd-mmm-yy')#</td>
 												<td>#nomType#</td>
 												<td>#nomClass#</td>
 												<td>#nomCode#</td>
@@ -1905,7 +1905,7 @@
 								<cfcase value="17">
 									<!--- business report --->
 									<cfset data=pur.BusReportTrans(parms)>
-									<!---<cfdump var="#data#" label="data" expand="yes">--->
+									<cfdump var="#data#" label="data" expand="yes">
 									<cfset nomList = ListSort(StructKeyList(data.saleRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.saletotals,","),"numeric","asc")>
 									<h1>Sales Analysis #DateFormat(srchDateFrom,'dd-mmm-yy')# to #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>

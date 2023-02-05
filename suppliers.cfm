@@ -457,7 +457,7 @@
 								<th>Total</th>
 							</tr>
 							<cfset keyList = ListSort(StructKeyList(dayTotals,","),"text","asc")>
-							<cfloop list="#keyList#" item="key">
+							<cfloop list="#keyList#" index="key">
 								<cfset value = StructFind(dayTotals,key)>
 								<tr>
 									<td>#DateFormat(key,'ddd dd-mmm-yy')#</td>

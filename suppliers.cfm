@@ -47,6 +47,7 @@
 </style>
 
 </head>
+<cftry>
 
 <cfparam name="srchReport" default="">
 <cfparam name="srchName" default="">
@@ -474,5 +475,11 @@
 	</div>
 </body>
 </cfoutput>
-</html>
 
+<cfcatch type="any">
+	<cfdump var="#cfcatch#" label="suppliers" expand="yes" format="html" 
+		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+</cfcatch>
+</cftry>
+
+</html>

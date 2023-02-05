@@ -121,17 +121,45 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.result.weekends = {}>
+		<cfif !IsDate(args.form.srchDateTo)>
+			<cfset args.form.srchDateTo = Now()>
+		</cfif>
 		<cfquery name="loc.result.QTrans" datasource="#args.datasource#" result="loc.result.QTransResult">
 			SELECT accID,accName, eiTimeStamp,eiNet
 			FROM tblepos_items
 			INNER JOIN tblAccount ON accID = eiSuppID
 			WHERE eiSuppID > 1
 			<cfif len(args.form.srchDateFrom)>
-				AND eiTimeStamp >= '#args.form.srchDateFrom#'
 				AND eiTimeStamp <= '#args.form.srchDateTo#'
+				AND eiTimeStamp >= '#args.form.srchDateFrom#'
 			</cfif>
 			ORDER BY accName, eiTimeStamp ASC
 		</cfquery>
+		<cfoutput>
+		<cfif loc.result.QTrans.recordcount gt 0>
+			<cfloop from="#args.form.srchDateFrom#" to="#args.form.srchDateTo#" index="loc.aDay">
+				<cfif DayOfWeek(loc.aDay) eq 7>
+					<cfset StructInsert(loc.result.weekends,DateFormat(loc.aDay,"yyyymmdd"),0)>
+				</cfif>
+			</cfloop>
+			<cfset loc.lastSat = 0>
+			<cfset loc.result.grandTotal = 0>
+			<cfset loc.result.dayKeys = ListSort(StructKeyList(loc.result.weekends,","),"text","asc")>
+			<cfloop query="loc.result.QTrans">
+				<cfset loc.result.grandTotal += eiNet>
+				<cfset loc.tranDate = DateFormat(eiTimeStamp,'yyyymmdd')>
+				<cfloop list="#loc.result.dayKeys#" index="loc.key">
+					<cfif loc.tranDate gte loc.lastSat AND loc.tranDate lte loc.key AND loc.lastSat neq 0>
+						<cfset loc.weekend = StructFind(loc.result.weekends,loc.lastSat)>
+						<cfset StructUpdate(loc.result.weekends,loc.lastSat,loc.weekend + eiNet)>
+						<cfbreak>
+					</cfif>
+					<cfset loc.lastSat = loc.key>
+				</cfloop>
+			</cfloop>
+		</cfif>
+		</cfoutput>
 		<cfreturn loc.result>
 	</cffunction>
 

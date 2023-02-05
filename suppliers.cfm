@@ -413,6 +413,7 @@
 							</tr>
 							<cfset suppID = 0>
 							<cfset suppTotal = 0>
+							<cfset grandTotal = 0>
 							<cfset dayTotals = {}>
 							<cfloop query="result.QTrans">
 								<cfif suppID gt 0 AND suppID neq accID>
@@ -426,6 +427,7 @@
 								</cfif>
 								<cfset suppID = accID>
 								<cfset suppTotal += eiNet>
+								<cfset grandTotal += eiNet>
 								<cfset tranDate = DateFormat(eiTimestamp,'yyyy-mm-dd')>
 								<cfif StructKeyExists(dayTotals,tranDate)>
 									<cfset currTotal = StructFind(dayTotals,tranDate)>
@@ -443,27 +445,38 @@
 							<tr>
 								<th></th>
 								<th>Total</th>
-								<th></th>
+								<th align="right"></th>
 								<th align="right">#DecimalFormat(suppTotal)#</th>
+							</tr>
+							<tr>
+								<th></th>
+								<th>Grand Total</th>
+								<th align="right"></th>
+								<th align="right">#DecimalFormat(grandTotal)#</th>
 							</tr>
 						</table>
 						<p>&nbsp;</p>
 						<table class="tableList" border="1">
 							<tr>
-								<th colspan="2">Day Totals</th>
+								<th colspan="2">Week Totals</th>
 							</tr>
 							<tr>
 								<th>Date</th>
 								<th>Total</th>
 							</tr>
-							<cfset keyList = ListSort(StructKeyList(dayTotals,","),"text","asc")>
+							<cfset keyList = ListSort(StructKeyList(result.weekends,","),"text","asc")>
 							<cfloop list="#keyList#" index="key">
-								<cfset value = StructFind(dayTotals,key)>
+								<cfset keyDate = "#left(key,4)#-#mid(key,5,2)#-#right(key,2)#">
+								<cfset value = StructFind(result.weekends,key)>
 								<tr>
-									<td>#DateFormat(key,'ddd dd-mmm-yy')#</td>
+									<td>#DateFormat(keyDate,'ddd dd-mmm-yy')#</td>
 									<td align="right">#value#</td>
 								</tr>
 							</cfloop>
+							<tr>
+								<th>Grand Total</th>
+								<th align="right">#DecimalFormat(result.grandTotal)#</th>
+							</tr>
 						</table>
 					</cfcase>
 				</cfswitch>

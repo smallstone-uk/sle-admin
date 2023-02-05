@@ -400,10 +400,19 @@
 					</cfcase>
 					<cfcase value="3">
 						<cfset result = purch.CODPaymentsList(parms)>
-						<h1>Shop COD Payments List</h1>
 						<table class="tableList" border="1">
+							<tr>
+								<th colspan="4">Shop COD Payments List</th>
+							</tr>
+							<tr>
+								<th>ID</th>
+								<th>Account Name</th>
+								<th>Date</th>
+								<th>Amount</th>
+							</tr>
 							<cfset suppID = 0>
 							<cfset suppTotal = 0>
+							<cfset dayTotals = {}>
 							<cfloop query="result.QTrans">
 								<cfif suppID gt 0 AND suppID neq accID>
 									<tr>
@@ -416,11 +425,42 @@
 								</cfif>
 								<cfset suppID = accID>
 								<cfset suppTotal += eiNet>
+								<cfset tranDate = DateFormat(eiTimestamp,'yyyy-mm-dd')>
+								<cfif StructKeyExists(dayTotals,tranDate)>
+									<cfset currTotal = StructFind(dayTotals,tranDate)>
+									<cfset StructUpdate(dayTotals,tranDate,currTotal+eiNet)>
+								<cfelse>
+									<cfset StructInsert(dayTotals,tranDate,eiNet)>
+								</cfif>
 								<tr>
 									<td>#accID#</td>
 									<td>#accName#</td>
 									<td align="right">#DateFormat(eiTimestamp,'ddd dd-mmm-yy')#</td>
 									<td align="right">#eiNet#</td>
+								</tr>
+							</cfloop>
+							<tr>
+								<th></th>
+								<th>Total</th>
+								<th></th>
+								<th align="right">#DecimalFormat(suppTotal)#</th>
+							</tr>
+						</table>
+						<p>&nbsp;</p>
+						<table class="tableList" border="1">
+							<tr>
+								<th colspan="2">Day Totals</th>
+							</tr>
+							<tr>
+								<th>Date</th>
+								<th>Total</th>
+							</tr>
+							<cfset keyList = ListSort(StructKeyList(dayTotals,","),"text","asc")>
+							<cfloop list="#keyList#" item="key">
+								<cfset value = StructFind(dayTotals,key)>
+								<tr>
+									<td>#DateFormat(key,'ddd dd-mmm-yy')#</td>
+									<td align="right">#value#</td>
 								</tr>
 							</cfloop>
 						</table>

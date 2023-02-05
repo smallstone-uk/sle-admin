@@ -1022,7 +1022,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QProducts" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT prodID,prodTitle,prodStatus,prodStaffDiscount, siUnitSize,siOurPrice, pcatID,pcatTitle
+				SELECT prodID,prodTitle,prodStatus,prodStaffDiscount,prodVATRate, siUnitSize,siOurPrice, pcatID,pcatTitle
 				FROM tblProducts
 				INNER JOIN tblProductCats ON prodCatID = pcatID
 				LEFT JOIN tblStockItem ON prodID = siProduct

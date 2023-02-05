@@ -54,6 +54,7 @@
 					<th>#data.products.pcatTitle#</th>
 					<th align="right">Size</th>
 					<th align="right">Price</th>
+					<th align="right">VAT</th>
 					<th>Status</th>
 					<th>Discount</th>
 				</tr>
@@ -63,6 +64,7 @@
 						<td><a href="ProductStock6.cfm?product=#prodID#" target="product">#prodTitle#</a></td>
 						<td>#siUnitSize#</td>
 						<td align="right">#siOurPrice#</td>
+						<td align="right">#prodVATRate#</td>
 						<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
 						<td class="sod_discount disable-select" data-id="#prodID#">#prodStaffDiscount#</td>
 					</tr>

@@ -117,6 +117,24 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="CODPaymentsList" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfquery name="loc.result.QTrans" datasource="#args.datasource#" result="loc.result.QTransResult">
+			SELECT accID,accName, eiTimeStamp,eiNet
+			FROM tblepos_items
+			INNER JOIN tblAccount ON accID = eiSuppID
+			WHERE eiSuppID > 1
+			<cfif len(args.form.srchDateFrom)>
+				AND eiTimeStamp >= '#args.form.srchDateFrom#'
+				AND eiTimeStamp <= '#args.form.srchDateTo#'
+			</cfif>
+			ORDER BY accName, eiTimeStamp ASC
+		</cfquery>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="PurchReport" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
@@ -606,8 +624,8 @@
 				INNER JOIN tblVATRates ON tblNominal.nomVATCode = tblVATRates.vatCode 
 				WHERE trnClientRef=0 
 				AND nomClass = 'other'
-				AND nomType = 'purch'
-				<!---AND trnLedger='nom'--->
+				<!---AND nomType = 'purch'
+				AND trnLedger='nom'--->
 				<!---AND nomClass NOT IN ('exclude','other')
 				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>--->
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'

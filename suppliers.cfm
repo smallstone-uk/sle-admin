@@ -87,7 +87,8 @@
 									<select name="srchReport">
 										<option value="">Select...</option>
 										<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Aged Balance Report</option>
-										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>COD Payments Report</option>
+										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>COD Payments Summary</option>
+										<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>COD Payments List</option>
 									</select>
 								</td>
 							</tr>
@@ -395,6 +396,33 @@
 								<cfif totals[13] lt 0><cfset style="crAmountTotal"><cfelse><cfset style="drAmountTotal"></cfif>
 								<td class="#style#">#DecimalFormat(totals[13])#</td>
 							</tr>
+						</table>
+					</cfcase>
+					<cfcase value="3">
+						<cfset result = purch.CODPaymentsList(parms)>
+						<h1>Shop COD Payments List</h1>
+						<table class="tableList" border="1">
+							<cfset suppID = 0>
+							<cfset suppTotal = 0>
+							<cfloop query="result.QTrans">
+								<cfif suppID gt 0 AND suppID neq accID>
+									<tr>
+										<th></th>
+										<th>Total</th>
+										<th></th>
+										<th align="right">#DecimalFormat(suppTotal)#</th>
+									</tr>
+									<cfset suppTotal = 0>
+								</cfif>
+								<cfset suppID = accID>
+								<cfset suppTotal += eiNet>
+								<tr>
+									<td>#accID#</td>
+									<td>#accName#</td>
+									<td align="right">#DateFormat(eiTimestamp,'ddd dd-mmm-yy')#</td>
+									<td align="right">#eiNet#</td>
+								</tr>
+							</cfloop>
 						</table>
 					</cfcase>
 				</cfswitch>

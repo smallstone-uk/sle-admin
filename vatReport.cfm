@@ -181,7 +181,7 @@
 								INNER JOIN tblNominal ON niNomID = nomID
 								WHERE nomID NOT IN (11,201)
 								AND `trnLedger` IN ('purch','nom')
-								AND `trnType` IN ('inv', 'crn') 
+								AND `trnType` IN ('inv', 'crn','nom') 
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								GROUP BY nomGroup, nomCode
 							</cfquery>

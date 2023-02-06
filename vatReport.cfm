@@ -83,7 +83,7 @@
 									</td>
 								</tr>
 								<tr>
-									<td><b>Options/b></td>
+									<td><b>Options</b></td>
 									<td>
 										<input type="checkbox" name="srchExclude" value="1" /> Exclude the above accounts?
 									</td>
@@ -117,7 +117,7 @@
 								GROUP BY pgNomGroup, pgTitle
 								ORDER BY pgNomGroup, pgTitle
 							</cfquery>
-							<cfdump var="#QSaleItemsResult#" label="QItems" expand="false">
+							<!---<cfdump var="#QSaleItemsResult#" label="QItems" expand="false">--->
 							
 							<cfset totNet = 0>
 							<cfset totVAT = 0>
@@ -180,7 +180,7 @@
 								INNER JOIN tblnomitems ON niTranID = trnID
 								INNER JOIN tblNominal ON niNomID = nomID
 								WHERE nomID NOT IN (11,201)
-								AND `trnLedger` = 'purch' 
+								AND `trnLedger` IN ('purch','nom')
 								AND `trnType` IN ('inv', 'crn') 
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								GROUP BY nomGroup, nomCode

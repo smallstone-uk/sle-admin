@@ -137,6 +137,7 @@
 									<th>Profit</th>
 									<th>POR%</th>
 								</tr>
+								<cfset lineCount = 0>
 								<cfloop query="QSaleItems">
 									<cfset totNet += Net>
 									<cfset totVAT += VAT>
@@ -144,6 +145,7 @@
 									<cfset totTrd += Trade>
 									<cfset profit = -(Net + Trade)>
 									<cfset totPrf += profit>
+									<cfset lineCount++>
 									<cfif Net neq 0>
 										<cfset POR = Round((profit / -Net) * 100)>
 									</cfif>
@@ -162,7 +164,8 @@
 									<cfset POR = Round((totPrf / -totNet) * 100)>
 								</cfif>
 								<tr>
-									<th colspan="2">TOTALS</th>
+									<th align="center">#lineCount#</th>
+									<th>TOTALS</th>
 									<th align="center">#totQty#</th>
 									<th align="right">#totNet#</th>
 									<th align="right">#totVAT#</th>
@@ -185,6 +188,7 @@
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								GROUP BY nomGroup, nomCode
 							</cfquery>
+							<cfset lineCount = 0>
 							<cfset nomFlag = 0>
 							<cfset totNet = 0>
 							<cfset totVAT = 0>
@@ -200,9 +204,11 @@
 									<th>VAT</th>
 								</tr>
 								<cfloop query="QPurItems">
+									<cfset lineCount++>
 									<cfif nomGroup gte "C" AND nomFlag eq 0>
 										<tr>
-											<th colspan="3">TOTALS</th>
+											<th align="center">#lineCount#</th>
+											<th colspan="2">TOTALS</th>
 											<th align="center">#totQty#</th>
 											<th align="right">#totNet#</th>
 											<th></th>
@@ -211,6 +217,7 @@
 										<tr>
 											<th colspan="7"><h1>Costs</h1></th>
 										</tr>
+										<cfset lineCount = 0>
 										<cfset totNet = 0>
 										<cfset totVAT = 0>
 										<cfset totQty = 0>
@@ -218,15 +225,17 @@
 									</cfif>
 									<cfif nomGroup gte "P" AND nomFlag eq 1>
 										<tr>
-											<th colspan="3">TOTALS</th>
+											<th align="center">#lineCount#</th>
+											<th colspan="2">TOTALS</th>
 											<th align="center">#totQty#</th>
 											<th align="right">#totNet#</th>
 											<th></th>
 											<th align="right">#totVAT#</th>
 										</tr>
 										<tr>
-											<th colspan="7"><h1>Capital</h1></th>
+											<th colspan="7"><h1>Nominal</h1></th>
 										</tr>
+										<cfset lineCount = 0>
 										<cfset totNet = 0>
 										<cfset totVAT = 0>
 										<cfset totQty = 0>
@@ -258,7 +267,8 @@
 									</cfif>
 								</cfloop>
 								<tr>
-									<th colspan="3">TOTALS</th>
+									<th align="center">#lineCount#</th>
+									<th colspan="2">TOTALS</th>
 									<th align="center">#totQty#</th>
 									<th align="right">#totNet#</th>
 									<th></th>

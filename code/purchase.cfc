@@ -144,16 +144,20 @@
 					<cfset StructInsert(loc.result.weekends,DateFormat(loc.aDay,"yyyymmdd"),0)>
 				</cfif>
 			</cfloop>
-			<cfset loc.lastSat = 0>
+			<cfset loc.test = []>
 			<cfset loc.result.grandTotal = 0>
 			<cfset loc.result.dayKeys = ListSort(StructKeyList(loc.result.weekends,","),"text","asc")>
 			<cfloop query="loc.result.QTrans">
+				<cfset loc.lastSat = 0>
 				<cfset loc.result.grandTotal += eiNet>
 				<cfset loc.tranDate = DateFormat(eiTimeStamp,'yyyymmdd')>
 				<cfloop list="#loc.result.dayKeys#" index="loc.key">
-					<cfif loc.tranDate gte loc.lastSat AND loc.tranDate lte loc.key AND loc.lastSat neq 0>
+					<!---<cfset ArrayAppend(loc.test,{title="before if","tdate"=loc.trandate,"sat"=loc.lastSat,"key"=loc.key,"value"=eiNet})>--->
+					<cfif loc.tranDate gte loc.lastSat AND loc.tranDate lte loc.key>
 						<cfset loc.weekend = StructFind(loc.result.weekends,loc.key)>
 						<cfset StructUpdate(loc.result.weekends,loc.key,loc.weekend + eiNet)>
+						<!---<cfset ArrayAppend(loc.test,{title="inside if","tdate"=loc.trandate,"sat"=loc.lastSat,"key"=loc.key,"value"=eiNet,"total"=loc.weekend + eiNet})>--->
+						<cfset loc.lastSat = loc.key>
 						<cfbreak>
 					</cfif>
 					<cfset loc.lastSat = loc.key>
@@ -161,6 +165,7 @@
 			</cfloop>
 		</cfif>
 		</cfoutput>
+		<!---<cfset loc.result.loc = loc>--->
 		<cfreturn loc.result>
 	</cffunction>
 

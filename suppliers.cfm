@@ -401,6 +401,7 @@
 					</cfcase>
 					<cfcase value="3">
 						<cfset result = purch.CODPaymentsList(parms)>
+						<!---<cfdump var="#result#" label="result" expand="false">--->
 						<table class="tableList" border="1">
 							<tr>
 								<th colspan="4">Shop COD Payments List</th>
@@ -470,7 +471,7 @@
 								<cfset value = StructFind(result.weekends,key)>
 								<tr>
 									<td>#DateFormat(keyDate,'ddd dd-mmm-yy')#</td>
-									<td align="right">#value#</td>
+									<td align="right">#DecimalFormat(value)#</td>
 								</tr>
 							</cfloop>
 							<tr>

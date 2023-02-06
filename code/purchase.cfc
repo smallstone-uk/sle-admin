@@ -130,7 +130,7 @@
 			FROM tblepos_items
 			INNER JOIN tblAccount ON accID = eiSuppID
 			WHERE eiSuppID > 1
-			AND eiSuppID NOT IN (1242)
+			AND eiSuppID NOT IN (1242)	<!--- bunnery --->
 			<cfif len(args.form.srchDateFrom)>
 				AND eiTimeStamp <= '#args.form.srchDateTo#'
 				AND eiTimeStamp >= '#args.form.srchDateFrom#'
@@ -152,8 +152,8 @@
 				<cfset loc.tranDate = DateFormat(eiTimeStamp,'yyyymmdd')>
 				<cfloop list="#loc.result.dayKeys#" index="loc.key">
 					<cfif loc.tranDate gte loc.lastSat AND loc.tranDate lte loc.key AND loc.lastSat neq 0>
-						<cfset loc.weekend = StructFind(loc.result.weekends,loc.lastSat)>
-						<cfset StructUpdate(loc.result.weekends,loc.lastSat,loc.weekend + eiNet)>
+						<cfset loc.weekend = StructFind(loc.result.weekends,loc.key)>
+						<cfset StructUpdate(loc.result.weekends,loc.key,loc.weekend + eiNet)>
 						<cfbreak>
 					</cfif>
 					<cfset loc.lastSat = loc.key>

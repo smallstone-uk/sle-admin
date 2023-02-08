@@ -116,8 +116,15 @@
 				var	bcode = $('#bcode').html()
 				var	productID = $('#productID').html()
 				var	allStock = $('#allStock').is(':checked')
-				LoadSalesItems(bcode,productID,allStock,'#salesdiv');
+				LoadSales(bcode,productID,allStock,'#salesdiv');
 				$('#salesTab').blur();
+			});
+			$('#itemsTab').click(function() {
+				var	bcode = $('#bcode').html()
+				var	productID = $('#productID').html()
+				var	allStock = $('#allStock').is(':checked')
+				LoadItems(bcode,productID,allStock,'#itemsdiv');
+				$('#itemsTab').blur();
 			});
 			$('#groupsBtn').click(function() {
 				window.open( 'ProductStock6GroupsMain.cfm' );
@@ -175,11 +182,13 @@
 						<li><a href="##productdiv" id="productTab">Product</a></li>
 						<li><a href="##stockdiv" id="stockTab">Stock</a></li>
 						<li><a href="##salesdiv" id="salesTab">Sales</a></li>
+						<li><a href="##itemsdiv" id="itemsTab">Sales Items</a></li>
 					</ul>
 					<div id="productdiv"><div class="title">Scan product...</div></div>
 					<div id="stockdiv"></div>
 					<div id="groupsdiv"></div>
 					<div id="salesdiv"></div>
+					<div id="itemsdiv"></div>
 					<div style="clear:both"></div>
 					<div id="result"></div>
 				</div>

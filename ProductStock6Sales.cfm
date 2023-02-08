@@ -100,6 +100,7 @@
 				<cfset totValueNet += data.valueNet - data.valueWaste>
 				<cfset totTrade += data.valueTrade>
 				<cfset totProfit += profit>
+				<tr>
 					<td align="right">#data.dateTitle#</td>
 					<td align="center">#data.numSales#</td>
 					<td align="center">#data.numWaste#</td>

@@ -5,9 +5,14 @@
 	<cfset parm = {}>
 	<cfset parm.datasource = application.site.datasource1>
 	<cfset parm.productID = productID>
+	<cfset parm.allStock = allStock>
 	<cfset parm.form=form>
 	<cfset lookup=pstock.LoadProductAndLatestStockItem(parm)>
-	<cfset lastYear = DateAdd("d",Now(),-365)>
+	<cfif allStock>
+		<cfset lastYear = '2013-02-01'>
+	<cfelse>
+		<cfset lastYear = DateAdd("d",Now(),-365)>
+	</cfif>
 	<cfset startDate = CreateDate(Year(lastYear),Month(lastYear),1)>
 	<!---<cfdump var="#lookup#" label="lookup" expand="false">--->
 	<cfquery name="QSalesItems" datasource="#parm.datasource#">

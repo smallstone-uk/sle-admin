@@ -6,9 +6,9 @@
 	<cfset parm.datasource = application.site.datasource1>
 	<cfset parm.barcode = bcode>
 	<cfset parm.productID = productID>
+	<cfset parm.allStock = allStock>
 	<cfset records = pstock.StockItemList(parm)>
 	<cfset suppliers=pstock.LoadSuppliers(parm)>
-	<!---<cfdump var="#records#" label="records" expand="false">--->
 	<script type="text/javascript">
 		$(document).ready(function() {
 			rates = [0,0,20,5];

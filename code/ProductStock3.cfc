@@ -464,7 +464,9 @@
 			<cfquery name="QStockItem" datasource="#args.datasource#">
 				UPDATE tblStockItem
 				SET siBookedIn = #Now()#,
-					siStatus='outofstock'
+					siStatus='outofstock',
+					siReceived=0,
+					soQtyItems=0
 				WHERE siID IN (#args.form.selectitem#)
 			</cfquery>
 		</cfif>

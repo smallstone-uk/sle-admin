@@ -108,13 +108,15 @@
 			$('#stockTab').click(function() {
 				var	bcode = $('#bcode').html()
 				var	productID = $('#productID').html()
-				LoadStockItems(bcode,productID,'#stockdiv');
+				var	allStock = $('#allStock').is(':checked')
+				LoadStockItems(bcode,productID,allStock,'#stockdiv');
 				$('#stockTab').blur();
 			});
 			$('#salesTab').click(function() {
 				var	bcode = $('#bcode').html()
 				var	productID = $('#productID').html()
-				LoadSalesItems(bcode,productID,'#salesdiv');
+				var	allStock = $('#allStock').is(':checked')
+				LoadSalesItems(bcode,productID,allStock,'#salesdiv');
 				$('#salesTab').blur();
 			});
 			$('#groupsBtn').click(function() {
@@ -156,14 +158,16 @@
 					<form method="post">
 						<span class="lookup">Manual Entry: </span><input name="barcodefld" id="barcodefld" class="lookup" type="text" size="15" maxlength="20" />
 						<input type="button" name="manual" id="manual" class="lookup" style="float:left" value="Look-up" />
+						
 					</form>
 					<div style="clear:both"></div>
 					<button id="newProduct">New Product</button>
-					<button id="groupsBtn">Groups</button>
+					<button id="groupsBtn">Groups</button>					
 				</div>
 				<div id="content-header">
 					<div id="bcode"></div>
 					<div id="productID"></div>
+					<input type="checkbox" id="allStock" name="allStock" value="1" />Show all stock records
 					<div style="clear:both"></div>
 				</div>
 				<div id="tabs">

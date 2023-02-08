@@ -708,7 +708,11 @@
 		<cfset loc.result={}>
 		<cfset loc.result.action = "">
 		<cfset loc.barcode = Trim(args.barcode)>
-		<cfset loc.lastYear = DateAdd("d",Now(),-365)>
+		<cfif args.allStock>
+			<cfset loc.lastYear = '2013-02-01'>
+		<cfelse>
+			<cfset loc.lastYear = DateAdd("d",Now(),-365)>
+		</cfif>
 		<cfset loc.startDate = CreateDate(Year(loc.lastYear),Month(loc.lastYear),1)>
 		<cfset loc.args = args>
 		<cftry>
@@ -759,6 +763,7 @@
 					INNER JOIN tblAccount on soAccountID = accID
 					WHERE siProduct = #loc.QProduct.prodID#
 					AND soDate >= #loc.startDate# 
+					AND siStatus NOT IN ('promo')
 					ORDER BY soDate DESC, siID DESC
 				</cfquery>
 				<cfset loc.result.recordcount=loc.result.StockItems.recordcount>
@@ -1352,7 +1357,9 @@
 			<cfquery name="QStockItem" datasource="#args.datasource#">
 				UPDATE tblStockItem
 				SET siBookedIn = #Now()#,
-					siStatus='outofstock'
+					siStatus='outofstock',
+					siReceived=0,
+					soQtyItems=0
 				WHERE siID IN (#args.form.selectitem#)
 			</cfquery>
 		</cfif>

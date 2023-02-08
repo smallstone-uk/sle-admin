@@ -160,12 +160,12 @@ function AmendProduct(form,result) {
 	});
 }
 
-function LoadStockItems(bcode,productID,result) {
-//	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " result " + result);
+function LoadStockItems(bcode,productID,allStock,result) {
+//	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6StockItems.cfm',
-		data : {"bcode":bcode,"productID":productID},
+		data : {"bcode":bcode,"productID":productID,"allStock": allStock },
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Stock Items...");
 		},
@@ -175,12 +175,12 @@ function LoadStockItems(bcode,productID,result) {
 	});
 }
 
-function LoadSalesItems(bcode,productID,result) {
-	 console.log("LoadSalesItems - bcode " + bcode + " productID " + productID + " result " + result);
+function LoadSalesItems(bcode,productID,allStock,result) {
+//	 console.log("LoadSalesItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6SalesItems.cfm',
-		data : {"bcode":bcode,"productID":productID},
+		data : {"bcode":bcode,"productID":productID,"allStock": allStock},
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales Items...");
 		},

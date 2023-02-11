@@ -96,6 +96,9 @@
 					<td align="right">#trnAmnt1#</td>
 					<td align="right">#trnAmnt2#</td>
 				</tr>
+				<cfset lastRef = trnRef>
+				<cfset lastAmount = trnAmnt1>
+				
 			</cfloop>
 			<tr>
 				<th colspan="6">#dupCount# duplicates found.</th>

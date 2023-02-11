@@ -552,7 +552,7 @@
 --->
 								<cfcase value="4">
 									<cfset stocklist=stock.StockTakeList(parm)>
-									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
+									<cfdump var="#stocklist#" label="stocklist" expand="no">
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=7>
 										<cfoutput>

@@ -127,7 +127,7 @@
 				<td>&nbsp;</td>
 				<th align="right">&pound;#DecimalFormat(totTrade)#</th>
 				<th align="right">&pound;#DecimalFormat(totProfit)#</th>
-				<th align="right">#DecimalFormat((totProfit / totValueNet) * 100)#%</th>
+				<th align="right"><cfif totValueNet neq 0>#DecimalFormat((totProfit / totValueNet) * 100)#%<cfelse> - </cfif></th>
 			</tr>
 		</table>
 	</cfoutput>

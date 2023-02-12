@@ -133,8 +133,8 @@
 			WHERE eiSuppID > 1
 			AND eiSuppID NOT IN (0)	<!--- none selected --->
 			<cfif len(args.form.srchDateFrom)>
-				AND eiTimeStamp <= '#args.form.srchDateTo#'
-				AND eiTimeStamp >= '#args.form.srchDateFrom#'
+				AND eiTimeStamp <= '#DateFormat(args.form.srchDateTo,"yyyy-mm-dd")#'
+				AND eiTimeStamp >= '#DateFormat(args.form.srchDateFrom,"yyyy-mm-dd")#'
 			</cfif>
 			ORDER BY accName, eiTimeStamp ASC
 		</cfquery>

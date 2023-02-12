@@ -130,7 +130,7 @@
 			FROM tblepos_items
 			INNER JOIN tblAccount ON accID = eiSuppID
 			WHERE eiSuppID > 1
-			AND eiSuppID NOT IN (1242)	<!--- bunnery --->
+			AND eiSuppID NOT IN (0)	<!--- none selected --->
 			<cfif len(args.form.srchDateFrom)>
 				AND eiTimeStamp <= '#args.form.srchDateTo#'
 				AND eiTimeStamp >= '#args.form.srchDateFrom#'

@@ -125,6 +125,7 @@
 		<cfif !IsDate(args.form.srchDateTo)>
 			<cfset args.form.srchDateTo = Now()>
 		</cfif>
+		<cfset args.form.srchDateTo = DateAdd("d",1,args.form.srchDateTo)>	<!--- to midnight next day --->
 		<cfquery name="loc.result.QTrans" datasource="#args.datasource#" result="loc.result.QTransResult">
 			SELECT accID,accName, eiTimeStamp,eiNet
 			FROM tblepos_items

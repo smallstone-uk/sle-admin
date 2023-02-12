@@ -64,7 +64,7 @@
 					<td align="right">#DecimalFormat(-eiVAT)#</td>
 					<td align="right">#DecimalFormat(eiTrade)#</td>
 					<td>#DecimalFormat(profit)#</td>
-					<td>#DecimalFormat((profit / -eiNet) * 100)#%</td>
+					<td><cfif eiNet neq 0>#DecimalFormat((profit / -eiNet) * 100)#%<cfelse> - </cfif></td>
 				</tr>
 			</cfloop>
 <!---

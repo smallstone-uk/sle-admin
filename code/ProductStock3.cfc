@@ -466,7 +466,7 @@
 				SET siBookedIn = #Now()#,
 					siStatus='outofstock',
 					siReceived=0,
-					soQtyItems=0
+					siQtyItems=0
 				WHERE siID IN (#args.form.selectitem#)
 			</cfquery>
 		</cfif>

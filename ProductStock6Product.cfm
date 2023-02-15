@@ -6,7 +6,7 @@
 <cfif form.prodID eq 0>
 	<cfset result=pstock.AddProduct(parm)>
 	<cfoutput>
-		<a href="productStock6.cfm?product=#result.productID#">View Product</a>
+		<a href="productStock6.cfm?product=#result.productID#">View Product #result.productID#</a>
 	</cfoutput>
 <cfelse>
 	<cfset result=pstock.AmendProduct(parm)>

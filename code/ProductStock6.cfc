@@ -704,6 +704,7 @@
 
 	<cffunction name="StockItemList" access="public" returntype="struct" hint="stock items for a given product record">
 		<cfargument name="args" type="struct" required="yes">
+
 		<cfset var loc={}>
 		<cfset loc.result={}>
 		<cfset loc.result.action = "">
@@ -729,7 +730,7 @@
 				</cfquery>
 			<cfelseif len(loc.barcode)>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
-					SELECT prodID,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
+					SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate, pcatID,pgID,pcatTitle,pgTitle,pgTarget
 					FROM tblProducts
 					INNER JOIN tblBarcodes on prodID = barProdID
 					LEFT JOIN tblStockItem ON siProduct = prodID

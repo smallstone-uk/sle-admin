@@ -6,7 +6,7 @@
 	<cfset parm.datasource = application.site.datasource1>
 	<cfset parm.barcode = bcode>
 	<cfset parm.productID = productID>
-	<cfset parm.allStock = allStock>
+	<cfset parm.allStock = StructKeyExists(form,"allStock")>
 	<cfset records = pstock.StockItemList(parm)>
 	<cfset suppliers=pstock.LoadSuppliers(parm)>
 	<script type="text/javascript">

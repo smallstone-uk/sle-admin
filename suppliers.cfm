@@ -90,6 +90,7 @@
 										<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Aged Balance Report</option>
 										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>COD Payments Summary</option>
 										<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>COD Payments List</option>
+										<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>COD Payment Analysis</option>
 									</select>
 								</td>
 							</tr>
@@ -479,6 +480,10 @@
 								<th align="right">#DecimalFormat(result.grandTotal)#</th>
 							</tr>
 						</table>
+					</cfcase>
+					<cfcase value="4">
+						<cfset result = purch.CODPaymentAnalysis(parms)>
+						<cfdump var="#result#" label="result" expand="false">
 					</cfcase>
 				</cfswitch>
 			</cfif>

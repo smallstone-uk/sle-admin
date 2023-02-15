@@ -91,7 +91,11 @@
 			<cfloop list="#dateKeys#" index="key">
 				<cfset data = StructFind(da,key)>
 				<cfset profit = data.valueNet - data.valueWaste - data.valueTrade>
-				<cfset POR = profit / (data.valueNet - data.valueWaste) * 100>
+				<cfif data.valueNet neq 0>
+					<cfset POR = profit / (data.valueNet - data.valueWaste) * 100>
+				<cfelse>
+					<cfset POR = 0>
+				</cfif>
 				<cfset totNumSales += data.numSales>
 				<cfset totNumWaste += data.numWaste>
 				<cfset totNumNet += (data.numSales - data.numWaste)>

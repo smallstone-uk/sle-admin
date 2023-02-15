@@ -284,7 +284,7 @@ function AddStock(form,result) {
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems("",data,result);
+			LoadStockItems("",data,"",result);
 		}
 	});
 }
@@ -296,12 +296,13 @@ function SaveStock(form,result) {
 		data: $(form).serialize(),
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Saving Stock...");
+			console.log(form);
 		},
 		success:function(data){
 			$(result).html(data);
 			$.closeDialog();
 			$.messageBox("Stock Item Saved", "success");
-			LoadStockItems("",data,result);
+			LoadStockItems("",data,"",result);
 		}
 	});
 }
@@ -316,7 +317,7 @@ function DeleteStockItem(stockitem,productID,result) {
 		},
 		success:function(data){
 			$(result).html(data);
-			LoadStockItems("",data,result);
+			LoadStockItems("",data,"",result);
 		}
 	});
 }

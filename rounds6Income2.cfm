@@ -44,7 +44,7 @@
 		<cfset mileage = {}>
 		<cfset mileage.east = {miles=12, mpg=28, mph=18, time=120}>
 		<cfset mileage.south = {miles=17, mpg=27, mph=17, time=120}>
-		<cfset mileage.west = {miles=20, mpg=30, mph=20, time=120}>
+		<cfset mileage.west = {miles=17, mpg=30, mph=20, time=110}>
 		<cfset mileage.sle = {miles=3, mpg=27, mph=20, time=20}>
 		<cfset mileage.north = {miles=12, mpg=30, mph=20, time=30}>
 
@@ -687,7 +687,7 @@
 											<cfset iTotal = (iDay.Profit + iDay.Charge) * val(driverRate) + (rnd.mileage * val(fuelRate))>
 											<cfset iWhole = int(iTotal)>
 											<cfset iRem = iTotal - iWhole>
-											<cfset iTotal = iWhole + (int(iRem gt 0))>
+											<cfset iTotal = iWhole + (int(iRem gt 0.1))>
 											<cfset iweekTotal += iTotal>
 											<th align="right">#DecimalFormat(iTotal)#</th>
 										</cfloop>

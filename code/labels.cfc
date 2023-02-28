@@ -68,7 +68,9 @@
 				<cfset item.ID=prodID>
 				<cfset item.Barcode=QBarcode.barCode>
 				<cfset item.Title=prodTitle>
-				<cfif DecimalFormat(prodOurPrice) lt 1.00>
+				<cfif prodOurPrice eq 0>
+					<cfset item.Price="">
+				<cfelseif prodOurPrice lt 1.00>
 					<cfset item.Price=NumberFormat(Right(DecimalFormat(prodOurPrice),2),"99")&"p">
 				<cfelse>
 					<cfset intNum=IsValid("integer",prodOurPrice)>

@@ -19,8 +19,6 @@
 <cftry>
 <cfobject component="code/accounts" name="supp">
 <cfset parm={}>
-<!---<cfset parm.nomGroup=2>--->
-
 <cfset parm.nomType = "sales">
 <cfset parm.accountID = url.account>
 <cfset parm.fromDate = url.fromDate>
@@ -49,13 +47,13 @@
 				<th width="120">Date</th>
 				<th>Type</th>
 				<th>Ref</th>
-				<th>Net</th>
-				<th>VAT/Disc</th>
-				<th>Gross</th>
-				<th>Balance</th>
-				<th>Items</th>
-				<th>Check</th>
-				<th>EPOS</th>
+				<th align="right">Net</th>
+				<th align="right">VAT/Disc</th>
+				<th align="right">Gross</th>
+				<th align="right">Balance</th>
+				<th align="center">Items</th>
+				<th align="right">CBack*</th>
+				<th align="right">EPOS</th>
 			</tr>
 			<cfif StructKeyExists(suppData,"trans")>
 				<cfset total1=0>
@@ -75,11 +73,11 @@
 						<td align="right">#DecimalFormat(item.trnAmnt1+item.trnAmnt2)#</td>
 						<td align="right">#DecimalFormat(total1+total2)#</td>
 						<td align="center" class="#classItems#">#item.nomRecs#</td>
-						<td align="center" class="#classItems#">#item.Total#</td>
+						<td align="right" class="#classItems#">#item.Total#</td>
 						<td align="right">
 							<cfset parm.fromDate = item.trnDate>
 							<cfset SalesItemTotal = supp.SalesItemTotal(parm)>
-							#SalesItemTotal#
+							#DecimalFormat(SalesItemTotal)#
 						</td>
 					</tr>
 				</cfloop> 
@@ -129,6 +127,7 @@
 			</cfloop>
 		</table>
 	</cfoutput>
+	<p>* This is mismatch in the nominal items caused by cashback.</p>
 </body>
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

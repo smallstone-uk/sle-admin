@@ -2271,6 +2271,26 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="SalesItemTotal" access="public" returntype="numeric">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = 0>
+		<cfif IsDate(args.fromDate)>
+			<cfset loc.toDate = DateAdd("d",1,args.fromDate)>
+		</cfif>
+		<cfquery name="loc.QTrans" datasource="#args.datasource#">
+			SELECT SUM( eiNet + eiVAT ) AS total
+			FROM `tblepos_items`
+			WHERE eiTimestamp
+			BETWEEN '#DateFormat(args.fromDate,"yyyy-mm-dd")#'
+			AND '#DateFormat(loc.toDate,"yyyy-mm-dd")#'
+		</cfquery>
+		<cfif loc.QTrans.recordcount gt 0>
+			<cfset loc.result = val(loc.QTrans.total)>
+		</cfif>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="SalesMissing" access="public" returntype="array">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

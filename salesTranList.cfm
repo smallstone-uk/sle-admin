@@ -30,7 +30,7 @@
 <cfset suppData = supp.TranList(parm)>
 <cfset SalesDuplicates = supp.SalesDuplicates(parm)>
 <cfset SalesMissing = supp.SalesMissing(parm)>
-
+<!---<cfdump var="#suppData#" label="suppData" expand="false">--->
 <body>
 	<cfoutput>
 		<table width="800">
@@ -46,7 +46,7 @@
 		<table width="800" class="tableList">
 			<tr>
 				<th>ID</th>
-				<th>Date</th>
+				<th width="120">Date</th>
 				<th>Type</th>
 				<th>Ref</th>
 				<th>Net</th>
@@ -54,7 +54,8 @@
 				<th>Gross</th>
 				<th>Balance</th>
 				<th>Items</th>
-				<th>Allocated</th>
+				<th>Check</th>
+				<th>EPOS</th>
 			</tr>
 			<cfif StructKeyExists(suppData,"trans")>
 				<cfset total1=0>
@@ -74,7 +75,12 @@
 						<td align="right">#DecimalFormat(item.trnAmnt1+item.trnAmnt2)#</td>
 						<td align="right">#DecimalFormat(total1+total2)#</td>
 						<td align="center" class="#classItems#">#item.nomRecs#</td>
-						<td align="center">#item.trnAlloc#</td>
+						<td align="center" class="#classItems#">#item.Total#</td>
+						<td align="right">
+							<cfset parm.fromDate = item.trnDate>
+							<cfset SalesItemTotal = supp.SalesItemTotal(parm)>
+							#SalesItemTotal#
+						</td>
 					</tr>
 				</cfloop> 
 				<tr>

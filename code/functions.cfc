@@ -3047,8 +3047,10 @@
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>					
+<!---
 		<cfdump var="#result#" label="Timings UpdatePubStock" expand="yes" format="html" 
 			output="#application.site.dir_logs#time-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->
 		<cfreturn result>
 	</cffunction>
 	

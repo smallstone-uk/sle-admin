@@ -2882,6 +2882,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
 		<cfset var QUpdate="">
+		<cfset var Qrec="">
 		<cfset var QPubUpdate="">
 		<cfset var QDelItems="">
 		<cfset var QCheckStock="">
@@ -2890,6 +2891,8 @@
 		<cfset var QVoucherItems="">
 		<cfset var updatePrice=0>
 		<cfset var trade=0>
+		<cfset var fnStart = getTickCount()>
+		<cfset result.timings = []>
 		
 		<cftry>
 			<cfif args.form.psDiscountType eq "pc">
@@ -2936,8 +2939,10 @@
 						#trade#
 					)
 				</cfquery>
+				<cfset ArrayAppend(result.timings,{"desc" = "QUpdate 1","Elapsed" = getTickCount() - fnStart})>
 				<cfset rowAdded=Qrec.generatedKey>
 				<cfset AddSups(args)>
+				<cfset ArrayAppend(result.timings,{"desc" = "AddSups","Elapsed" = getTickCount() - fnStart})>
 			<cfelse>
 				<cfquery name="QUpdate" datasource="#args.datasource#" result="Qrec">
 					UPDATE tblPubStock
@@ -2958,6 +2963,7 @@
 						psTradePrice=#trade#
 					WHERE psID=#args.form.psID#
 				</cfquery>
+				<cfset ArrayAppend(result.timings,{"desc" = "QUpdate 2","Elapsed" = getTickCount() - fnStart})>
 				<cfset rowAdded=args.form.psID>
 			</cfif>
 						
@@ -2969,6 +2975,7 @@
 				AND psDate > '#LSDateFormat(args.form.psDate,"YYYY-MM-DD")#'
 				LIMIT 1;
 			</cfquery>
+			<cfset ArrayAppend(result.timings,{"desc" = "QCheck","Elapsed" = getTickCount() - fnStart})>
 			<cfif QCheck.recordcount is 0>
 				<cfquery name="QPubUpdate" datasource="#args.datasource#">
 					UPDATE tblPublication
@@ -2999,6 +3006,7 @@
 						pubPWVat=#args.form.psPWVat#
 					WHERE pubID=#args.form.psPubID#
 				</cfquery>
+				<cfset ArrayAppend(result.timings,{"desc" = "QPubUpdate","Elapsed" = getTickCount() - fnStart})>
 			</cfif>
 
 			<cfset updatePrice = val(args.form.psRetail) + val(args.form.psPWRetail)>
@@ -3009,11 +3017,13 @@
 				AND diDate='#LSDateFormat(args.form.psDate,"yyyy-mm-dd")#'
 				AND diType='debit'
 			</cfquery>
+			<cfset ArrayAppend(result.timings,{"desc" = "QDelItems","Elapsed" = getTickCount() - fnStart})>
 			<cfquery name="QVoucherTitles" datasource="#args.datasource#">
 				UPDATE tblVoucherTitles
 				SET vtValue=#DecimalFormat(updatePrice)#
 				WHERE vtPubID=#args.form.psPubID#
 			</cfquery>
+			<cfset ArrayAppend(result.timings,{"desc" = "QVoucherTitles","Elapsed" = getTickCount() - fnStart})>
 			<cfquery name="QSelectItems" datasource="#args.datasource#">
 				SELECT *
 				FROM tblVoucherItems,tblVoucherTitles
@@ -3028,16 +3038,17 @@
 					SET vtmAmount=#DecimalFormat(updatePrice)#
 					WHERE vtmID=#QSelectItems.vtmID#
 				</cfquery>
+				<cfset ArrayAppend(result.timings,{"desc" = "QVoucherItems loop","Elapsed" = getTickCount() - fnStart})>
 			</cfloop>
 			
 			<cfset result.msg="Publication has been updated">
-			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="UpdatePubStock" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
-		</cftry>
-					
+		</cftry>					
+		<cfdump var="#result#" label="Timings UpdatePubStock" expand="yes" format="html" 
+			output="#application.site.dir_logs#time-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		<cfreturn result>
 	</cffunction>
 	

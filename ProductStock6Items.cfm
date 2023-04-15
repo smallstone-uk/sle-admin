@@ -28,6 +28,14 @@
 	<cfset numNet = 0>
 	<cfset valueNet = 0>
 	<cfset valueTrade = 0>
+	<cfset tot = {count=0,qty=0,net=0,VAT=0,trade=0,profit=0}>
+	
+		
+	<style type="text/css">
+		.refund {background-color:#FCC;}
+		.normal {background-color:#FFFFFF;}
+	</style>
+	
 	<cfoutput>
 		<table width="100%" class="showTable">
 			<tr>
@@ -51,38 +59,50 @@
 				<th align="right">Profit</th>
 				<th align="right">POR%</th>
 			</tr>
-			<cfloop query="QSalesItems">
-				<cfset profit = -(eiNet + eiTrade)>
-				<tr>
-					<td align="center">#ehID#</td>
-					<td align="right">#DateFormat(ehTimestamp,"ddd dd-mmm-yy")#</td>
-					<td align="center">#ehMode#</td>
-					<td align="center">#ehPayAcct#</td>
-					<td align="center">#eiClass#</td>
-					<td align="center">#eiQty#</td>
-					<td align="right">#DecimalFormat(-eiNet)#</td>
-					<td align="right">#DecimalFormat(-eiVAT)#</td>
-					<td align="right">#DecimalFormat(eiTrade)#</td>
-					<td>#DecimalFormat(profit)#</td>
-					<td><cfif eiNet neq 0>#DecimalFormat((profit / -eiNet) * 100)#%<cfelse> - </cfif></td>
-				</tr>
-			</cfloop>
-<!---
+			<cfif QSalesItems.recordcount gt 0>
+				<cfloop query="QSalesItems">
+					<cfset tot.count++>
+					<cfset flag = 2 * int(ehMode eq "rfd") - 1>
+					<cfif flag eq -1> <!--- reg mode --->
+						<cfset item = {qty=eiQty ,net=eiNet * flag, VAT=eiVAT * flag, trade=eiTrade}>
+						<cfset class = "normal">
+					<cfelse> <!--- refund mode --->
+						<cfset item = {qty=0 ,net=eiNet * -1, VAT=eiVAT * -1, trade=eiTrade * -1}>
+						<cfset class = "refund">
+					</cfif>
+					<cfset item.profit = item.net - item.trade>
+					<cfset tot.qty += item.qty>
+					<cfset tot.net += item.net>
+					<cfset tot.VAT += item.VAT>
+					<cfset tot.trade += item.trade>
+					<cfset tot.profit += item.profit>
+					<tr class="#class#">
+						<td align="center">#ehID#</td>
+						<td align="right">#DateFormat(ehTimestamp,"ddd dd-mmm-yy")#</td>
+						<td align="center">#ehMode#</td>
+						<td align="center">#ehPayAcct#</td>
+						<td align="center">#eiClass#</td>
+						<td align="center">#item.qty#</td>
+						<td align="right">#DecimalFormat(item.net)#</td>
+						<td align="right">#DecimalFormat(item.VAT)#</td>
+						<td align="right">#DecimalFormat(item.trade)#</td>
+						<td align="right">#DecimalFormat(item.profit)#</td>
+						<td align="right"><cfif flag eq -1>#DecimalFormat((item.profit / item.net) * 100)#%<cfelse>-</cfif></td>
+					</tr>
+				</cfloop>
+			<cfelse>
+				<tr><td colspan="11">No records found.</td></tr>
+			</cfif>
 			<tr>
-				<th></th>
-				<th align="center">#totNumSales#</th>
-				<th align="center">#totNumWaste#</th>
-				<th align="center">#totNumNet#</th>
-				<td>&nbsp;</td>
-				<th align="right">&pound;#DecimalFormat(totValueSales)#</th>
-				<th align="right">&pound;#DecimalFormat(totValueWaste)#</th>
-				<th align="right">&pound;#DecimalFormat(totValueNet)#</th>
-				<td>&nbsp;</td>
-				<th align="right">&pound;#DecimalFormat(totTrade)#</th>
-				<th align="right">&pound;#DecimalFormat(totProfit)#</th>
-				<th align="right">#DecimalFormat((totProfit / totValueNet) * 100)#%</th>
+				<th align="left">#tot.count#</th>
+				<th colspan="4" align="left">Totals</th>
+				<th>#tot.qty#</th>
+				<th>#DecimalFormat(tot.net)#</th>
+				<th>#DecimalFormat(tot.VAT)#</th>
+				<th>#DecimalFormat(tot.trade)#</th>
+				<th>#DecimalFormat(tot.profit)#</th>
+				<th><cfif tot.net neq 0>#DecimalFormat((tot.profit / tot.net) * 100)#%</cfif></th>
 			</tr>
---->
 		</table>
 	</cfoutput>
 	

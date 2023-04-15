@@ -169,6 +169,7 @@
 					FROM tblproducts
 					INNER JOIN tblepos_items AS st ON eiProdID=prodID
 					WHERE prodID = #loc.productID#
+					AND eiQty > 0	<!--- negatives cause problems --->
 					AND DATE(st.eiTimestamp) BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
 					GROUP BY prodID
 				</cfquery>

@@ -14,7 +14,7 @@
 		<cfset lastYear = DateAdd("d",Now(),-365)>
 	</cfif>
 	<cfset startDate = CreateDate(Year(lastYear),Month(lastYear),1)>
-	<!---<cfdump var="#lookup#" label="lookup" expand="false">--->
+
 	<cfquery name="QSalesItems" datasource="#parm.datasource#">
 		SELECT *
 		FROM tblepos_items
@@ -44,16 +44,16 @@
 				<th align="right">Date</th>
 				<th align="center">Sales</th>
 				<th align="center">Waste</th>
-				<th align="center">Net</th>
 				<td>&nbsp;</td>
-				<th align="right">Value</th>
-				<th align="right">Waste</th>
 				<th align="right">Net</th>
+				<th align="right">VAT</th>
+				<th align="right">Waste</th>
 				<td>&nbsp;</td>
 				<th align="right">Trade</th>
 				<th align="right">Profit</th>
 				<th align="right">POR%</th>
 			</tr>
+			<cfset tot = {count=0,sold=0,waste=0,net=0,VAT=0,trade=0,profit=0}>
 			<cfset da = {}>
 			<cfset dateKey = 0>
 			<cfset totNumSales = 0>
@@ -65,32 +65,63 @@
 			<cfset totTrade = 0>
 			<cfset totProfit = 0>
 			<cfloop query="QSalesItems">
+				<cfset tot.count++>
+				<cfset class = ehMode>
 				<cfset period = LSDateFormat(eiTimeStamp,"yyyymm")>
+				<cfif ehMode eq "reg"> <!--- reg mode --->
+					<cfset item = {sold=eiQty, waste=0, net=eiNet * -1, VAT=eiVAT * -1, trade=eiTrade}>
+				<cfelseif ehMode eq "wst"> <!--- waste mode --->
+					<cfset item = {sold=0, waste=eiQty ,net=0, VAT=0, trade=eiTrade}>
+				<cfelse> <!--- refund mode --->
+					<cfset item = {sold=eiQty, waste=0, net=eiNet * -1, VAT=eiVAT * -1, trade=eiTrade * -1}>
+				</cfif>
+				<cfset item.profit = item.net - item.trade>
+				<cfset tot.sold += item.sold>
+				<cfset tot.waste += item.waste>
+				<cfset tot.net += item.net>
+				<cfset tot.VAT += item.VAT>
+				<cfset tot.trade += item.trade>
+				<cfset tot.profit += item.profit>
 				<cfif not StructKeyExists(da,period)>
-					<cfset StructInsert(da,period,{dateTitle = LSDateFormat(eiTimeStamp,"mmmm yyyy"), valueNet = 0,valueTrade = 0,valueWaste = 0,numSales = 0,numWaste=0})>
+					<cfset StructInsert(da,period,{dateTitle = LSDateFormat(eiTimeStamp,"mmmm yyyy"),valueNet = 0,valueVAT = 0,valueTrade = 0,valueProfit = 0,valueWaste = 0,numSales = 0,numWaste = 0})>
 				</cfif>
 				<cfset mdata = StructFind(da,period)>
-				<cfset mdata.valueTrade += eiTrade>
-				<cfif ehMode eq 'wst'>
-					<cfset mdata.numWaste += abs(eiQty)>
-					<cfset mdata.valueWaste += eiNet>
+				<cfset mdata.valueNet += item.net>
+				<cfset mdata.valueVAT += item.VAT>
+				<cfset mdata.valueTrade += item.trade>
+				<cfset mdata.valueProfit += item.profit>
+				<cfif ehMode eq "wst">
+					<cfset mdata.numWaste += item.waste>
+					<cfset mdata.valueWaste += item.trade>
 				<cfelse>
-					<cfset mdata.numSales += eiQty>
-					<cfset mdata.valueNet -= eiNet>
-				</cfif>
-				<cfset valueNet += eiNet>
-				<cfset valueTrade += eiTrade>
-				<cfif eiQty gt 0>
-					<cfset numSales += eiQty>
-				<cfelse>
-					<cfset numWaste -= eiQty>
+					<cfset mdata.numSales += item.sold>
 				</cfif>
 				<cfset StructUpdate(da,period,mdata)>
 			</cfloop>
+			
 			<cfset dateKeys = ListSort(StructKeyList(da,","),"numeric","desc")>
 			<cfloop list="#dateKeys#" index="key">
 				<cfset data = StructFind(da,key)>
-				<cfset profit = data.valueNet - data.valueWaste - data.valueTrade>
+				<cfif data.valueNet neq 0>
+					<cfset POR = data.valueProfit / data.valueNet * 100>
+				<cfelse>
+					<cfset POR = 0>
+				</cfif>
+				<!---<cfdump var="#data#" label="#key#" expand="false">--->
+				<tr>
+					<td align="right">#data.dateTitle#</td>
+					<td align="center">#data.numSales#</td>
+					<td align="center">#data.numWaste#</td>
+					<td>&nbsp;</td>
+					<td align="right">&pound;#DecimalFormat(data.valueNet)#</td>
+					<td align="right">&pound;#DecimalFormat(data.valueVAT)#</td>
+					<td align="right">&pound;#DecimalFormat(data.valueWaste)#</td>
+					<td>&nbsp;</td>
+					<td align="right">&pound;#DecimalFormat(data.valueTrade)#</td>
+					<td align="right">&pound;#DecimalFormat(data.valueProfit)#</td>
+					<td align="right">#DecimalFormat(POR)#%</td>
+				</tr>
+<!---				<cfset profit = data.valueNet - data.valueWaste - data.valueTrade>
 				<cfif data.valueNet neq 0>
 					<cfset POR = profit / (data.valueNet - data.valueWaste) * 100>
 				<cfelse>
@@ -118,20 +149,20 @@
 					<td align="right">&pound;#DecimalFormat(profit)#</td>
 					<td align="right">#DecimalFormat(POR)#%</td>
 				</tr>
+--->
 			</cfloop>
 			<tr>
+				<th align="left">Totals</th>
+				<th align="center">#tot.sold#</th>
+				<th align="center">#tot.waste#</th>
 				<th></th>
-				<th align="center">#totNumSales#</th>
-				<th align="center">#totNumWaste#</th>
-				<th align="center">#totNumNet#</th>
-				<td>&nbsp;</td>
-				<th align="right">&pound;#DecimalFormat(totValueSales)#</th>
-				<th align="right">&pound;#DecimalFormat(totValueWaste)#</th>
-				<th align="right">&pound;#DecimalFormat(totValueNet)#</th>
-				<td>&nbsp;</td>
-				<th align="right">&pound;#DecimalFormat(totTrade)#</th>
-				<th align="right">&pound;#DecimalFormat(totProfit)#</th>
-				<th align="right"><cfif totValueNet neq 0>#DecimalFormat((totProfit / totValueNet) * 100)#%<cfelse> - </cfif></th>
+				<th align="right">#DecimalFormat(tot.net)#</th>
+				<th align="right">#DecimalFormat(tot.VAT)#</th>
+				<th align="right">#DecimalFormat(tot.waste)#</th>
+				<th></th>
+				<th align="right">#DecimalFormat(tot.trade)#</th>
+				<th align="right">#DecimalFormat(tot.profit)#</th>
+				<th align="right"><cfif tot.net neq 0>#DecimalFormat((tot.profit / tot.net) * 100)#%</cfif></th>
 			</tr>
 		</table>
 	</cfoutput>

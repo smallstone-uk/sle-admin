@@ -75,8 +75,13 @@
 <cfparam name="theYear" default="#Year(now())#">
 <cfparam name="group" default="0">
 <cfparam name="category" default="0">
-<cfparam name="srchDateFrom" default="">
-<cfparam name="srchDateTo" default="">
+<cfparam name="srchDateFrom" default="#DateFormat(CreateDate(Year(now()),1,1),'yyyy-mm-dd')#">
+<cfparam name="srchDateTo" default="#DateFormat(Now(),'yyyy-mm-dd')#">
+<cfset timespan = DateDiff("d",srchDateFrom,srchDateTo)>
+<cfif timespan lt 180>
+	<cfset dateFrom = DateAdd("d",-180,Now())>
+	<cfset srchDateFrom = DateFormat(CreateDate(Year(dateFrom),Month(dateFrom),1),'yyyy-mm-dd')>
+</cfif>
 <cfobject component="code/sales" name="sales">
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
@@ -85,6 +90,7 @@
 <cfset parms.rptYear=theYear>
 <cfset parms.srchDateFrom = srchDateFrom>
 <cfset parms.srchDateTo = srchDateTo>
+	
 <cfset groups = sales.LoadGroups(parms)>
 
 <body>

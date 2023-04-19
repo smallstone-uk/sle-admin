@@ -151,7 +151,7 @@
 				<cfset StructInsert(loc.purchy,"BFwd",loc.purchBFWD)>
 				<cfset StructInsert(loc.purchy,"prodStockLevel",prodStockLevel)>
 	
-				<cfquery name="loc.salesItems" datasource="#args.datasource#">
+				<cfquery name="loc.salesItems" datasource="#args.datasource#" result="loc.siResult">
 					SELECT prodID,prodTitle,
 					SUM(CASE WHEN MONTH(st.eiTimestamp)=1 THEN eiQty ELSE 0 END) AS "jan",
 					SUM(CASE WHEN MONTH(st.eiTimestamp)=2 THEN eiQty ELSE 0 END) AS "feb",
@@ -169,7 +169,6 @@
 					FROM tblproducts
 					INNER JOIN tblepos_items AS st ON eiProdID=prodID
 					WHERE prodID = #loc.productID#
-					AND eiQty > 0	<!--- negatives cause problems --->
 					AND DATE(st.eiTimestamp) BETWEEN '#args.srchDateFrom#' AND '#args.srchDateTo#'
 					GROUP BY prodID
 				</cfquery>

@@ -44,7 +44,7 @@
 		#textBox {line-height:1em; z-index:99999999}
 	</style>
 	
-	<script src="common/scripts/common.js" type="text/javascript"></script>
+	<!---<script src="common/scripts/common.js" type="text/javascript"></script>--->
 	<script src="scripts/jquery-1.11.1.min.js" type="text/javascript"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script>
 	<script src="scripts/jquery.dcmegamenu.1.3.3.js" type="text/javascript"></script>

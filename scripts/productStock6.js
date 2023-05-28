@@ -1,3 +1,5 @@
+// version 2.0 28/05/2023
+
 var Barcode = "";
 var Ticks = 0;
 
@@ -161,7 +163,7 @@ function AmendProduct(form,result) {
 }
 
 function LoadStockItems(bcode,productID,allStock,result) {
-//	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6StockItems.cfm',

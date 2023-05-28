@@ -176,7 +176,7 @@ function LoadStockItems(bcode,productID,allStock,result) {
 }
 
 function LoadSales(bcode,productID,allStock,result) {
-//	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6Sales.cfm',

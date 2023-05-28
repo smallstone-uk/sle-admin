@@ -8,6 +8,7 @@
 	<cfset parm.productID = productID>
 	<cfset parm.allStock = StructKeyExists(form,"allStock")>
 	<cfset records = pstock.StockItemList(parm)>
+	<!---<cfdump var="#records#" label="records" expand="false">--->
 	<cfset suppliers=pstock.LoadSuppliers(parm)>
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -144,7 +145,7 @@
 						<td>#accName#</td>
 						<td>#soRef#</td>
 						<td>#siRef#</td>
-						<td>#LSDateFormat(soDate)#</td>
+						<td>#LSDateFormat(soDate)#<br />#LSDateFormat(siBookedIn)#</td>
 						<td align="center">#siQtyPacks#</td>
 						<td align="center">#siQtyItems#</td>
 						<td align="center">#totalItems#</td>

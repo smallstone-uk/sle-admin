@@ -757,13 +757,13 @@
 						<cfelse><cfset loc.rec.pgTarget = pgTarget / 100></cfif>
 				</cfloop>
 				<cfset loc.result.product = loc.rec>
-				<cfquery name="loc.result.StockItems" datasource="#args.datasource#">
+				<cfquery name="loc.result.StockItems" datasource="#args.datasource#" result="loc.result.StockItemsResult">
 					SELECT tblStockItem.*, soRef,soDate,soStatus, accID,accName
 					FROM tblStockItem
-					INNER JOIN tblStockOrder ON siOrder = soID
+					LEFT JOIN tblStockOrder ON siOrder = soID
 					INNER JOIN tblAccount on soAccountID = accID
 					WHERE siProduct = #loc.QProduct.prodID#
-					AND soDate >= #loc.startDate# 
+					AND soDate >= #loc.startDate#
 					AND siStatus NOT IN ('promo')
 					ORDER BY soDate DESC, siID DESC
 				</cfquery>

@@ -11,4 +11,5 @@
 	<cfloop array="#clubs#" index="item">
 		<a href="javascript:void(0)" class="deal_item" data-id="#item.edID#">#item.edIndex#: #item.edTitle# - #item.edDealType# (#item.edQty#) - #item.edAmount#</a>
 	</cfloop>
+	#ArrayLen(clubs)# deals.
 </cfoutput>

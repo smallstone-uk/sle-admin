@@ -37,6 +37,7 @@
 		.productHeader {background-color:#99CCFF;}
 	</style>
 </head>
+<cfobject component="code/deals" name="deals">
 
 	<cffunction name="LoadDealData" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
@@ -71,6 +72,7 @@
 				<cfif len(args.dealStatus)>AND edStatus = '#args.dealStatus#'</cfif>
 				<cfif StructKeyExists(args,"boughtFrom") AND len(args.boughtFrom)>AND prodLastBought >= '#DateFormat(args.boughtFrom,"yyyy-mm-dd")#'</cfif>
 				<cfif StructKeyExists(args,"boughtTo") AND len(args.boughtTo)>AND prodLastBought <= '#DateFormat(args.boughtTo,"yyyy-mm-dd")#'</cfif>
+				<cfif StructKeyExists(args,"retailClub") AND retailClub gt 0>AND ercID = #args.retailClub#</cfif>
 				ORDER BY ercID, edTitle, ediProduct
 			</cfquery>
 			<!---<cfdump var="#loc.QDealResult#" label="QDeals" expand="false">--->
@@ -204,6 +206,7 @@
 	</cffunction>
 
 <body>
+<cfparam name="retailClub" default="">
 <cfparam name="dealview" default="">
 <cfparam name="boughtFrom" default="">
 <cfparam name="boughtTo" default="">
@@ -213,6 +216,19 @@
 		<div>
 			<form method="post" enctype="multipart/form-data">
 				<table class="tableList" border="1">
+					<tr>
+						<td>Retail Clubs</td>
+						<td>
+							<select name="retailClub" id="retailClubSelect">
+								<option value="-1">All Deals</option>
+								<optgroup label="Retail Clubs">
+									<cfloop array="#deals.LoadRetailClubs()#" index="item">
+										<option value="#item.ercID#"<cfif retailClub eq item.ercID> selected="selected"</cfif>>#item.ercTitle#</option>
+									</cfloop>
+								</optgroup>
+							</select>
+						</td>
+					</tr>
 					<tr>
 						<td>Deal Types</td>
 						<td>
@@ -259,6 +275,7 @@
 		<cfif StructKeyExists(form,"dealview")>
 			<cfset parm = {}>
 			<cfset parm.datasource = application.site.datasource1>
+			<cfset parm.retailClub = form.retailClub>
 			<cfset parm.range = form.dealview>
 			<cfset parm.boughtFrom = form.boughtFrom>
 			<cfset parm.boughtTo = form.boughtTo>
@@ -330,7 +347,7 @@
 					<tr class="productHeader">
 						<td></td>
 						<td></td>
-						<td>##</td>
+						<td align="center">##</td>
 						<td>Prod ID</td>
 						<td>Ref</td>
 						<td>Product Title</td>

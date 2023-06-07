@@ -481,7 +481,7 @@
 			<cfif arguments.retailClub gt -1>
 				WHERE edRetailClub = #val(arguments.retailClub)#
 			</cfif>
-			ORDER BY edRetailClub DESC, edEnds DESC
+			ORDER BY edRetailClub DESC, edIndex ASC, edTitle ASC
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.deals)>

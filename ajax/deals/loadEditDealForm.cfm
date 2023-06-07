@@ -185,7 +185,9 @@
 				<td>
 					<select name="ed_retailclub" id="edRetailClubSelect">
 						<cfloop array="#deals.LoadRetailClubs()#" index="item">
-							<option <cfif val(item.ercID) is val(deal.edRetailClub)>selected</cfif> value="#item.ercID#" data-starts="#LSDateFormat(item.ercStarts, 'yyyy-mm-dd')#" data-ends="#LSDateFormat(item.ercEnds, 'yyyy-mm-dd')#">#item.ercTitle# (#item.ercIssue#)</option>
+							<option <cfif val(item.ercID) is val(deal.edRetailClub)>selected</cfif> value="#item.ercID#" 
+								data-starts="#LSDateFormat(item.ercStarts, 'yyyy-mm-dd')#" 
+								data-ends="#LSDateFormat(item.ercEnds, 'yyyy-mm-dd')#">#item.ercTitle# (#item.ercIssue#)</option>
 						</cfloop>
 					</select>
 				</td>
@@ -232,9 +234,9 @@
 			<tr>
 				<td align="left">Status</td>
 				<td>
-					<select name="ed_active">
-						<option value="Active">Active</option>
-						<option value="Inactive">Inactive</option>
+					<select name="edStatus">
+						<option value="Active"<cfif deal.edStatus eq "active"> selected="selected"</cfif>>Active</option>
+						<option value="Inactive"<cfif deal.edStatus eq "inactive"> selected="selected"</cfif>>Inactive</option>
 					</select>
 				</td>
 			</tr>

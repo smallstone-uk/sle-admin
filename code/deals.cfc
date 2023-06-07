@@ -501,4 +501,15 @@
 		
 		<cfreturn loc.result>
 	</cffunction>
+
+	<cffunction name="SaveDealStatus" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblepos_deals
+			SET edStatus = '#args.newStatus#'
+			WHERE edID = #val(args.dealID)#
+		</cfquery>
+	</cffunction>
+
 </cfcomponent>

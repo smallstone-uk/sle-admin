@@ -209,7 +209,7 @@
 			<tr>
 				<td align="left">Status</td>
 				<td>
-					<select name="ed_active">
+					<select name="edStatus">
 						<option value="Active">Active</option>
 						<option value="Inactive">Inactive</option>
 					</select>

@@ -136,7 +136,7 @@
 				'#loc.edType#',
 				#val(args.header.ed_amount)#,
 				#val(args.header.ed_quantity)#,
-				'#args.header.ed_active#',
+				'#args.header.edStatus#',
 				#val(args.header.ed_retailclub)#,
 				#val(loc.dealIndex)#
 			)
@@ -217,7 +217,7 @@
 					edType = '#loc.edType#',
 					edAmount = #val(args.header.ed_amount)#,
 					edQty = #val(args.header.ed_quantity)#,
-					edStatus = '#args.header.ed_active#',
+					edStatus = '#args.header.edStatus#',
 					edRetailClub = #val(args.header.ed_retailclub)#
 				WHERE edID = #val(args.header.ed_id)#
 				LIMIT 1

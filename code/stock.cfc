@@ -159,9 +159,10 @@
 			AND pcatID=prodCatID
 			AND soRef='#args.ref#'
 		</cfquery>
-<!---<cfdump var="#loc.OrderContents#" label="OrderContents" expand="yes" format="html" 
-	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
---->		<cfif loc.OrderContents.recordcount gt 0>
+<cfdump var="#loc.OrderContents#" label="OrderContents" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
+		<cfif loc.OrderContents.recordcount gt 0>
 			<cfset loc.result.count=loc.OrderContents.recordcount>
 			<cfset loc.result.OrderID=loc.OrderContents.soID>
 			<cfset loc.result.OrderRef=args.ref>
@@ -196,7 +197,7 @@
                         <cfset loc.rec.newFlag = true>
                         <cfset loc.rec.changedFlag = false>
 						<cfset ArrayAppend(loc.result.items,loc.rec)>
-						<cfset ArrayAppend(loc.skips,loc.rec.prodRef)>
+						<cfset ArrayAppend(loc.skips,loc.rec.prodRef)><em></em>
 					<cfelse>
 						<cfset loc.rec.QbarCode=loc.Qbarcode>
 						<cfset loc.rec.barCode=loc.Qbarcode.barCode>
@@ -216,6 +217,7 @@
 						<cfset loc.rec.prodPriceMarked=prodPriceMarked>
 						<cfset loc.rec.siID=siID>
 						<cfset loc.rec.siQtyPacks=siQtyPacks>
+						<cfset loc.rec.siQtyItems=siQtyItems>
 						<cfset loc.rec.siWSP=siWSP>
 						<cfset loc.rec.siUnitTrade=siUnitTrade>
 						<cfset loc.rec.siOurPrice=siOurPrice>
@@ -565,6 +567,7 @@ ORDER BY prodCatID,prodTitle  ASC
 		<cfset loc.result = {}>
 		
 		<cftry>
+<!---
 			<cfquery name="loc.QStock" datasource="#args.datasource#" result="loc.result.QStockResult">
 				SELECT prodID,prodCatID,prodRef,prodTitle,prodUnitSize,prodCountDate,prodStockLevel,prodUnitTrade,prodPriceMarked,prodLastBought,prodVATRate,
 					(SELECT siOurPrice FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS ourPrice,
@@ -577,8 +580,23 @@ ORDER BY prodCatID,prodTitle  ASC
 				<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
 				ORDER BY pgTitle,pcatTitle,prodTitle
 			</cfquery>
-			<cfset loc.result.QStock = loc.QStock>
-			<cfset loc.result.recCount = loc.QStock.recordcount>
+--->
+			<cfquery name="loc.result.QStock" datasource="#args.datasource#" result="loc.result.QStockResult">
+				SELECT prodID,prodCatID,prodRef,prodTitle,prodUnitSize,prodCountDate,prodStockLevel,prodUnitTrade,prodPriceMarked,prodLastBought,prodVATRate,
+					(SELECT siOurPrice FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS ourPrice,
+					(SELECT siUnitTrade FROM tblStockItem WHERE siProduct=prodID ORDER BY siID DESC LIMIT 1) AS unitTrade,
+					(SELECT SUM(siQtyItems) FROM tblStockItem INNER JOIN tblStockOrder ON soID=siOrder WHERE siProduct=prodID AND soDate >= '2023-01-01') AS itemsBought,
+					(SELECT SUM(eiQty) FROM tblepos_items WHERE eiProdID=prodID AND eiTimeStamp >= '2023-01-01') AS itemsSold,
+				pcatTitle,pgTitle,pgTarget
+				FROM tblProducts
+				INNER JOIN tblProductCats ON prodCatID=pcatID
+				INNER JOIN tblproductgroups ON pcatGroup=pgID
+				WHERE prodCountDate IS NOT NULL
+				<cfif len(args.form.srchStockDate) GT 0>AND prodCountDate >= '#args.form.srchStockDate#'</cfif>
+				ORDER BY pgTitle,pcatTitle,prodTitle
+				LIMIT 0,50
+			</cfquery>	
+			<cfset loc.result.recCount = loc.result.QStock.recordcount>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

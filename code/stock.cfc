@@ -139,6 +139,15 @@
 				<cfset loc.rec.siStatus=siStatus>
 				<cfset loc.rec.siSubs=siSubs>
 				<cfset loc.rec.category=pcatTitle>
+						<cfset loc.rec.siID=siID>
+						<cfset loc.rec.siQtyPacks=siQtyPacks>
+						<cfset loc.rec.siQtyItems=siQtyItems>
+						<cfset loc.rec.siWSP=siWSP>
+						<cfset loc.rec.siUnitTrade=siUnitTrade>
+						<cfset loc.rec.siOurPrice=siOurPrice>
+						<cfset loc.rec.siPOR=siPOR>
+						<cfset loc.rec.siReceived=siReceived>
+						<cfset loc.rec.siStatus=siStatus>
 			</cfloop>
 		<cfelse>
 			<cfset loc.rec.prodRef="not found">

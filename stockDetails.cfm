@@ -218,7 +218,7 @@
 							<div class="module">
 							<div class="clear"></div>
 							<cfif stockSheet.count gt 0>
-								<cfdump var="#stockSheet#" label="stockSheet" expand="false">
+								<!---<cfdump var="#stockSheet#" label="stockSheet" expand="false">--->
 								<table width="100%" id="stockTable" class="tableList" border="1">
 									<tr>
 										<td class="header" colspan="4">Reference: #stockSheet.OrderRef# (ID: #stockSheet.orderID#)</td>

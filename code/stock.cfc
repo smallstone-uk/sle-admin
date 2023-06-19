@@ -168,9 +168,9 @@
 			AND pcatID=prodCatID
 			AND soRef='#args.ref#'
 		</cfquery>
-<cfdump var="#loc.OrderContents#" label="OrderContents" expand="yes" format="html" 
-	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
+	<!---<cfdump var="#loc.OrderContents#" label="OrderContents" expand="yes" format="html" 
+		output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->
 		<cfif loc.OrderContents.recordcount gt 0>
 			<cfset loc.result.count=loc.OrderContents.recordcount>
 			<cfset loc.result.OrderID=loc.OrderContents.soID>

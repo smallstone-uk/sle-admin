@@ -142,6 +142,9 @@
 	.substitute {color:#FF0000; font-weight:bold;}
 	.small {font-size:10px;}
 	.sod_wsp {background-color:#9CF;}
+	.ourPrice {font-weight:bold; color:#0066CC; font-size:20px}
+	.tiny {font-size:9px}
+
 	@page {size:portrait;margin:40px;}
 
 	@media print {
@@ -215,7 +218,7 @@
 							<div class="module">
 							<div class="clear"></div>
 							<cfif stockSheet.count gt 0>
-								<!---<cfdump var="#stockSheet#" label="stockSheet" expand="false">--->
+								<cfdump var="#stockSheet#" label="stockSheet" expand="false">
 								<table width="100%" id="stockTable" class="tableList" border="1">
 									<tr>
 										<td class="header" colspan="4">Reference: #stockSheet.OrderRef# (ID: #stockSheet.orderID#)</td>
@@ -230,11 +233,13 @@
 										<th class="headleft">Description</th>
 										<th class="headleft">Unit Size</th>
 										<th class="headright">WSP</th>
-										<th class="headright">Unit Price</th>
-										<th>Packs</th>
-										<th class="headright">Trade<br>Total</th>
+										<th class="headright">Unit<br>Price</th>
+										<th>Ordered<br>Packs</th>
+										<th>Received<br>Units</th>
+										<th class="headright">Order<br>Total</th>
+										<th class="headright">Recvd<br>Total</th>
 										<th class="headright" width="40">Our Price</th>
-										<th>PM</th>
+										<!---<th>PM</th>--->
 										<th class="headright">POR</th>
 										<th width="40">VAT Rate</th>
 										<th width="40">Status</th>
@@ -248,13 +253,16 @@
 									<cfset totalTrade = 0>
 									<cfloop array="#stockSheet.items#" index="item">
 										<cfset avgPOR += item.siPOR>
+										<cfset packQty = Iif(val(item.prodPackQty) lt 1,1,val(item.prodPackQty))>
 										<cfif StructKeyExists(item,"prodRef") AND item.prodref neq "not found">
 											<cfset rowCount++>
 											<cfset itemCount++>
-											<cfif StructKeyExists(item,"siWSP") AND StructKeyExists(item,"siQtyPacks")>
-												<cfset orderTotal += (val(item.siWSP)*val(item.siQtyPacks))>
-												<cfset recvdTotal += (val(item.siWSP)*val(item.siReceived))>
-											</cfif>
+											<!---<cfif StructKeyExists(item,"siWSP") AND StructKeyExists(item,"siQtyPacks")>--->
+											<cfset orderValue = (val(item.siWSP) * val(item.siQtyPacks))>
+											<cfset recvdValue = val(item.siUnitTrade) * val(item.siQtyItems)>
+											<cfset orderTotal += orderValue>
+											<cfset recvdTotal += recvdValue>
+											<!---</cfif>--->
 											<cfif item.category neq category>
 												<tr>
 													<td></td>
@@ -291,7 +299,7 @@
 													<a href="https://www.booker.co.uk/products/product-list?keywords=#item.barCode#" 
 														target="booker"><div class="barcode#itemCount#">#item.barCode#</div></a>
 												</td>
-												<td><a href="ProductStock6.cfm?product=#item.prodID#" target="_blank">#item.prodRef#</a>
+												<td><a href="ProductStock6.cfm?product=#item.prodID#" target="_blank">[#item.prodID#] #item.prodRef#</a>
 													<cfif len(item.msg)><br /><span class="substitute">#item.msg#</span></cfif></td>
 												<td class="sod_title" data-id="#item.prodID#">#item.prodTitle#</td>
 												<td>#item.prodPackQty# X #item.prodUnitSize#</td>
@@ -306,9 +314,12 @@
 												</td>
 												<td align="center" class="sod_unittrade">#item.siUnitTrade#</td>
 												<td align="center">#item.siQtyPacks#</td>
+												<td align="center">#item.siReceived#</td>
+												<td align="right" >#DecimalFormat(orderValue)#</td>
+												<td align="right" >#DecimalFormat(recvdValue)#</td>
 												<td align="right" class="sod_wspTotal">#DecimalFormat(wspTotal)#</td>
-												<td align="right"><strong>#item.prodOurPrice#</strong></td>
-												<td align="center">#YesNoFormat(item.prodPriceMarked)#</td>
+												<td align="right" class="ourPrice">&pound;#item.siOurPrice# <span class="tiny">#GetToken(" ,PM",item.prodPriceMarked+1,",")#</span></td>
+												<!---<td align="center">#YesNoFormat(item.prodPriceMarked)#</td>--->
 												<td align="right" class="sod_POR">#item.siPOR#%</td>
 												<td align="right" class="sod_vatRate">#DecimalFormat(item.prodVATRate)#%</td>
 												<td align="right">#item.siStatus#</td>
@@ -316,13 +327,21 @@
 										</cfif>
 									</cfloop>
 									<cfset avgPOR = avgPOR / itemCount>
-									<tr height="30">
+<!---									<tr height="30">
 										<td class="noPrint"></td>
 										<td class="headright" colspan="7">Average POR #DecimalFormat(avgPOR)#% &nbsp; Order Value</td>
 										<td class="headright" id="orderTotal">#DecimalFormat(orderTotal)#</td>
 										<td class="headright" colspan="3">Received Value</td>
 										<td class="headright">#DecimalFormat(recvdTotal)#</td>
 										<td></td>
+									</tr>
+--->									
+									<tr height="30">
+										<td class="noPrint"></td>
+										<td class="headright" colspan="9"></td>
+										<td class="headright" id="orderTotal">#DecimalFormat(orderTotal)#</td>
+										<td class="headright">#DecimalFormat(recvdTotal)#</td>
+										<td colspan="6"></td>
 									</tr>
 								</table>
 							<cfelse>

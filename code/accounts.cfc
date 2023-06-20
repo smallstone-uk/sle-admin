@@ -269,6 +269,7 @@
 				accName = '#args.form.Name#',
 				accIndex = '#args.form.accIndex#',
 				accType = '#args.form.Type#',
+				accPayType = '#args.form.PayType#',
 				accNomAcct = #val(args.form.NominalAccount)#,
 				accPayAcc = #val(args.form.FundSource)#
 			WHERE accID = #val(args.form.accountID)#
@@ -294,6 +295,18 @@
 			SELECT *
 			FROM tblNominal
 			WHERE nomGroup IN ('R3','R4')
+		</cfquery>
+		
+		<cfreturn QueryToArrayOfStruct(loc.sources)>
+	</cffunction>
+	<cffunction name="LoadPaymentTypes" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		
+		<cfquery name="loc.sources" datasource="#args.datasource#">
+			SELECT *
+			FROM tblATitles
+			WHERE ttlType = 2
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.sources)>
@@ -2248,7 +2261,7 @@
 		<cfif IsDate(args.toDate)>
 			<cfset loc.toDate = args.toDate>
 		<cfelse>
-			<cfset loc.toDate = DateFormat(now(),'yyyy-mm-dd')>
+			<cfset loc.toDate = DateAdd("d",1,args.fromDate)>
 		</cfif>
 		<cfset result.supplier=QueryToStruct(QAccount)>
 		<cfquery name="QTrans" datasource="#args.datasource#">
@@ -2257,8 +2270,8 @@
 			LEFT JOIN tblNomItems ON niTranID=trnID
 			WHERE trnLedger='#args.nomType#'
 			AND trnAccountID=#args.accountID#
-			AND trnDate >= '#args.fromDate#'
-			AND trnDate <= '#loc.toDate#'
+			AND trnDate >= '#DateFormat(args.fromDate,"yyyy-mm-dd")#'
+			AND trnDate <= '#DateFormat(loc.toDate,"yyyy-mm-dd")#'
 			GROUP BY trnID
 			ORDER by trnDate
 			<!---LIMIT 0,50;--->

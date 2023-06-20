@@ -49,7 +49,7 @@
 </head>
 <cftry>
 
-<cfparam name="srchReport" default="">
+<cfparam name="srchReport" default="1">
 <cfparam name="srchName" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
@@ -61,7 +61,7 @@
 <cfparam name="srchAllocated" default="1">
 <cfparam name="srchIgnoreZero" default="1">
 <cfparam name="srchGrossFigures" default="1">
-<cfparam name="srchSort" default="accName">
+<cfparam name="srchSort" default="accType">
 
 <cfquery name="QGroups" datasource="#application.site.datasource1#">
 	SELECT ttlValue,ttlTitle FROM tblATitles WHERE ttlType=1 ORDER BY ttlOrder
@@ -148,7 +148,7 @@
 									<select name="srchPayType">
 										<option value=""<cfif srchPayType eq ""> selected="selected"</cfif>>Any Pay Types</option>
 										<cfloop query="QPayTypes">
-											<option value="#ttlValue#"<cfif srchPayType eq ttlValue> selected="selected"</cfif>>#ttlTitle#</option>
+											<option value="#ttlValue#"<cfif srchPayType eq ttlValue> selected="selected"</cfif>>#ttlValue# - #ttlTitle#</option>
 										</cfloop>
 									</select>
 								</td>
@@ -160,6 +160,7 @@
 										<option value="accID"<cfif srchSort eq "accID"> selected="selected"</cfif>>Record order</option>
 										<option value="accCode"<cfif srchSort eq "accCode"> selected="selected"</cfif>>Reference</option>
 										<option value="accName"<cfif srchSort eq "accName"> selected="selected"</cfif>>Name</option>
+										<option value="accType"<cfif srchSort eq "accType"> selected="selected"</cfif>>Type</option>
 									</select>
 								</td>
 							</tr>

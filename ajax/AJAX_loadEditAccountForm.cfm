@@ -7,6 +7,7 @@
 <cfset parm.code = accCode>
 <cfset account = acc.LoadAccountByCode(parm)>
 <cfset groups = acc.LoadAccountGroups(parm)>
+<cfset pay_types = acc.LoadPaymentTypes(parm)>
 <cfset fund_sources = acc.LoadFundSources(parm)>
 
 <cfoutput>
@@ -75,6 +76,17 @@
 								<option value="null" selected="selected">Select type...</option>
 								<option value="sales" <cfif account.accType eq "sales">selected="selected"</cfif>>Sales</option>
 								<option value="purch" <cfif account.accType eq "purch">selected="selected"</cfif>>Purchases</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">Payment Method</td>
+						<td>
+							<select name="PayType" class="NAFPayType">
+								<option value="null" selected="selected">Select type...</option>
+								<cfloop array="#pay_types#" index="i">
+									<option value="#i.ttlValue#" <cfif account.accPayType is i.ttlValue>selected="selected"</cfif>>#i.ttlValue# - #i.ttlTitle#</option>
+								</cfloop>
 							</select>
 						</td>
 					</tr>

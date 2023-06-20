@@ -26,6 +26,52 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="CODPaymentAnalysis" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfset loc.span = DateDiff("d",args.form.srchDateFrom,args.form.srchDateTo) + 1>
+			<cfquery name="loc.result.QTrans" datasource="#args.datasource#" result="loc.result.QTransResult">
+				SELECT accID,accCode,accGroup,accPayType,accIndex,accName,accType,
+						eiSuppID,eiTimeStamp,eiNet
+				FROM tblepos_items
+				INNER JOIN tblAccount ON eiSuppID = accID
+				WHERE eiSuppID > 1
+				<cfif len(args.form.srchDateFrom)>
+					AND eiTimeStamp >= '#args.form.srchDateFrom#'
+					AND eiTimeStamp <= '#args.form.srchDateTo#'
+				</cfif>
+				ORDER BY eiTimeStamp ASC
+			</cfquery>
+			<cfif loc.span lt 8>
+				<!--- day summary --->
+				<cfset loc.days = {}>
+				<cfloop from="#args.form.srchDateFrom#" to="#args.form.srchDateTo#" index="loc.i">
+					<cfset StructInsert(loc.days,DateFormat(loc.i,'yyyy-mm-dd'),0)>
+				</cfloop>
+				<cfloop query="loc.result.QTrans">
+					<cfset loc.tranDate = DateFormat(eiTimestamp,'yyyy-mm-dd')>
+					<cfif StructKeyExists(loc.days,loc.tranDate)>
+						<cfset loc.currTotal = StructFind(loc.days,loc.tranDate)>
+						<cfset StructUpdate(loc.days,loc.tranDate,loc.currTotal+eiNet)>
+					<cfelse>
+						<cfset StructInsert(loc.days,loc.tranDate,eiNet)>
+					</cfif>
+				</cfloop>
+			<cfelseif loc.span lt 32>
+				<!--- week summary --->
+			<cfelse>
+				<!--- month summary --->
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="CODPaymentAnalysis" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc>
+	</cffunction>
+
 	<cffunction name="CODPaymentsReport" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
@@ -195,6 +241,8 @@
 				ORDER BY accCode
 			<cfelseif srchSort eq "accName">
 				ORDER BY accName
+			<cfelseif srchSort eq "accType">
+				ORDER BY accPayType,accName
 			<cfelse>
 				ORDER BY accID
 			</cfif>

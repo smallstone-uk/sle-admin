@@ -27,6 +27,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			var isEditingOpenStock = false;
+			$(".srchStatus").chosen({width: "300px"});
 			$('.openstock').click(function(event) {
 				if (!isEditingOpenStock) {
 					var value = $(this).html().trim();
@@ -77,11 +78,12 @@
 <cfparam name="category" default="0">
 <cfparam name="srchDateFrom" default="#DateFormat(CreateDate(Year(now()),1,1),'yyyy-mm-dd')#">
 <cfparam name="srchDateTo" default="#DateFormat(Now(),'yyyy-mm-dd')#">
-<cfset timespan = DateDiff("d",srchDateFrom,srchDateTo)>
+<cfparam name="srchStatus" default="">
+<!---<cfset timespan = DateDiff("d",srchDateFrom,srchDateTo)>
 <cfif timespan lt 180>
 	<cfset dateFrom = DateAdd("d",-180,Now())>
 	<cfset srchDateFrom = DateFormat(CreateDate(Year(dateFrom),Month(dateFrom),1),'yyyy-mm-dd')>
-</cfif>
+</cfif>--->
 <cfobject component="code/sales" name="sales">
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
@@ -90,8 +92,10 @@
 <cfset parms.rptYear=theYear>
 <cfset parms.srchDateFrom = srchDateFrom>
 <cfset parms.srchDateTo = srchDateTo>
+<cfset parms.srchStatus = srchStatus>
 	
 <cfset groups = sales.LoadGroups(parms)>
+<cfset prodStatusTitles = "active,inactive,donotbuy">
 
 <body>
 <cfoutput>
@@ -123,9 +127,13 @@
 					</td>
 				</tr>
 				<tr>
-					<td><b>Show Query</b></td>
+					<td><b>Stock Status</b></td>
 					<td>
-						<input type="checkbox" name="srchShowQuery" />
+						<select name="srchStatus" class="srchStatus" multiple="multiple" data-placeholder="Select...(optional)">
+							<cfloop list="#prodStatusTitles#" index="i" delimiters=",">
+								<option value="#i#"<cfif ListFind(srchStatus,i)> selected="selected"</cfif>>#i#</option>
+							</cfloop>
+						</select>									
 					</td>
 				</tr>
 				<tr>

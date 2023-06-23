@@ -90,12 +90,12 @@
 				INNER JOIN tblProductCats ON pcatID = prodCatID
 				INNER JOIN tblProductGroups ON pcatGroup = pgID
 				WHERE pgType != 'epos'
-				AND prodStatus != 'inactive'
 				AND siID IS NOT NULL
 				AND DATE(siBookedIn) > '2018-10-28'	<!--- start date of EPOS till --->
 				<cfif StructKeyExists(args,"grpID") AND args.grpID gt 0>AND pcatGroup = #args.grpID#</cfif>
 				<cfif StructKeyExists(args,"catID") AND args.catID gt 0>AND prodCatID = #args.catID#</cfif>
 				<cfif StructKeyExists(args,"productID")>AND prodID = #args.productID#</cfif>
+				<cfif StructKeyExists(args,"srchStatus") AND len(args.srchStatus)>AND prodStatus IN ('#args.srchStatus#')</cfif>
 				GROUP BY pgTitle, pcatTitle, prodID
 				ORDER BY pgTitle, pcatTitle, prodTitle, siUnitSize, prodID
 			</cfquery>
@@ -104,7 +104,8 @@
 			<cfset loc.salesData = {}>
 			<cfloop query="loc.productList">
 				<cfset loc.productID = prodID>
-				<cfquery name="loc.purchItems" datasource="#args.datasource#">
+
+				<cfquery name="loc.purchItems" datasource="#args.datasource#" result="loc.siResult">
 					SELECT prodID,prodTitle,
 					SUM(CASE WHEN MONTH(siBookedIn)=1 THEN siQtyItems ELSE 0 END) AS "jan",
 					SUM(CASE WHEN MONTH(siBookedIn)=2 THEN siQtyItems ELSE 0 END) AS "feb",
@@ -126,6 +127,7 @@
 					AND siStatus IN ('closed','returned')
 					GROUP BY prodID
 				</cfquery>
+
 				<cfif loc.purchItems.recordCount gt 0>
 					<cfset StructInsert(loc.purchData,loc.productID,QueryRowToStruct(loc.purchItems,1))>
 				<cfelse>
@@ -151,7 +153,7 @@
 				<cfset StructInsert(loc.purchy,"BFwd",loc.purchBFWD)>
 				<cfset StructInsert(loc.purchy,"prodStockLevel",prodStockLevel)>
 	
-				<cfquery name="loc.salesItems" datasource="#args.datasource#" result="loc.siResult">
+				<cfquery name="loc.salesItems" datasource="#args.datasource#">
 					SELECT prodID,prodTitle,
 					SUM(CASE WHEN MONTH(st.eiTimestamp)=1 THEN eiQty ELSE 0 END) AS "jan",
 					SUM(CASE WHEN MONTH(st.eiTimestamp)=2 THEN eiQty ELSE 0 END) AS "feb",
@@ -195,13 +197,13 @@
 				<cfset loc.salesy = StructFind(loc.salesData,loc.productID)>
 				<cfset StructInsert(loc.salesy,"BFwd",loc.salesBFWD)>
 			</cfloop>
-			<cfreturn loc>
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="selectProducts" expand="yes" format="html" 
 				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
+		<cfreturn loc>
 	</cffunction>
 	
 	<cffunction name="LoadGroups" access="public" returntype="struct">

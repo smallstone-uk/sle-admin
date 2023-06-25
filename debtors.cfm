@@ -164,11 +164,11 @@
 					<cfset parms={}>
 					<cfset parms.datasource=application.site.datasource1>
 					<cfset parms.form=form>
-					<cfobject component="code/functions" name="func">
+					<cfobject component="code/news" name="news">
 					
 					<cfif form.srchReport eq 1>
-						<cfset debtors=func.AgedDebtors(parms)>
-				
+						<cfset debtors=news.AgedDebtors(parms)>
+
 						<cfset totals=[0,0,0,0,0]>
 						<cfset credits=[0,0,0,0,0]>
 						<cfset debitCount=0>
@@ -189,6 +189,7 @@
 									<th width="60" align="right">Balance</th>
 									<th width="40" align="left">Level</th>
 									<th width="90" align="left">Chased</th>
+									<th width="90" align="left">Alloc</th>
 								</tr>
 								<cfif parms.form.srchSort eq "cltBalance">
 									<cfloop array="#debtors.balances#" index="key">
@@ -225,6 +226,7 @@
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
 											<td align="center">#item.cltChase#</td>
 											<td>#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>
 								<cfelse>
@@ -260,6 +262,7 @@
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
 											<td align="center">#item.cltChase#</td>
 											<td>#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>
 								</cfif>

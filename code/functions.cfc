@@ -4134,7 +4134,7 @@
 		<cfreturn result>
 	</cffunction>
 	
-	<cffunction name="AgedDebtors" access="public" returntype="struct">
+	<cffunction name="AgedDebtorsOld2023" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var result={}>
 		<cfset var QClients=0>

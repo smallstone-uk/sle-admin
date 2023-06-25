@@ -37,7 +37,7 @@
 				<cfif len(StructFind(args.form,"srchPayType"))>AND cltPayType="#args.form.srchPayType#"</cfif>
 				<cfif len(StructFind(args.form,"srchMethod"))>AND cltPayMethod="#args.form.srchMethod#"</cfif>
 				<cfif len(StructFind(args.form,"srchName"))>AND (cltName LIKE "%#args.form.srchName#%" 
-					OR cltCompanyName LIKE "%#args.form.srchName#%")</cfif>
+					OR cltCompanyName LIKE "%#args.form.srchName#%" OR cltDelHouseName LIKE "%#args.form.srchName#%")</cfif>
 				<cfif StructKeyExists(args.form,"srchSkipInactive")>AND cltAccountType <> "N"</cfif>
 				<cfif len(args.form.srchSort)>
 					<cfif args.form.srchSort eq "address">

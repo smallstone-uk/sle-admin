@@ -256,8 +256,7 @@
 										<cfif StructKeyExists(item,"siPOR")>
 											<cfset avgPOR += item.siPOR>
 											<cfset packQty = Iif(val(item.prodPackQty) lt 1,1,val(item.prodPackQty))>
-										<cfelse><cfdump var="#item#" label="item" expand="false">
-										</cfif>
+										<cfelse><tr><td colspan="14"><cfdump var="#item#" label="item" expand="false"></td></tr></cfif>
 										<cfif StructKeyExists(item,"prodRef") AND item.prodref neq "not found">
 											<cfset rowCount++>
 											<cfset itemCount++>

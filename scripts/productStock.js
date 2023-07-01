@@ -232,7 +232,7 @@ function AddNewBarcode(id,type,row,code) {
 function PrintLabels(form,result) {
 	$.ajax({
 		type: 'POST',
-		url: 'tickets.cfm',
+		url: 'ProductStock6Tickets.cfm',
 		data: $(form).serialize(),
 		success:function(data){
 			$(result).html(data).fadeIn(function() {

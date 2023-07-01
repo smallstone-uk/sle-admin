@@ -709,7 +709,7 @@ function DeleteDeal(form) {
 function PrintDeals(form,result) {
 	$.ajax({
 		type: 'POST',
-		url: 'tickets.cfm',
+		url: 'ProductStock6Tickets.cfm',
 		data: $(form).serialize(),
 		success:function(data){
 			$(result).html(data).fadeIn(function() {

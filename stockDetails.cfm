@@ -252,7 +252,7 @@
 									<cfset avgPOR = 0>
 									<cfset totalTrade = 0>
 									<cfloop array="#stockSheet.items#" index="item">
-										<cfset avgPOR += item.siPOR>
+										<cfif StructKeyExists(item,"siPOR")><cfset avgPOR += item.siPOR></cfif>
 										<cfset packQty = Iif(val(item.prodPackQty) lt 1,1,val(item.prodPackQty))>
 										<cfif StructKeyExists(item,"prodRef") AND item.prodref neq "not found">
 											<cfset rowCount++>

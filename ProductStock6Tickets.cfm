@@ -1,9 +1,9 @@
 <style type="text/css">
 	.header {width:100%; height:10px; border:solid 1px #ff000;}
 	
-	.ticket {width:230px; height:141px; max-height:141px; float:left;color:#000; border:dashed 1px #fff; margin:0px;}
+	.ticket {width:230px; float:left;color:#000; border:dashed 0px #fff; margin:0px; padding:0px;}
  	
-	.ticket .ticket-left {border:solid 1px #eee; height:132px; background-color:#fff; overflow:hidden; margin:0px; padding:10px;}
+	.ticket .ticket-left {border:solid 1px #bbb; height:128px; background-color:#fff; overflow:hidden; margin:0px; padding:10px 10px 0px 10px;}
 	.ticket .ticket-left .title {clear:both; float:left; width:100%; height: 50px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
 	.ticket .ticket-left .info {width: 100%; float:left; margin:0 0 0 0; height: 40px; font-size:18px; color:#000000;}
 	.ticket .ticket-left .price {text-align:right; padding:0 0 0 0; color:#000000; height:28px; font-size:22px; font-weight:bold;}
@@ -15,7 +15,7 @@
 	.ticket .ticket-left .codebox {width: 100%; float:left; color:#000000; margin-top:5px;}
 	.ticket .ticket-left .rrpStyle {text-decoration:line-through; float:left; color:#ff0000; height:14px; font-size:16px;}
 
-	.ticket .ticket-inner {border:solid 1px #eee; height:132px; background-color:#fff; overflow:hidden; margin-left:0px; padding:10px;}
+	.ticket .ticket-inner {border:solid 1px #bbb; height:128px; background-color:#fff; overflow:hidden; margin-left:0px; padding:10px 10px 0px 10px;}
 	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
 	.ticket .ticket-inner .info {width: 100%; float:left; margin:0 0 0 0; height: 40px; font-size:18px; color:#000000;}
 	.ticket .ticket-inner .price {text-align:right; padding:0 0 0 0; color:#000000; height:28px; font-size:22px; font-weight:bold;}

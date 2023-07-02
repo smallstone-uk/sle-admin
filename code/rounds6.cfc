@@ -698,7 +698,7 @@
 		<cfset loc.result = {}>
 		
 		<cftry>
-			<!---<cfdump var="#args#" label="NewDeliveryNotes" expand="false">--->
+			<cfdump var="#args#" label="NewDeliveryNotes" expand="false">
 			<div style="page-break-before:always;"></div>				
 			<cfoutput>
 				<cfloop array="#args.delNotes#" index="loc.customer">

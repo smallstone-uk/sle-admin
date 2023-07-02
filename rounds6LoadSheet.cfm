@@ -121,7 +121,7 @@
 			<cfif ArrayLen(rnd.list)>
 				<cfloop array="#rnd.list#" index="street">
 					<div class="street-wrap">
-					<!---<cfdump var="#street#" label="street" expand="false">--->
+					<cfdump var="#street#" label="street" expand="false">
 						<cfset hideGroup = "">
 						<cfset showOnce = 1>
 						<!--- Street Header --->

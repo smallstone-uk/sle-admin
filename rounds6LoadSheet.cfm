@@ -300,6 +300,7 @@
 			</div>
 		</div>
 		
+		
 		<!--- Consolidated Summary --->
 		<cfset pubArray = []>
 		<cfloop collection="#drops.grandtotalQty#" item="pubkey">

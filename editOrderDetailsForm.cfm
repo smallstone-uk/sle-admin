@@ -155,6 +155,7 @@
 			<td width="25%" align="right"><strong>Order Group</strong></td>
 			<td>
 				<select name="ordGroup">
+					<option value=""></option>
 					<cfloop query="orderGroups.QGetOrderGroups">
 						<option value="#ogID#"<cfif order.ordGroup eq ogID> selected="selected"</cfif>>#ogName#</option>
 					</cfloop>

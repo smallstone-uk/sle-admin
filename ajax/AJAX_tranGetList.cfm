@@ -133,12 +133,12 @@
 					});
 				});
 				$('.selectAllOnList').click(function(event) {
+					var total = 0;
+					var amount = 0;
 					if (this.checked) {
 						$('.selectitem').prop({checked: true});
 						$('.selectAllOnList').prop({checked: true});
 	
-						var total = 0;
-						var amount = 0;
 						$('.selectitem').each(function() {
 							if (this.checked) {
 								var id = $(this).val();
@@ -160,6 +160,7 @@
 					} else {
 						$('.selectitem').prop({checked: false});
 						$('.selectAllOnList').prop({checked: false});
+						$('.amountAllocatedTotal').html(nf(total, "str"));
 					}
 				});
 				$('.selectitem').click(function(event) {

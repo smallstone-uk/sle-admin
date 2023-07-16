@@ -34,6 +34,7 @@
 	INNER JOIN tblStockItem ON siOrder=soID
 	WHERE soDate >= '#DateFormat(srchDate,"yyyy-mm-dd")#'
 	GROUP BY soID
+	ORDER BY soDate
 	LIMIT #srchLimit#
 </cfquery>
 <body>
@@ -130,7 +131,6 @@
 				</table>
 				<cfoutput>
 				<!---<a href="bookerprocess.cfm?processAll=true">Reprocess all files?</a><br>--->
-				<cfdump var="#QStockOrders#" label="QStockOrders" expand="false">
 				<h2>Processed Orders from: #DateFormat(srchDate,"dd-mmm-yyyy")# limit: #srchLimit#</h2>
 				<table width="100%" class="tableList" border="1">
 					<tr>

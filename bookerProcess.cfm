@@ -23,16 +23,18 @@
 	});
 </script>
 
-<cfset fileLimit = 100>
+<cfset fromDate = DateAdd("d",-90,now())>
+<cfparam name="srchDate" default="#fromDate#">
+<cfparam name="srchLimit" default="100">
 <cfset dataDir="#application.site.dir_data#\stock\">
 <cfdirectory directory="#dataDir#" action="list" name="QDir" sort="name DESC">
 <cfquery name="QStockOrders" datasource="#application.site.datasource1#">
 	SELECT tblStockOrder.*, Count(siID) AS items
 	FROM tblStockOrder
 	INNER JOIN tblStockItem ON siOrder=soID
+	WHERE soDate >= '#DateFormat(srchDate,"yyyy-mm-dd")#'
 	GROUP BY soID
-	ORDER BY soDate DESC
-	LIMIT #fileLimit#
+	LIMIT #srchLimit#
 </cfquery>
 <body>
 	<div id="wrapper">
@@ -106,7 +108,7 @@
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>
-								<cfif recCount eq fileLimit><cfbreak></cfif>
+								<cfif recCount eq srchLimit><cfbreak></cfif>
 							</cfif>
 						</cfloop>
 						<tr><td colspan="5">&nbsp;</td></tr>
@@ -121,23 +123,25 @@
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>
-								<cfif recCount eq fileLimit><cfbreak></cfif>
+								<cfif recCount eq srchLimit><cfbreak></cfif>
 							</cfif>
 						</cfloop>
 					</cfoutput>
 				</table>
+				<cfoutput>
 				<!---<a href="bookerprocess.cfm?processAll=true">Reprocess all files?</a><br>--->
-				<h2>Processed Orders</h2>
+				<cfdump var="#QStockOrders#" label="QStockOrders" expand="false">
+				<h2>Processed Orders from: #DateFormat(srchDate,"dd-mmm-yyyy")# limit: #srchLimit#</h2>
 				<table width="100%" class="tableList" border="1">
 					<tr>
-						<th align="left">#</td>
+						<th align="left">##</td>
 						<th align="left">ID</th>
 						<th align="left">Order Reference</th>
 						<th align="left">Date Submitted</th>
 						<th align="left">Items</th>
 						<th align="left">Date Scanned</th>
 					</tr>
-					<cfoutput query="QStockOrders">
+					<cfloop query="QStockOrders">
 						<tr>
 							<td>#currentrow#</td>
 							<td>#soID#</td>
@@ -146,8 +150,9 @@
 							<td>#items#</td>
 							<td>#LSDateFormat(soScanned,"ddd dd-mmm-yyyy")# #TimeFormat(soScanned,"HH:mm:ss")#</td>
 						</tr>
-					</cfoutput>
+					</cfloop>
 				</table>
+				</cfoutput>
 			</div>
 		</div>
 		<cfinclude template="sleFooter.cfm">

@@ -94,8 +94,9 @@
 				var vatRate = $(this).attr("data-vatRate");
 				var packQty = $(this).attr("data-packqty");
 				var qtyPacks = $(this).attr("data-qtyPacks");
-				var htmlStr = "<input type='text' size='6' value='" + value + "' class='sod_wsp_input' data-id='" + stockID + "' data-ourPrice='" + ourPrice+ "' data-vatRate='" + vatRate + "' data-packqty='" + packQty + "' data-row='" + rowID
-+ "' data-qtyPacks='" + qtyPacks + "' />";
+				var htmlStr = "<input type='text' size='6' value='" + value + "' class='sod_wsp_input' data-id='" + 
+					stockID + "' data-ourPrice='" + ourPrice+ "' data-vatRate='" + vatRate + "' data-packqty='" + packQty + "' data-row='" + 
+					rowID + "' data-qtyPacks='" + qtyPacks + "' />";
 				$(this).html(htmlStr);
 				$(this).find('.sod_wsp_input').focus();
 			}
@@ -238,8 +239,9 @@
 										<th>Received<br>Units</th>
 										<th class="headright">Order<br>Total</th>
 										<th class="headright">Recvd<br>Total</th>
+										<th class="headright" width="40">WSP Value</th>
 										<th class="headright" width="40">Our Price</th>
-										<!---<th>PM</th>--->
+										<th>PM</th>
 										<th class="headright">POR</th>
 										<th width="40">VAT Rate</th>
 										<th width="40">Status</th>
@@ -269,7 +271,7 @@
 											<cfif item.category neq category>
 												<tr>
 													<td></td>
-													<td colspan="13" style="background-color:##EFF3F7"><strong>#item.category#</strong></td>
+													<td colspan="17" style="background-color:##EFF3F7"><strong>#item.category#</strong></td>
 												</tr>
 												<cfset category=item.category>
 											</cfif>
@@ -321,7 +323,8 @@
 												<td align="right" >#DecimalFormat(orderValue)#</td>
 												<td align="right" >#DecimalFormat(recvdValue)#</td>
 												<td align="right" class="sod_wspTotal">#DecimalFormat(wspTotal)#</td>
-												<td align="right" class="ourPrice">&pound;#item.siOurPrice# <span class="tiny">#GetToken(" ,PM",item.prodPriceMarked+1,",")#</span></td>
+												<td align="right" class="ourPrice">&pound;#item.siOurPrice#</td>
+												<td align="left"><span class="tiny">#GetToken(" ,PM",item.prodPriceMarked+1,",")#</span></td>
 												<!---<td align="center">#YesNoFormat(item.prodPriceMarked)#</td>--->
 												<td align="right" class="sod_POR">#item.siPOR#%</td>
 												<td align="right" class="sod_vatRate">#DecimalFormat(item.prodVATRate)#%</td>

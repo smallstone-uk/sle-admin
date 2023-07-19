@@ -23,7 +23,7 @@
 	});
 </script>
 
-<cfset fromDate = DateAdd("d",-90,now())>
+<cfset fromDate = DateAdd("d",-30,now())>
 <cfparam name="srchDate" default="#fromDate#">
 <cfparam name="srchLimit" default="100">
 <cfset dataDir="#application.site.dir_data#\stock\">

@@ -23,7 +23,7 @@
 <cfset parm.accountID = url.account>
 <cfset parm.fromDate = url.fromDate>
 <cfif StructKeyExists(url,"toDate")><cfset parm.toDate = url.toDate>
-	<cfelse><cfset parm.toDate = ""></cfif>
+	<cfelse><cfset parm.toDate = "#DateFormat(DateAdd("d",-1,Now()),'yyyy-mm-dd')#"></cfif>
 <cfset parm.datasource = application.site.datasource1>
 <cfset suppData = supp.TranList(parm)>
 <cfset SalesDuplicates = supp.SalesDuplicates(parm)>
@@ -127,7 +127,7 @@
 			</cfloop>
 		</table>
 	</cfoutput>
-	<p>* This is mismatch in the nominal items caused by cashback.</p>
+	<p>* This is mismatch in the nominal items caused by cashback & suppliers.</p>
 </body>
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

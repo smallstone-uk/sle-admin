@@ -34,10 +34,12 @@
 	});
 </script>
 <cfoutput>
+	<cfset minAgeDate = DateAdd("y",-18,Now())>
 <div id="header">
 	<div id="header-inner">
 		<div id="logo"><span>#application.company.name#</span></div>
 		<div id="contact">
+			<span><b>#minAgeDate#</span>
 			<span><b>Tel</b>: 01872 275102</span>
 			<span><b>Post Office</b>: 01872 223670</span>
 			<span><b>Email</b>: news@shortlanesendstore.co.uk</span>

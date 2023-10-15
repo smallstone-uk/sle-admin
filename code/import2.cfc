@@ -264,6 +264,7 @@
 			<cfset loc.grossRetailPrice = RoundDec(loc.netRetailPrice * (1 + args.VAT / 100))>
 			<cfset loc.result.profit = loc.netRetailPrice - loc.result.netUnitPrice>
 			<cfif args.pm OR (loc.grossRetailPrice - args.retail) lt 0.03>	<!--- if our price < retail --->
+            	<cfif args.retail IS 0><cfset args.retail = loc.result.grossUnitPrice * 1.5></cfif>
 				<cfset loc.grossRetailPrice = args.retail>
 				<cfset loc.netRetailPrice = RoundDec(loc.grossRetailPrice / (1 + args.VAT / 100))>
 			</cfif>

@@ -288,7 +288,7 @@
 			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.result.ourPrice) * 100)>
 			<tr>
 				<td colspan="16">
-                	<cfdump var="#loc#" expand="no">
+                	<cfdump var="#loc#" expand="no" label="#args.description#">
                 </td>
             </tr>
 

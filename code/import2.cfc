@@ -258,6 +258,11 @@
 				<cfset args.description = ReplaceNoCase(args.description,"Delicatessen Fine Eating","DFE")>
 			</cfif>
 			<!--- calculate price --->
+			<tr>
+				<td colspan="16">
+                	<cfdump var="#loc#" expand="no" label="#args.description#">
+                </td>
+            </tr>
 			<cfset loc.result.netUnitPrice = RoundDec(args.WSP / val(args.packQty))>
 			<cfset loc.result.grossUnitPrice = RoundDec(loc.result.netUnitPrice * (1 + args.VAT / 100))>
 			<cfset loc.netRetailPrice = RoundDec(loc.result.netUnitPrice * (1 + loc.target / 100))>
@@ -286,11 +291,6 @@
 			</cfif>
 			<cfset loc.result.profit = loc.result.ourPrice - loc.result.grossUnitPrice>
 			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.result.ourPrice) * 100)>
-			<tr>
-				<td colspan="16">
-                	<cfdump var="#loc#" expand="no" label="#args.description#">
-                </td>
-            </tr>
 
 			<!--- product record --->
 			<cfif NOT loc.doUpdate>

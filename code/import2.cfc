@@ -267,15 +267,15 @@
 				<cfset loc.grossRetailPrice = args.retail>
 				<cfset loc.netRetailPrice = RoundDec(loc.grossRetailPrice / (1 + args.VAT / 100))>
 			</cfif>
+			<cfset loc.result.retail = args.retail>
+			<cfset loc.result.ourPrice = loc.grossRetailPrice>
+			<cfset loc.result.netTotalValue = loc.netRetailPrice * args.packQty>
+			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>
 			<tr>
 				<td colspan="16">
                 	<cfdump var="#loc#" expand="no" label="#args.description#">
                 </td>
             </tr>
-			<cfset loc.result.retail = args.retail>
-			<cfset loc.result.ourPrice = loc.grossRetailPrice>
-			<cfset loc.result.netTotalValue = loc.netRetailPrice * args.packQty>
-			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>
 
 			<cfset loc.result.class = "ourPrice">
 			<cfset loc.result.classQty = "">

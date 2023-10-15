@@ -97,7 +97,7 @@
 				<cfset lineCount++>
 				<cfset showRedclass = "">
 				<cfset pmClass = "">
-				<cfset pmClassDiff = "">
+				<cfset pmClassDiff = "">               
 				<cfset totWSP += rec.wsp>
 				<cfset totRetail += recResult.netTotalValue>
 				<cfif rec.category neq category>
@@ -109,7 +109,7 @@
 				<cfif rec.pm><cfset pmClass = "pricemarked"></cfif>
 				<cfif int(rec.pm) neq recResult.prevPM><cfset pmClassDiff = "pricemarkdiff"></cfif>
                 <cfif recResult.problem><cfset showRedclass = "priceproblem"></cfif>
-				<tr class="#priceproblem#">
+				<tr class="#showRedclass#">
 					<td align="center">#lineCount#</td>
 					<td>
 						<cfif StructKeyExists(recResult,"barcode")>

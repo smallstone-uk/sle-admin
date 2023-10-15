@@ -88,11 +88,11 @@
 			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
-<!---
+
 					<tr>
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" label="#rec.description#" expand="false"></td>
 					</tr>
---->
+
 				<cfset lineCount++>
 				<cfset pmClass = "">
 				<cfset pmClassDiff = "">

@@ -12,6 +12,7 @@
 		.noBarcode {color:#FF0000; font-weight:bold}
 		.pricemarked {color:#FF00ff; font-size:16px; font-weight:bold !Important}
 		.pricemarkdiff {color:#FF00ff; background-color:#6633FF; font-size:16px; font-weight:bold !Important}
+		.priceproblem {color:#FF00ff; background-color:#FF0000; font-size:16px; font-weight:bold !Important}
 	</style>
 </head>
 
@@ -94,6 +95,7 @@
 
 
 				<cfset lineCount++>
+				<cfset showRedclass = "">
 				<cfset pmClass = "">
 				<cfset pmClassDiff = "">
 				<cfset totWSP += rec.wsp>
@@ -106,7 +108,8 @@
 				</cfif>
 				<cfif rec.pm><cfset pmClass = "pricemarked"></cfif>
 				<cfif int(rec.pm) neq recResult.prevPM><cfset pmClassDiff = "pricemarkdiff"></cfif>
-				<tr>
+                <cfif recResult.problem><cfset showRedclass = "priceproblem"></cfif>
+				<tr class="#priceproblem#">
 					<td align="center">#lineCount#</td>
 					<td>
 						<cfif StructKeyExists(recResult,"barcode")>

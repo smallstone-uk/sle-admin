@@ -258,13 +258,17 @@
 				<cfset args.description = ReplaceNoCase(args.description,"Delicatessen Fine Eating","DFE")>
 			</cfif>
 			<!--- calculate price --->
+			<cfset loc.result.problem = 0>
 			<cfset loc.result.netUnitPrice = RoundDec(args.WSP / val(args.packQty))>
 			<cfset loc.result.grossUnitPrice = RoundDec(loc.result.netUnitPrice * (1 + args.VAT / 100))>
 			<cfset loc.netRetailPrice = RoundDec(loc.result.netUnitPrice * (1 + loc.target / 100))>
 			<cfset loc.grossRetailPrice = RoundDec(loc.netRetailPrice * (1 + args.VAT / 100))>
 			<cfset loc.result.profit = loc.netRetailPrice - loc.result.netUnitPrice>
 			<cfif args.pm OR (loc.grossRetailPrice - args.retail) lt 0.03>	<!--- if our price < retail --->
-            	<cfif val(args.retail) IS 0><cfset args.retail = loc.result.grossUnitPrice * 1.5></cfif>	<!--- retail price missing --->
+            	<cfif val(args.retail) IS 0>	<!--- retail price missing --->
+					<cfset args.retail = loc.result.grossUnitPrice * 1.5>
+                    <cfset loc.result.problem = 1>
+                </cfif>
 				<cfset loc.grossRetailPrice = args.retail>
 				<cfset loc.netRetailPrice = RoundDec(loc.grossRetailPrice / (1 + args.VAT / 100))>
 			</cfif>

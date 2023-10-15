@@ -272,7 +272,7 @@
 			<cfset loc.result.netTotalValue = loc.netRetailPrice * args.packQty>
 			<tr>
 				<td colspan="16">
-                	<cfdump var="#loc#" expand="no" label="#args.description#">
+                	<cfdump var="#loc#" expand="no" label="#args.description# #args.retail#">
                 </td>
             </tr>
 			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>

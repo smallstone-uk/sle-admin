@@ -88,7 +88,7 @@
 			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
 					<tr>
-						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" label="#rec.description#" expand="false"></td>
+						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#rec#" expand="false"></td>
 					</tr>
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
 

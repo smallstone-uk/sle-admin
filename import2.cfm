@@ -100,7 +100,7 @@
 				<cfset totRetail += recResult.netTotalValue>
 				<cfif rec.category neq category>
 					<tr>
-						<td colspan="16" style="background-color:##eeeeee"><strong>#rec.category#</strong></td>
+						<td colspan="16" style="background-color:##eeeeee"><strong>#rec.category#</strong><cfdump var="#rec#" expand="no"></td>
 					</tr>
 					<cfset category=rec.category>
 				</cfif>

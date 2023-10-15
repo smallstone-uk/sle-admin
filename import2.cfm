@@ -7,12 +7,12 @@
 	<style>
 		.more {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D47FAA !Important}
 		.different {color:#553FFF; font-size:16px; font-weight:bold; background-color:#FFCCFF !Important}
+		.priceproblem {color:#553FFF; font-size:16px; font-weight:bold; background-color:#F00 !Important}
 		.changed {color:#553FFF; font-size:16px; font-weight:bold; background-color:#D4FF55 !Important}
 		.ourPrice {color:#553FFF; font-size:16px; font-weight:bold !Important}
 		.noBarcode {color:#FF0000; font-weight:bold}
 		.pricemarked {color:#FF00ff; font-size:16px; font-weight:bold !Important}
 		.pricemarkdiff {color:#FF00ff; background-color:#6633FF; font-size:16px; font-weight:bold !Important}
-		.priceproblem {color:#FF00ff; background-color:#FF0000; font-size:16px; font-weight:bold !Important}
 	</style>
 </head>
 
@@ -92,7 +92,10 @@
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#rec#" expand="false"></td>
 					</tr>--->
 				<cfset recResult=import.UpdateRecord(records.header,rec)>
-
+<!---					<tr>
+						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" expand="false"></td>
+					</tr>
+--->
 
 				<cfset lineCount++>
 				<cfset showRedclass = "">
@@ -109,7 +112,7 @@
 				<cfif rec.pm><cfset pmClass = "pricemarked"></cfif>
 				<cfif int(rec.pm) neq recResult.prevPM><cfset pmClassDiff = "pricemarkdiff"></cfif>
                 <cfif recResult.problem><cfset showRedclass = "priceproblem"></cfif>
-				<tr class="#showRedclass#">
+				<tr>
 					<td align="center">#lineCount#</td>
 					<td>
 						<cfif StructKeyExists(recResult,"barcode")>
@@ -121,7 +124,7 @@
 					<td>#rec.packsize#</td>
 					<td align="center" class="#pmClass# #pmClassDiff#">#int(rec.pm)# = #recResult.prevPM#</td>
 					<td align="center">#rec.packQty#</td>
-					<td align="right">&pound;#rec.retail#</td>
+					<td align="right" class="#showRedclass#">&pound;#rec.retail#</td>
 					<td align="center" class="#recResult.classQty#">#recResult.qty1#</td>
 					<td align="center">#rec.vat#%</td>
 					<td align="right" class="#recResult.class#">&pound;#recResult.ourPrice#</td>

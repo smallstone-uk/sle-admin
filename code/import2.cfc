@@ -424,10 +424,10 @@
 						<cfset loc.result.qty1 = 1>
 						<cfset loc.result.classQty = "changed">
 					</cfif>
-					<cfdump var="#loc#" label="qty #loc.QProduct.prodTitle#" expand="yes" format="html" 
+					<!---<cfdump var="#loc#" label="qty #loc.QProduct.prodTitle#" expand="yes" format="html" 
 						output="#application.site.dir_logs#qty-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 					<cfdump var="#header#" label="qtyh #loc.QProduct.prodTitle#" expand="yes" format="html" 
-						output="#application.site.dir_logs#qtyh-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+						output="#application.site.dir_logs#qtyh-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">--->
 				</cfif>
 				
 				<!--- stock item record --->

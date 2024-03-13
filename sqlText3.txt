@@ -1,0 +1,69 @@
+Move all 'named' staff wage transactions to "Staff Wages" account.
+
+Staff Wages account ID: 3082
+
+UPDATE tblnomitems 
+INNER JOIN tblNominal ON nomID = niNomID 
+SET niNomID = 3082 
+WHERE nomGroup = 'FP' 
+AND nomID != 3082 
+
+// fix all prices on website to match till since sept 20.
+SELECT siID, siProduct, siOurPrice, prodID, prodtitle, prodOurPrice
+FROM tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+
+WHERE prodOurPrice != siOurPrice
+
+SELECT siID, siProduct, siOurPrice, prodID, prodtitle, prodOurPrice
+FROM tblProducts
+LEFT JOIN tblStockItem ON prodID = siProduct
+AND tblStockItem.siID = (
+	SELECT MAX( siID )
+	FROM tblStockItem
+	WHERE prodID = siProduct )
+
+WHERE prodOurPrice != siOurPrice
+
+// sales performance
+select prodID,prodRef,prodTitle,prodCatID,sum(tblepos_items.eiQty) as productsSold,
+       min(DATE(tblepos_header.ehTimeStamp)) as firstSale,
+       max(DATE(tblepos_header.ehTimeStamp)) as lastSale,
+       DATEDIFF(max(tblepos_header.ehTimeStamp),min(tblepos_header.ehTimeStamp)) as days,
+       sum(tblepos_items.eiQty) / DATEDIFF(max(tblepos_header.ehTimeStamp),min(tblepos_header.ehTimeStamp)) as averageSold,
+       DATEDIFF(NOW(),max(tblepos_header.ehTimeStamp)) AS lastSold
+from tblproducts
+join tblepos_items on tblproducts.prodID = tblepos_items.eiProdID
+join tblepos_header on tblepos_items.eiParent = tblepos_header.ehID
+WHERE tblepos_header.ehTimeStamp > '2020-02-21'
+AND eiClass = 'sale'
+group by tblproducts.prodID
+ORDER BY averagesold DESC, prodCatID, prodTitle
+
+
+// Round drops
+SELECT rndTitle, ordHouseName,ordHouseNumber,ordContact, stName, ordTown, cltRef,cltName
+FROM `tblrounditems` 
+INNER JOIN tblorder ON riOrderID = ordID
+INNER JOIN tblclients ON cltID = ordClientID
+INNER JOIN tblrounds ON rndID = riRoundID
+INNER JOIN tblStreets2 ON ordStreetCode = stID
+WHERE cltAccountType NOT IN ('H','N')
+AND riDay = 'thu'
+AND ordActive = 1
+ORDER BY riRoundID, riOrder
+
+SELECT rndTitle, ordHouseName,ordHouseNumber,ordContact, stName, ordTown,ordPostCode, cltRef,cltName
+FROM `tblrounditems` 
+INNER JOIN tblorder ON riOrderID = ordID
+INNER JOIN tblclients ON cltID = ordClientID
+INNER JOIN tblrounds ON rndID = riRoundID
+INNER JOIN tblStreets2 ON ordStreetCode = stID
+WHERE cltAccountType NOT IN ('H','N')
+AND riDay = 'thu'
+AND ordActive = 1
+ORDER BY riRoundID, riOrder

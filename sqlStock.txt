@@ -38,3 +38,11 @@ AND `prodLastBought` > '2020-01-01'
 AND `prodStatus` = 'active'
 AND pgDiscount = 1
 
+
+// estimated closing stock based on last 15 days purchases
+SELECT SUM(trnAmnt1) AS Total
+FROM `tbltrans` 
+WHERE `trnLedger` = 'purch' 
+AND `trnType` IN ('inv', 'crn') 
+AND `trnDate` BETWEEN '2024-01-15' AND '2024-01-31'
+

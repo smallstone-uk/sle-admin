@@ -161,12 +161,12 @@ input[type="button"]:disabled {opacity: 0.5;cursor: default;}
     margin: 20px 0 0 0;
 }
 #footer-inner {width:1000px;margin:0 auto;padding: 20px 0; }
-#footer-inner #nav {float:left;width:200px;}
-#footer-inner #nav ul {margin: 0;padding: 0;list-style: none;}
-#footer-inner #nav ul li {padding: 0;margin: 0;display: block;font-size: 12px;color: #000;}
-#footer-inner #nav ul li label {display:inline;}
-#footer-inner #nav ul li a {display: block;font-size: 12px;text-decoration: none;color: #fff;padding: 2px 10px;margin:0 0 2px 0;}
-#footer-inner #nav ul li a:hover {background:#555;}
+#footer-inner #foot-nav {float:left;width:300px;}
+#footer-inner #foot-nav ul {margin: 0;padding: 0;list-style: none;}
+#footer-inner #foot-nav ul li {padding: 0;margin: 0;display: block;font-size: 12px;color: #000;}
+#footer-inner #foot-nav ul li label {display:inline;}
+#footer-inner #foot-nav ul li a {display: block;font-size: 12px;text-decoration: none;color: #fff;padding: 2px 10px;margin:0 0 2px 0;}
+#footer-inner #foot-nav ul li a:hover {background:#555;}
 
 #footer-inner #contact {float: right;width: 400px;padding: 10px 0;text-align: right;}
 #footer-inner #contact span {display: block;font-size: 12px;color:#fff;}

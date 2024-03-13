@@ -67,6 +67,9 @@
 <cfparam name="srchTranType" default="">
 <cfparam name="srchRange" default="">
 <cfparam name="srchStatus" default="">
+<cfparam name="srchShowQuery" default="">
+
+
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -225,6 +228,10 @@
 									<td><b>Fix Data</b></td>
 									<td><input type="checkbox" name="srchFixData" value="1" /></td>
 								</tr>
+								<tr>
+									<td><b>Show Query</b></td>
+									<td><input type="checkbox" name="srchShowQuery" value="1" <cfif StructKeyExists(form,"srchShowQuery")>checked</cfif> /></td>
+								</tr>
 							</table>
 						</div>
 					</form>
@@ -236,11 +243,13 @@
 							<cfset parms.datasource=application.site.datasource1>
 							<cfset parms.form=form>
 							<cfobject component="code/purchase" name="pur">
+                            <cfdump var="#form#">
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset trans=pur.TranList(parms)>
 									<cfset accountID=0>
 									<cfset tranCountTotal = 0>
+                                   <cfif StructKeyExists(form,"srchShowQuery")><cfdump var="#trans#"></cfif>
 									<table border="1" class="tableList" width="98%">
 										<cfloop array="#trans.tranArray#" index="tran">
 											<cfif accountID neq tran.accID>

@@ -79,6 +79,7 @@
 <cfparam name="srchDateFrom" default="#DateFormat(CreateDate(Year(now()),1,1),'yyyy-mm-dd')#">
 <cfparam name="srchDateTo" default="#DateFormat(Now(),'yyyy-mm-dd')#">
 <cfparam name="srchStatus" default="">
+<cfparam name="srchCloseStock" default="">
 <!---<cfset timespan = DateDiff("d",srchDateFrom,srchDateTo)>
 <cfif timespan lt 180>
 	<cfset dateFrom = DateAdd("d",-180,Now())>
@@ -93,6 +94,7 @@
 <cfset parms.srchDateFrom = srchDateFrom>
 <cfset parms.srchDateTo = srchDateTo>
 <cfset parms.srchStatus = srchStatus>
+<cfset parms.srchCloseStock = srchCloseStock>
 	
 <cfset groups = sales.LoadGroups(parms)>
 <cfset prodStatusTitles = "active,inactive,donotbuy">
@@ -137,6 +139,12 @@
 					</td>
 				</tr>
 				<tr>
+					<td><b>Ignore Zero Stock</b></td>
+					<td>
+						<input type="checkbox" name="srchCloseStock" value="1" <cfif StructKeyExists(form,"srchCloseStock")>checked</cfif> />
+					</td>
+				</tr>
+				<tr>
 					<td colspan="2"><input type="submit" name="btnGo" value="Go"></td>
 				</tr>
 			</table>
@@ -145,8 +153,9 @@
 	</div>
 
 	<cfif group neq 0>
+   		<cfdump var="#parms#" label="parms" expand="false">
 		<cfset products = sales.selectProducts(parms)>
-		<!---<cfdump var="#products#" label="products" expand="false">--->
+		<cfdump var="#products#" label="products" expand="false">
 		<table class="tableList" border="1">
 			<cfif StructKeyExists(form,"srchShowQuery")>
 				<tr>
@@ -159,6 +168,7 @@
 			</tr>
 			<tr>
 				<th width="60">Product<br />Code</th>
+				<th>ID</th>
 				<th>Description</th>
 				<th>Size</th>
 				<th width="26">Open<br />Stock</th>
@@ -226,6 +236,7 @@
 					<td>#prodRef#<br />
 						<span class="sod_status disable-select" data-id="#prodID#">#prodStatus#</span>
 					</td>
+                    <td>#prodID#</td>
 					<td><a href="productStock6.cfm?product=#prodID#" target="stockcheck">#prodTitle#</a></td>
 					<cfif val(siOurPrice) eq 0>
 						<cfset class = "priceErr">

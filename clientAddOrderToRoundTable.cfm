@@ -8,6 +8,7 @@
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.form=form>
 <cfset orders=rnd.LoadOrder(parm)>
+<!---<cfdump var="#orders#" label="orders">--->
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -85,6 +86,9 @@
 				<td><cfif StructKeyExists(orders.days.sat,"ID")><a href="#orders.days.sat.ID#" class="removeItem" title="Click to delete">#orders.days.sat.RoundTitle#</a><cfelse>None</cfif></td>
 				<td><cfif StructKeyExists(orders.days.sun,"ID")><a href="#orders.days.sun.ID#" class="removeItem" title="Click to delete">#orders.days.sun.RoundTitle#</a><cfelse>None</cfif></td>
 			</tr>
+            <tr>
+            	<td></td>
+            </tr>
 		</table>
 	</div>
 </cfoutput>

@@ -28,8 +28,11 @@
 	
 	<style type="text/css">
 		.active {background: #2D97D3;}
+		.orderNotActive {color:#ccc}
+		.orderActive {color:#000}
 	</style>
 	<cfoutput>
+    	<p>Grey text are inactive orders</p>
 		<table border="1" class="tableList trhover roundTable" width="100%">
 			<tr class="nodrop nodrag">
 				<th width="40">Ref</th>
@@ -45,15 +48,18 @@
 							$('.row'+thisorderID).addClass("active");
 						} else {};
 					</script>
-					<tr class="row#i.OrderID#">
+                    <cfif i.ordActive><cfset textStyle = "orderActive">
+                    	<cfelse><cfset textStyle = "orderNotActive"></cfif>
+					<tr class="row#i.OrderID# #textStyle#">
 						<td><input type="hidden" name="item" value="#i.ID#"><input type="hidden" name="order#i.ID#" class="orderItem" value="#i.order#">#i.Ref#</td>
-						<td>#i.name# #i.street# </td>
+						<td>#i.name# #i.street#</td>
 						<td align="center"><a href="#application.site.normal#clientDetails.cfm?row=0&ref=#i.ref#" target="_blank">#i.cltAccountType#</a></td>
 					</tr>
 				</cfloop>
 			<cfelse>
 				<tr><td colspan="3">Order to assign to this day.</td></tr>
 			</cfif>
+            <tr><td colspan="3">Drop Count: #ArrayLen(roundList)#.</td></tr>
 		</table>
 	</cfoutput>
 

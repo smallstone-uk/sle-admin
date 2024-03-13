@@ -136,6 +136,7 @@
 				<cfset item.OrderID=riOrderID>
 				<cfset item.Order=riOrder>
 				<cfset item.DayName=riDay>
+				<cfset item.ordActive=ordActive>
 				<cfset item.cltAccountType = cltAccountType>
 				<cfif val(QRounds.ordStreetCode) gt 0>
 					<cfset item.name="#QRounds.ordHouseName# #QRounds.ordHouseNumber#">

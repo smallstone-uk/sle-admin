@@ -906,7 +906,7 @@
 		<cfset var rec={}>
 		
 		<cftry>
-			<cfquery name="QTrans" datasource="#args.datasource#">
+			<cfquery name="QTrans" datasource="#args.datasource#" result="result.QTransResult">
 				SELECT accID,accName,accType,accNomAcct,accPayAcc, trnID,trnLedger,trnRef,trnDesc,trnDate,trnAccountID,trnClientRef,trnType,trnMethod,trnAmnt1,trnAmnt2
 				FROM tblTrans,tblAccount
 				WHERE trnAccountID=accID
@@ -925,7 +925,19 @@
 					AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#' </cfif>
 				<cfif val(args.form.srchAccount) gt 0>AND trnAccountID=#args.form.srchAccount#</cfif>
 				<cfif len(args.form.srchLedger) gt 0>AND trnLedger='#args.form.srchLedger#'</cfif>
-				
+				<cfif len(args.form.srchDept)>
+                	<cfswitch expression="#args.form.srchDept#">
+                    	<cfcase value="shop">
+                        	AND accID = 1
+                        </cfcase>
+                    	<cfcase value="news">
+                        	AND accID = 4
+                        </cfcase>
+                    	<cfcase value="other">
+                        	AND accID NOT IN (1,4)
+                        </cfcase>
+                    </cfswitch>
+                </cfif>
 				<cfif StructKeyExists(args.form, "srchTranType") AND len(args.form.srchTranType)>
 					AND trnType IN ('#REReplaceNoCase(args.form.srchTranType, ",", "','", "all")#')
 				</cfif>

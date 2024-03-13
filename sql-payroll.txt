@@ -19,3 +19,11 @@ WHERE phDate
 BETWEEN '2020-01-01'
 AND '2020-12-31'
 GROUP BY phEmployee
+
+// Annual payroll data
+SELECT empFirstName, empLastName, empStatus, SUM(piGross) AS Gross, SUM(piHours) AS Hours, SUM(piHolHours) AS Holiday
+FROM `tblpayitems`
+inner join tblpayheader ON piParent=phID
+inner join tblemployee ON phEmployee=empID
+WHERE phDate BETWEEN '2022-02-01' AND '2023-01-31'
+GROUP BY empID

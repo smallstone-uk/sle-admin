@@ -1053,6 +1053,7 @@
 				</cfoutput>
 			</cfsavecontent>
 			<cfsavecontent variable="logit">
+            	<cfoutput>
 				to="#args.email#" 
 				from="news@shortlanesendstore.co.uk" 
 				bcc="news@shortlanesendstore.co.uk" 
@@ -1069,6 +1070,7 @@
 				cfmailpart type="html">
 					#content#
 				/cfmailpart>
+                </cfoutput>
 			</cfsavecontent>
 			<cflog text="#logit#">
 			<cfmail 

@@ -13,7 +13,7 @@
 <cfset testmode=0> <!--- DEV USE ONLY. NOT FOR FIXING INVOICES--->
 <cfset grandtotal=0>
 <cfset overalltotal=0>
-
+<cfdump var="#chargeCheck#" label="chargeCheck" expand="false">
 <cfoutput>
 	<h1>Data Check</h1>
 	<cfset keys = ListSort(StructKeyList(chargeCheck.grid,","),"numeric","asc")>

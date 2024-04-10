@@ -46,3 +46,10 @@ WHERE `trnLedger` = 'purch'
 AND `trnType` IN ('inv', 'crn') 
 AND `trnDate` BETWEEN '2024-01-15' AND '2024-01-31'
 
+
+// products & labels (bunnery) - set Our Price to match Label price
+update tblproducts 
+INNER JOIN tbllabels ON tblproducts.prodID = tbllabels.labProdID
+INNER JOIN tblATitles ON tbllabels.labFormat = ttlValue
+set prodOurPrice = labPrice
+WHERE tbllabels.labFormat=9

@@ -4,24 +4,24 @@
 	.ticket {width:230px; float:left;color:#000; border:dashed 0px #fff; margin:0px; padding:0px;}
  	
 	.ticket .ticket-left {border:solid 1px #bbb; height:128px; background-color:#fff; overflow:hidden; margin:0px; padding:10px 10px 0px 10px;}
-	.ticket .ticket-left .title {clear:both; float:left; width:100%; height: 50px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
+	.ticket .ticket-left .title {clear:both; float:left; width:100%; height: 70px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
 	.ticket .ticket-left .info {width: 100%; float:left; margin:0 0 0 0; height: 40px; font-size:18px; color:#000000;}
 	.ticket .ticket-left .price {text-align:right; padding:0 0 0 0; color:#000000; height:28px; font-size:22px; font-weight:bold;}
 	.ticket .ticket-left .code {width: 58%; float: left; font-size:11px; color:#000000; margin-top:4px;}
 	.ticket .ticket-left .date {width: 38%; float:right; font-size: 10px; color:#000000; margin-top:4px; text-align:right;}
-	.ticket .ticket-left .foozy {width:100%; float:left; color:#000000; border:solid 1px #fff;}
+	.ticket .ticket-left .foozy {width:100%; float:left; color:#000000; border:solid 1px #fff; height:20px;}
 	.ticket .ticket-left .infobox {width:49%; float:left; color:#000000;}
 	.ticket .ticket-left .pricebox {width:49%; float:right; color:#000000; height: 28px;}
 	.ticket .ticket-left .codebox {width: 100%; float:left; color:#000000; margin-top:5px;}
 	.ticket .ticket-left .rrpStyle {text-decoration:line-through; float:left; color:#ff0000; height:14px; font-size:16px;}
 
 	.ticket .ticket-inner {border:solid 1px #bbb; height:128px; background-color:#fff; overflow:hidden; margin-left:0px; padding:10px 10px 0px 10px;}
-	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 50px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
+	.ticket .ticket-inner .title {clear:both; float:left; width:100%; height: 70px; margin:0; overflow:hidden; color:#000000; font-size:18px;}
 	.ticket .ticket-inner .info {width: 100%; float:left; margin:0 0 0 0; height: 40px; font-size:18px; color:#000000;}
 	.ticket .ticket-inner .price {text-align:right; padding:0 0 0 0; color:#000000; height:28px; font-size:22px; font-weight:bold;}
 	.ticket .ticket-inner .code {width: 58%; float: left; font-size:11px; color:#000000; margin-top:4px;}
 	.ticket .ticket-inner .date {width: 38%; float:right; font-size: 10px; color:#000000; margin-top:4px; float:right; text-align:right;}
-	.ticket .ticket-inner .foozy {width:100%; float:left; color:#000000; border:solid 1px #fff;}
+	.ticket .ticket-inner .foozy {width:100%; float:left; color:#000000; border:solid 1px #fff; height:20px;}
 	.ticket .ticket-inner .infobox {width:49%; float:left; color:#000000;}
 	.ticket .ticket-inner .pricebox {width:49%; float:right; color:#000000; height: 28px;}
 	.ticket .ticket-inner .codebox {width: 100%; float:left; color:#000000; margin-top:5px;}
@@ -74,14 +74,14 @@
 				<div class="ticket">
 					<cfif count MOD 3 eq 1><cfset boxStyle="ticket-left"><cfelse><cfset boxStyle="ticket-inner"></cfif>
 					<div class="#boxStyle#">
-						<div class="title">#Left(prodTitle,50)#</div>
+						<div class="title">#Left(prodTitle,70)#</div>
 						<div class="foozy">
 							<div class="infobox">
 								<div class="info">#siUnitSize#</div>							
 							</div>
 							<div class="pricebox">
 								<cfif siRRP gt siOurPrice><div class="rrpStyle">#siRRP#&nbsp;</div></cfif>
-								<div class="price">#ourprice#</div>
+								<cfif prodPriceMarked>Price Marked<cfelse><div class="price">#ourprice#</div></cfif>
 							</div>
 						</div>
 						<div class="codebox">

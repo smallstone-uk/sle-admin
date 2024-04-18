@@ -2109,9 +2109,13 @@
                                     <cfloop collection="#data.panel#" item="key">
                                     	<cfset nom = StructFind(data.panel,key)>
                                     	<tr>
+                                        	<td>#nom.ID#</td>
                                         	<td>#nom.title#</td>
-                                            <cfif nom.group eq "asset"><td align="right">#DecimalFormat(nom.value)#</td><td></td>
-                                            <cfelse><td></td><td align="right">#DecimalFormat(nom.value)#</td></cfif>
+                                            <cfif nom.group eq "asset" OR val(nom.value) gte 0>
+                                            	<td align="right">#DecimalFormat(nom.value)#</td><td></td>
+                                            <cfelse>
+                                            	<td></td><td align="right">#DecimalFormat(nom.value)#</td>
+                                            </cfif>
                                         </tr>
                                     </cfloop>
                                     </table>

@@ -1687,7 +1687,7 @@
 		
 		<cftry>
             <cfquery name="loc.result.QNominal" datasource="#args.datasource#">
-                SELECT nomTitle,nomGroup,SUM(niAmount) AS total
+                SELECT nomID,nomTitle,nomGroup,SUM(niAmount) AS total
                 FROM tblnomitems
                 INNER JOIN tblNominal ON niNomID = nomID
                 INNER JOIN tbltrans ON niTranID = trnID
@@ -1697,7 +1697,7 @@
            </cfquery>
            <cfset loc.num = StructCount(panel)>
            <cfset loc.num++>
-           <cfset StructInsert(panel,loc.num,{"title" = loc.result.QNominal.nomTitle,
+           <cfset StructInsert(panel,loc.num,{"ID" = nominalID, "title" = loc.result.QNominal.nomTitle,
 		   		"group" = loc.result.QNominal.nomGroup, "value" = loc.result.QNominal.total})>
 
 		<cfcatch type="any">
@@ -1733,14 +1733,14 @@
                     WHERE trnAccountID = 4 
                     AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                 </cfquery>
-                <cfset StructInsert(loc.result.panel,1,{"title" = "News Debtors", "group" = "asset", "value" = loc.result.QNewsDebtors.total})>
+                <cfset StructInsert(loc.result.panel,1,{"ID" = 0,"title" = "News Debtors", "group" = "asset", "value" = loc.result.QNewsDebtors.total})>
                 <cfquery name="loc.result.QCreditors" datasource="#args.datasource#">
                     SELECT SUM( trnAmnt1 + trnAmnt2 ) AS total
                     FROM tbltrans
                     WHERE trnLedger = 'purch'
                     AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                 </cfquery>
-                <cfset StructInsert(loc.result.panel,2,{"title" = "Trade Creditors", "group" = "liability", "value" = loc.result.QCreditors.total})>
+                <cfset StructInsert(loc.result.panel,2,{"ID" = 0,"title" = "Trade Creditors", "group" = "liability", "value" = loc.result.QCreditors.total})>
                 <cfset loc.fortnight = DateAdd("d",-15,loc.result.prdTo)>
                 <cfquery name="loc.result.QClosingStock" datasource="#args.datasource#">
                     SELECT SUM(trnAmnt1) AS Total
@@ -1750,7 +1750,7 @@
                     AND trnDate BETWEEN '#LSDateFormat(loc.fortnight,"yyyy-mm-dd")#' 
                     	AND '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                </cfquery>
-               <cfset StructInsert(loc.result.panel,3,{"title" = "Closing Stock", "group" = "asset", "value" = loc.result.QClosingStock.total})>
+               <cfset StructInsert(loc.result.panel,3,{"ID" = 0,"title" = "Closing Stock", "group" = "asset", "value" = loc.result.QClosingStock.total})>
 
                <cfloop list="#application.controls.ctlBSIDs#" index="loc.i">
                    <cfset EndofYearNominal(args,loc.result.panel,loc.result.prdTo,loc.i)>

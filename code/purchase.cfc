@@ -1751,8 +1751,8 @@
                     	AND '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                </cfquery>
                <cfset StructInsert(loc.result.panel,3,{"title" = "Closing Stock", "group" = "asset", "value" = loc.result.QClosingStock.total})>
-               
-               <cfloop list="41,1441,3092,1651,1531,1801,651,1811" index="loc.i">
+
+               <cfloop list="#application.controls.ctlBSIDs#" index="loc.i">
                    <cfset EndofYearNominal(args,loc.result.panel,loc.result.prdTo,loc.i)>
                </cfloop>
             </cfif>

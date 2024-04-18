@@ -73,6 +73,7 @@
 				<cfset loc.result.PayDayNo = ctlPayDayNo>
 				<cfset loc.result.WeekNoStartDate = ctlWeekNoStartDate>
 				<cfset loc.result.ctlInvMessage = ctlInvMessage>
+                <cfset loc.result.ctlBSIDs = ctlBSIDs>
 			</cfloop>
 
 			<cfcatch type="any">

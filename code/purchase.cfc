@@ -1728,19 +1728,21 @@
             </cfif>
             <cfif len(loc.result.prdTo)>
                 <cfquery name="loc.result.QNewsDebtors" datasource="#args.datasource#">
-                    SELECT sum(trnAmnt1) as total
+                    SELECT SUM(trnAmnt1 + trnAmnt2) as total
                     FROM tbltrans
                     WHERE trnAccountID = 4 
                     AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                 </cfquery>
                 <cfset StructInsert(loc.result.panel,1,{"ID" = 0,"title" = "News Debtors", "group" = "asset", "value" = loc.result.QNewsDebtors.total})>
+                
                 <cfquery name="loc.result.QCreditors" datasource="#args.datasource#">
-                    SELECT SUM( trnAmnt1 + trnAmnt2 ) AS total
+                    SELECT SUM(trnAmnt1 + trnAmnt2) AS total
                     FROM tbltrans
                     WHERE trnLedger = 'purch'
                     AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
                 </cfquery>
-                <cfset StructInsert(loc.result.panel,2,{"ID" = 0,"title" = "Trade Creditors", "group" = "liability", "value" = loc.result.QCreditors.total})>
+                <cfset StructInsert(loc.result.panel,2,{"ID" = 0,"title" = "Trade Creditors", "group" = "liability", "value" = -abs(loc.result.QCreditors.total)})>
+               
                 <cfset loc.fortnight = DateAdd("d",-15,loc.result.prdTo)>
                 <cfquery name="loc.result.QClosingStock" datasource="#args.datasource#">
                     SELECT SUM(trnAmnt1) AS Total

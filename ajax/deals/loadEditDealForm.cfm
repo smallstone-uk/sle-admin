@@ -27,30 +27,44 @@
 						success: function(data) {
 							$('*').blur();
 							var result = JSON.parse(data);
+							console.log(result);
 							if (typeof window.productSelectComplete == "function") {
-								if (typeof result.PRODUCT.PRODID != "undefined") {
-									window.productSelectComplete([{
-										id: result.PRODUCT.PRODID,
-										title: result.PRODUCT.PRODTITLE
-									}]);
+								console.log("window.productSelectComplete is function");
+								if (result.PRODUCTID != 0) {
+									console.log("result.PRODUCTID not 0");
+								/*if (typeof result.PRODUCT.PRODID != 0) {*/
+									if (result.PRODUCT) {
+										console.log("result.PRODUCT");
+										window.productSelectComplete([{
+											id: result.PRODUCT.PRODID,
+											title: result.PRODUCT.PRODTITLE
+										}]);
+									} else {
+										$.messageBox("Product not found", "error");
+									}
 								} else {
 									$.messageBox("Product not found", "error");
 								}
+								/*}*/
 							} else {
-								if (typeof result.PRODUCT.PRODID != "undefined") {
-									$('.rowList').append(
-										'<tr>' +
-											'<td><a href="javascript:void(0)" class="ctrlDelProdItem" data-prodID="' + result.PRODUCT.PRODID + '" data-dealID="#deal.edID#">D</a></td>' +
-											'<td>' + result.PRODUCT.PRODID + '</td>' +
-											'<td id="rli_name" align="left">' +
-												'<a href="javascript:void(0)" class="deal_product_item" title=' + barcode + ' data-title="New Row" data-id="' + result.PRODUCT.PRODID + '">' + result.PRODUCT.PRODTITLE + '</a>' +
-											'</td>' +
-											'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value="0"></td>' +
-											'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value="0"></td>' +
-										'</tr>'
-									);
-								} else {
-									$.messageBox("Product not found", "error");
+								if (result.PRODUCTID != 0) {
+									console.log("here");
+									if (typeof result.PRODUCTID != 0) {
+										$('.rowList').append(
+											'<tr>' +
+												'<td><a href="javascript:void(0)" class="ctrlDelProdItem" data-prodID="' + result.PRODUCT.PRODID + '" data-dealID="#deal.edID#">D</a></td>' +
+												'<td>' + result.PRODUCT.PRODID + '</td>' +
+												'<td id="rli_name" align="left">' +
+													'<a href="javascript:void(0)" class="deal_product_item" title=' + barcode + 
+														' data-title="New Row" data-id="' + result.PRODUCT.PRODID + '">' + result.PRODUCT.PRODTITLE + '</a>' +
+												'</td>' +
+												'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value="0"></td>' +
+												'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value="0"></td>' +
+											'</tr>'
+										);
+									} else {
+										$.messageBox("Product not found", "error");
+									}
 								}
 							}
 						}

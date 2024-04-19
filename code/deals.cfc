@@ -227,7 +227,16 @@
 				DELETE FROM tblEPOS_DealItems
 				WHERE ediParent = #val(args.header.ed_id)#
 			</cfquery>
-
+				
+			<!--- remove duplicates --->
+			<cfset loc.uniques = []>
+			<cfloop array="#args.items#" index="item">
+				<cfif !ArrayFind(loc.uniques,item)>
+					<cfset ArrayAppend(loc.uniques,item)>
+				</cfif>
+			</cfloop>
+			<cfset args.items = loc.uniques>
+			
 			<cfif NOT ArrayIsEmpty(args.items)>
 				<cfquery name="loc.addItems" datasource="#GetDatasource()#">
 					INSERT INTO tblEPOS_DealItems (

@@ -10,6 +10,8 @@
    <!--- <cf_dumptofile var="#parm#">--->
     <cfset lookup = pstock.FindProduct(parm)>
 	<cfoutput>#SerializeJSON(lookup)#</cfoutput>
+<cfdump var="#lookup#" label="lookup" expand="yes" format="html" 
+	output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 
 	<cfcatch type="any">
 		<cf_dumptofile var="#cfcatch#">

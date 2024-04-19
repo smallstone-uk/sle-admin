@@ -106,6 +106,7 @@
 											<option value="15"<cfif srchReport eq "15"> selected="selected"</cfif>>Allocation Check</option>
 											<option value="16"<cfif srchReport eq "16"> selected="selected"</cfif>>Data Check Reports</option>
 											<option value="17"<cfif srchReport eq "17"> selected="selected"</cfif>>Business Report</option>
+											<option value="18"<cfif srchReport eq "18"> selected="selected"</cfif>>Balance Sheet Report</option>
 											
 										</select>
 									</td>
@@ -243,7 +244,6 @@
 							<cfset parms.datasource=application.site.datasource1>
 							<cfset parms.form=form>
 							<cfobject component="code/purchase" name="pur">
-                            <cfdump var="#form#">
 							<cfswitch expression="#srchReport#">
 								<cfcase value="1">
 									<cfset trans=pur.TranList(parms)>
@@ -2099,6 +2099,30 @@
 											<th></th>
 										</tr>
 									</table>
+								</cfcase>
+								
+								<cfcase value="18">
+									<cfset data=pur.EndofYearSummary(parms)>
+									<!---<cfdump var="#data#" label="data" expand="yes">--->
+                                    <h1>Balance Sheet (draft) as at #DateFormat(data.prdTo,'dd-mmm-yyyy')#</h1>
+                                    <table class="tableList" border="1"> 
+                                    <cfloop collection="#data.panel#" item="key">
+                                    	<cfset nom = StructFind(data.panel,key)>
+                                    	<tr>
+                                        	<td>#nom.ID#</td>
+                                        	<td>#nom.title#</td>
+                                            <cfif nom.group eq "asset">
+                                           		<td align="right">#DecimalFormat(nom.value)#</td><td></td>
+											<cfelseif nom.group eq "liability">
+                                            	<td></td><td align="right">#DecimalFormat(nom.value)#</td>
+											<cfelseif val(nom.value) gte 0>
+                                            	<td align="right">#DecimalFormat(nom.value)#</td><td></td>
+                                            <cfelse>
+                                            	<td></td><td align="right">#DecimalFormat(nom.value)#</td>
+                                            </cfif>
+                                        </tr>
+                                    </cfloop>
+                                    </table>
 								</cfcase>
 							</cfswitch>
 						</cfif>

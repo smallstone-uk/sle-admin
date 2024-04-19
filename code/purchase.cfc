@@ -1676,5 +1676,95 @@
 		</cftry>
 		<cfreturn loc.result>
 	</cffunction>		
-	
+
+	<cffunction name="EndofYearNominal" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfargument name="panel" type="struct" required="yes">
+		<cfargument name="periodTo" type="Date" required="yes">
+		<cfargument name="nominalID" type="numeric" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+            <cfquery name="loc.result.QNominal" datasource="#args.datasource#">
+                SELECT nomID,nomTitle,nomGroup,SUM(niAmount) AS total
+                FROM tblnomitems
+                INNER JOIN tblNominal ON niNomID = nomID
+                INNER JOIN tbltrans ON niTranID = trnID
+                WHERE niNomID = #val(nominalID)#
+                AND trndate <= '#LSDateFormat(periodTo,"yyyy-mm-dd")#'
+                GROUP BY niNomID;
+           </cfquery>
+           <cfset loc.num = StructCount(panel)>
+           <cfset loc.num++>
+           <cfset StructInsert(panel,loc.num,{"ID" = nominalID, "title" = loc.result.QNominal.nomTitle,
+		   		"group" = loc.result.QNominal.nomGroup, "value" = loc.result.QNominal.total})>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="EndofYearSummary" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.prdTo = "">
+        <cfset loc.result.panel = {}>
+        
+		<cftry>
+			<cfif len(args.form.srchRange)>
+                <cfif Left(args.form.srchRange,2) eq 'FY'>
+                    <cfset loc.fyDate=StructFind(application.site.FYDates,args.form.srchRange)>
+                    <cfset loc.result.prdFrom = loc.fyDate.start>
+                    <cfset loc.result.prdTo = loc.fyDate.end>
+                </cfif>
+            <cfelseif len(args.form.srchDateFrom)>
+                <cfset loc.result.prdFrom = LSDateFormat(args.form.srchDateFrom,"yyyy-mm-dd")>
+                <cfset loc.result.prdTo = LSDateFormat(args.form.srchDateTo,"yyyy-mm-dd")>
+            </cfif>
+            <cfif len(loc.result.prdTo)>
+                <cfquery name="loc.result.QNewsDebtors" datasource="#args.datasource#">
+                    SELECT SUM(trnAmnt1 + trnAmnt2) as total
+                    FROM tbltrans
+                    WHERE trnAccountID = 4 
+                    AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
+                </cfquery>
+                <cfset StructInsert(loc.result.panel,1,{"ID" = 0,"title" = "News Debtors", "group" = "asset", "value" = loc.result.QNewsDebtors.total})>
+                
+                <cfquery name="loc.result.QCreditors" datasource="#args.datasource#">
+                    SELECT SUM(trnAmnt1 + trnAmnt2) AS total
+                    FROM tbltrans
+                    WHERE trnLedger = 'purch'
+                    AND trnDate <= '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
+                </cfquery>
+                <cfset StructInsert(loc.result.panel,2,{"ID" = 0,"title" = "Trade Creditors", "group" = "liability", "value" = -abs(loc.result.QCreditors.total)})>
+               
+                <cfset loc.fortnight = DateAdd("d",-15,loc.result.prdTo)>
+                <cfquery name="loc.result.QClosingStock" datasource="#args.datasource#">
+                    SELECT SUM(trnAmnt1) AS Total
+                    FROM tbltrans
+                    WHERE trnLedger = 'purch' 
+                    AND trnType IN ('inv', 'crn') 
+                    AND trnDate BETWEEN '#LSDateFormat(loc.fortnight,"yyyy-mm-dd")#' 
+                    	AND '#LSDateFormat(loc.result.prdTo,"yyyy-mm-dd")#'
+               </cfquery>
+               <cfset StructInsert(loc.result.panel,3,{"ID" = 0,"title" = "Closing Stock", "group" = "asset", "value" = loc.result.QClosingStock.total})>
+
+               <cfloop list="#application.controls.ctlBSIDs#" index="loc.i">
+                   <cfset EndofYearNominal(args,loc.result.panel,loc.result.prdTo,loc.i)>
+               </cfloop>
+            </cfif>
+            
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 </cfcomponent>

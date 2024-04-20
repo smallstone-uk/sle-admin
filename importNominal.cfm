@@ -47,6 +47,9 @@
 <cfparam name="srchCustomers" default="on">
 <cfparam name="srchUnknown" default="">
 <cfparam name="srchFilter" default="">
+<cfparam name="srchColName" default="">
+<cfparam name="srchField" default="">
+<cfparam name="srchRef" default="">
 <cfparam name="srchDebit" default="">
 <cfparam name="srchCredit" default="">
 
@@ -54,11 +57,12 @@
 <cfobject component="code/accounts" name="acc">
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
-<cfset nominals=pur.LoadNominalCodes(parms)>
+<cfset nominals=acc.LoadNominalCodes(parms)>
 
 <cfset insertCount = 0>
 <cfset recordCount = 0>
-
+<cfset colNames = "">
+ 
 <body>
 
 	<cffunction name="processSheet" access="public" returntype="struct">
@@ -69,63 +73,69 @@
 		<cfset loc.accountRef="">
 		<cfset loc.inFilter=true>
 		<cfset loc.inRange=true>
+        <cfset loc.trans = []>
 		
 		<cfspreadsheet action="read" src="#args.fileName#" name="spready">
 		<cfset SpreadsheetSetActiveSheet(spready,"Bank Recon")>
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
-<cfdump var="#reconInfo#" label="reconInfo" expand="false">
+
 		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
-				columns="1-10" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="true">
-			<cfdump var="#QData#" label="QData" expand="false">
+				columns="1-12" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="true" />
+			<!---<cfdump var="#QData#" label="QData" expand="false">--->
+            <cfset colNames = QData.ColumnList>
 			<cfoutput>
 				<table class="tableStyle" border="1">
-					<tr>
-						<th>Reference</th>
-						<th>Date</th>
-						<th>Name</th>
-						<th>Amount</th>
-						<th>Exists?</th>
-						<th>In Range?</th>
-					</tr>
+                    <tr>
+                    <cfloop list="#colNames#" index="fld">
+                        <td>#fld#</td>
+                    </cfloop>
+                    </tr>
 					<cfloop query="QData">
 						<cfset loc.exists = 0>
 						<cfset loc.inRange = true>
 						<cfif StructKeyExists(args,"form")>
 							<cfset loc.inRange = Qdata.Date GTE args.form.srchDateFrom AND (Qdata.Date LTE args.form.srchDateTo OR len(args.form.srchDateTo) IS 0)>
+                            <cfset loc.inRange = loc.inRange AND Evaluate(srchColName) eq srchFilter>
 						</cfif>
 						<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 							SELECT *
 							FROM tblTrans
-							WHERE trnDate='#Date#'
+							WHERE trnRef='#Ref#'
 						</cfquery>
 						<cfif loc.QCheckExists.recordcount gt 0>
 							<cfset loc.exists = 1>
 							<cfset recordCount++>
 						<cfelseif loc.inRange AND Value neq 0>
 							<cfset insertCount++>
+							<cfset loc.rec = {
+                                "trnDate" = LSDateFormat(Date,'yyyy-mm-dd'),
+                                "trnRef" = Ref,
+                                "trnDesc" = Description,
+								"items" = [
+									{"niNomID" = srchDebit,
+									"niAmount" = ABS(Value)},
+									{"niNomID" = srchCredit,
+									"niAmount" = -ABS(Value)}
+								]
+                            }>
+                            <cfset ArrayAppend(loc.trans,loc.rec)>
 							<cfif srchMode eq 2>
-								<cfset loc.rec = {
-									"trnDate" = Date,
-									"trnRef" = '',
-									"trnDesc" = Description,
-									"trnAmount" = Value
-								}>
-								<cfset InsertTran(loc.rec)>
+                            	<tr>
+									<td><cfset InsertTran(loc.rec)></td>
+                                </tr>
 							</cfif>
 						</cfif>
 						<cfif loc.inRange>
-						<tr>
-							<td>##</td>
-							<td align="right">#Date#</td>
-							<td>#Description#</td>
-							<td align="right">#Value#</td>
-							<td align="center">#loc.exists#</td>
-							<td align="center">#loc.inRange#</td>
-						</tr>
-						</cfif>
+                        	<tr>
+                            <cfloop list="#colNames#" index="fld">
+                                <td>#Evaluate(fld)#</td>
+                            </cfloop>
+                            </tr>
+                        </cfif>
 					</cfloop>
 				</table>
+                <!---<cfdump var="#loc.trans#" label="loc.trans" expand="false">--->
 			</cfoutput>
 		</cfloop>
 
@@ -134,6 +144,7 @@
 		
 	<cffunction name="InsertTran" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
+      <!---  <cfdump var="#args#" label="args" expand="false">--->
 		<cfset var loc={}>
 		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 			SELECT *
@@ -147,15 +158,21 @@
 				VALUES ('nom','#args.trnRef#','#DateFormat(args.trnDate,"yyyy-mm-dd")#','#args.trnDesc#','nom',1,1)
 			</cfquery>
 			<cfset loc.tranID = loc.QInsertTranResult.generatedKey>
+            <cfset loc.str = "">
+            <cfloop array="#args.items#" index="loc.rec">
+                <cfset loc.str = "#loc.str#(#loc.rec.niNomID#,#loc.tranID#,#loc.rec.niAmount#),">
+            </cfloop>
+            <cfset loc.str = RemoveChars(loc.str, len(loc.str),1)>
+            <!---<cfdump var="#loc.str#" label="loc.str" expand="false">--->
 			<cfquery name="loc.QInsertItems" datasource="#application.site.datasource1#">
 				INSERT INTO tblNomItems
 					(niNomID,niTranID,niAmount)
-				VALUES 	(2092,#loc.tranID#,#args.trnAmount#),
-						(181,#loc.tranID#,#-args.trnAmount#)
+				VALUES
+                	#loc.str#
 			</cfquery>
-		</cfif>
+		</cfif>       
 	</cffunction>
-		
+    		
 <!--- main --->
 <cftry>
 	<cfflush interval="200">
@@ -192,12 +209,16 @@
 </cftry>
 
 <cfdirectory directory="#dataDir#" action="list" name="QDir">
-<h2><a href="importDelWages.cfm">Import Delivery Wages</a></h2>
+<h2><a href="importDelWages.cfm">Import Nominal Transactions</a></h2>
 <cfoutput>
 <form name="processForm" method="post" enctype="multipart/form-data">
 	<table class="tableStyle" border="1" width="500">
 		<tr>
 			<th colspan="2" align="left">Import Settings</th>
+		</tr>
+		<tr>
+			<td>Reference</td>
+			<td><input type="text" name="srchRef" value="#srchRef#" size="15" /></td>
 		</tr>
 		<tr>
 			<td>Transaction Dates From</td>
@@ -208,15 +229,24 @@
 			<td><input type="text" name="srchDateTo" value="#srchDateTo#" size="15" class="datepicker" /></td>
 		</tr>
 		<tr>
+			<td>Match Column Name</td>
+			<td>
+            	<select name="srchColName" class="select">
+                	<cfloop list="#colNames#" index="fld">
+                    	<option value="#fld#"<cfif fld is srchColName> selected="selected"</cfif>>#fld#</option>
+                    </cfloop>
+            	</select>
+                To: <input type="text" name="srchFilter" value="#srchFilter#" size="15" />
+            </td>
+		</tr>
+		<tr>
 			<td>Debit Account</td>
 			<td>
 				<select name="srchDebit" class="select">
 					<option value="">Select...</option>
-					<cfset keys=ListSort(StructKeyList(nominals.codes,","),"text","asc",",")>
-					<cfloop list="#keys#" index="key">
-						<cfset nom=StructFind(nominals.codes,key)>
+					<cfloop array="#nominals.nomArray#" index="nom">
 						<option value="#nom.nomID#"<cfif nom.nomID is srchDebit> selected="selected"</cfif>>
-							#nom.nomCode# - #nom.nomTitle#</option>
+							#NumberFormat(nom.nomID,'0000')# - #nom.nomGroup# - #nom.nomCode# - #nom.nomTitle#</option>
 					</cfloop>
 				</select>
 			</td>					
@@ -226,18 +256,12 @@
 			<td>
 				<select name="srchCredit" class="select">
 					<option value="">Select...</option>
-					<cfset keys=ListSort(StructKeyList(nominals.codes,","),"text","asc",",")>
-					<cfloop list="#keys#" index="key">
-						<cfset nom=StructFind(nominals.codes,key)>
+					<cfloop array="#nominals.nomArray#" index="nom">
 						<option value="#nom.nomID#"<cfif nom.nomID is srchCredit> selected="selected"</cfif>>
-							#nom.nomCode# - #nom.nomTitle#</option>
+							#NumberFormat(nom.nomID,'0000')# - #nom.nomGroup# - #nom.nomCode# - #nom.nomTitle#</option>
 					</cfloop>
 				</select>
 			</td>					
-		</tr>
-		<tr>
-			<td>Filter Key</td>
-			<td><input type="text" name="srchFilter" value="#srchFilter#" size="15" /></td>
 		</tr>
 		<tr>
 			<td>Processing Mode</td>

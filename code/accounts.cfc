@@ -1649,6 +1649,7 @@
 		<cfset loc.result = {}>
 		<cfset loc.rec={}>
 		<cfset loc.result.codes = {}>
+		<cfset loc.result.NomArray = []>
 		<cftry>
 			<cfquery name="loc.result.QNominal" datasource="#args.datasource#">
 				SELECT *,
@@ -1670,6 +1671,7 @@
 				<cfset loc.rec.nomVATCode=nomVATCode>
 				<cfset loc.rec.nomVATRate=VATRate>
 				<cfset StructInsert(loc.result.codes,nomCode,loc.rec)>
+                <cfset ArrayAppend(loc.result.NomArray,loc.rec)>
 			</cfloop>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

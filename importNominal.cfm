@@ -106,6 +106,7 @@
 						<cfif loc.QCheckExists.recordcount gt 0>
 							<cfset loc.exists = 1>
 							<cfset recordCount++>
+                            #Date#<bR>
 						<cfelseif loc.inRange AND Value neq 0>
 							<cfset insertCount++>
 							<cfset loc.rec = {

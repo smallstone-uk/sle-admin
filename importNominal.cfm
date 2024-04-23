@@ -82,7 +82,7 @@
 		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
 				columns="1-12" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="true" />
-			<!---<cfdump var="#QData#" label="QData" expand="false">--->
+			<cfdump var="#QData#" label="QData" expand="false">
             <cfset colNames = QData.ColumnList>
 			<cfoutput>
 				<table class="tableStyle" border="1">
@@ -115,9 +115,9 @@
                                 "trnDesc" = Description,
 								"items" = [
 									{"niNomID" = srchDebit,
-									"niAmount" = ABS(Value)},
+									"niAmount" = ABS(val(Value))},
 									{"niNomID" = srchCredit,
-									"niAmount" = -ABS(Value)}
+									"niAmount" = -ABS(val(Value))}
 								]
                             }>
                             <cfset ArrayAppend(loc.trans,loc.rec)>

@@ -82,7 +82,7 @@
 		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
 				columns="1-12" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="true" />
-			<cfdump var="#QData#" label="QData" expand="false">
+			<!---<cfdump var="#QData#" label="QData" expand="false">--->
             <cfset colNames = QData.ColumnList>
 			<cfoutput>
 				<table class="tableStyle" border="1">
@@ -106,7 +106,6 @@
 						<cfif loc.QCheckExists.recordcount gt 0>
 							<cfset loc.exists = 1>
 							<cfset recordCount++>
-                            #Date#<bR>
 						<cfelseif loc.inRange AND Value neq 0>
 							<cfset insertCount++>
 							<cfset loc.rec = {

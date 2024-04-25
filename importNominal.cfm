@@ -103,10 +103,11 @@
 							FROM tblTrans
 							WHERE trnRef='#Ref#'
 						</cfquery>
+                        <cfset loc.cleanValue = val(Value)>
 						<cfif loc.QCheckExists.recordcount gt 0>
 							<cfset loc.exists = 1>
 							<cfset recordCount++>
-						<cfelseif loc.inRange AND Value neq 0>
+						<cfelseif loc.inRange AND loc.cleanValue neq 0>
 							<cfset insertCount++>
 							<cfset loc.rec = {
                                 "trnDate" = LSDateFormat(Date,'yyyy-mm-dd'),
@@ -114,9 +115,9 @@
                                 "trnDesc" = Description,
 								"items" = [
 									{"niNomID" = srchDebit,
-									"niAmount" = ABS(val(Value))},
+									"niAmount" = ABS(loc.cleanValue)},
 									{"niNomID" = srchCredit,
-									"niAmount" = -ABS(val(Value))}
+									"niAmount" = -ABS(loc.cleanValue)}
 								]
                             }>
                             <cfset ArrayAppend(loc.trans,loc.rec)>

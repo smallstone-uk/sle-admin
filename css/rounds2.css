@@ -75,7 +75,7 @@ h1 {line-height: 22px !important;font-size: 20px !important;margin: 10px 0 0 0 !
 .delTableList th {padding:4px 5px;background: #EFF3F7; border-color: #BDC9DD;color: #18315C; font-size: 18px;}
 .delTableList td {padding:2px 5px;border-color: #BDC9DD; font-size:20px;}
 .delTableList .client {padding:2px 5px; font-size:20px;}
-.delTableList .pickPub {padding:2px 5px; font-size:24px;}
+.delTableList .pickPub {padding:2px 5px; font-size:24px; font-weight:bold;}
 .bigGap {width:100%; height:20px;}
 
 

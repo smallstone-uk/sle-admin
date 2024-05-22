@@ -723,7 +723,7 @@
 						</cfif>
 						<cfif arraylen(loc.order.items)>
 							<tr>
-								<td>#loc.order.number#</td>
+								<td class="client">#loc.order.number#</td>
 								<td>
 									<div class="house-items">
 										<ul>
@@ -775,7 +775,7 @@
 							<cfset loc.pick = StructFind(loc.pickList,loc.pickKey)>
 							<cfset loc.pickCount += loc.pick.qty>
 							<tr>
-								<td><strong>#loc.pick.title#</strong></td>
+								<td class="pickPub">#loc.pick.title#</td>
 								<td align="center"><strong>#loc.pick.qty#</strong></td>
 							</tr>
 						</cfloop>

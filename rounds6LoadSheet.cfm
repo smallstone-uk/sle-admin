@@ -33,7 +33,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.print').click(function(e) {
-				if (confirm("Izabelle said: This option will NOT charge the customers. Only use this option if you are re-printing rounds already charged. Are you sure you want to continue?")) {
+				if (confirm("This option will NOT charge the customers. Only use this option if you are re-printing rounds already charged. Are you sure you want to continue?")) {
 					Print();
 					e.preventDefault();
 				}

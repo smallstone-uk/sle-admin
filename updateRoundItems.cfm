@@ -79,7 +79,8 @@
 					<cfif i is 1>
 						<cfquery name="QUpdate" datasource="#args.datasource#">
 							UPDATE tblRoundItems
-							SET riDay='mon'
+							SET riDay='mon',
+                            	riDayEnum = 'mon'
 							WHERE riID=#riID#
 						</cfquery>
 					<cfelse>
@@ -89,11 +90,13 @@
 								riOrderID,
 								riRoundID,
 								riDay,
+                                riDayEnum,
 								riOrder
 							) VALUES (
 								#val(riClientID)#,
 								#val(riOrderID)#,
 								#val(riRoundID)#,
+								'#ddd#',
 								'#ddd#',
 								#val(riOrder)#
 							)

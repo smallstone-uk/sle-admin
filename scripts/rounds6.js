@@ -22,7 +22,7 @@ function LoadRoundSheet() {
 function LoadIncomeSheet() {
 	$.ajax({
 		type: 'POST',
-		url: 'rounds6IncomeSheet.cfm',
+		url: 'rounds6IncomeSheet3.cfm',
 		data : $('#roundForm').serialize(),
 		beforeSend:function(){
 			$('#loading').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Building income sheet...").fadeIn();

@@ -47,6 +47,7 @@
 		.summaryList td {padding:2px 5px; border-color: #ccc;}
 
 		.header td {background-color:#55BFFF; padding:4px 5px;}
+		.info {background-color:#eee;}
 		.footer {background-color:#AAFFFF}
 		.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}
 		.rndfooter td {background-color:#D6FE89; padding:4px 0px; font-weight:bold; font-size:14px !important}
@@ -58,7 +59,7 @@
 <cfset parm.roundDate=DateFormat(DateAdd('d',1,Now()),'yyyy-mm-dd')>
 <cfobject component="code/rounds6" name="rnd">
 <cfset roundList=rnd.LoadRoundList(parm)>
-
+<cfdump var="#roundList#" label="roundList" expand="false">
 	<cfparam name="showTrans" default="0">
 	<cfparam name="showDumps" default="0">
 	<cfparam name="useNewCode" default="0">

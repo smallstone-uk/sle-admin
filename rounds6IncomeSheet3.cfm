@@ -11,6 +11,12 @@
 		<cfset loc.result.rounds = {}>
 		
 		<cftry>
+			<cfquery name="loc.result.QDrivers" datasource="#args.datasource1#">
+				SELECT rndID,rndRef,rndTitle, drName,drDay
+				FROM tbldriver
+				INNER JOIN tblRounds ON rndID = drRoundID
+				WHERE 1
+			</cfquery>
 			<cfquery name="loc.QData" datasource="#args.datasource1#">
 				SELECT riRoundID,riDayEnum,riOrder,riOrderID,
 					rndID,rndRef,rndTitle,rndMileage,rndStyle,
@@ -162,6 +168,7 @@
 					<cfset loc.customer.dayCharges[riDayEnum] = delPrice1>
 				</cfif>
 			</cfloop>
+
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -261,6 +268,30 @@
 				<cfset loc.roundData.totals.netProfit = loc.roundData.totals.grossProfit - loc.roundData.totals.driverPay>
 			</cfloop>	<!--- end round --->
 			
+			<!--- build driver struct rndID,rndRef,rndTitle, drName,drDay --->
+			<cfset loc.result.drivers = {}>
+			<cfloop query="args.QDrivers">
+				<cfif ListFind(args.parms.form.roundsTicked,rndID)>
+					<cfif !StructKeyExists(loc.result.drivers,rndRef)>
+						<cfset StructInsert(loc.result.drivers,rndRef, {"Round" = rndTitle, roundTotal = 0,
+								sun = {},
+								mon = {},
+								tue = {},
+								wed = {},
+								thu = {},
+								fri = {},
+								sat = {}					
+						})>
+					</cfif>
+					<cfset loc.rota = StructFind(loc.result.drivers,rndRef)>
+					<cfif StructKeyExists(args.rounds,rndRef)>
+						<cfset loc.rnd = StructFind(args.rounds,rndRef)>
+						<cfset loc.rota.roundTotal += loc.rnd.activeDays[drDay].total>
+						<cfset StructUpdate(loc.rota,drDay, {"Driver" = drName, "driverPay" = loc.rnd.activeDays[drDay].total})>
+					</cfif>
+				</cfif>
+			</cfloop>
+
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -281,27 +312,29 @@
 				<cfloop list="#loc.roundKeys#" index="loc.roundKey" delimiters=",">
 					<cfset loc.roundData = StructFind(args.rounds,loc.roundKey)>
 					<table class="roundList" border="1">
-						<tr>
-							<th class="rndheader">#loc.roundKey#</th>
-							<th colspan="16" class="rndheader">#loc.roundData.roundTitle#</th>
-						</tr>
-						<tr>
-							<th width="10"></th>
-							<th>Publication</th>
-							<th align="right">Retail Price</th>
-							<th align="right">Trade Price</th>
-							<th width="30" align="center">Sun</th>
-							<th width="30" align="center">Mon</th>
-							<th width="30" align="center">Tue</th>
-							<th width="30" align="center">Wed</th>
-							<th width="30" align="center">Thu</th>
-							<th width="30" align="center">Fri</th>
-							<th width="30" align="center">Sat</th>
-							<th width="20" align="center">Weekly Total</th>
-							<th width="40" align="right">Retail Value</th>
-							<th width="40" align="right">Trade Total</th>
-							<th width="40" align="right">Profit</th>
-						</tr>
+						<cfif StructKeyExists(args.parms.form,"showTrans")>
+							<tr>
+								<th class="rndheader">#loc.roundKey#</th>
+								<th colspan="16" class="rndheader">#loc.roundData.roundTitle#</th>
+							</tr>
+							<tr>
+								<th width="10"></th>
+								<th>Publication</th>
+								<th align="right">Retail Price</th>
+								<th align="right">Trade Price</th>
+								<th width="30" align="center">Sun</th>
+								<th width="30" align="center">Mon</th>
+								<th width="30" align="center">Tue</th>
+								<th width="30" align="center">Wed</th>
+								<th width="30" align="center">Thu</th>
+								<th width="30" align="center">Fri</th>
+								<th width="30" align="center">Sat</th>
+								<th width="20" align="center">Weekly Total</th>
+								<th width="40" align="right">Retail Value</th>
+								<th width="40" align="right">Trade Total</th>
+								<th width="40" align="right">Profit</th>
+							</tr>
+						</cfif>
 						<!--- loop customers --->
 						<cfset loc.customerKeys = ListSort(StructKeyList(loc.roundData.customers,","),"text","asc")>
 						<cfloop list="#loc.customerKeys#" index="loc.customerKey" delimiters=",">
@@ -397,14 +430,16 @@
 								</tr>
 							</cfif>
 						</cfloop>
-						<tr class="rndfooter">
-							<td align="center">#ListLen(loc.customerKeys)#</td>
-							<td>drops</td>
-							<td align="right" colspan="10">#loc.roundData.roundTitle# Totals</td>
-							<td align="right">#DecimalFormat(loc.roundData.Totals.pubRetail)#</td>
-							<td align="right">#DecimalFormat(loc.roundData.Totals.pubTrade)#</td>
-							<td align="right">#DecimalFormat(loc.roundData.Totals.pubProfit)#</td>
-						</tr>
+						<cfif StructKeyExists(args.parms.form,"showTrans")>
+							<tr class="rndfooter">
+								<td align="center">#ListLen(loc.customerKeys)#</td>
+								<td>drops</td>
+								<td align="right" colspan="10">#loc.roundData.roundTitle# Totals</td>
+								<td align="right">#DecimalFormat(loc.roundData.Totals.pubRetail)#</td>
+								<td align="right">#DecimalFormat(loc.roundData.Totals.pubTrade)#</td>
+								<td align="right">#DecimalFormat(loc.roundData.Totals.pubProfit)#</td>
+							</tr>
+						</cfif>
 					</table>
 				</cfloop>
 			</cfoutput>
@@ -517,6 +552,67 @@
 				</table>
 			</cfoutput>
 	
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="ShowDriverSummary" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.driverTotals = {}>
+		
+		<cftry>
+			<cfset loc.roundKeys = ListSort(StructKeyList(args.drivers,","),"text","asc")>
+			<cfoutput>
+				<table class="summaryList" style="margin:10px">
+					<tr>
+						<th width="80"></th>
+						<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
+							<th width="60" align="right">#loc.dayName#</th>
+						</cfloop>
+						<th width="60" align="right">Totals</th>
+					</tr>
+					<cfloop list="#loc.roundKeys#" index="loc.roundKey" delimiters=",">
+						<cfset loc.rnd = StructFind(args.drivers,loc.roundKey)>
+						<tr>
+							<td>#loc.rnd.round#</td>
+							<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
+								<cfset loc.dayData = StructFind(loc.rnd,loc.dayName)>
+								<cfif !StructIsEmpty(loc.dayData)>
+									<cfif !StructKeyExists(loc.driverTotals,loc.dayData.driver)>
+										<cfset StructInsert(loc.driverTotals,loc.dayData.driver,0)>
+									</cfif>
+									<cfset loc.balance = StructFind(loc.driverTotals,loc.dayData.driver)>
+									<cfset StructUpdate(loc.driverTotals,loc.dayData.driver,loc.balance + loc.dayData.driverPay)>
+									<td align="right">
+										#loc.dayData.driver#<br />#showField(loc.dayData.driverPay)#
+									</td>
+								<cfelse>
+									<td align="right"></td>
+								</cfif>
+							</cfloop>
+							<td align="right">#DecimalFormat(loc.rnd.roundTotal)#</td>
+						</tr>
+					</cfloop>
+				</table>
+				<!--- output driver totals --->
+				<cfset loc.driverKeys = ListSort(StructKeyList(loc.driverTotals,","),"text","asc")>
+				<table class="summaryList" style="margin:10px">
+					<cfloop list="#loc.driverKeys#" index="loc.driver" delimiters=",">
+						<cfset loc.driverPay = StructFind(loc.driverTotals,loc.driver)>
+						<tr>
+							<td>#loc.driver#</td>
+							<td align="right">#DecimalFormat(loc.driverPay)#</td>
+						</tr>
+					</cfloop>
+				</table>
+			</cfoutput>
+			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -667,6 +763,7 @@
 	<cfset view = showRoundData(data)>
 	<cfset view = showRoundSummary(data)>
 	<cfset view = ShowDaySummary(data)>
+	<cfset view = ShowDriverSummary(data)>
 
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

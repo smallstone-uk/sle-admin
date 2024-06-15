@@ -230,14 +230,14 @@
 				
 			<!--- remove duplicates --->
 			<cfset loc.uniques = []>
-			<cfloop array="#args.items#" index="item">
-				<cfif !ArrayFind(loc.uniques,item)>
-					<cfset ArrayAppend(loc.uniques,item)>
+			<cfloop array="#args.items#" index="loc.item">
+				<cfif !ArrayFind(loc.uniques,loc.item)>
+					<cfset ArrayAppend(loc.uniques,loc.item)>
 				</cfif>
 			</cfloop>
 			<cfset args.items = loc.uniques>
 			
-			<cfif NOT ArrayIsEmpty(args.items)>
+			<cfif !ArrayIsEmpty(loc.uniques)>
 				<cfquery name="loc.addItems" datasource="#GetDatasource()#">
 					INSERT INTO tblEPOS_DealItems (
 						ediParent,
@@ -246,13 +246,13 @@
 						ediMaxQty
 					) VALUES
 					<cfset loc.counter = 1>
-					<cfloop array="#loc.uniques#" index="item">
+					<cfloop array="#loc.uniques#" index="loc.item">
 						(
 							#val(args.header.ed_id)#,
 							#val(item.id)#,
 							#val(item.minqty)#,
 							#val(item.maxqty)#
-						)<cfif loc.counter neq ArrayLen(args.items) AND ArrayLen(args.items) gt 1>,</cfif>
+						)<cfif loc.counter neq ArrayLen(loc.uniques) AND ArrayLen(loc.uniques) gt 1>,</cfif>
 						<cfset loc.counter++>
 					</cfloop>
 				</cfquery>

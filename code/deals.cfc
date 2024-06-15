@@ -246,7 +246,7 @@
 						ediMaxQty
 					) VALUES
 					<cfset loc.counter = 1>
-					<cfloop array="#args.items#" index="item">
+					<cfloop array="#loc.uniques#" index="item">
 						(
 							#val(args.header.ed_id)#,
 							#val(item.id)#,

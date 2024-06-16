@@ -4,7 +4,7 @@
 <cfif parm.retailClub gt -1>
     <cfset clubs = deals.LoadAllDeals(parm.retailClub)>
 <cfelse>
-    <cfset clubs = deals.LoadAllDeals()>
+    <cfset clubs = deals.LoadLatestDeals(parm.retailClub)>
 </cfif>
 
 <cfoutput>

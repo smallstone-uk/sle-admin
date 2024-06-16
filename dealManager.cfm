@@ -23,7 +23,7 @@
 </head>
 
 <cfobject component="code/deals" name="deals">
-<cfset existingDeals = deals.LoadAllDeals()>
+<cfset existingDeals = deals.LoadLatestDeals()>
 
 <cfoutput>
 <body>
@@ -124,6 +124,7 @@
 	</script>
 	<div id="wrapper">
 		<cfinclude template="sleHeader.cfm">
+		<cfset retailClubs = deals.LoadRetailClubs()>
 		<div id="content">
 			<div id="content-inner" style="padding-right:0;">
 				<div class="module">
@@ -135,9 +136,9 @@
 					<h2>Existing Deals</h2>
 					<div style="margin-bottom: 10px">
 						<select name="retail_club" id="retailClubSelect">
-							<option value="-1">All Deals</option>
+						<!---	<option value="-1">All Deals</option>--->
 							<optgroup label="Retail Clubs">
-								<cfloop array="#deals.LoadRetailClubs()#" index="item">
+								<cfloop array="#retailClubs#" index="item">
 									<option value="#item.ercID#">#item.ercTitle#</option>
 								</cfloop>
 							</optgroup>

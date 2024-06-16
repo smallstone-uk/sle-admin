@@ -107,11 +107,12 @@
 				$('.rowList').append(
 					'<tr>' +
 						'<td><a href="javascript:void(0)" class="ctrlDelProdItem" data-prodID="0" data-dealID="0">D</a></td>' +
+						'<td>(id)</td>' +
 						'<td id="rli_name" align="left">' +
-							'<a href="javascript:void(0)" class="deal_product_item" data-title="New Row" data-id="0">New Row</a>' +
+							'<a href="javascript:void(0)" class="deal_product_item" data-title="New Row" data-id="0">Click to select product...</a>' +
 						'</td>' +
-						'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min Qty" value=""></td>' +
-						'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max Qty" value=""></td>' +
+						'<td id="rli_min" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_minqty" placeholder="Min" value=""></td>' +
+						'<td id="rli_max" align="right"><input type="text" style="text-align:right;width:50px;" name="edi_maxqty" placeholder="Max" value=""></td>' +
 					'</tr>'
 				);
 				$('*').blur();
@@ -191,14 +192,15 @@
 	<cfif NOT deal.edID is 1>
     	<a href="javascript:void(0)" id="delDeal" class="sleui-button">Delete Deal</a>
 	</cfif>
+	<cfset retailClubs = deals.LoadRetailClubs()>
 	<form method="post" enctype="multipart/form-data" class="DealFormHeader">
 		<input type="hidden" name="ed_id" value="#deal.edID#">
 		<table class="deal_form" width="100%" border="0">
 			<tr>
-				<td align="left">Retail Club</td>
+				<td align="left" width="100">Retail Club</td>
 				<td>
 					<select name="ed_retailclub" id="edRetailClubSelect">
-						<cfloop array="#deals.LoadRetailClubs()#" index="item">
+						<cfloop array="#deals.LoadRetailClubs(retailClubs)#" index="item">
 							<option <cfif val(item.ercID) is val(deal.edRetailClub)>selected</cfif> value="#item.ercID#" 
 								data-starts="#LSDateFormat(item.ercStarts, 'yyyy-mm-dd')#" 
 								data-ends="#LSDateFormat(item.ercEnds, 'yyyy-mm-dd')#">#item.ercTitle# (#item.ercIssue#)</option>
@@ -207,11 +209,15 @@
 				</td>
 			</tr>
 			<tr>
-				<td align="left" width="100">ID</td>
-				<td><input type="text" name="ed_id" disabled="true" value="#deal.edID#" placeholder="Deal ID"></td>
+				<td align="left">Index</td>
+				<td><input type="text" name="ed_edIndex" size="6" disabled="true" value="#deal.edIndex#" disabled="disabled"></td>
 			</tr>
 			<tr>
-				<td align="left" width="100">Title</td>
+				<td align="left">ID</td>
+				<td><input type="text" name="ed_id" size="6" disabled="true" value="#deal.edID#" placeholder="Deal ID"></td>
+			</tr>
+			<tr>
+				<td align="left">Title</td>
 				<td><input type="text" name="ed_title" value="#deal.edTitle#" placeholder="Deal Title (printed on labels)"></td>
 			</tr>
 			<tr>
@@ -239,11 +245,11 @@
 			</tr>
 			<tr>
 				<td align="left">Amount</td>
-				<td><input type="text" name="ed_amount" value="#DecimalFormat(deal.edAmount)#" placeholder="Amount (GBP)"></td>
+				<td><input type="text" name="ed_amount" size="6" value="#DecimalFormat(deal.edAmount)#" placeholder="Amount (GBP)"></td>
 			</tr>
 			<tr>
 				<td align="left">Quantity</td>
-				<td><input type="text" name="ed_quantity" value="#deal.edQty#" placeholder="Qty"></td>
+				<td><input type="text" name="ed_quantity" size="6" value="#deal.edQty#" placeholder="Qty"></td>
 			</tr>
 			<tr>
 				<td align="left">Status</td>

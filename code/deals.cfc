@@ -191,9 +191,6 @@
 		<cfargument name="args" type="struct" required="yes">
         <cfset var loc = {}>
  		<cftry>
-		   <cfdump var="#args#" label="UpdateDeal" expand="yes" format="html" 
-			output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
 			<!---Check if the deal exists--->
 			<cfquery name="loc.check" datasource="#GetDatasource()#">
 				SELECT *
@@ -510,17 +507,27 @@
 	</cffunction>
 	
 	<cffunction name="LoadLatestDeals" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
-		
 		<cftry>
-			<cfquery name="loc.latestClub" datasource="#GetDatasource()#">
-				SELECT MAX(ercID) AS ID FROM tblepos_retailclubs				
-			</cfquery>
+			<cfif args.retailClub neq 0>
+				<cfset loc.retailClub = args.retailClub>
+			<cfelse>
+				<cfquery name="loc.latestClub" datasource="#GetDatasource()#">
+					SELECT MAX(ercID) AS ID FROM tblepos_retailclubs				
+				</cfquery>
+				<cfset loc.retailClub = loc.latestClub.ID>
+			</cfif>
 			<cfquery name="loc.deals" datasource="#GetDatasource()#">
 				SELECT *
 				FROM tblEPOS_Deals
-				WHERE edRetailClub = #val(loc.latestClub.ID)#
+				WHERE edRetailClub = #val(loc.retailClub)#
+				<cfif args.status eq "active">
+					AND edStatus = "active"
+				<cfelseif args.status eq "inactive">
+					AND edStatus = "inactive"
+				</cfif>
 				ORDER BY edRetailClub DESC, edIndex ASC, edTitle ASC
 			</cfquery>
 		<cfcatch type="any">

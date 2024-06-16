@@ -44,7 +44,7 @@
 .deal_wrapper, .club_wrapper {
 	float: left;
 	width: 100%;
-	height: 100%;
+	height: 80vh;
 	overflow-y: scroll;
 }
 

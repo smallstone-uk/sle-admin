@@ -23,7 +23,7 @@
 </head>
 
 <cfobject component="code/deals" name="deals">
-<cfset existingDeals = deals.LoadAllDeals()>
+<!---<cfset existingDeals = deals.LoadLatestDeals()>--->
 
 <cfoutput>
 <body>
@@ -94,7 +94,8 @@
 				$.ajax({
 					type: "POST",
 					url: "ajax/deals/load_deals.cfm",
-					data: {"retailClub": (retailClub || $('##retailClubSelect').val())},
+					data: $('##clubForm').serialize(),
+				/*	data: {"retailClub": (retailClub || $('##retailClubSelect').val())},*/
 					success: function(data) {
 						$('.deal_wrapper').html(data);
 						$('*').blur();
@@ -117,6 +118,11 @@
 				var clubID = $(this).val();
 				load_deals(clubID);
 			});
+			
+			$('##retailStatus').change(function(event) {
+				var clubID = $(this).val();
+				load_deals(clubID);
+			});
 
 			load_deals();
 			load_clubs();
@@ -124,6 +130,7 @@
 	</script>
 	<div id="wrapper">
 		<cfinclude template="sleHeader.cfm">
+		<cfset retailClubs = deals.LoadRetailClubs()>
 		<div id="content">
 			<div id="content-inner" style="padding-right:0;">
 				<div class="module">
@@ -133,16 +140,23 @@
 				</div>
 				<div class="module" style="width:27%;">
 					<h2>Existing Deals</h2>
+					<form method="post" id="clubForm">
 					<div style="margin-bottom: 10px">
-						<select name="retail_club" id="retailClubSelect">
-							<option value="-1">All Deals</option>
+						Club: <select name="retail_club" id="retailClubSelect">
+						<!---	<option value="-1">All Deals</option>--->
 							<optgroup label="Retail Clubs">
-								<cfloop array="#deals.LoadRetailClubs()#" index="item">
+								<cfloop array="#retailClubs#" index="item">
 									<option value="#item.ercID#">#item.ercTitle#</option>
 								</cfloop>
 							</optgroup>
 						</select>
+						Status: <select name="status" id="retailStatus">
+							<option value="active">Active</option>
+							<option value="inactive">Inactive</option>
+							<option value="either">Either</option>
+						</select>
 					</div>
+					</form>
 					<div class="deal_wrapper"></div>
 				</div>
 				<div class="module" style="width: calc(48% - 20px);float: left;margin-left: 10px;">

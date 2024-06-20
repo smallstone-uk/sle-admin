@@ -1,16 +1,14 @@
 ﻿<cfobject component="code/deals" name="deals">
-<cfset parm.retailClub = val(retailClub)>
 
-<cfif parm.retailClub gt -1>
-    <cfset clubs = deals.LoadAllDeals(parm.retailClub)>
-<cfelse>
-    <cfset clubs = deals.LoadAllDeals()>
-</cfif>
+<cfset parms = {}>
+<cfset parms.retailClub = val(form.retail_Club)>
+<cfset parms.status = form.status>
+<cfset deals = deals.LoadLatestDeals(parms)>
 
 <cfoutput>
-	<cfloop array="#clubs#" index="item">
+	<cfloop array="#deals#" index="item">
 		<a href="javascript:void(0)" class="deal_item" data-id="#item.edID#">
 			#item.edIndex#: #item.edTitle# - #item.edDealType# (#item.edQty#) - &pound;#item.edAmount# #item.edStatus#</a>
 	</cfloop>
-	#ArrayLen(clubs)# deals.
+	#ArrayLen(deals)# deals.
 </cfoutput>

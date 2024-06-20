@@ -63,14 +63,35 @@
 
     <cffunction name="LoadRetailClubs" access="public" returntype="array">
         <cfset var loc = {}>
-    
+    	<cfset loc.clubArray = []>
+		
         <cfquery name="loc.clubs" datasource="#GetDatasource()#">
 			SELECT *
 			FROM tblEPOS_RetailClubs
 			ORDER BY ercTimestamp DESC
 		</cfquery>
-    
-        <cfreturn QueryToArrayOfStruct(loc.clubs)>
+    	<cfloop query="loc.clubs">
+			<cfif ercID lt 10>
+				<cfset ArrayPrepend(loc.clubArray,{
+					"ercID" = ercID,
+					"ercTitle" = ercTitle,
+					"ercIssue" = ercIssue,
+					"ercStarts" = ercStarts,
+					"ercEnds" = ercEnds,
+					"ercIndex" = ercIndex
+				})>
+			<cfelse>
+				<cfset ArrayAppend(loc.clubArray,{
+					"ercID" = ercID,
+					"ercTitle" = ercTitle,
+					"ercIssue" = ercIssue,
+					"ercStarts" = ercStarts,
+					"ercEnds" = ercEnds,
+					"ercIndex" = ercIndex
+				})>
+			</cfif>
+		</cfloop>
+        <cfreturn loc.clubArray>
     </cffunction>
 
     <cffunction name="CreateDeal" access="public" returntype="struct">
@@ -169,96 +190,101 @@
     <cffunction name="UpdateDeal" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
         <cfset var loc = {}>
-    
-        <!---Check if the deal exists--->
-        <cfquery name="loc.check" datasource="#GetDatasource()#">
-			SELECT *
-			FROM tblEPOS_Deals
-			WHERE edID = #val(args.header.ed_id)#
-			LIMIT 1
-		</cfquery>
-
-		<cfif loc.check.recordcount is 1>
-			<cfset loc.edType = ""/>
-
-			<cfswitch expression="#args.header.ed_dealtype#">
-				<cfcase value="twofor">
-					<cfset loc.edType = "Quantity"/>
-				</cfcase>
-				<cfcase value="bogof">
-					<cfset loc.edType = "Discount"/>
-				</cfcase>
-				<cfcase value="anyfor">
-					<cfset loc.edType = "Discount"/>
-				</cfcase>
-				<cfcase value="mealdeal">
-					<cfset loc.edType = "Discount"/>
-				</cfcase>
-				<cfcase value="halfprice">
-					<cfset loc.edType = "Discount"/>
-				</cfcase>
-				<cfcase value="nodeal">
-					<cfset loc.edType = "Quantity"/>
-				</cfcase>
-				<cfcase value="only">
-					<cfset loc.edType = "Quantity"/>
-				</cfcase>
-				<cfcase value="b1g1hp">
-					<cfset loc.edType = "Discount"/>
-				</cfcase>
-			</cfswitch>
-
-			<cfquery name="loc.updateHeader" datasource="#GetDatasource()#">
-				UPDATE tblEPOS_Deals
-				SET edTitle = '#args.header.ed_title#',
-					edStarts = '#args.header.ed_starts#',
-					edEnds = '#args.header.ed_ends#',
-					edDealType = '#args.header.ed_dealtype#',
-					edType = '#loc.edType#',
-					edAmount = #val(args.header.ed_amount)#,
-					edQty = #val(args.header.ed_quantity)#,
-					edStatus = '#args.header.edStatus#',
-					edRetailClub = #val(args.header.ed_retailclub)#
+ 		<cftry>
+			<!---Check if the deal exists--->
+			<cfquery name="loc.check" datasource="#GetDatasource()#">
+				SELECT *
+				FROM tblEPOS_Deals
 				WHERE edID = #val(args.header.ed_id)#
 				LIMIT 1
 			</cfquery>
-
-			<cfquery name="loc.delItems" datasource="#GetDatasource()#">
-				DELETE FROM tblEPOS_DealItems
-				WHERE ediParent = #val(args.header.ed_id)#
-			</cfquery>
-				
-			<!--- remove duplicates --->
-			<cfset loc.uniques = []>
-			<cfloop array="#args.items#" index="item">
-				<cfif !ArrayFind(loc.uniques,item)>
-					<cfset ArrayAppend(loc.uniques,item)>
-				</cfif>
-			</cfloop>
-			<cfset args.items = loc.uniques>
-			
-			<cfif NOT ArrayIsEmpty(args.items)>
-				<cfquery name="loc.addItems" datasource="#GetDatasource()#">
-					INSERT INTO tblEPOS_DealItems (
-						ediParent,
-						ediProduct,
-						ediMinQty,
-						ediMaxQty
-					) VALUES
-					<cfset loc.counter = 1>
-					<cfloop array="#args.items#" index="item">
-						(
-							#val(args.header.ed_id)#,
-							#val(item.id)#,
-							#val(item.minqty)#,
-							#val(item.maxqty)#
-						)<cfif loc.counter neq ArrayLen(args.items) AND ArrayLen(args.items) gt 1>,</cfif>
-						<cfset loc.counter++>
-					</cfloop>
+	
+			<cfif loc.check.recordcount is 1>
+				<cfset loc.edType = ""/>
+	
+				<cfswitch expression="#args.header.ed_dealtype#">
+					<cfcase value="twofor">
+						<cfset loc.edType = "Quantity"/>
+					</cfcase>
+					<cfcase value="bogof">
+						<cfset loc.edType = "Discount"/>
+					</cfcase>
+					<cfcase value="anyfor">
+						<cfset loc.edType = "Discount"/>
+					</cfcase>
+					<cfcase value="mealdeal">
+						<cfset loc.edType = "Discount"/>
+					</cfcase>
+					<cfcase value="halfprice">
+						<cfset loc.edType = "Discount"/>
+					</cfcase>
+					<cfcase value="nodeal">
+						<cfset loc.edType = "Quantity"/>
+					</cfcase>
+					<cfcase value="only">
+						<cfset loc.edType = "Quantity"/>
+					</cfcase>
+					<cfcase value="b1g1hp">
+						<cfset loc.edType = "Discount"/>
+					</cfcase>
+				</cfswitch>
+	
+				<cfquery name="loc.updateHeader" datasource="#GetDatasource()#">
+					UPDATE tblEPOS_Deals
+					SET edTitle = '#args.header.ed_title#',
+						edStarts = '#args.header.ed_starts#',
+						edEnds = '#args.header.ed_ends#',
+						edDealType = '#args.header.ed_dealtype#',
+						edType = '#loc.edType#',
+						edAmount = #val(args.header.ed_amount)#,
+						edQty = #val(args.header.ed_quantity)#,
+						edStatus = '#args.header.edStatus#',
+						edRetailClub = #val(args.header.ed_retailclub)#
+					WHERE edID = #val(args.header.ed_id)#
+					LIMIT 1
 				</cfquery>
+	
+				<cfquery name="loc.delItems" datasource="#GetDatasource()#">
+					DELETE FROM tblEPOS_DealItems
+					WHERE ediParent = #val(args.header.ed_id)#
+				</cfquery>
+	
+				<!--- remove duplicates --->
+				<cfset loc.dedupes = {}>
+				<cfloop array="#args.items#" index="loc.item">
+					<cfif !StructKeyExists(loc.dedupes,loc.item.id)>
+						<cfset StructInsert(loc.dedupes,loc.item.id,loc.item)>
+					</cfif>
+				</cfloop>
+				<cfif !StructIsEmpty(loc.dedupes)>
+					<cfset loc.uniqueCount = StructCount(loc.dedupes)>
+					<cfquery name="loc.addItems" datasource="#GetDatasource()#">
+						INSERT INTO tblEPOS_DealItems (
+							ediParent,
+							ediProduct,
+							ediMinQty,
+							ediMaxQty
+						) VALUES
+						<cfset loc.counter = 1>
+						<cfloop collection="#loc.dedupes#" item="loc.key">
+							<cfset loc.item = StructFind(loc.dedupes,loc.key)>
+							(
+								#val(args.header.ed_id)#,
+								#val(loc.item.id)#,
+								#val(loc.item.minqty)#,
+								#val(loc.item.maxqty)#
+							)<cfif loc.counter neq loc.uniqueCount>,</cfif>
+							<cfset loc.counter++>
+						</cfloop>
+					</cfquery>
+				</cfif>
 			</cfif>
-		</cfif>
     
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
         <cfreturn loc>
     </cffunction>
 
@@ -480,6 +506,38 @@
 		<cfreturn QueryToStruct(loc.deal)>
 	</cffunction>
 	
+	<cffunction name="LoadLatestDeals" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfif args.retailClub neq 0>
+				<cfset loc.retailClub = args.retailClub>
+			<cfelse>
+				<cfquery name="loc.latestClub" datasource="#GetDatasource()#">
+					SELECT MAX(ercID) AS ID FROM tblepos_retailclubs				
+				</cfquery>
+				<cfset loc.retailClub = loc.latestClub.ID>
+			</cfif>
+			<cfquery name="loc.deals" datasource="#GetDatasource()#">
+				SELECT *
+				FROM tblEPOS_Deals
+				WHERE edRetailClub = #val(loc.retailClub)#
+				<cfif args.status eq "active">
+					AND edStatus = "active"
+				<cfelseif args.status eq "inactive">
+					AND edStatus = "inactive"
+				</cfif>
+				ORDER BY edRetailClub DESC, edIndex ASC, edTitle ASC
+			</cfquery>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn QueryToArrayOfStruct(loc.deals)>
+	</cffunction>
+
 	<cffunction name="LoadAllDeals" access="public" returntype="array">
 		<cfargument name="retailClub" type="numeric" required="no" default="-1">
 		<cfset var loc = {}>

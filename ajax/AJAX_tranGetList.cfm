@@ -210,7 +210,7 @@
 						<tr><td width="10" class="noPrint"></td>
 							<td colspan="8" align="right"><strong>Brought Forward</strong>&nbsp;</td>
 							<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
-							<td align="center" class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" value="0" /></td>
+							<td align="center" class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" tabindex="-1" value="0" /></td>
 						</tr>
 					</cfif>
 					<cfif StructKeyExists(trans,"allocError")>

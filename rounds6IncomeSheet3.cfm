@@ -323,7 +323,7 @@
 				<cfloop list="#loc.roundKeys#" index="loc.roundKey" delimiters=",">
 					<cfset loc.roundData = StructFind(args.rounds,loc.roundKey)>
 					<table class="roundList" border="1">
-						<cfif StructKeyExists(args.parms.form,"showTrans")>
+						<cfif StructKeyExists(args.parms.form,"showHeader")>
 							<tr>
 								<th class="rndheader">#loc.roundKey#</th>
 								<th colspan="16" class="rndheader">#loc.roundData.roundTitle#</th>
@@ -350,7 +350,7 @@
 						<cfset loc.customerKeys = ListSort(StructKeyList(loc.roundData.customers,","),"text","asc")>
 						<cfloop list="#loc.customerKeys#" index="loc.customerKey" delimiters=",">
 							<cfset loc.drop = StructFind(loc.roundData.customers,loc.customerKey)>
-							<cfif StructKeyExists(args.parms.form,"showTrans")>
+							<cfif StructKeyExists(args.parms.form,"showHeader")>
 								<tr class="header">
 									<td><a href="clientDetails.cfm?row=0&ref=#loc.drop.cltRef#" target="_new">#loc.drop.cltRef#</a></td>
 									<td>#loc.drop.cltName#</td>
@@ -361,7 +361,7 @@
 									<td colspan="4">#loc.drop.ordID#</td>
 								</tr>
 							</cfif>
-							<cfif StructKeyExists(args.parms.form,"showTrans")>
+							<cfif StructKeyExists(args.parms.form,"showDetail")>
 								<!--- loop publications --->
 								<cfset loc.pubKeys = ListSort(StructKeyList(loc.drop.pubs,","),"numeric","asc")>							
 								<cfloop list="#loc.pubKeys#" index="loc.pubKey" delimiters=",">
@@ -442,7 +442,7 @@
 							</cfif>
 						</cfloop>
 						
-						<cfif StructKeyExists(args.parms.form,"showTrans")>
+						<cfif StructKeyExists(args.parms.form,"showHeader")>
 							<tr class="rndfooter">
 								<td align="center">#ListLen(loc.customerKeys)#</td>
 								<td>drops</td>

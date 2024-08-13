@@ -58,7 +58,7 @@
 					OR oiSat != 0 AND riDayEnum = 'sat'
 					OR oiSun != 0 AND riDayEnum = 'sun'
 				)
-				<cfif StructKeyExists(args.form,"useSamples")>AND riOrderID IN (221,6131,951,6311,6371,7031,7121,8942,10662)</cfif>
+				<cfif StructKeyExists(args.form,"useSamples")>AND riOrderID IN (221,6131,951,6311,6371,7031,7121,8942,10662,12122)</cfif>
 				ORDER BY rndRef,riOrder,riDayEnum   
 			</cfquery>
 			<!---<cfif StructKeyExists(args.form,"showDumps")><cfdump var="#loc.QData#" label="loc.QData" expand="false"></cfif>--->

@@ -440,7 +440,7 @@
 									<td align="right" width="50">#DecimalFormat(loc.drop.totRetail)#</td>
 									<td align="right" width="50">#DecimalFormat(loc.drop.totTrade)#</td>
 									<td align="right" width="50">#DecimalFormat(loc.drop.totProfit)#</td>
-									<td align="right">#loc.cumRetail#</td>
+									<td align="right">#DecimalFormat(loc.cumRetail)#</td>
 								</tr>
 							</cfif>
 						</cfloop>

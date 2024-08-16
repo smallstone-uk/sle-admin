@@ -347,6 +347,7 @@
 							</tr>
 						</cfif>
 						<!--- loop customers --->
+						<cfset loc.cumRetail = 0>
 						<cfset loc.customerKeys = ListSort(StructKeyList(loc.roundData.customers,","),"text","asc")>
 						<cfloop list="#loc.customerKeys#" index="loc.customerKey" delimiters=",">
 							<cfset loc.drop = StructFind(loc.roundData.customers,loc.customerKey)>
@@ -378,6 +379,7 @@
 												</cfif>
 											</td>
 										</cfloop>
+										<cfset loc.cumRetail += loc.pub.wkRetail>
 										<td align="center">#loc.pub.qtyWeekly#</td>
 										<td align="right">#DecimalFormat(loc.pub.wkRetail)#</td>
 										<td align="right">#DecimalFormat(loc.pub.wkTrade)#</td>
@@ -438,6 +440,7 @@
 									<td align="right" width="50">#DecimalFormat(loc.drop.totRetail)#</td>
 									<td align="right" width="50">#DecimalFormat(loc.drop.totTrade)#</td>
 									<td align="right" width="50">#DecimalFormat(loc.drop.totProfit)#</td>
+									<td align="right">#loc.cumRetail#</td>
 								</tr>
 							</cfif>
 						</cfloop>

@@ -47,6 +47,7 @@
 		.summaryList td {padding:2px 5px; border-color: #ccc;}
 
 		.header td {background-color:#55BFFF; padding:4px 5px;}
+		.header2 td {background-color:#fff; padding:4px 5px;}
 		.info {background-color:#eee;}
 		.footer {background-color:#AAFFFF}
 		.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}

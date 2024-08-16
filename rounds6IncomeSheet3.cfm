@@ -354,8 +354,13 @@
 						<cfset loc.customerKeys = ListSort(StructKeyList(loc.roundData.customers,","),"text","asc")>
 						<cfloop list="#loc.customerKeys#" index="loc.customerKey" delimiters=",">
 							<cfset loc.drop = StructFind(loc.roundData.customers,loc.customerKey)>
+							<cfif !StructKeyExists(args.parms.form,"showDetail")>
+								<cfset loc.header = "header2">
+							<cfelse>
+								<cfset loc.header = "header">
+							</cfif>
 							<cfif StructKeyExists(args.parms.form,"showHeader")>
-								<tr class="header">
+								<tr class="#loc.header#">
 									<td><a href="clientDetails.cfm?row=0&ref=#loc.drop.cltRef#" target="_new">#loc.drop.cltRef#</a></td>
 									<td>#loc.drop.cltName#</td>
 									<td colspan="6">#loc.drop.address#</td>

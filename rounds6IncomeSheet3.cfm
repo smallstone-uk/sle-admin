@@ -1,3 +1,6 @@
+<!--- revision 1.01	16/08/2024 --->
+<!--- added running total to publication totals --->
+
 <cftry>
 	<cfsetting requesttimeout="300">
 	<cfparam name="driverRate" default="0.65">

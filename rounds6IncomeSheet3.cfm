@@ -367,7 +367,8 @@
 									<td align="center">#loc.drop.cltAccountType#</td>
 									<td>#loc.drop.delCode#</td>
 									<td>#loc.drop.delPrice1#</td>
-									<td colspan="4">#loc.drop.ordID#</td>
+									<td>#loc.drop.ordID#</td>
+									<td colspan="3"><input name="dummy" type="checkbox" value="1" /></td>
 								</tr>
 							</cfif>
 							<cfif StructKeyExists(args.parms.form,"showDetail")>

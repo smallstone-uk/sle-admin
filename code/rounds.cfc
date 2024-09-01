@@ -221,6 +221,7 @@
 						FROM tblRoundItems
 						WHERE riOrderID=#args.form.orderID#
 						AND riDay='#ddd#'
+						AND riRoundID = #val(args.form.roundID)#		<!--- allow drop on multiple rounds --->
 						LIMIT 1;
 					</cfquery>
 					<cfif QCheck.recordcount is 0>
@@ -229,11 +230,13 @@
 								riRoundID,
 								riOrderID,
 								riOrder,
-								riDay
+								riDay,
+                                riDayEnum
 							) Values (
 								#args.form.roundID#,
 								#args.form.orderID#,
 								0,
+								'#ddd#',
 								'#ddd#'
 							)
 						</cfquery>
@@ -246,6 +249,7 @@
 					FROM tblRoundItems
 					WHERE riOrderID=#args.form.orderID#
 					AND riDay='#args.form.roundDay#'
+					AND riRoundID = #val(args.form.roundID)#		<!--- allow drop on multiple rounds --->
 					LIMIT 1;
 				</cfquery>
 				<cfif QCheck.recordcount is 0>
@@ -254,11 +258,13 @@
 							riRoundID,
 							riOrderID,
 							riOrder,
-							riDay
+							riDay,
+                            riDayEnum
 						) Values (
 							#args.form.roundID#,
 							#args.form.orderID#,
 							0,
+							'#args.form.roundDay#',
 							'#args.form.roundDay#'
 						)
 					</cfquery>
@@ -281,24 +287,28 @@
 		<cfset var result={}>
 		<cfset var result.orderID=0>
 		<cfset var result.days={}>
-		<cfset var result.days.mon={}>
-		<cfset var result.days.tue={}>
-		<cfset var result.days.wed={}>
-		<cfset var result.days.thu={}>
-		<cfset var result.days.fri={}>
-		<cfset var result.days.sat={}>
-		<cfset var result.days.sun={}>
+		<cfset var result.days.mon=[]>
+		<cfset var result.days.tue=[]>
+		<cfset var result.days.wed=[]>
+		<cfset var result.days.thu=[]>
+		<cfset var result.days.fri=[]>
+		<cfset var result.days.sat=[]>
+		<cfset var result.days.sun=[]>
 		<cfset var item={}>
 		<cfset var result.list=ArrayNew(1)>
 		<cfset var QRound="">
+		
+		<cfset var loc = {}>
+		<cfset loc.days = {}>
 
 		<cfquery name="QRound" datasource="#args.datasource#">
 			SELECT *
 			FROM tblRoundItems,tblRounds
-			WHERE riOrderID=#val(args.form.orderID)#
-			AND riRoundID=rndID
+			WHERE riOrderID = #val(args.form.orderID)#
+			AND riRoundID = rndID
+			ORDER BY riDayEnum, riRoundID
 		</cfquery>
-		<cfset result.orderID=val(args.form.orderID)>
+		<cfset result.orderID = val(args.form.orderID)>
 		<cfloop query="QRound">
 			<cfset item={}>
 			<cfset item.ID=riID>
@@ -308,11 +318,18 @@
 			<cfset item.RoundDay=riDay>
 			<cfset ArrayAppend(result.list,item)>
 			
+			<cfif !StructKeyExists(loc.days,riDay)>
+				<cfset StructInsert(loc.days,riDay,[])>
+			</cfif>
+			<cfset ArrayAppend(StructFind(loc.days,riDay),item)>
+			
 			<cfif StructKeyExists(result.days,riDay)>
+				<cfset result.ping = StructFind(result.days,riDay)>
+				<!---<cfset ArrayAppend(result.ping,item)>--->
 				<cfset StructUpdate(result.days,riDay,item)>
 			</cfif>
 		</cfloop>
-
+		<cfset result.loc = loc>
 		<cfreturn result>
 	</cffunction>
 	

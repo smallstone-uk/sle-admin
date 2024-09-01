@@ -210,7 +210,7 @@
 						<tr><td width="10" class="noPrint"></td>
 							<td colspan="8" align="right"><strong>Brought Forward</strong>&nbsp;</td>
 							<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
-							<td align="center" class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" value="0" /></td>
+							<td align="center" class="noPrint"><input type="checkbox" name="selectitem" class="selectitem" data-amount="#val(balance)#" tabindex="-1" value="0" /></td>
 						</tr>
 					</cfif>
 					<cfif StructKeyExists(trans,"allocError")>
@@ -253,7 +253,7 @@
 										value="#item.trnID#"<cfif item.trnAlloc is 1> checked="checked" disabled="disabled"</cfif> />
 								</span>
 								<cfif item.trnAllocID gt 0>
-									<a href="purchRemittancePDF.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" target="_blank">#item.trnAllocID#</a>
+									<a href="purchRemittancePDF.cfm?accountID=#acctData.Account.accID#&amp;allocationID=#item.trnAllocID#" tabindex="-1" target="_blank">#item.trnAllocID#</a>
 								</cfif>
 							</td>
 						</tr>

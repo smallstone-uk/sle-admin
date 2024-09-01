@@ -153,9 +153,9 @@
 	</div>
 
 	<cfif group neq 0>
-   		<cfdump var="#parms#" label="parms" expand="false">
+   		<!---<cfdump var="#parms#" label="parms" expand="false">--->
 		<cfset products = sales.selectProducts(parms)>
-		<cfdump var="#products#" label="products" expand="false">
+		<!---<cfdump var="#products#" label="products" expand="false">--->
 		<table class="tableList" border="1">
 			<cfif StructKeyExists(form,"srchShowQuery")>
 				<tr>

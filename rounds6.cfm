@@ -25,6 +25,15 @@
 			LoadRoundSheet();
 			e.preventDefault();
 		});
+		$('.selectAllOnList').click(function(event) {
+			if (this.checked) {
+				$('.roundstick').prop({checked: true});
+				$('.selectAllOnList').prop({checked: true});
+			} else {
+				$('.roundstick').prop({checked: false});
+				$('.selectAllOnList').prop({checked: false});
+			}
+		})
 		$('#showRoundOrder').click(function(e) {
 			if (this.checked) {
 				$('#priorityLink').hide();
@@ -86,6 +95,7 @@
 								<tr>
 									<td></td>
 									<td id="roundList" valign="top">
+										<input type="checkbox" name="selectAllOnList" class="selectAllOnList" checked="checked" />
 										<cfloop array="#roundList.rounds#" index="item">
 											<label><input type="checkbox" name="roundsTicked" value="#item.ID#" class="checkbox roundstick" checked="checked" />#item.Title#</label>
 										</cfloop>

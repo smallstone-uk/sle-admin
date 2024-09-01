@@ -330,7 +330,11 @@
                 	<cfdump var="#loc#" expand="no" label="#args.description# #args.retail#">
                 </td>
             </tr>--->
-			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>
+			<cfif loc.netRetailPrice neq 0>
+				<cfset loc.result.POR = RoundDec((loc.result.profit / loc.netRetailPrice) * 100)>
+			<cfelse>
+				<cfset loc.result.POR = 0>
+			</cfif>
 
 			<cfset loc.result.class = "ourPrice">
 			<cfset loc.result.classQty = "">
@@ -345,8 +349,9 @@
 				<cfset loc.result.ourPrice = (int(loc.result.ourPrice * 10) * 10 + loc.lastDigit) / 100>
 			</cfif>
 			<cfset loc.result.profit = loc.result.ourPrice - loc.result.grossUnitPrice>
-			<cfset loc.result.POR = RoundDec((loc.result.profit / loc.result.ourPrice) * 100)>
-
+			<cfif loc.result.ourPrice neq 0>
+				<cfset loc.result.POR = RoundDec((loc.result.profit / loc.result.ourPrice) * 100)>
+			</cfif>
 			<!--- product record --->
 			<cfif NOT loc.doUpdate>
 				<cfdump var="#loc#" label="#args.description#" expand="false">

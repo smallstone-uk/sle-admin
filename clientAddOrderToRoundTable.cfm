@@ -8,7 +8,6 @@
 <cfset parm.datasource=application.site.datasource1>
 <cfset parm.form=form>
 <cfset orders=rnd.LoadOrder(parm)>
-<!---<cfdump var="#orders#" label="orders">--->
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -56,7 +55,7 @@
 </script>
 
 <cfoutput>
-	<div style="width:500px;">
+	<div style="width:750px;">
 		<cfif ArrayLen(orders.list)>
 			<input type="hidden" id="firstRound" value="#orders.list[1].roundID#" />
 			<p>This order is already attached to:</p>
@@ -69,14 +68,29 @@
 		</cfif>
 		<table border="1" class="tableList" width="100%">
 			<tr>
-				<th>Monday</th>
-				<th>Tuesday</th>
-				<th>Wednesday</th>
-				<th>Thursday</th>
-				<th>Friday</th>
-				<th>Saturday</th>
-				<th>Sunday</th>
+				<th width="100">Monday</th>
+				<th width="100">Tuesday</th>
+				<th width="100">Wednesday</th>
+				<th width="100">Thursday</th>
+				<th width="100">Friday</th>
+				<th width="100">Saturday</th>
+				<th width="100">Sunday</th>
 			</tr>
+			<tr>
+				<cfloop list="mon,tue,wed,thu,fri,sat,sun" index="j">
+					<cfif StructKeyExists(orders.loc.days,j)>
+						<cfset thisDay = StructFind(orders.loc.days,j)>
+						<td>
+							<cfloop array="#thisDay#" index="i">
+								<span class="roundname"><a href="#i.ID#" class="removeItem" title="Click to delete">#i.RoundTitle#</a><br /></span>
+							</cfloop>
+						</td>
+					<cfelse>
+						<td>None</td>
+					</cfif>
+				</cfloop>
+			</tr>
+<!---
 			<tr>
 				<td><cfif StructKeyExists(orders.days.mon,"ID")><a href="#orders.days.mon.ID#" class="removeItem" title="Click to delete">#orders.days.mon.RoundTitle#</a><cfelse>None</cfif></td>
 				<td><cfif StructKeyExists(orders.days.tue,"ID")><a href="#orders.days.tue.ID#" class="removeItem" title="Click to delete">#orders.days.tue.RoundTitle#</a><cfelse>None</cfif></td>
@@ -86,6 +100,7 @@
 				<td><cfif StructKeyExists(orders.days.sat,"ID")><a href="#orders.days.sat.ID#" class="removeItem" title="Click to delete">#orders.days.sat.RoundTitle#</a><cfelse>None</cfif></td>
 				<td><cfif StructKeyExists(orders.days.sun,"ID")><a href="#orders.days.sun.ID#" class="removeItem" title="Click to delete">#orders.days.sun.RoundTitle#</a><cfelse>None</cfif></td>
 			</tr>
+--->
             <tr>
             	<td></td>
             </tr>

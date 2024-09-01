@@ -47,6 +47,7 @@
 		.summaryList td {padding:2px 5px; border-color: #ccc;}
 
 		.header td {background-color:#55BFFF; padding:4px 5px;}
+		.header2 td {background-color:#fff; padding:4px 5px;}
 		.info {background-color:#eee;}
 		.footer {background-color:#AAFFFF}
 		.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}
@@ -60,7 +61,8 @@
 <cfobject component="code/rounds6" name="rnd">
 <cfset roundList=rnd.LoadRoundList(parm)>
 <cfdump var="#roundList#" label="roundList" expand="false">
-	<cfparam name="showTrans" default="0">
+	<cfparam name="showHeader" default="0">
+	<cfparam name="showDetail" default="0">
 	<cfparam name="showDumps" default="0">
 	<cfparam name="useNewCode" default="0">
 	<cfparam name="useSamples" default="0">
@@ -109,7 +111,8 @@
 								<tr>
                                     <td><b>Options</b></td>
                                     <td>
-                                        <input name="showTrans" type="checkbox" value="1"<cfif showTrans> checked</cfif> /> Show Transactions?<br>
+                                        <input name="showHeader" type="checkbox" value="1"<cfif showHeader> checked</cfif> /> Show Header?<br>
+                                        <input name="showDetail" type="checkbox" value="1"<cfif showDetail> checked</cfif> /> Show Detail?<br>
                                         <input name="showDumps" type="checkbox" value="1"<cfif showDumps> checked</cfif> /> Show Dumps?<br>
                                         <input name="useNewCode" type="checkbox" value="1"<cfif useNewCode> checked</cfif> /> Use New Delivery Code?<br>
                                         <input name="useSamples" type="checkbox" value="1"<cfif useSamples> checked</cfif> /> Use Sample Data?<br>

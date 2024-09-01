@@ -75,7 +75,7 @@
 									loc.info = val(loc.cell);
 								}
 							}
-							WriteOutput(loc.j & " ["& loc.cell &"]<br />");
+						//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
 						}
 						} else {
 							for (loc.j = 0; loc.j < loc.cols.size(); loc.j++) {
@@ -134,7 +134,7 @@
 						loc.category = ReReplace(loc.cols.text(),"\( \d+ \)","","all");// category title
 						if (len(loc.category)) 
 							loc.category = Replace(loc.category,"Retail","","one"); // remove 'Retail' title
-						WriteOutput("<br />" & loc.category & "<br />");
+					//	WriteOutput("<br />" & loc.category & "<br />");
 					}
 				}
 			</cfscript>

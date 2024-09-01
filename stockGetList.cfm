@@ -160,8 +160,8 @@
 										var htmlStr = "<input type='text' size='40' value='" + value + "' class='sod_title_input' data-id='" + prodID + "'>";
 										$(this).html(htmlStr);
 										$(this).find('.sod_title_input').focus();
+										isEditingTitle = true;
 									}
-									isEditingTitle = true;
 								});
 								$(document).on("blur", ".sod_title_input", function(event) {
 									var value = $(this).val();

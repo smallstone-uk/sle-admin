@@ -28,102 +28,107 @@
 					loc.record={};
 					loc.row = loc.rows.get(loc.i);
         			loc.cols = loc.row.select("td");
-					loc.qty = 0;
+				//	loc.qty = 0; not used
 				//	WriteOutput(loc.cols.size() & "<br />");
 					if (loc.cols.size() gt 2) {
 						if (loc.cols.size() gt 12) {
 							for (loc.j = 0; loc.j < loc.cols.size(); loc.j++) {
-							loc.cell = loc.cols.get(loc.j).text();
-							if (loc.j eq 0) {
-								StructInsert(loc.record,"barcode",loc.cell);
-							} else if (loc.j eq 1){ // product code
-								StructInsert(loc.record,"code",loc.cell);
-							} else if (loc.j eq 2){ // description
-								loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
-								StructInsert(loc.record,"description",loc.cell);
-								StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
-							} else if (loc.j eq 3) { // Booker added another cell for no reason??
-							} else if (loc.j eq 4) { // qty field	e.g 12 x 100g
-								loc.packQty = Trim(ListFirst(loc.cell,"x"));	// get first item (qty)
-								StructInsert(loc.record,"packQty",loc.packQty);	// add pack qty to struct
-								loc.packSize = Trim(ListRest(loc.cell,"x")); // get unit size
-								StructInsert(loc.record,"packSize",loc.packSize);	// add size to struct
-							} else if (loc.j eq 5) { // WSP field
-								if (Find("Now",loc.cell)) { // found price change e.g. Was: £4.99 Now: £4.69
-									loc.WSP = ReReplace(ListLast(loc.cell," "),"[^0-9.]","","all"); // get now price and remove £
-								} else {
-									loc.WSP = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+								loc.cell = loc.cols.get(loc.j).text();
+								if (loc.j eq 0) {
+									StructInsert(loc.record,"barcode",loc.cell);
+								} else if (loc.j eq 1){ // product code
+									StructInsert(loc.record,"code",loc.cell);
+								} else if (loc.j eq 2){ // description
+									loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
+									StructInsert(loc.record,"description",loc.cell);
+									StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
+								} else if (loc.j eq 3) { // Booker added another cell for no reason??
+								} else if (loc.j eq 4) { // qty field	e.g 12 x 100g
+									loc.packQty = Trim(ListFirst(loc.cell,"x"));	// get first item (qty)
+									StructInsert(loc.record,"packQty",loc.packQty);	// add pack qty to struct
+									loc.packSize = Trim(ListRest(loc.cell,"x")); // get unit size
+									StructInsert(loc.record,"packSize",loc.packSize);	// add size to struct
+								} else if (loc.j eq 5) { // WSP field
+									if (Find("Now",loc.cell)) { // found price change e.g. Was: £4.99 Now: £4.69
+										loc.WSP = ReReplace(ListLast(loc.cell," "),"[^0-9.]","","all"); // get now price and remove £
+									} else {
+										loc.WSP = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+									}
+									StructInsert(loc.record,"WSP",loc.WSP);	// add WSP to struct
+								} else if (loc.j eq 6) { // RRP remove £
+									loc.retail = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+									StructInsert(loc.record,"retail",loc.retail);	// add WSP to struct
+								} else if (loc.j eq 7) { // VAT Rate
+								//	loc.vat=Replace(loc.cell,"%",""); // remove %
+									loc.vat=ReReplace(loc.cell,"[^0-9.]","","all"); 
+									StructInsert(loc.record,"vat",loc.vat);	// add VAT to struct
+								} else if (loc.j eq 8) { // ordered Qty-4
+										loc.qty4 = val(loc.cell);
+								} else if (loc.j eq 9) { // ordered Qty-3
+										loc.qty3 = val(loc.cell);
+								} else if (loc.j eq 10) { // ordered Qty-2
+										loc.qty2 = val(loc.cell);
+								} else if (loc.j eq 11) { // ordered Qty-1
+										loc.qty1 = val(loc.cell);
+								} else if (loc.j eq 12) { // basket qty
+										loc.qty0 = val(loc.cell);
+								} else { // other fields
+									if (val(loc.cell) gt 0) {
+										loc.info = val(loc.cell);
+									}
 								}
-								StructInsert(loc.record,"WSP",loc.WSP);	// add WSP to struct
-							} else if (loc.j eq 6) { // RRP remove £
-								loc.retail = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
-								StructInsert(loc.record,"retail",loc.retail);	// add WSP to struct
-							} else if (loc.j eq 7) { // VAT Rate
-							//	loc.vat=Replace(loc.cell,"%",""); // remove %
-								loc.vat=ReReplace(loc.cell,"[^0-9.]","","all"); 
-								StructInsert(loc.record,"vat",loc.vat);	// add VAT to struct
-							} else if (loc.j eq 8) { // ordered Qty-4
-									loc.qty4 = val(loc.cell);
-							} else if (loc.j eq 9) { // ordered Qty-3
-									loc.qty3 = val(loc.cell);
-							} else if (loc.j eq 10) { // ordered Qty-2
-									loc.qty2 = val(loc.cell);
-							} else if (loc.j eq 11) { // ordered Qty-1
-									loc.qty1 = val(loc.cell);
-							} else { // other fields
-								if (val(loc.cell) gt 0) {
-									loc.info = val(loc.cell);
-								}
+							//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
 							}
-						//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
-						}
 						} else {
 							for (loc.j = 0; loc.j < loc.cols.size(); loc.j++) {
-							loc.cell = loc.cols.get(loc.j).text();
-							if (loc.j eq 0) {
-								StructInsert(loc.record,"barcode",loc.cell);
-							} else if (loc.j eq 1){ // product code
-								StructInsert(loc.record,"code",loc.cell);
-							} else if (loc.j eq 2){ // description
-								loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
-								StructInsert(loc.record,"description",loc.cell);
-								StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
-							} else if (loc.j eq 3) { // qty field	e.g 12 x 100g
-								loc.packQty = Trim(ListFirst(loc.cell,"x"));	// get first item (qty)
-								StructInsert(loc.record,"packQty",loc.packQty);	// add pack qty to struct
-								loc.packSize = Trim(ListRest(loc.cell,"x")); // get unit size
-								StructInsert(loc.record,"packSize",loc.packSize);	// add size to struct
-							} else if (loc.j eq 4) { // WSP field
-								if (Find("Now",loc.cell)) { // found price change e.g. Was: £4.99 Now: £4.69
-									loc.WSP = ReReplace(ListLast(loc.cell," "),"[^0-9.]","","all"); // get now price and remove £
-								} else {
-									loc.WSP = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+								loc.cell = loc.cols.get(loc.j).text();
+								if (loc.j eq 0) {
+									StructInsert(loc.record,"barcode",loc.cell);
+								} else if (loc.j eq 1){ // product code
+									StructInsert(loc.record,"code",loc.cell);
+								} else if (loc.j eq 2){ // description
+									loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
+									StructInsert(loc.record,"description",loc.cell);
+									StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
+								} else if (loc.j eq 3) { // qty field	e.g 12 x 100g
+									loc.packQty = Trim(ListFirst(loc.cell,"x"));	// get first item (qty)
+									StructInsert(loc.record,"packQty",loc.packQty);	// add pack qty to struct
+									loc.packSize = Trim(ListRest(loc.cell,"x")); // get unit size
+									StructInsert(loc.record,"packSize",loc.packSize);	// add size to struct
+								} else if (loc.j eq 4) { // WSP field
+									if (Find("Now",loc.cell)) { // found price change e.g. Was: £4.99 Now: £4.69
+										loc.WSP = ReReplace(ListLast(loc.cell," "),"[^0-9.]","","all"); // get now price and remove £
+									} else {
+										loc.WSP = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+									}
+									StructInsert(loc.record,"WSP",loc.WSP);	// add WSP to struct
+								} else if (loc.j eq 5) { // RRP remove £
+									loc.retail = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
+									StructInsert(loc.record,"retail",loc.retail);	// add WSP to struct
+								} else if (loc.j eq 6) { // VAT Rate
+								//	loc.vat=Replace(loc.cell,"%",""); // remove %
+									loc.vat=ReReplace(loc.cell,"[^0-9.]","","all"); 
+									StructInsert(loc.record,"vat",loc.vat);	// add VAT to struct
+								} else if (loc.j eq 7) { // ordered Qty-4
+										loc.qty4 = val(loc.cell);
+								} else if (loc.j eq 8) { // ordered Qty-3
+										loc.qty3 = val(loc.cell);
+								} else if (loc.j eq 9) { // ordered Qty-2
+										loc.qty2 = val(loc.cell);
+								} else if (loc.j eq 10) { // ordered Qty-1
+										loc.qty1 = val(loc.cell);
+								} else if (loc.j eq 11) { // basket qty
+										loc.qty0 = val(loc.cell);
+								} else { // other fields
+									if (val(loc.cell) gt 0) {
+										loc.info = val(loc.cell);
+									}
 								}
-								StructInsert(loc.record,"WSP",loc.WSP);	// add WSP to struct
-							} else if (loc.j eq 5) { // RRP remove £
-								loc.retail = ReReplace(loc.cell,"[^0-9.]","","all"); // remove £
-								StructInsert(loc.record,"retail",loc.retail);	// add WSP to struct
-							} else if (loc.j eq 6) { // VAT Rate
-							//	loc.vat=Replace(loc.cell,"%",""); // remove %
-								loc.vat=ReReplace(loc.cell,"[^0-9.]","","all"); 
-								StructInsert(loc.record,"vat",loc.vat);	// add VAT to struct
-							} else if (loc.j eq 7) { // ordered Qty-4
-									loc.qty4 = val(loc.cell);
-							} else if (loc.j eq 8) { // ordered Qty-3
-									loc.qty3 = val(loc.cell);
-							} else if (loc.j eq 9) { // ordered Qty-2
-									loc.qty2 = val(loc.cell);
-							} else if (loc.j eq 10) { // ordered Qty-1
-									loc.qty1 = val(loc.cell);
-							} else { // other fields
-								if (val(loc.cell) gt 0) {
-									loc.info = val(loc.cell);
-								}
+							//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
 							}
-						//	WriteOutput(loc.j & " ["& loc.cell &"]<br />");
-						}
 						}
 						StructInsert(loc.record,"category",loc.category);	// add product category to record
+						StructInsert(loc.record,"qty0",loc.qty0);	// add qtys found
 						StructInsert(loc.record,"qty1",loc.qty1);	// add qtys found
 						StructInsert(loc.record,"qty2",loc.qty2);
 						StructInsert(loc.record,"qty3",loc.qty3);
@@ -216,7 +221,7 @@
 		<cfset loc.result={}>
 		<cfset loc.result.action="">
 		<cfset loc.doUpdate = true>		<!--- DO NOT USE - does not work --->
-		<!---<cfdump var="#args#" label="UpdateRecord" expand="false">--->
+
 		<cftry>		
 			<!--- category record --->
 			<cfset loc.newCat = ReReplaceNoCase(args.category,'(Cat.)',"Catering")>		<!--- replace cat with catering --->
@@ -450,7 +455,12 @@
 				
 				<cfset loc.result.days = -1>
 				<cfset loc.result.lastQty = 0>
-				<cfset loc.result.qty1 = args.qty1>
+				<cfif args.qty1 gt 0>
+					<cfset loc.result.qty1 = args.qty1>
+				<cfelse>
+					<cfset loc.result.qty1 = args.qty0>
+				</cfif>
+				<!---<cfset loc.result.qty1 = args.qty1>--->
 				<cfif args.qty1 gt 1>	<!--- get most recent stock item --->
 					<cfset loc.result.classQty = "more">
 					<cfquery name="loc.QProduct" datasource="#application.site.datasource1#">

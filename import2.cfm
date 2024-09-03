@@ -14,6 +14,28 @@
 		.pricemarked {color:#FF00ff; font-size:16px; font-weight:bold !Important}
 		.pricemarkdiff {color:#FF00ff; background-color:#6633FF; font-size:16px; font-weight:bold !Important}
 	</style>
+	<script src="scripts/jquery-1.11.1.min.js"></script>
+	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.sod_status').click(function(event) {
+				var value = $(this).html();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this);
+				$.ajax({
+					type: "POST",
+					url: "saveProductStatus.cfm",
+					data: {"status": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						cell.css("color",'red');
+						cell.css("font-weight",'bold');
+					}
+				});
+			});
+		});
+	</script>
 </head>
 
 <body>
@@ -88,10 +110,10 @@
 			<cfset category="">
 			<cfset noBarcodeCount = 0>
 			<cfloop array="#records.basket#" index="rec">
-					<!---<tr>
+<!---					<tr>
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#rec#" expand="false"></td>
-					</tr>--->
-				<cfset recResult=import.UpdateRecord(records.header,rec)>
+					</tr>
+--->				<cfset recResult=import.UpdateRecord(records.header,rec)>
 <!---					<tr>
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#recResult#" expand="false"></td>
 					</tr>

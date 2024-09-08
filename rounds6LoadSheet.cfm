@@ -369,12 +369,12 @@
 		
 	<div>
 		<!--- include shop stock sheet if all rounds printed--->
-		<cfif roundcount eq ArrayLen(roundList.rounds)>
+		<!---<cfif roundcount eq ArrayLen(roundList.rounds)>--->
 			<cfinclude template="pubNewsPrices.cfm">
-		<cfelse>
+		<!---<cfelse>
 			<h1>STOCK MOVEMENT REPORT WAS NOT PRINTED</h1>
 			<p>All rounds must be included in the print run for this report to be included.</p>
-		</cfif>
+		</cfif>--->
 		<cfset dayNo=DayofWeek(parm.roundDate)-1>
 <!---
 		<cfif dayNo eq 0>

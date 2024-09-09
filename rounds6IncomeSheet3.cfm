@@ -465,6 +465,7 @@
 							</tr>
 						</cfif>
 					</table>
+					<div class="summary" style="page-break-before:always;">
 				</cfloop>
 			</cfoutput>
 		<cfcatch type="any">
@@ -574,6 +575,7 @@
 						<th align="right">#DecimalFormat(loc.grand.netProfit)#</th>
 					</tr>
 				</table>
+				<div class="summary" style="page-break-before:always;">
 			</cfoutput>
 	
 		<cfcatch type="any">

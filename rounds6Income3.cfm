@@ -60,7 +60,7 @@
 <cfset parm.roundDate=DateFormat(DateAdd('d',1,Now()),'yyyy-mm-dd')>
 <cfobject component="code/rounds6" name="rnd">
 <cfset roundList=rnd.LoadRoundList(parm)>
-<cfdump var="#roundList#" label="roundList" expand="false">
+
 	<cfparam name="showHeader" default="0">
 	<cfparam name="showDetail" default="0">
 	<cfparam name="showDumps" default="0">

@@ -13,7 +13,7 @@
 <cfset testmode=0> <!--- DEV USE ONLY. NOT FOR FIXING INVOICES--->
 <cfset grandtotal=0>
 <cfset overalltotal=0>
-<cfdump var="#chargeCheck#" label="chargeCheck" expand="false">
+
 <cfoutput>
 	<h1>Data Check</h1>
 	<cfset keys = ListSort(StructKeyList(chargeCheck.grid,","),"numeric","asc")>
@@ -43,7 +43,8 @@
 						<td align="right">
 							#theDay.price#<br />
 							#theDay.charge#<br />
-							#theDay.count#
+							#theDay.count#<br />
+                            #theDay.date#
 						</td>
 						<cfset wTotal.price += theDay.price>
 						<cfset wTotal.charge += theDay.charge>
@@ -81,6 +82,7 @@
 	</table>
 	
 <cfset invoices = inv.LoadInvoiceRun(parm)>
+<!---<cfdump var="#invoices#" label="invoices" expand="false">--->
 <cfset arraytotal=val(ArrayLen(invoices.list))+val(ArrayLen(invoices.post))+val(ArrayLen(invoices.email))+val(ArrayLen(invoices.weekly))>
 	<cfif ArrayLen(invoices.list)>
 		<cfset grandtotal=0>
@@ -94,6 +96,7 @@
 				<th width="60">Type</th>
 				<th width="200">Client</th>
 				<th>Address</th>
+				<th>Round</th>
 			</tr>
 			<cfloop array="#invoices.list#" index="item">
 				<cfset row=row+1>
@@ -174,6 +177,7 @@
 					<td align="center">#item.invoiceType#</td>
 					<td>#item.ClientName#</td>
 					<td>#item.Address#</td>
+					<td>#item.rndTitle# #item.riOrder#</td>
 				</tr>
 			</cfloop>
 			<cfset overalltotal=overalltotal+grandtotal>
@@ -197,6 +201,7 @@
 				<th width="60">Type</th>
 				<th width="200">Client</th>
 				<th>Address</th>
+				<th>Round</th>
 			</tr>
 			<cfloop array="#invoices.post#" index="item">
 				<cfset row=row+1>
@@ -276,6 +281,7 @@
 					<td align="center">#item.invoiceType#</td>
 					<td>#item.ClientName#</td>
 					<td>#item.Address#</td>
+					<td>#item.rndTitle# #item.riOrder#</td>
 				</tr>
 			</cfloop>
 			<cfset overalltotal=overalltotal+grandtotal>
@@ -299,6 +305,7 @@
 				<th width="60">Type</th>
 				<th width="200">Client</th>
 				<th>Address</th>
+				<th>Round</th>
 			</tr>
 			<cfloop array="#invoices.weekly#" index="item">
 				<cfset row=row+1>
@@ -378,6 +385,7 @@
 					<td align="center">#item.invoiceType#</td>
 					<td>#item.ClientName#</td>
 					<td>#item.Address#</td>
+					<td>#item.rndTitle# #item.riOrder#</td>
 				</tr>
 			</cfloop>
 			<cfset overalltotal=overalltotal+grandtotal>
@@ -401,6 +409,7 @@
 				<th width="60">Type</th>
 				<th width="200">Client</th>
 				<th>Address</th>
+				<th>Round</th>
 			</tr>
 			<cfloop array="#invoices.email#" index="item">
 				<cfset row=row+1>
@@ -480,6 +489,7 @@
 					<td align="center">#item.invoiceType#</td>
 					<td>#item.ClientName#</td>
 					<td>#item.Address#</td>
+					<td>#item.rndTitle# #item.riOrder#</td>
 				</tr>
 			</cfloop>
 			<cfset overalltotal=overalltotal+grandtotal>

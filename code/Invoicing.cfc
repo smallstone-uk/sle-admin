@@ -19,7 +19,7 @@
 		<cftry>
 			<cfquery name="QClients" datasource="#args.datasource#">
 				SELECT *
-				FROM tblOrder,tblClients,tblStreets2,tblRoundItems
+				FROM tblOrder,tblClients,tblStreets2,tblRoundItems,tblrounds
 				WHERE ordActive=1
 				<cfif StructKeyExists(args.form,"client") AND val(args.form.client) neq 0>
 					AND cltID IN (#args.form.client#)
@@ -30,7 +30,9 @@
 				AND ordClientID=cltID
 				AND ordStreetCode=stID
 				AND riOrderID=ordID
+				AND riRoundID = rndID
 				AND riDay='#DateFormat(args.form.delDate,"DDD")#'
+				AND rndActive = 1
 				<cfif StructKeyExists(args.form,"accOrder")>ORDER BY cltRef asc<cfelse>ORDER BY riRoundID asc, riOrder asc</cfif>
 			</cfquery>
 			<cfset result.clientCount=QClients.recordcount>
@@ -78,9 +80,11 @@
 				<cfset item.cltShowBal=cltShowBal>
 				<cfset item.AccountType=cltAccountType>
 				<cfset item.PaymentType=cltPaymentType>
+				
 				<cfset item.InvDeliver=cltInvDeliver>
 				<cfset item.PayMethod=cltPayMethod>
 				<cfset item.PayType=cltPayType>
+				
 				<cfset item.InvoiceType=cltInvoiceType>
 				<cfset item.InvoiceRef=QGetInv.trnRef>
 				<cfif item.InvDeliver is "post">
@@ -90,6 +94,8 @@
 				<cfelse>
 					<cfset item.RoundID=riRoundID>
 				</cfif>
+				<cfset item.rndTitle = rndTitle>
+				<cfset item.riOrder = riOrder>
 				<cfset item.Dept=cltDept>
 				<cfif len(cltName) AND len(cltCompanyName)>
 					<cfset item.ClientName="#cltName# #cltCompanyName#">
@@ -187,7 +193,8 @@
 				<cfset StructInsert(loc.thisWeek,dayName,{
 					"Price" = price,
 					"Charge" = charge,
-					"Count" = num
+					"Count" = num,
+					"Date" = diDate
 				})>
 			</cfloop>
 			

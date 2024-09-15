@@ -48,7 +48,7 @@
 		</cfoutput>
 	</cfif>
 </cfif>
-
+<!---<cfdump var="#tranLoad#" label="tranLoad" expand="false">--->
 <cfif tranLoad.error is 0>	
 	<style type="text/css">
 		.red {color:#ff0000;}
@@ -257,33 +257,33 @@
 			<table border="1" class="tableList">
 				<tr>
 					<th width="30">Code</th>
-					<th width="150">Title</th>
+					<th width="250">Title</th>
 					<th width="20">Amount</th>
 				</tr>
 				<cfif ArrayLen(tranLoad.items)>
 					<cfloop array="#tranLoad.items#" index="item">
-						<cfif item.niNomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
+						<!--- <cfif item.niNomID neq 231>	07/09/22 hide vouchers from sales side --->
 							<input type="hidden" name="niID" value="#item.niID#">
 							<tr>
 								<td>#item.nomCode#</td>
 								<td>#item.nomTitle#</td>
 								<td align="right"><input type="text" name="niAmount_#item.niID#" class="amount nomAmount" value="#DecimalFormat(item.niAmount)#" size="10"></td>
 							</tr>
-						</cfif>
+						<!---</cfif>--->
 					</cfloop>
 				<cfelse>
 					<cfset keys=ListSort(StructKeyList(nominals.codes,","),"text","asc",",")>
 					<cfloop list="#keys#" index="key">
 						<cfif StructKeyExists(nominals.codes,key)>
 							<cfset nom=StructFind(nominals.codes,key)>
-							<cfif nom.nomID neq 231>	<!--- 07/09/22 hide vouchers from sales side --->
+							<!--- <cfif nom.nomID neq 231>	07/09/22 hide vouchers from sales side --->
 								<input type="hidden" name="niNomID" value="#nom.nomID#">
 								<tr>
 									<td>#nom.nomCode#</td>
 									<td>#nom.nomTitle#</td>
 									<td align="right"><input type="text" name="niAmount_#nom.nomID#" value="" class="amount nomAmount" size="10"></td>
 								</tr>
-							</cfif>
+							<!---</cfif>--->
 						</cfif>
 					</cfloop>
 				</cfif>
@@ -304,7 +304,7 @@
 			<table border="1" class="tableList">
 				<tr>
 					<th width="30">Code</th>
-					<th width="150">Title</th>
+					<th width="250">Title</th>
 					<th width="20">Amount</th>
 					<cfif ArrayLen(tranLoad.payItems)>
 						<cfset currGroup = "">

@@ -1994,7 +1994,7 @@
 					FROM tblNomItems,tblNominal
 					WHERE niTranID=#val(args.tranID)#
 					AND niNomID=nomID
-					AND niNomID != 231	<!--- 07/09/22 hide vouchers from sales side --->
+					<!--- AND niNomID != 231	07/09/22 hide vouchers from sales side --->
 					AND nomType='sales'
 					ORDER BY niID asc
 				</cfquery>

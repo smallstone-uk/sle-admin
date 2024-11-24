@@ -91,6 +91,7 @@
 										<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>COD Payments Summary</option>
 										<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>COD Payments List</option>
 										<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>COD Payment Analysis</option>
+										<option value="5"<cfif srchReport eq "5"> selected="selected"</cfif>>COD Cross Reference</option>
 									</select>
 								</td>
 							</tr>
@@ -485,6 +486,10 @@
 					<cfcase value="4">
 						<cfset result = purch.CODPaymentAnalysis(parms)>
 						<cfdump var="#result#" label="result" expand="false">
+					</cfcase>
+					<cfcase value="5">
+						<cfset parms.data = purch.CODLoadCrossCheck(parms)>
+						<cfset purch.CODViewCrossCheck(parms)>
 					</cfcase>
 				</cfswitch>
 			</cfif>

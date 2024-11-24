@@ -26,6 +26,99 @@
 		<cfreturn result>
 	</cffunction>
 
+	<cffunction name="CODLoadCrossCheck" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.suppliers = {}>
+		
+		<cftry>
+			<cfquery name="loc.QCODPayments" datasource="#args.datasource#">
+				SELECT 	accID,accCode,accGroup,accPayType,accIndex,accName,accType,
+						tblepos_items.*
+				FROM tblepos_items
+				INNER JOIN tblAccount ON eiSuppID = accID
+				WHERE eiSuppID > 1
+				<cfif len(args.form.srchDateFrom)>
+					AND eiTimeStamp >= '#args.form.srchDateFrom#'
+					AND eiTimeStamp <= '#args.form.srchDateTo#'
+				</cfif>
+				ORDER BY eiTimeStamp ASC
+			</cfquery>
+			<cfset loc.result.QCODPayments = loc.QCODPayments>
+			<cfloop query="loc.QCODPayments">
+				<cfset loc.tranDate = LSDateFormat(eiTimeStamp,"yyyy-mm-dd")>
+				<cfset loc.trnAmount = val(eiNet)>
+				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
+					SELECT *
+					FROM tblTrans
+					WHERE trnAccountID = #eiSuppID#
+					AND trnDate = '#loc.tranDate#'
+					AND trnAmnt1 = #loc.trnAmount#
+					LIMIT 1;
+				</cfquery>
+				<cfif !StructKeyExists(loc.result.suppliers,accID)>
+					<cfset StructInsert(loc.result.suppliers,accID,{"accID" = accID, "accName" = accName, trans = []})>
+				</cfif>
+				<cfset loc.supp = StructFind(loc.result.suppliers,accID)>
+				<cfset ArrayAppend(loc.supp.trans,{
+					"eiID" = eiID,
+					"eiTimeStamp" = loc.tranDate,
+					"eiNet" = eiNet,
+					"eiSuppID" = eiSuppID,
+					"found" = loc.QSuppPayment.recordcount,
+					"trnID" = val(loc.QSuppPayment.trnID)
+				})>
+			</cfloop>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="CODViewCrossCheck" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfoutput>
+				<table class="tableList" border="1">
+				<cfloop collection="#args.data.suppliers#" item="loc.key">
+					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
+					<tr>
+						<th>#loc.key#</th>
+						<th colspan="4">#loc.supp.accName#</th>
+					</tr>
+					<tr>
+						<th>eiID</th>
+						<th>eiTimeStamp</th>
+						<th>trnID</th>
+						<th>eiNet</th>
+						<th>found</th>
+					</tr>
+					<cfloop array="#loc.supp.trans#" index="loc.tran">
+						<tr>
+							<td>#loc.tran.eiID#</td>
+							<td>#DateFormat(loc.tran.eiTimeStamp,"ddd dd-mmm-yyyy")#</td>
+							<td align="right">#loc.tran.trnID#</td>
+							<td align="right">#loc.tran.eiNet#</td>
+							<td align="center">#loc.tran.found#</td>
+						</tr>
+					</cfloop>
+				</cfloop>
+				</table>
+			</cfoutput>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="CODPaymentAnalysis" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

@@ -44,6 +44,7 @@
 	.drAmount {text-align:right; color:#000000; font-size:12px}
 	.crAmountTotal {text-align:right; color:#FF0000; font-weight:bold;}
 	.drAmountTotal {text-align:right; color:#000000; font-weight:bold;}
+	.error { background-color:#FF0000; text-align:right; font-size:12px}
 </style>
 
 </head>
@@ -489,6 +490,7 @@
 					</cfcase>
 					<cfcase value="5">
 						<cfset parms.data = purch.CODLoadCrossCheck(parms)>
+						<!---<cfdump var="#parms.data#" label="data" expand="false">--->
 						<cfset purch.CODViewCrossCheck(parms)>
 					</cfcase>
 				</cfswitch>

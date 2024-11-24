@@ -53,8 +53,9 @@
 					SELECT *
 					FROM tblTrans
 					WHERE trnAccountID = #eiSuppID#
+					AND trnType = 'inv'
 					AND trnDate = '#loc.tranDate#'
-					AND trnAmnt1 = #loc.trnAmount#
+					<!---AND trnAmnt1 = #loc.trnAmount#--->
 					LIMIT 1;
 				</cfquery>
 				<cfif !StructKeyExists(loc.result.suppliers,accID)>
@@ -63,7 +64,9 @@
 				<cfset loc.supp = StructFind(loc.result.suppliers,accID)>
 				<cfset ArrayAppend(loc.supp.trans,{
 					"eiID" = eiID,
+					"eiParent" = eiParent,
 					"eiTimeStamp" = loc.tranDate,
+					"trnType" = loc.QSuppPayment.trnType,
 					"eiNet" = eiNet,
 					"eiSuppID" = eiSuppID,
 					"found" = loc.QSuppPayment.recordcount,
@@ -83,6 +86,7 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.errors = 0>
 		<cftry>
 			<cfoutput>
 				<table class="tableList" border="1">
@@ -90,25 +94,33 @@
 					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
 					<tr>
 						<th>#loc.key#</th>
-						<th colspan="4">#loc.supp.accName#</th>
+						<th colspan="5">#loc.supp.accName#</th>
 					</tr>
 					<tr>
 						<th>eiID</th>
 						<th>eiTimeStamp</th>
 						<th>trnID</th>
+						<th>EPOS Tran</th>
 						<th>eiNet</th>
 						<th>found</th>
 					</tr>
 					<cfloop array="#loc.supp.trans#" index="loc.tran">
-						<tr>
+						<cfset loc.class = "">
+						<cfset loc.errors += int(loc.tran.found eq 0)>
+						<cfif loc.tran.found eq 0><cfset loc.class = "error"></cfif>
+						<tr class="#loc.class#">
 							<td>#loc.tran.eiID#</td>
 							<td>#DateFormat(loc.tran.eiTimeStamp,"ddd dd-mmm-yyyy")#</td>
 							<td align="right">#loc.tran.trnID#</td>
+							<td align="right">#loc.tran.eiParent#</td>
 							<td align="right">#loc.tran.eiNet#</td>
 							<td align="center">#loc.tran.found#</td>
 						</tr>
 					</cfloop>
 				</cfloop>
+				<tr>
+					<th colspan="6">#loc.errors# errors found.</th>
+				</tr>
 				</table>
 			</cfoutput>
 		<cfcatch type="any">

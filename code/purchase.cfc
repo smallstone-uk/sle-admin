@@ -47,16 +47,19 @@
 			</cfquery>
 			<cfset loc.result.QCODPayments = loc.QCODPayments>
 			<cfloop query="loc.QCODPayments">
-				<cfset loc.tranDate = LSDateFormat(eiTimeStamp,"yyyy-mm-dd")>
-				<cfset loc.trnAmount = val(eiNet)>
+				<cfset loc.tillDate = LSDateFormat(eiTimeStamp,"yyyy-mm-dd")>
+				<cfset loc.tillAmount = val(eiNet)>
 				<cfset loc.class = "normal">
+				<cfset loc.tran = {}>
+				<cfset loc.tran.trnID = 0>
+				<cfset loc.tran.trnDate = "">
+				<cfset loc.tran.trnAmnt1 = 0.00>
 				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
 					SELECT *
 					FROM tblTrans
 					WHERE trnAccountID = #eiSuppID#
 					AND trnType = 'pay'
-					AND trnDate = '#loc.tranDate#'
-					<!---AND trnAmnt1 = #loc.trnAmount#--->
+					AND trnDate = '#loc.tillDate#'
 					LIMIT 1;
 				</cfquery>
 				<cfif loc.QSuppPayment.recordcount eq 0>
@@ -65,16 +68,25 @@
 						FROM tblTrans
 						WHERE trnAccountID = #eiSuppID#
 						AND trnType = 'pay'
-						AND trnDate BETWEEN '#LSDateFormat(DateAdd("d",-5,loc.tranDate),"yyyy-mm-dd")#' 
-							AND '#LSDateFormat(DateAdd("d",5,loc.tranDate),"yyyy-mm-dd")#'
-						<!---AND trnAmnt1 = #loc.trnAmount#--->
-						LIMIT 1;
+						AND trnDate BETWEEN '#LSDateFormat(DateAdd("d",-5,loc.tillDate),"yyyy-mm-dd")#' 
+							AND '#LSDateFormat(DateAdd("d",5,loc.tillDate),"yyyy-mm-dd")#'
 					</cfquery>
-					<cfif loc.QSuppPayment.recordcount eq 1>
+					<cfif loc.QSuppPayment.recordcount gt 0>
+						<cfloop query="loc.QSuppPayment">
+							<cfif ABS(trnAmnt1) eq loc.tillAmount>
+								<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
+								<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
+								<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
+							</cfif>			
+						</cfloop>
 						<cfset loc.class = "drifted">
 					<cfelse>
 						<cfset loc.class = "missing">
 					</cfif>
+				<cfelse>
+					<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
+					<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
+					<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
 				</cfif>
 				<cfif !StructKeyExists(loc.result.suppliers,accID)>
 					<cfset StructInsert(loc.result.suppliers,accID,{"accID" = accID, "accName" = accName, trans = []})>
@@ -83,13 +95,14 @@
 				<cfset ArrayAppend(loc.supp.trans,{
 					"eiID" = eiID,
 					"eiParent" = eiParent,
-					"eiTimeStamp" = loc.tranDate,
+					"eiTimeStamp" = loc.tillDate,
 					"trnType" = loc.QSuppPayment.trnType,
 					"eiNet" = eiNet,
 					"eiSuppID" = eiSuppID,
 					"found" = loc.QSuppPayment.recordcount,
-					"trnID" = val(loc.QSuppPayment.trnID),
-					"trnDate" = loc.QSuppPayment.trnDate,
+					"trnID" = val(loc.tran.trnID),
+					"trnDate" = loc.tran.trnDate,
+					"trnAmnt1" = loc.tran.trnAmnt1,
 					"class" = loc.class
 				})>
 			</cfloop>
@@ -114,15 +127,17 @@
 					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
 					<tr>
 						<th>#loc.key#</th>
-						<th colspan="6">#loc.supp.accName#</th>
+						<th colspan="8">#loc.supp.accName#</th>
 					</tr>
 					<tr>
 						<th>eiID</th>
+						<th>EPOS Tran</th>
 						<th>eiTimeStamp</th>
+						<th>eiNet</th>
+						<th></th>
 						<th>trnID</th>
 						<th>Tran Date</th>
-						<th>EPOS Tran</th>
-						<th>eiNet</th>
+						<th>Tran Amount</th>
 						<th>found</th>
 					</tr>
 					<cfloop array="#loc.supp.trans#" index="loc.tran">
@@ -131,17 +146,19 @@
 						<cfif loc.tran.found eq 0><cfset loc.class = "error"></cfif>
 						<tr class="#loc.tran.class#">
 							<td>#loc.tran.eiID#</td>
+							<td align="right">#loc.tran.eiParent#</td>
 							<td>#DateFormat(loc.tran.eiTimeStamp,"ddd dd-mmm-yyyy")#</td>
+							<td align="right">#loc.tran.eiNet#</td>
+							<td>&nbsp;</td>
 							<td align="right">#loc.tran.trnID#</td>
 							<td align="right">#DateFormat(loc.tran.trnDate,"ddd dd-mmm-yyyy")#</td>
-							<td align="right">#loc.tran.eiParent#</td>
-							<td align="right">#loc.tran.eiNet#</td>
+							<td align="right">#loc.tran.trnAmnt1#</td>
 							<td align="center">#loc.tran.found#</td>
 						</tr>
 					</cfloop>
 				</cfloop>
 				<tr>
-					<th colspan="6">#loc.errors# errors found.</th>
+					<th colspan="9">#loc.errors# errors found.</th>
 				</tr>
 				</table>
 			</cfoutput>

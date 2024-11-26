@@ -49,15 +49,33 @@
 			<cfloop query="loc.QCODPayments">
 				<cfset loc.tranDate = LSDateFormat(eiTimeStamp,"yyyy-mm-dd")>
 				<cfset loc.trnAmount = val(eiNet)>
+				<cfset loc.class = "normal">
 				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
 					SELECT *
 					FROM tblTrans
 					WHERE trnAccountID = #eiSuppID#
-					AND trnType = 'inv'
+					AND trnType = 'pay'
 					AND trnDate = '#loc.tranDate#'
 					<!---AND trnAmnt1 = #loc.trnAmount#--->
 					LIMIT 1;
 				</cfquery>
+				<cfif loc.QSuppPayment.recordcount eq 0>
+					<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
+						SELECT *
+						FROM tblTrans
+						WHERE trnAccountID = #eiSuppID#
+						AND trnType = 'pay'
+						AND trnDate BETWEEN '#LSDateFormat(DateAdd("d",-5,loc.tranDate),"yyyy-mm-dd")#' 
+							AND '#LSDateFormat(DateAdd("d",5,loc.tranDate),"yyyy-mm-dd")#'
+						<!---AND trnAmnt1 = #loc.trnAmount#--->
+						LIMIT 1;
+					</cfquery>
+					<cfif loc.QSuppPayment.recordcount eq 1>
+						<cfset loc.class = "drifted">
+					<cfelse>
+						<cfset loc.class = "missing">
+					</cfif>
+				</cfif>
 				<cfif !StructKeyExists(loc.result.suppliers,accID)>
 					<cfset StructInsert(loc.result.suppliers,accID,{"accID" = accID, "accName" = accName, trans = []})>
 				</cfif>
@@ -70,7 +88,9 @@
 					"eiNet" = eiNet,
 					"eiSuppID" = eiSuppID,
 					"found" = loc.QSuppPayment.recordcount,
-					"trnID" = val(loc.QSuppPayment.trnID)
+					"trnID" = val(loc.QSuppPayment.trnID),
+					"trnDate" = loc.QSuppPayment.trnDate,
+					"class" = loc.class
 				})>
 			</cfloop>
 			
@@ -94,12 +114,13 @@
 					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
 					<tr>
 						<th>#loc.key#</th>
-						<th colspan="5">#loc.supp.accName#</th>
+						<th colspan="6">#loc.supp.accName#</th>
 					</tr>
 					<tr>
 						<th>eiID</th>
 						<th>eiTimeStamp</th>
 						<th>trnID</th>
+						<th>Tran Date</th>
 						<th>EPOS Tran</th>
 						<th>eiNet</th>
 						<th>found</th>
@@ -108,10 +129,11 @@
 						<cfset loc.class = "">
 						<cfset loc.errors += int(loc.tran.found eq 0)>
 						<cfif loc.tran.found eq 0><cfset loc.class = "error"></cfif>
-						<tr class="#loc.class#">
+						<tr class="#loc.tran.class#">
 							<td>#loc.tran.eiID#</td>
 							<td>#DateFormat(loc.tran.eiTimeStamp,"ddd dd-mmm-yyyy")#</td>
 							<td align="right">#loc.tran.trnID#</td>
+							<td align="right">#DateFormat(loc.tran.trnDate,"ddd dd-mmm-yyyy")#</td>
 							<td align="right">#loc.tran.eiParent#</td>
 							<td align="right">#loc.tran.eiNet#</td>
 							<td align="center">#loc.tran.found#</td>

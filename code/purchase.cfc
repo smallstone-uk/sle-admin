@@ -46,7 +46,7 @@
 				ORDER BY eiTimeStamp ASC
 			</cfquery>
 			<cfset loc.result.QCODPayments = loc.QCODPayments>
-			<cfloop query="loc.QCODPayments">
+			<cfloop query="loc.QCODPayments">	<!--- loop supplier till payments --->
 				<cfset loc.tillDate = LSDateFormat(eiTimeStamp,"yyyy-mm-dd")>
 				<cfset loc.tillAmount = val(eiNet)>
 				<cfset loc.class = "normal">
@@ -54,7 +54,7 @@
 				<cfset loc.tran.trnID = 0>
 				<cfset loc.tran.trnDate = "">
 				<cfset loc.tran.trnAmnt1 = 0.00>
-				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
+				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">	<!--- look for matching payment --->
 					SELECT *
 					FROM tblTrans
 					WHERE trnAccountID = #eiSuppID#
@@ -62,8 +62,8 @@
 					AND trnDate = '#loc.tillDate#'
 					LIMIT 1;
 				</cfquery>
-				<cfif loc.QSuppPayment.recordcount eq 0>
-					<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">
+				<cfif loc.QSuppPayment.recordcount eq 0>	<!--- found no match --->
+					<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">	<!--- widen the date search range --->
 						SELECT *
 						FROM tblTrans
 						WHERE trnAccountID = #eiSuppID#
@@ -72,18 +72,20 @@
 							AND '#LSDateFormat(DateAdd("d",5,loc.tillDate),"yyyy-mm-dd")#'
 					</cfquery>
 					<cfif loc.QSuppPayment.recordcount gt 0>
-						<cfloop query="loc.QSuppPayment">
-							<cfif ABS(trnAmnt1) eq loc.tillAmount>
+						<cfloop query="loc.QSuppPayment">	<!--- loop the found records --->
+							<cfset loc.class = "missing">	<!--- assume it wont be found --->
+							<cfif ABS(trnAmnt1) eq loc.tillAmount>	<!--- found it --->
 								<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
 								<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
 								<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
+								<cfset loc.class = "drifted">
+								<cfbreak>
 							</cfif>			
 						</cfloop>
-						<cfset loc.class = "drifted">
-					<cfelse>
+					<cfelse>	<!--- still nothing found --->
 						<cfset loc.class = "missing">
 					</cfif>
-				<cfelse>
+				<cfelse>	<!--- found it first time --->
 					<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
 					<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
 					<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
@@ -125,7 +127,7 @@
 				<table class="tableList" border="1">
 				<cfloop collection="#args.data.suppliers#" item="loc.key">
 					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
-					<tr>
+					<tr class="header">
 						<th>#loc.key#</th>
 						<th colspan="8">#loc.supp.accName#</th>
 					</tr>

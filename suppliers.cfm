@@ -44,6 +44,7 @@
 	.drAmount {text-align:right; color:#000000; font-size:12px}
 	.crAmountTotal {text-align:right; color:#FF0000; font-weight:bold;}
 	.drAmountTotal {text-align:right; color:#000000; font-weight:bold;}
+	.header th {background-color:#CFF; color:#000; font-size:12px}
 	.normal {background-color:#fff; color:#000; text-align:right; font-size:12px}
 	.missing {background-color:#FF0000; color:#fff; text-align:right; font-size:12px}
 	.drifted {background-color:#FF9F00; color:#000; text-align:right; font-size:12px}

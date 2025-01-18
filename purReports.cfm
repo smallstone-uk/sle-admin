@@ -609,7 +609,7 @@
 											</cfif>
 										</cfloop>
 											<tr>
-												<td colspan="6" align="right"></td>
+												<td colspan="6" align="right">Total: #code# - #item.Title#</td>
 												<td align="right"><b>#DecimalFormat(rec.drTotal)#</b></td>
 												<td align="right"><b>#DecimalFormat(rec.crTotal)#</b></td>
 											</tr>

@@ -33,16 +33,20 @@
 				<li>
 					<table class="tableList" border="1" width="100%">
 						<tr>
-							<th align="left" width="200">Employee #rowCount#</th>
-							<td width="250">#record.employee.FirstName# #record.employee.LastName#</td>
-							<th align="left" width="200">Week Ending</th>
-							<td width="250">#DateFormat(parm.weekending,"dd-mmm-yyyy")#</td>
+							<th width="120" align="right">Employee</th>
+							<td width="120">#record.employee.FirstName# #record.employee.LastName#</td>
+							<th width="120" align="right">Week Ending</th>
+							<td width="120">#DateFormat(parm.weekending,"dd-mmm-yyyy")#</td>
+							<th width="120"align="right">Method</th>
+							<td width="120">#record.header.phMethod#</td>
 						</tr>
 						<tr>
-							<th align="left" width="200">Tax Code</th>
-							<td width="250">#record.employee.TaxCode#</td>
-							<th align="left" width="200">Week Number</th>
-							<td width="250">#pr2.GetPayrollWeekNumber(parm.weekending)#</td>
+							<th align="right">Tax Code</th>
+							<td>#record.employee.TaxCode#</td>
+							<th align="right">Week Number</th>
+							<td>#record.header.phWeekNo#<!---#pr2.GetPayrollWeekNumber(parm.weekending)#---></td>
+							<th align="right"></th>
+							<td></td>
 						</tr>
 					</table>
 					<div style="padding:5px 0;"></div>
@@ -72,7 +76,7 @@
 							</cfif>
 							<tr class="pr2_depts">
 								<th class="pr2_dept" data-dept="#dept.depID#" data-rate="#payRate#" align="left">#dept.depName#</th>
-								<td width="75" align="center">&pound;#payRate#</td>
+								<td width="75" align="center"><cfif len(payRate) neq 0>&pound;</cfif>#payRate#</td>
 								<cfloop from="1" to="7" index="i">
 									<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 										<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
@@ -109,12 +113,12 @@
 							<td style="vertical-align: top;padding: 0;">
 								<table class="tableList pr2_hour_totals" border="1">
 									<tr>
-										<th width="150">(Week #record.totals.recs#)</th>
+										<th width="200">(Week #record.totals.recs#)</th>
 										<th width="90">This Year</th>
 										<th width="90">This Period</th>
 									</tr>
 									<tr>
-										<th align="left">Work Hours</th>
+										<th align="left">Hours Worked</th>
 										<td data-role="holiday" align="right">#record.totals.workSum#</td>
 										<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 									</tr>
@@ -130,7 +134,7 @@
 										<td align="right">#record.header.phHolHours#</td>
 									</tr>				
 									<tr>
-										<th align="left">Annual Holiday Remaining</th>
+										<th align="left">Estimated Holiday Remaining</th>
 										<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
 										<td></td>
 									</tr>

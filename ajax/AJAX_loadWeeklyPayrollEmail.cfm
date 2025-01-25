@@ -122,22 +122,20 @@
 								<body>
 										<table class="tableList" width="100%">
 											<tr>
-												<th width="200" align="left">Employer</th>
-												<td width="250">#record.employee.employer#</td>
-												<th width="200" align="left">Reference</th>
-												<td width="250">#record.employee.employerRef#</td>
+												<th width="120" align="right">Employee</th>
+												<td width="120">#record.employee.FirstName# #record.employee.LastName#</td>
+												<th width="120" align="right">Week Ending</th>
+												<td width="120">#DateFormat(parm.weekending,"dd-mmm-yyyy")#</td>
+												<th width="120"align="right">Method</th>
+												<td width="120">#record.header.phMethod#</td>
 											</tr>
 											<tr>
-												<th align="left">Employee Name</th>
-												<td>#record.employee.FirstName# #record.employee.LastName#</td>
-												<th align="left">Week Ending</th>
-												<td>#DateFormat(parm.weekending,"dd-mmm-yyyy")#</td>
-											</tr>
-											<tr>
-												<th align="left">Tax Code</th>
+												<th align="right">Tax Code</th>
 												<td>#record.employee.TaxCode#</td>
-												<th align="left">Tax Week Number</th>
-												<td>#pr2.GetPayrollWeekNumber(parm.weekending)#</td>
+												<th align="right">Week Number</th>
+												<td>#record.header.phWeekNo#<!---#pr2.GetPayrollWeekNumber(parm.weekending)#---></td>
+												<th align="right"></th>
+												<td></td>
 											</tr>
 										</table>
 										<div style="padding:5px 0;"></div>
@@ -168,7 +166,7 @@
 												<cfif val(payRate) neq 0>
 												<tr class="pr2_depts">
 													<th class="pr2_dept" data-dept="#dept.depID#" data-rate="#payRate#" align="left">#dept.depName#</th>
-													<td width="75" align="center">&pound;#payRate#</td>
+													<td width="75" align="center"><cfif len(payRate) neq 0>&pound;</cfif>#payRate#</td>
 													<cfloop from="1" to="7" index="i">
 														<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 															<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
@@ -206,12 +204,12 @@
 												<td style="vertical-align: top;padding: 0;">
 													<table class="tableList">
 														<tr>
-															<th width="150">(Calandar Week #record.totals.recs#)</th>
-															<th width="80" align="right">This<br />Year</th>
-															<th width="80" align="right">This<br />Week</th>
+															<th width="200">(Calandar Week #record.totals.recs#)</th>
+															<th width="60" align="right">This<br />Year</th>
+															<th width="60" align="right">This<br />Week</th>
 														</tr>
 														<tr>
-															<th align="left">Work Hours</th>
+															<th align="left">Hours Worked</th>
 															<td data-role="holiday" align="right">#record.totals.workSum#</td>
 															<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 														</tr>
@@ -227,7 +225,7 @@
 															<td align="right">#record.header.phHolHours#</td>
 														</tr>				
 														<tr>
-															<th align="left">Annual Holiday Remaining</th>
+															<th align="left">Estimated Holiday Remaining</th>
 															<td data-role="holiday" align="right">#DecimalFormat(record.totals.remain)#</td>
 															<td></td>
 														</tr>
@@ -238,8 +236,8 @@
 													<table class="tableList">
 														<tr>
 															<th width="150"></th>
-															<th width="80" align="right">This<br />Year</th>
-															<th width="80" align="right">This<br />Week</th>
+															<th width="60" align="right">This<br />Year</th>
+															<th width="60" align="right">This<br />Week</th>
 														</tr>
 														<tr>
 															<th align="left">Pension Contribution</th>

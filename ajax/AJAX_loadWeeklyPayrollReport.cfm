@@ -17,6 +17,7 @@
 		.tableList.trhover tr.active:hover {background:##0F5E8B;}
 		.pr2-reportList {list-style-type: none;margin: 0;padding: 0;}
 		.pr2-reportList li {padding: 10px 0;border-bottom: 1px dashed ##000;min-height: 240px;max-height: 300px;}
+		##paycontent {margin:20px; min-width:800px;}
 		@page  
 		{   size:portrait;
 			margin-top:20px;
@@ -25,6 +26,7 @@
 			margin-bottom:20px;
 		}
 	</style>
+	<div id="paycontent">
 	<ul class="pr2-reportList">
 		<cfset rowCount=0>
 		<cfloop array="#records#" index="record">
@@ -114,8 +116,8 @@
 								<table class="tableList pr2_hour_totals" border="1">
 									<tr>
 										<th width="200">(Week #record.totals.recs#)</th>
-										<th width="90">This Year</th>
-										<th width="90">This Period</th>
+										<th width="60">This Year</th>
+										<th width="60">This Period</th>
 									</tr>
 									<tr>
 										<th align="left">Hours Worked</th>
@@ -145,8 +147,8 @@
 								<table class="tableList pr2_gross_totals" border="1">
 									<tr>
 										<th width="150"></th>
-										<th width="90">This Year</th>
-										<th width="90">This Period</th>
+										<th width="60">This Year</th>
+										<th width="60">This Period</th>
 									</tr>
 									<tr>
 										<th align="left">Pension Contribution</th>
@@ -248,6 +250,7 @@
 			</cfif>
 		</cfloop>
 	</ul>
+	</div>
 </cfoutput>
 
 <cfcatch type="any">

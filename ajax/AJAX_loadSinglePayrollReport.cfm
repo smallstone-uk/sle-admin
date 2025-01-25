@@ -17,6 +17,7 @@
 		.tableList td {padding:2px 5px;border-color: ##BDC9DD;}
 		.tableList.trhover tr:hover {background: ##EFF3F7;}
 		.tableList.trhover tr.active:hover {background:##0F5E8B;}
+		##paycontent {margin:20px; min-width:800px;}
 		@page  
 		{   size:portrait;
 			margin-top:20px;
@@ -25,18 +26,23 @@
 			margin-bottom:20px;
 		}
 	</style>
+	<div id="paycontent">
 	<table class="tableList" border="1" width="100%">
 		<tr>
-			<th align="left" width="200">Employee</th>
-			<td width="250">#record.employee.FirstName# #record.employee.LastName#</td>
-			<th align="left" width="200">Tax Week Ending</th>
-			<td width="250">#DateFormat(parm.form.weekending,"ddd dd-mmm-yyyy")#</td>
+			<th width="120" align="right">Employee</th>
+			<td width="120">#record.employee.FirstName# #record.employee.LastName#</td>
+			<th width="120" align="right">Week Ending</th>
+			<td width="120">#DateFormat(parm.form.weekending,"dd-mmm-yyyy")#</td>
+			<th width="120"align="right">Method</th>
+			<td width="120">#record.header.phMethod#</td>
 		</tr>
 		<tr>
-			<th align="left" width="200">Tax Code</th>
-			<td width="250">#record.employee.TaxCode#</td>
-			<th align="left" width="200">Tax Week Number</th>
-			<td width="250">#pr2.GetPayrollWeekNumber(parm.form.weekending)#</td>
+			<th align="right">Tax Code</th>
+			<td>#record.employee.TaxCode#</td>
+			<th align="right">Week Number</th>
+			<td>#record.header.phWeekNo#<!---#pr2.GetPayrollWeekNumber(parm.weekending)#---></td>
+			<th align="right"></th>
+			<td></td>
 		</tr>
 	</table>
 	<div style="padding:5px 0;"></div>
@@ -66,7 +72,7 @@
 			</cfif>
 			<tr class="pr2_depts">
 				<th class="pr2_dept" data-dept="#dept.depID#" data-rate="#payRate#" align="left">#dept.depName#</th>
-				<td width="75" align="center">&pound;#payRate#</td>
+				<td width="75" align="center"><cfif len(payRate) neq 0>&pound;</cfif>#payRate#</td>
 				<cfloop from="1" to="7" index="i">
 					<cfif StructKeyExists(deptItems, "#DayOfWeekAsString(i)#")>
 						<cfset dayItem = StructFind(deptItems, "#DayOfWeekAsString(i)#")>
@@ -103,12 +109,12 @@
 			<td style="vertical-align: top;padding: 0;">
 				<table class="tableList pr2_hour_totals" border="1">
 					<tr>
-						<th width="150">(Week #record.totals.recs#)</th>
-						<th width="80">This Year</th>
-						<th width="80">This Period</th>
+						<th width="200">(Week #record.totals.recs#)</th>
+						<th width="60">This Year</th>
+						<th width="60">This Period</th>
 					</tr>
 					<tr>
-						<th align="left">Work Hours</th>
+						<th align="left">Hours Worked</th>
 						<td data-role="holiday" align="right">#record.totals.workSum#</td>
 						<td data-role="holiday" align="right">#record.header.phWorkHours#</td>
 					</tr>
@@ -135,8 +141,8 @@
 				<table class="tableList pr2_gross_totals" border="1">
 					<tr>
 						<th width="150"></th>
-						<th width="80">This Year</th>
-						<th width="80">This Period</th>
+						<th width="60">This Year</th>
+						<th width="60">This Period</th>
 					</tr>
 					<tr>
 						<th align="left">Pension Contribution</th>
@@ -231,6 +237,7 @@
 			</td>
 		</tr>
 	</table>
+	</div>
 </cfoutput>
 
 <cfcatch type="any">

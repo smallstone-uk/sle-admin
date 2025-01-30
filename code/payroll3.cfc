@@ -18,7 +18,7 @@
 				SUM(phWorkHours) AS WorkHours,
 				SUM(phHolHours) AS HolHours
 			FROM tblPayHeader
-			WHERE phDate BETWEEN '#args.form.From#' AND '#args.form.To#'
+			WHERE phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 			GROUP BY phDate
 		</cfquery>
 		
@@ -28,8 +28,8 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = []>
-		<cfset loc.fromDate = args.form.From>
-		<cfset loc.toDate = args.form.To>
+		<cfset loc.fromDate = args.form.srchDateFrom>
+		<cfset loc.toDate = args.form.srchDateTo>
 		<cfset loc.currentDate = "">
 		
 		<cfquery name="loc.weeks" datasource="#args.database#">
@@ -95,22 +95,22 @@
 			<!---GET HEADERS--->
 			<cfquery name="loc.headers" datasource="#args.database#" result="loc.subResult.QheaderResult">
 				SELECT *,
-					(SELECT SUM(phGross) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS GrossSum,
-					(SELECT SUM(phPAYE) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS PAYESum,
-					(SELECT SUM(phNI) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS NISum,
-					(SELECT SUM(phNP) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS NPSum,
-					(SELECT SUM(phTotalHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HoursSum,
-					(SELECT SUM(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS WorkSum,
-					(SELECT AVG(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS WorkAvg,
-					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS HolSum,
-					(SELECT SUM(phEmployerContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS EmployerPensionSum,
-					(SELECT SUM(phMemberContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS MemberPensionSum,
-					(SELECT SUM(phLotterySubs) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS LottoSum,
-					(SELECT SUM(phAdjustment) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#') AS AdjustmentSum
+					(SELECT SUM(phGross) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS GrossSum,
+					(SELECT SUM(phPAYE) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS PAYESum,
+					(SELECT SUM(phNI) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS NISum,
+					(SELECT SUM(phNP) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS NPSum,
+					(SELECT SUM(phTotalHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS HoursSum,
+					(SELECT SUM(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS WorkSum,
+					(SELECT AVG(phWorkHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS WorkAvg,
+					(SELECT SUM(phHolHours) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS HolSum,
+					(SELECT SUM(phEmployerContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS EmployerPensionSum,
+					(SELECT SUM(phMemberContribution) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS MemberPensionSum,
+					(SELECT SUM(phLotterySubs) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS LottoSum,
+					(SELECT SUM(phAdjustment) FROM tblPayHeader WHERE phEmployee = #val(emp)# AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#') AS AdjustmentSum
 				FROM tblPayHeader
 				INNER JOIN tblEmployee ON empID = phEmployee
 				WHERE phEmployee = #val(emp)#
-				AND phDate BETWEEN '#args.form.From#' AND '#args.form.To#'
+				AND phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 				<cfif args.currentEmployees>AND empStatus = 'active'</cfif>
 				ORDER BY phDate
 			</cfquery>
@@ -182,7 +182,7 @@
 				FROM tblpayitems
 				INNER JOIN tblPayHeader ON piParent = phID
 				INNER JOIN tblEmployee ON phEmployee = empID
-				WHERE phDate BETWEEN '#args.form.from#' AND '#args.form.to#'
+				WHERE phDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 				<cfif StructKeyExists(args.form,"employee") AND len(args.form.employee)>AND empID IN (#args.form.employee#)</cfif>
 				<cfif StructKeyExists(args.form,"active")>AND empStatus = 'active'</cfif>
 				AND empRate = 0
@@ -546,4 +546,97 @@
 		
 		<cfreturn loc.result>
 	</cffunction>
+	
+	<cffunction name="PostPayrollToNominalLedger" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfargument name="data" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cftry>
+			<cfloop array="#data.headers#" index="loc.item">
+				<cfset loc.result.trnRef = "#NumberFormat(loc.item.empID,'000')#-#LSDateFormat(loc.item.weekEnding,'yymmdd')#">
+				<cfset loc.result.trnDate = LSDateFormat(loc.item.weekEnding,'yyyy-mm-dd')>
+				<cfset loc.result.trnDesc = "Pay #data.employee.firstname# #data.employee.lastname#">
+				<cfset loc.result.trnLedger = 'nom'>
+				<cfset loc.result.trnAccountID = 3>
+				<cfset loc.result.trnType = 'nom'>
+				<cfset loc.result.trnAlloc = 1>
+				<cfset loc.result.nomItems = []>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 1881, value = loc.item.np})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2182, value = loc.item.paye})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2172, value = loc.item.ni})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3252, value = loc.item.memberPension})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3242, value = loc.item.employerPension})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2332, value = -(loc.item.memberPension + loc.item.employerPension)})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3082, value = -(loc.item.np + loc.item.paye + loc.item.ni)})>
+				<cfquery name="loc.QTranExists" datasource="#args.database#">
+					SELECT trnID
+					FROM tblTrans
+					WHERE trnRef = '#loc.result.trnRef#'
+					AND trnDate = '#loc.result.trnDate#'
+					AND trnAccountID = #loc.result.trnAccountID#
+				</cfquery>
+				<cfif loc.QTranExists.recordcount is 0>
+					<cfset loc.result.trnID = 0>
+				<cfelse>
+					<cfset loc.result.trnID = loc.QTranExists.trnID>
+				</cfif>
+				<cfif args.form.importdata>
+					<cfif loc.result.trnID is 0>
+						<cfquery name="loc.QInsertTran" datasource="#args.database#" result="loc.QInsertResult">
+							INSERT INTO tblTrans
+								(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc)
+							VALUES
+								('#loc.result.trnRef#','#loc.result.trnDate#','#loc.result.trnDesc#','#loc.result.trnLedger#',#loc.result.trnAccountID#,'#loc.result.trnType#',#loc.result.trnAlloc#)
+						</cfquery>
+						<cfset loc.result.trnID = loc.QInsertResult.generatedkey>
+					<cfelse>
+						<cfquery name="loc.QUpdateTran" datasource="#args.database#">
+							UPDATE tblTrans
+							SET
+								trnRef = '#loc.result.trnRef#',
+								trnDate = '#loc.result.trnDate#',
+								trnDesc = '#loc.result.trnDesc#',
+								trnLedger = '#loc.result.trnLedger#',
+								trnAccountID = #loc.result.trnAccountID#,
+								trnType = '#loc.result.trnType#',
+								trnAlloc = #loc.result.trnAlloc#
+							WHERE trnID = #loc.result.trnID#
+						</cfquery>
+					</cfif>
+					<cfloop array="#loc.result.nomItems#" index="loc.item">
+						<cfquery name="loc.QItemExists" datasource="#args.database#">
+							SELECT niID 
+							FROM tblNomItems 
+							WHERE niTranID = #loc.result.trnID#
+							AND niNomID = #loc.item.nomID#
+						</cfquery>
+						<cfif loc.QItemExists.recordcount is 0>
+							<cfquery name="loc.QInsertITem" datasource="#args.database#">
+								INSERT INTO tblNomItems
+									(niTranID,niNomID,niAmount)
+								VALUES
+									(#loc.result.trnID#,#loc.item.nomID#,#loc.item.value#)
+							</cfquery>
+						<cfelse>
+							<cfquery name="loc.QItemExists" datasource="#args.database#">
+								UPDATE tblNomItems
+								SET niAmount = #loc.item.value#
+								WHERE niTranID = #loc.result.trnID#
+								AND niNomID = #loc.item.nomID#
+							</cfquery>
+							<cfset loc.item.status = 2>
+						</cfif>
+					</cfloop>
+				</cfif>
+			</cfloop>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 </cfcomponent>

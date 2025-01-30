@@ -6,15 +6,24 @@
 <cfset parm.database = application.site.datasource1>
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.form = form>
-<cfset parm.currentEmployees = true>
-<cfif parm.form.sort eq "employee">
+<cfif StructKeyExists(form,"currentEmployees")>
+	<cfset parm.currentEmployees = form.currentEmployees>
+<cfelse>
+	<cfset parm.currentEmployees = "0">
+</cfif>
+<cfif StructKeyExists(form,"importData")>
+	<cfset parm.importData = form.importData>
+<cfelse>
+	<cfset parm.importData = "0">
+</cfif>
+<cfif parm.form.reportType eq "employee">
 	<cfset Report = pr.LoadEmployeeReport(parm)>
-<cfelseif parm.form.sort eq "postTrans">
-	<cfset parm.currentEmployees = false>
+<cfelseif parm.form.reportType eq "postTrans">
+	<!---<cfset parm.currentEmployees = false>--->
 	<cfset Report = pr.LoadEmployeeReport(parm)>
-<cfelseif parm.form.sort eq "date_minimal">
+<cfelseif parm.form.reportType eq "date_minimal">
 	<cfset Report = pr.LoadMinimalPayrollReportByDate(parm)>
-<cfelseif parm.form.sort eq "holiday">
+<cfelseif parm.form.reportType eq "holiday">
 	<cfset Report = pr.LoadHolidayReportByDate(parm)>
 <cfelse>
 	<cfset Report = pr.LoadPayrollReportByDate(parm)>
@@ -24,7 +33,7 @@
 <cfset header=100>
 <cfset row=20>
 
-<cfif parm.form.sort eq "employee">
+<cfif parm.form.reportType eq "employee">
 	<cfoutput>
 		<cfsavecontent variable="sReport">
 			<cfloop array="#Report#" index="rep">
@@ -142,7 +151,7 @@
 			</cfloop>
 		</cfsavecontent>
 	</cfoutput>
-<cfelseif parm.form.sort eq "date">
+<cfelseif parm.form.reportType eq "date">
 	<cfsavecontent variable="sReport">
 		<cfoutput>
 			<table class="tableList" border="1">
@@ -220,7 +229,7 @@
 			</table>
 		</cfoutput>
 	</cfsavecontent>
-<cfelseif parm.form.sort eq "date_minimal">
+<cfelseif parm.form.reportType eq "date_minimal">
 	<cfsavecontent variable="sReport">
 		<cfset totalTakeHome = 0>
 		<cfset totalNet = 0>
@@ -291,7 +300,7 @@
 		</cfoutput>
 	</cfsavecontent>
 	
-<cfelseif parm.form.sort eq "holiday">
+<cfelseif parm.form.reportType eq "holiday">
 	<cfoutput>
 	<table class="tableList" border="0" cellpadding="0" cellspacing="0">
 		<tr>
@@ -396,7 +405,8 @@
 	</table>
 	</cfoutput>
 
-<cfelseif parm.form.sort eq "postTrans">
+<cfelseif parm.form.reportType eq "postTrans">
+	<cfset rep = {}>
 	<cfoutput>
 	<table class="tableList" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
@@ -410,9 +420,23 @@
 			<th width="" align="right">Member Pension</th>
 			<th width="" align="right">Lotto</th>
 			<th width="" align="right">Gross Pay</th>
+			<th width="" align="right">Tran ID</th>
 		</tr>
+		
 		<cfloop array="#Report#" index="rep">
+			<tr>
+				<td colspan="11">
+					<cfset data = pr.PostPayrollToNominalLedger(parm,rep)>
+				</td>
+			</tr>
 			<cfloop array="#rep.headers#" index="item">
+<!---
+				<tr>
+					<td colspan="11">
+						<cfdump var="#item#" label="item" expand="false">
+					</td>
+				</tr>
+--->
 				<tr>
 					<td>#rep.employee.firstname# #rep.employee.lastname#</td>
 					<td align="center">#DateFormat(item.WeekEnding, "dd/mm/yyyy")#</td>
@@ -424,6 +448,7 @@
 					<td align="right">#item.MemberPension#</td>
 					<td align="right">#item.Lotto#</td>
 					<td align="right">#item.Gross#</td>
+					<td align="right">#data.trnID#</td>
 				</tr>
 			</cfloop>
 		</cfloop>
@@ -431,7 +456,7 @@
 	</cfoutput>
 </cfif>
 
-<cfif parm.form.sort neq "postTrans" AND StructKeyExists(variables,"sReport")>
+<cfif parm.form.reportType neq "postTrans" AND StructKeyExists(variables,"sReport")>
 	<script>
 		$(document).ready(function(e) {
 			<cfoutput>

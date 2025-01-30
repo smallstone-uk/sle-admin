@@ -565,8 +565,8 @@
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 1881, value = loc.item.np})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2182, value = loc.item.paye})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2172, value = loc.item.ni})>
-				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3252, value = loc.item.memberPension})>
-				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3242, value = loc.item.employerPension})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3272, value = loc.item.employerPension})>
+				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3282, value = loc.item.memberPension})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2332, value = -(loc.item.memberPension + loc.item.employerPension)})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3082, value = -(loc.item.np + loc.item.paye + loc.item.ni)})>
 				<cfquery name="loc.QTranExists" datasource="#args.database#">

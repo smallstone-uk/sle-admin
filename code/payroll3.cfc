@@ -64,6 +64,7 @@
 				FROM tblPayHeader, tblEmployee
 				WHERE phDate = '#i.weekEnding#'
 				AND phEmployee = empID
+				<cfif args.currentEmployees>AND empStatus = 'active'</cfif>
 				ORDER BY empFirstName ASC
 			</cfquery>
 			<cfset i.items = QueryToArrayOfStruct(loc.headers)>
@@ -365,7 +366,6 @@
 				WHERE etWHeadID = #val(loc.wHeadID)#
 				AND etType = '#item.type#'
 			</cfquery>
-			<cfdump var="#item#" label="item" expand="no">
 			<cfif loc.checkItem.recordcount is 0>
 				<cfquery name="loc.newItem" datasource="#args.database#">
 					INSERT INTO tblEmpWorkItem (
@@ -410,7 +410,6 @@
 					WHERE etWHeadID = #val(loc.wHeadID)#
 					AND etType = '#item.type#'
 				</cfquery>
-				<cfdump var="#loc.newItemResult#" label="newItemResult" expand="no">
 			</cfif>
 		</cfloop>
 		
@@ -569,7 +568,7 @@
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3282, value = loc.item.memberPension})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 2332, value = -(loc.item.memberPension + loc.item.employerPension)})>
 				<cfset ArrayAppend(loc.result.nomItems, {"nomID" = 3082, value = -(loc.item.np + loc.item.paye + loc.item.ni)})>
-				<cfquery name="loc.QTranExists" datasource="#args.database#">
+				<cfquery name="loc.QTranExists" datasource="#args.database#" result="loc.tranExists">
 					SELECT trnID
 					FROM tblTrans
 					WHERE trnRef = '#loc.result.trnRef#'
@@ -581,7 +580,7 @@
 				<cfelse>
 					<cfset loc.result.trnID = loc.QTranExists.trnID>
 				</cfif>
-				<cfif args.form.importdata>
+				<cfif args.importdata>
 					<cfif loc.result.trnID is 0>
 						<cfquery name="loc.QInsertTran" datasource="#args.database#" result="loc.QInsertResult">
 							INSERT INTO tblTrans
@@ -590,6 +589,7 @@
 								('#loc.result.trnRef#','#loc.result.trnDate#','#loc.result.trnDesc#','#loc.result.trnLedger#',#loc.result.trnAccountID#,'#loc.result.trnType#',#loc.result.trnAlloc#)
 						</cfquery>
 						<cfset loc.result.trnID = loc.QInsertResult.generatedkey>
+						<cfset loc.result.msg = "tran added #loc.result.trnID#">
 					<cfelse>
 						<cfquery name="loc.QUpdateTran" datasource="#args.database#">
 							UPDATE tblTrans
@@ -603,6 +603,7 @@
 								trnAlloc = #loc.result.trnAlloc#
 							WHERE trnID = #loc.result.trnID#
 						</cfquery>
+						<cfset loc.result.msg = "tran updated #loc.result.trnID#">
 					</cfif>
 					<cfloop array="#loc.result.nomItems#" index="loc.item">
 						<cfquery name="loc.QItemExists" datasource="#args.database#">
@@ -612,14 +613,14 @@
 							AND niNomID = #loc.item.nomID#
 						</cfquery>
 						<cfif loc.QItemExists.recordcount is 0>
-							<cfquery name="loc.QInsertITem" datasource="#args.database#">
+							<cfquery name="loc.QInsertItem" datasource="#args.database#">
 								INSERT INTO tblNomItems
 									(niTranID,niNomID,niAmount)
 								VALUES
 									(#loc.result.trnID#,#loc.item.nomID#,#loc.item.value#)
 							</cfquery>
 						<cfelse>
-							<cfquery name="loc.QItemExists" datasource="#args.database#">
+							<cfquery name="loc.QUpdateItem" datasource="#args.database#">
 								UPDATE tblNomItems
 								SET niAmount = #loc.item.value#
 								WHERE niTranID = #loc.result.trnID#

@@ -422,18 +422,17 @@
 			<th width="" align="right">Gross Pay</th>
 			<th width="" align="right">Tran ID</th>
 		</tr>
-		<cfdump var="#Report#" label="Report" expand="false">
 		<cfloop array="#Report#" index="rep">
 			<cfloop array="#rep.headers#" index="item">
 				<tr>
 					<td colspan="11">
 						<cfset data = pr.PostPayrollToNominalLedger(parm,rep)>
-						<cfdump var="#data#" label="data" expand="false">
+						<!---<cfdump var="#data#" label="data" expand="false">--->
 					</td>
 				</tr>
 				<tr>
 					<td colspan="11">
-						<cfdump var="#item#" label="item" expand="false">
+					<!---	<cfdump var="#item#" label="item" expand="false">--->
 					</td>
 				</tr>
 

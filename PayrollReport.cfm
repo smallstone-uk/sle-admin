@@ -54,6 +54,13 @@
 
 <cftry>
 	<cfobject component="code/payroll" name="pr">
+	<cfparam name="Employee" default="">
+	<cfparam name="srchAccount" default="">
+	<cfparam name="srchDateFrom" default="">
+	<cfparam name="srchDateTo" default="">
+	<cfparam name="reportType" default="">
+	<cfparam name="currentEmployees" default="#StructKeyExists(form,"currentEmployees")#">
+	<cfparam name="importData" default="#StructKeyExists(form,"importData")#">
 	<cfset parm = {}>
 	<cfset parm.database = application.site.datasource1>
 	<cfset parm.active = false>
@@ -87,20 +94,24 @@
 										</tr>
 										<tr>
 											<td>From</td>
-											<td><input type="text" name="From" value="#LSDateFormat(startMonth,'yyyy-mm-dd')#" class="datepicker" /></td>
+											<td><input type="text" name="srchDateFrom" value="#LSDateFormat(startMonth,'yyyy-mm-dd')#" class="datepicker" /></td>
 										</tr>
 										<tr>
 											<td>To</td>
-											<td><input type="text" name="To" value="#LSDateFormat(endMonth,'yyyy-mm-dd')#" class="datepicker" /></td>
+											<td><input type="text" name="srchDateTo" value="#LSDateFormat(endMonth,'yyyy-mm-dd')#" class="datepicker" /></td>
 										</tr>
 										<tr>
 											<td>Options</td>
-											<td><input type="checkbox" name="currentEmployees" value="1" />Current employees only</td>
+											<td><input type="checkbox" name="currentEmployees" value="1" checked="checked" />Current Employees Only?</td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><input type="checkbox" name="importData" value="1" />Import Selected Data?</td>
 										</tr>
 										<tr>
 											<td>Report type</td>
 											<td>
-												<select name="Sort">
+												<select name="reportType">
 													<option value="date">Weekly Summary per Employee</option>
 													<option value="employee">Employee Summary per Week</option>
 													<option value="date_minimal">Payment Summary Totals</option>

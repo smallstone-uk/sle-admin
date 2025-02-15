@@ -20,9 +20,21 @@
 	<cffunction name="SaveProductLock" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
+		<cfif args.newLock eq 'locked'>
+			<cfset loc.lock = 1>
+		<cfelse><cfset loc.lock = 0></cfif>
 		<cfquery name="loc.save" datasource="#args.datasource#">
 			UPDATE tblProducts
-			SET prodLocked = '#int(args.newLock)#'
+			SET prodLocked = #loc.lock#
+			WHERE prodID = #val(args.product)#
+		</cfquery>
+	</cffunction>
+	<cffunction name="SaveProductReorder" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblProducts
+			SET prodReorder = '#args.newReorder#'
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>

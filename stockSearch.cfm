@@ -116,7 +116,7 @@
 				if (!isEditingTitle) {
 					var value = $(this).html();
 					var prodID = $(this).attr("data-id");
-					var htmlStr = "<input type='text' size='40' value='" + value + "' class='sod_title_input' data-id='" + prodID + "'>";
+					var htmlStr = "<input type='text' size='30' value='" + value + "' class='sod_title_input' data-id='" + prodID + "'>";
 					$(this).html(htmlStr);
 					$(this).find('.sod_title_input').focus();
 				}
@@ -133,6 +133,44 @@
 					success: function(data) {
 						cell.html(data.trim());
 						isEditingTitle = false;
+					}
+				});
+			});
+			var isEditingReorder = false;
+			$('.sod_reorder').click(function(event) {
+				if (!isEditingReorder) {
+					var value = $(this).html();
+					var prodID = $(this).attr("data-id");
+					var htmlStr = "<select name = 'reorder' " + "' class='sod_reorder_select' data-id='" + prodID + "'>";
+					htmlStr = htmlStr + "<option value='None' "; 
+						if (value == 'None') {htmlStr = htmlStr + 'selected=selected'};
+					htmlStr = htmlStr + ">None</option>";
+					htmlStr = htmlStr + "<option value='Monday' "; 
+						if (value == 'Monday') {htmlStr = htmlStr + 'selected=selected'};
+					htmlStr = htmlStr + ">Monday</option>";
+					htmlStr = htmlStr + "<option value='Thursday' ";
+						if (value == 'Thursday') {htmlStr = htmlStr + 'selected=selected'};
+					htmlStr = htmlStr + ">Thursday</option>";
+					htmlStr = htmlStr + "<option value='Every' ";
+						if (value == 'Every') {htmlStr = htmlStr + 'selected=selected'};				
+					htmlStr = htmlStr + ">Every</option>";
+					htmlStr = htmlStr + "</select>";
+					$(this).html(htmlStr);
+					$(this).find('.sod_reorder_select').focus();
+				}
+				isEditingReorder = true;
+			});
+			$(document).on("blur", ".sod_reorder_select", function(event) {
+				var value = $(this).val();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this).parent('.sod_reorder');
+				$.ajax({
+					type: "POST",
+					url: "saveProductReorder.cfm",
+					data: {"reorder": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						isEditingReorder = false;
 					}
 				});
 			});
@@ -388,15 +426,15 @@
 													<th>ID</th>
 													<th>Reference</th>
 													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
+													<th>Size</th>
+													<th>Price Desc.</th>
 													<th>Product<br>Status</th>
 													<th>Discountable</th>
 													<th>Lock</th>
-													<th>Size</th>
-													<th>Price Desc.</th>
+													<th>Reorder</th>
 													<th>Our Price</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>
-													<th>Reorder</th>
 													<th>Last Purchased</th>
 												</tr>
 											<cfset category=0>
@@ -417,15 +455,15 @@
 													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
-													<td class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
-													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
-													<td class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
 													<td>#siUnitSize#</td>
 													<td>#prodUnitSize#</td>
+													<td align="center" class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
+													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
+													<td align="center" class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
+													<td align="center" class="sod_reorder disable-select" data-id="#prodID#">#prodReorder#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
-													<td>#prodReorder#</td>
 													<td>
 														<cfif StructKeyExists(stocklist.stockItems,'soDate')>
 															#LSDateFormat(soDate,"ddd dd-mmm yy")# <span class="tiny">ordered</span>

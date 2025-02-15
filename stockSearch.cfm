@@ -431,7 +431,7 @@
 													<th>Product<br>Status</th>
 													<th>Discountable</th>
 													<th>Lock</th>
-													<th>Reorder</th>
+													<th width="100">Reorder</th>
 													<th>Our Price</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>

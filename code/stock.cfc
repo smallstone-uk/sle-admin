@@ -38,6 +38,15 @@
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>
+	<cffunction name="SaveProductRestock" access="public" returntype="void">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfquery name="loc.save" datasource="#args.datasource#">
+			UPDATE tblProducts
+			SET prodRestockLevel = '#args.newStockLevel#'
+			WHERE prodID = #val(args.product)#
+		</cfquery>
+	</cffunction>
 	<cffunction name="SaveProductTitle" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

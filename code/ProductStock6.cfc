@@ -126,7 +126,7 @@
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
 					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
-							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,prodLocked,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,prodLocked,prodUnitTrade,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
 					LEFT JOIN tblStockItem ON prodID = siProduct
@@ -162,6 +162,7 @@
 						<cfset loc.rec.PriceMarked = GetToken(" |PM",prodPriceMarked+1,"|")>
 						<cfset loc.rec.prodMinPrice = prodMinPrice>
 						<cfset loc.rec.prodOurPrice = prodOurPrice>
+						<cfset loc.rec.prodUnitTrade = prodUnitTrade>
 						<cfset loc.rec.prodStatus = prodStatus>
 						<cfset loc.rec.prodReorder = prodReorder>
 						<cfset loc.rec.prodLocked = prodLocked>

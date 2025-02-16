@@ -136,6 +136,31 @@
 					}
 				});
 			});
+			var isEditingStock = false;
+			$('.sod_restock').click(function(event) {
+				if (!isEditingStock) {
+					var value = $(this).html();
+					var prodID = $(this).attr("data-id");
+					var htmlStr = "<input type='text' size='2' value='" + value + "' class='sod_restock_input' data-id='" + prodID + "'>";
+					$(this).html(htmlStr);
+					$(this).find('.sod_restock_input').focus();
+				}
+				isEditingStock = true;
+			});
+			$(document).on("blur", ".sod_restock_input", function(event) {
+				var value = $(this).val();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this).parent('.sod_restock');
+				$.ajax({
+					type: "POST",
+					url: "saveProductRestock.cfm",
+					data: {"stockQty": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						isEditingStock = false;
+					}
+				});
+			});
 			var isEditingReorder = false;
 			$('.sod_reorder').click(function(event) {
 				if (!isEditingReorder) {
@@ -276,6 +301,7 @@
 											<!---<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>Latest Price List</option>--->
 											<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>Stock Take Report</option>
 											<option value="5"<cfif srchReport eq "5"> selected="selected"</cfif>>Stock Sales Performance</option>
+											<option value="6"<cfif srchReport eq "6"> selected="selected"</cfif>>Restocking Report</option>
 										</select>
 									</td>
 								</tr>
@@ -416,7 +442,7 @@
 								<cfcase value="1">
 									<cfset stocklist=stock.StockSearch(parm)>
 									<!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
-									<cfset colspan=13>
+									<cfset colspan=14>
 									<cfif stocklist.recCount GT 0>
 										<cfoutput>
 											<p><strong>#stocklist.recCount# products</strong></p>
@@ -714,6 +740,96 @@
 										</cfoutput>
 									</cfif>
 									<!---<cfdump var="#stocklist#" label="stocklist" expand="no">--->
+								</cfcase>
+								
+								<cfcase value="6">
+									<cfset colspan=14>
+									<cfset stocklist=stock.StockSearch(parm)>
+									<cfset restockTotalNet = 0>
+									<cfset restockTotalVAT = 0>
+									<cfif stocklist.recCount GT 0>
+										<cfoutput>
+											<p><strong>#stocklist.recCount# products</strong></p>
+											<table width="100%" class="tableList" border="1">
+												<tr>
+													<th width="10"></th>
+													<th>ID</th>
+													<th>Reference</th>
+													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
+													<th>Size</th>
+													<th>Pack Qty</th>
+													<th>Our Price</th>
+													<th>Product<br>Status</th>
+													<th>Discountable</th>
+													<th>Lock Status</th>
+													<th width="100">Reorder</th>
+													<th width="100">Reorder<br>Qty</th>
+													<th width="100">Reorder<br>Value</th>
+													<th>Stock<br>Status</th>
+													<th>Last Purchased</th>
+												</tr>
+											<cfset category=0>
+											<cfloop query="stocklist.stockItems">
+												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
+												<cfset caseValueNet = prodUnitTrade * val(prodPackQty) * prodRestockLevel>
+												<cfset caseValueVAT = caseValueNet * (1 + prodVATRate / 100)>
+												<cfset restockTotalNet += caseValueNet>
+												<cfset restockTotalVAT += caseValueVAT>
+												<cfif prodCatID neq category>
+													<tr class="searchrow" data-title="">
+														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
+														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong>
+															<cfif pcatShow><span class="catActive">Active</span>
+																<cfelse><span class="catInactive">Inactive</span></cfif>
+														</th>
+													</tr>
+													<cfset category=prodCatID>
+												</cfif>
+												<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
+													<td><input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" value="#prodID#"></td>
+													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
+													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
+													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
+													<td>#siUnitSize#</td>
+													<td>#siPackQty#</td>
+													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
+													<td align="center" class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
+													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
+													<td align="center" class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
+													<td align="center" class="sod_reorder disable-select" data-id="#prodID#">#prodReorder#</td>
+													<td align="center" class="sod_restock disable-select" data-id="#prodID#">#prodRestockLevel#</td>
+													<td align="right">#DecimalFormat(caseValueNet)#</td>
+													<td>#siStatus#</td>
+													<td>
+														<cfif StructKeyExists(stocklist.stockItems,'soDate')>
+															#LSDateFormat(soDate,"ddd dd-mmm yy")# <span class="tiny">ordered</span>
+														<cfelse>#DateFormat(prodLastBought,"dd-mmm-yyyy")#</cfif>
+													</td>
+												</tr>
+											</cfloop>
+												<tr>
+													<th align="right" colspan="12">Net Total</th>
+													<th align="right">#DecimalFormat(restockTotalNet)#</th>
+													<th></th>
+													<th></th>
+												</tr>
+												<tr>
+													<th align="right" colspan="12">VAT Total</th>
+													<th align="right">#DecimalFormat(restockTotalVAT)#</th>
+													<th></th>
+													<th></th>
+												</tr>
+												<tr>
+													<th align="right" colspan="12">Gross Total</th>
+													<th align="right">#DecimalFormat(restockTotalNet + restockTotalVAT)#</th>
+													<th></th>
+													<th></th>
+												</tr>
+											</table>
+										</cfoutput>
+									<cfelse>
+										No records found.
+									</cfif>
 								</cfcase>
 								<cfdefaultcase>
 									No Report selected.

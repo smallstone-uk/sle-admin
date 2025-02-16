@@ -163,12 +163,13 @@
 					<tr><td>Category</td><td>#lookup.catTitle#</td></tr>
 					<tr><td>Minimum Price</td><td>&pound;#lookup.product.prodMinPrice#</td></tr>
 					<tr><td>Our Price</td><td>&pound;#lookup.product.prodOurPrice#</td></tr>
+					<tr><td>Unit Trade</td><td>&pound;#lookup.product.prodUnitTrade#</td></tr>
 					<tr><td>Price Description</td><td>#lookup.product.prodUnitSize#</td></tr>
 					<tr><td>Discountable</td><td>#lookup.product.prodStaffDiscount#</td></tr>
 					<tr><td>Price Marked</td><td>#YesNoFormat(lookup.product.prodPriceMarked)#</td></tr>
 					<tr><td>Locked</td><td>#YesNoFormat(lookup.product.prodLocked)#</td></tr>
 					<tr><td>VAT Rate</td><td>#lookup.product.prodVATRate#%</td></tr>
-					<tr><td>Stock Checked</td><td>#lookup.product.prodCountDate# &nbsp; Check Level #lookup.product.prodStockLevel#</td></tr>
+					<tr><td>Last Stock Check</td><td>#lookup.product.prodCountDate# &nbsp; Check Level #lookup.product.prodStockLevel#</td></tr>
 					<tr><td>Status</td><td>#lookup.product.prodStatus# &nbsp; Reorder #lookup.product.prodReorder#</td></tr>
 				</table>
 				<table class="showTable" border="1">
@@ -254,16 +255,8 @@
 							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
 						<tr><td>Our Price</td><td>
 							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
-						<tr><td>Price Description</td><td>
-							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="#lookup.product.prodUnitSize#" /></td></tr>
-						<tr><td height="33">Options</td><td>
-							Discountable 
-							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />
-							Price Marked
-							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> />
-							Locked
-							<input type="checkbox" name="prodLocked" id="prodLocked"<cfif lookup.product.prodLocked> checked="checked"</cfif> />
-						</td></tr>
+						<tr><td>Unit Trade</td><td>
+							<input type="text" name="prodUnitTrade" id="prodUnitTrade" class="field" size="10" value="#lookup.product.prodUnitTrade#" /> (ex. VAT)</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -275,6 +268,16 @@
 								</select>
 							</td>
 						</tr>
+						<tr><td>Price Description</td><td>
+							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="#lookup.product.prodUnitSize#" /></td></tr>
+						<tr><td height="33">Options</td><td>
+							<input type="checkbox" name="prodStaffDiscount" id="prodStaffDiscount"<cfif lookup.product.prodStaffDiscount> checked="checked"</cfif> />
+							Discountable 
+							<input type="checkbox" name="prodPriceMarked" id="prodPriceMarked"<cfif lookup.product.prodPriceMarked> checked="checked"</cfif> />
+							Price Marked
+							<input type="checkbox" name="prodLocked" id="prodLocked"<cfif lookup.product.prodLocked> checked="checked"</cfif> />
+							Locked
+						</td></tr>
 						<tr>
 							<td>EPOS Category</td>
 							<td>
@@ -309,7 +312,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td>Stock Check Date</td>
+							<td>Last Stock<br />Check Date</td>
 							<td>
 								<input type="text" name="prodCountDate" id="prodCountDate" size="10" class="datepicker" 
 									value="#LSDateFormat(lookup.product.prodCountDate,'dd-mmm-yyyy')#" tabindex="6" />

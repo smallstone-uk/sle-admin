@@ -772,7 +772,7 @@
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 												<cfset caseValueNet = prodUnitTrade * val(prodPackQty) * prodRestockLevel>
-												<cfset caseValueVAT = caseValueNet * (1 + prodVATRate / 100)>
+												<cfset caseValueVAT = caseValueNet * (prodVATRate / 100)>
 												<cfset restockTotalNet += caseValueNet>
 												<cfset restockTotalVAT += caseValueVAT>
 												<cfif prodCatID neq category>

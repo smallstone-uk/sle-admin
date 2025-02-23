@@ -1,5 +1,72 @@
 <cfcomponent displayname="productstock" extends="core">
 
+	<cffunction name="FindProductData" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.msg = "">
+		<cfset loc.result.barcode = "">
+		<cfset loc.result.productID = 0>
+		
+		<cftry>
+			<cfif StructKeyExists(args.form,"barcode") AND LEN(args.form.barcode)>	<!--- barcode supplied --->
+				<cfset loc.result.barcode = NumberFormat(Left(args.form.barcode,15),"0000000000000")>
+				<cfquery name="loc.QBarcode" datasource="#args.datasource#">
+					SELECT *
+					FROM tblBarcodes
+					WHERE barCode LIKE '%#loc.result.barcode#%'
+					LIMIT 1;
+				</cfquery>
+				<cfif loc.QBarcode.recordCount IS 1>
+					<cfset loc.result.productID = loc.QBarcode.barProdID>
+					<cfif loc.QBarcode.barType neq args.form.source>
+						<cfset loc.result.msg = "Invalid barcode - that is a #loc.QBarcode.barType# barcode.">
+					</cfif>
+				<cfelse>
+					<cfset loc.result.msg = "Barcode not found">
+				</cfif>
+			<cfelse>
+				<cfset loc.result.msg = "Barcode not passed to function.">
+			</cfif>
+		
+			<cfif loc.result.productID>
+				<cfquery name="loc.result.QProduct" datasource="#args.datasource#">		<!--- load product and latest stock item --->
+					SELECT	prodID,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,prodLocked,prodUnitTrade,
+							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
+							tblStockOrder.*
+					FROM tblProducts
+					LEFT JOIN tblStockItem ON prodID = siProduct
+					INNER JOIN tblStockOrder ON soID = siOrder
+					AND tblStockItem.siID = (
+						SELECT MAX( siID )
+						FROM tblStockItem
+						WHERE prodID = siProduct
+					)
+					WHERE prodID = #val(loc.result.productID)#
+					LIMIT 1;
+				</cfquery>
+				
+				<cfquery name="loc.result.QDeals" datasource="#args.datasource#">	<!--- load current deals --->
+					SELECT ercTitle, edTitle,edType,edStarts,edEnds,edQty,edStatus,edDealType,edAmount
+					FROM tblepos_dealitems
+					INNER JOIN tblepos_deals ON edID = ediParent
+					INNER JOIN tblepos_retailclubs ON ercID = edRetailClub
+					WHERE ediProduct = #val(loc.result.productID)#
+					AND edStarts <= NOW()
+					AND edEnds >= NOW()
+					ORDER BY ediID DESC
+				</cfquery>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+
 	<cffunction name="LoadProductAndLatestStockItem" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -7,7 +74,7 @@
 		
 		<cftry>
 			<cfquery name="loc.QProduct" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT 	prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+				SELECT 	prodID,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
 						prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,
 						siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 				FROM tblProducts
@@ -125,7 +192,7 @@
 			<cfset ArrayAppend(loc.result.msgs,loc.result.msg)>
 			<cfif loc.result.productID>
 				<cfquery name="loc.QProduct" datasource="#args.datasource#">
-					SELECT prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
+					SELECT prodID,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount,prodMinPrice,
 							prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodEposCatID,prodVATRate,prodStatus,prodReorder,prodUnitSize,prodLocked,prodUnitTrade,
 							siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus
 					FROM tblProducts
@@ -320,7 +387,7 @@
 		<cfset loc.result = {}>
 		
 		<cfquery name="loc.stockItems" datasource="#args.datasource#" result="loc.stockResult">
-			SELECT 	pcatTitle,prodID,prodStaffDiscount,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
+			SELECT 	pcatTitle,prodID,prodRef,prodRecordTitle,prodTitle,prodCountDate,prodStockLevel,prodLastBought,prodStaffDiscount
 					prodPackPrice,prodOurPrice,prodValidTo,prodPriceMarked,prodCatID,prodVATRate,
 					siID,siRef,siOrder,siUnitSize,siPackQty,siQtyPacks,siQtyItems,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siReceived,siBookedIn,siExpires,siStatus,
 					barcode,soDate

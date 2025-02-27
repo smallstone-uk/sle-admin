@@ -583,7 +583,7 @@
 				<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
 				<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
 				<cfset loc.tran.trnPayDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
-				<cfset loc.tran.trnDesc = "PR #phMethod# #empFirstName# #empLastName#">
+				<cfset loc.tran.trnDesc = "PR #empFirstName# #empLastName#">
 				<cfset loc.tran.trnLedger = 'nom'>
 				<cfset loc.tran.trnAccountID = 3>
 				<cfset loc.tran.trnMethod = phMethod>
@@ -599,9 +599,9 @@
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>
 				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = -phAdjustment})> - phAdjustment --->
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI)})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution)})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs)})>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI) })>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution) })>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs) })>
 				<!--- Payroll transaction --->
 				<cfquery name="loc.QTranExists" datasource="#args.database#">
 					SELECT trnID
@@ -731,13 +731,13 @@
 							<cfquery name="loc.QUpdateItemCR" datasource="#args.database#">
 								UPDATE tblNomItems
 								SET niAmount = -#loc.netpay#
-								WHERE niTranID = #loc.tran.trnID#
+								WHERE niTranID = #loc.paytran.trnID#
 								AND niNomID = #loc.cashAccount#
 							</cfquery>
 							<cfquery name="loc.QUpdateItemDR" datasource="#args.database#">
 								UPDATE tblNomItems
 								SET niAmount = #loc.netpay#
-								WHERE niTranID = #loc.tran.trnID#
+								WHERE niTranID = #loc.paytran.trnID#
 								AND niNomID = #loc.staffWages#
 							</cfquery>
 							<cfset loc.paytran.msg = 'paytran items updated #loc.paytran.trnID#'>

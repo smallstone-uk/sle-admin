@@ -405,8 +405,15 @@
 	</cfoutput>
 
 <cfelseif parm.form.reportType eq "postTrans">
-	<!---<cfdump var="#report#" label="report" expand="false">--->
 	<cfoutput>
+		<table border="1" class="tableList">
+		<cfloop collection="#report.nomTitles#" item="key">
+			<cfset nomTitle = StructFind(report.nomTitles,key)>
+			<tr>
+				<td>#key#</td><td>#nomTitle#</td>
+			</tr>
+		</cfloop>
+		</table>
 		<table border="1" class="tableList">
 			<tr>
 				<th>Tran ID</th>

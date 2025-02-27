@@ -609,8 +609,9 @@
 		<cfquery name="loc.employees" datasource="#args.datasource#">
 			SELECT *
 			FROM tblEmployee
-			WHERE empStatus='active'
-			ORDER BY empFirstName ASC
+			WHERE 1
+			<cfif len(args.status)>AND empStatus='#args.status#'</cfif>
+			ORDER BY empStatus, empFirstName ASC
 		</cfquery>
 		<cfreturn QueryToArrayOfStruct(loc.employees)>
 	</cffunction>

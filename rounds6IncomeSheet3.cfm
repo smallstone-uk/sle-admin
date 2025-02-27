@@ -3,7 +3,7 @@
 
 <cftry>
 	<cfsetting requesttimeout="300">
-	<cfparam name="driverRate" default="0.65">
+	<cfparam name="driverRate" default="0.75">
 	<cfparam name="fuelRate" default="0.30">
 
 	<cffunction name="loadRoundData" access="public" returntype="struct">
@@ -818,6 +818,14 @@
 	<cfif StructKeyExists(form,"showDumps")><cfdump var="#data#" label="2nd Pass" expand="true"></cfif>
 
 	<!--- output data --->
+	<cfoutput>
+		<table class="summaryList" style="margin:10px">
+			<tr>
+				<td>Driver Rate</td><td>#driverRate#</td>
+				<td>Fuel Rate</td><td>#fuelRate#</td>
+			</tr>
+		</table>
+	</cfoutput>
 	<cfset view = showRoundData(data)>
 	<cfset view = showRoundSummary(data)>
 	<cfset view = ShowDaySummary(data)>

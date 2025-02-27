@@ -60,6 +60,7 @@
 					WHERE trnAccountID = #eiSuppID#
 					AND trnType = 'pay'
 					AND trnDate = '#loc.tillDate#'
+					AND ABS(trnAmnt1) = #loc.tillAmount#
 					LIMIT 1;
 				</cfquery>
 				<cfif loc.QSuppPayment.recordcount eq 0>	<!--- found no match --->
@@ -1295,7 +1296,7 @@
 			GROUP BY trnLedger,nomGroup,nomClass,nomCode
 			ORDER BY trnLedger,nomGroup,nomClass,nomCode
 		</cfquery>
-
+<cfdump var="#QTrans#" label="QTrans" expand="false">
 		<cfif len(args.form.srchDateFrom)>
 			<cfset result.dateFrom=LSDateFormat(args.form.srchDateFrom,"dd-mmm-yyyy")>
 			<cfset result.dateTo=LSDateFormat(args.form.srchDateTo,"dd-mmm-yyyy")>

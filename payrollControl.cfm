@@ -4,6 +4,7 @@
 <cfset parm = {}>
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.url = application.site.normal>
+<cfset parm.status = ''>
 <cfset employees = pr2.LoadEmployees(parm)>
 
 <cfoutput>

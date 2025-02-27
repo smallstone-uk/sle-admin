@@ -19,8 +19,7 @@
 <cfif parm.form.reportType eq "employee">
 	<cfset Report = pr.LoadEmployeeReport(parm)>
 <cfelseif parm.form.reportType eq "postTrans">
-	<!---<cfset parm.currentEmployees = false>--->
-	<cfset Report = pr.LoadEmployeeReport(parm)>
+	<cfset Report = pr.ImportPayrollData(parm)>
 <cfelseif parm.form.reportType eq "date_minimal">
 	<cfset Report = pr.LoadMinimalPayrollReportByDate(parm)>
 <cfelseif parm.form.reportType eq "holiday">
@@ -406,52 +405,41 @@
 	</cfoutput>
 
 <cfelseif parm.form.reportType eq "postTrans">
-	<cfset rep = {}>
+	<!---<cfdump var="#report#" label="report" expand="false">--->
 	<cfoutput>
-	<table class="tableList" width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<th width="">Name</th>
-			<th width="100">Date</th>
-			<th width="">Week No</th>
-			<th width="" align="right">Net Pay</th>
-			<th width="" align="right">PAYE</th>
-			<th width="" align="right">NI</th>
-			<th width="" align="right">Employer Pension</th>
-			<th width="" align="right">Member Pension</th>
-			<th width="" align="right">Lotto</th>
-			<th width="" align="right">Gross Pay</th>
-			<th width="" align="right">Tran ID</th>
-		</tr>
-		<cfloop array="#Report#" index="rep">
-			<cfloop array="#rep.headers#" index="item">
-				<tr>
-					<td colspan="11">
-						<cfset data = pr.PostPayrollToNominalLedger(parm,rep)>
-						<!---<cfdump var="#data#" label="data" expand="false">--->
-					</td>
-				</tr>
-				<tr>
-					<td colspan="11">
-					<!---	<cfdump var="#item#" label="item" expand="false">--->
-					</td>
-				</tr>
-
-				<tr>
-					<td>#rep.employee.firstname# #rep.employee.lastname#</td>
-					<td align="center">#DateFormat(item.WeekEnding, "dd/mm/yyyy")#</td>
-					<td align="center">#item.WeekNo#</td>
-					<td align="right">#item.NP#</td>
-					<td align="right">#item.PAYE#</td>
-					<td align="right">#item.NI#</td>
-					<td align="right">#item.EmployerPension#</td>
-					<td align="right">#item.MemberPension#</td>
-					<td align="right">#item.Lotto#</td>
-					<td align="right">#item.Gross#</td>
-					<td align="right">#data.trnID#</td>
-				</tr>
-			</cfloop>
+		<table border="1" class="tableList">
+			<tr>
+				<th>Tran ID</th>
+				<th>Date</th>
+				<th>Reference</th>
+				<th>Description</th>
+				<th>Pay Method</th>
+				<th>Items Posted</th>
+			</tr>
+		<cfloop array="#report.trans#" index="tran">
+			<tr>
+				<td>#tran.trnID#</td>
+				<td>#DateFormat(tran.trnDate, "dd/mm/yyyy")#</td>
+				<td>#tran.trnRef#</td>
+				<td>#tran.trnDesc#</td>
+				<td>#tran.trnMethod#</td>
+				<td>
+					<table border="0" class="tableList">
+						<cfloop array="#tran.nomItems#" index="item">
+							<cfif item.status neq 'ignored'>
+							<tr>
+								<td width="50">#item.nomID#</td>
+								<td width="200">#StructFind(report.nomTitles,item.nomID)#</td>
+								<td width="50" align="right">#DecimalFormat(item.value)#</td>
+								<td width="200">#item.status#</td>
+							</tr>
+							</cfif>
+						</cfloop>
+					</table>
+				</td>
+			</tr>
 		</cfloop>
-	</table>
+		</table>
 	</cfoutput>
 </cfif>
 

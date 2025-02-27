@@ -564,7 +564,7 @@
 			<cfquery name="loc.QNomTitles" datasource="#args.database#">
 				SELECT nomID, nomTitle
 				FROM tblNominal
-				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332,3292)
+				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332,3302)
 			</cfquery>
 			<cfset loc.result.nomTitles = {}>
 			<cfloop query="loc.QNomTitles">
@@ -598,7 +598,7 @@
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3292, status = '', value = phAdjustment})>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = phAdjustment})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI)})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution)})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs + phAdjustment)})>

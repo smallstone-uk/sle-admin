@@ -598,10 +598,10 @@
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = phAdjustment})>
+				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = -phAdjustment})> - phAdjustment --->
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI)})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution)})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs + phAdjustment)})>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs)})>
 				<!--- Payroll transaction --->
 				<cfquery name="loc.QTranExists" datasource="#args.database#">
 					SELECT trnID

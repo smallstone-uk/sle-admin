@@ -1,5 +1,6 @@
 <cftry>
 <cfsetting showdebugoutput="no">
+<cfflush interval="500">
 <cfobject component="code/payroll3" name="pr">
 <cfset callback = true>
 <cfset parm = {}>

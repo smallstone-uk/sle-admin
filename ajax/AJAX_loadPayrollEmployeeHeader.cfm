@@ -5,7 +5,6 @@
 <cfset parm.url = application.site.normal>
 <cfset parm.form = form>
 <cfset record = pr2.LoadPayrollRecord(parm)>
-
 <cfoutput>
 	<script>
 		$(document).ready(function(e) {
@@ -309,7 +308,11 @@
 					</select>
 				</td>
 				<th align="left" width="200">Week Number</th>
-				<td width="250">#pr2.GetPayrollWeekNumber(parm.form.weekending)#</td>
+				<td width="250">
+					<cfif !StructKeyExists(record.header,"phWeekNo")>
+						#pr2.GetPayrollWeekNumber(parm.form.weekending)#
+					<cfelse>#record.header.phWeekNo#</cfif>
+				</td>
 			</tr>
 			<tr>
 				<th align="left" width="200">Tax Code</th>

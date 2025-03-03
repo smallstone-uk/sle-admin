@@ -64,7 +64,7 @@
 				<th width="100">Date</th>
 				<th width="100">Type</th>
 				<th width="100">Paid In</th>
-				<th width="100">Ref</th>
+				<th width="160">Ref</th>
 				<th>Description</th>
 				<th width="100" align="right">DR</th>
 				<th width="100" align="right">CR</th>

@@ -6,6 +6,10 @@
 <cfset parm.url = application.site.normal>
 <cfset parm.form = form>
 <cfset transactions = acc.LoadNominalTransactions(parm)>
+	<style type="text/css">
+		.shaded { background-color:#ddd; border:#ff0000;}
+		.normal { background-color:#fff; border:#ccc;}
+	</style>
 
 <cfoutput>
 	<script>
@@ -90,13 +94,13 @@
 				</cfif>
 				<cfset dayMod = changeCounter MOD 2>
 				<cfif dayMod eq 1>
-					<cfset shade = "##cccccc">
+					<cfset rowStyle = "shaded">
 				<cfelse>
-					<cfset shade = "##ffffff">
+					<cfset rowStyle = "normal">
 				</cfif>
 				<cfset lastDate = item.trnDate>
 
-				<tr bgcolor="#shade#">
+				<tr class="#rowStyle#">
 					<td width="10" align="center">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>

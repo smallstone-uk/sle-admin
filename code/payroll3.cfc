@@ -564,7 +564,7 @@
 			<cfquery name="loc.QNomTitles" datasource="#args.database#">
 				SELECT nomID, nomTitle
 				FROM tblNominal
-				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332,3302)
+				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332, 3302)
 			</cfquery>
 			<cfset loc.result.nomTitles = {}>
 			<cfloop query="loc.QNomTitles">
@@ -589,19 +589,20 @@
 				<cfset loc.tran.trnMethod = phMethod>
 				<cfset loc.tran.trnType = 'nom'>
 				<cfset loc.tran.trnAlloc = 1>
+				<cfset loc.tran.phID = phID>
 				<cfset loc.netpay = 0>
-				<cfset loc.lotSub = 0>
+				<cfset loc.lotSub = phLotterySubs>
 				<cfset loc.tran.nomItems = []>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.netPayAccount, status = '', value = phNP})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2182, status = '', value = phPAYE})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2172, status = '', value = phNI})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>
+				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>--->
 				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = -phAdjustment})> - phAdjustment --->
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI) })>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution) })>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP + phLotterySubs) })>
+				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP) })>	<!--- + phLotterySubs--->
 				<!--- Payroll transaction --->
 				<cfquery name="loc.QTranExists" datasource="#args.database#">
 					SELECT trnID
@@ -644,7 +645,7 @@
 					<cfloop array="#loc.tran.nomItems#" index="loc.item">
 						<cfset loc.tran.checkSum += loc.item.value>
 						<cfif loc.item.nomID eq loc.netPayAccount><cfset loc.netpay = loc.item.value></cfif>		<!--- save net pay for later --->
-						<cfif loc.item.nomID eq loc.lotteryAccount><cfset loc.lotSub = loc.item.value></cfif>
+						<!---<cfif loc.item.nomID eq loc.lotteryAccount><cfset loc.lotSub = loc.item.value></cfif>--->
 						<cfquery name="loc.QItemExists" datasource="#args.database#">
 							SELECT niID 
 							FROM tblNomItems 

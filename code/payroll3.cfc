@@ -578,6 +578,8 @@
 								AND  '#args.form.srchDateTo#'
 			</cfquery>
 			<cfloop query="loc.QPayHeaders">
+				<cfset loc.netpay = 0>
+				<cfset loc.lotSub = phLotterySubs>
 				<cfset loc.tran = {}>
 				<cfset loc.paytran = {}>
 				<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
@@ -590,8 +592,6 @@
 				<cfset loc.tran.trnType = 'nom'>
 				<cfset loc.tran.trnAlloc = 1>
 				<cfset loc.tran.phID = phID>
-				<cfset loc.netpay = 0>
-				<cfset loc.lotSub = phLotterySubs>
 				<cfset loc.tran.nomItems = []>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.netPayAccount, status = '', value = phNP})>
 				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2182, status = '', value = phPAYE})>
@@ -723,21 +723,21 @@
 								INSERT INTO tblNomItems
 									(niTranID,niNomID,niAmount)
 								VALUES
-									(#loc.paytran.trnID#,#loc.cashAccount#,-#loc.netpay#),
-									(#loc.paytran.trnID#,#loc.staffWages#,#loc.netpay#)
+									(#loc.paytran.trnID#,#loc.cashAccount#,#-(loc.netpay - loc.lotSub)#),
+									(#loc.paytran.trnID#,#loc.staffWages#,#loc.netpay - loc.lotSub#)
 							</cfquery>
 							<cfset loc.paytran.trnID = loc.QInsertPayItemResult.generatedkey>
 							<cfset loc.paytran.msg = "pay items added #loc.paytran.trnID#">
 						<cfelse>
 							<cfquery name="loc.QUpdateItemCR" datasource="#args.database#">
 								UPDATE tblNomItems
-								SET niAmount = -#loc.netpay#
+								SET niAmount = #-(loc.netpay - loc.lotSub)#
 								WHERE niTranID = #loc.paytran.trnID#
 								AND niNomID = #loc.cashAccount#
 							</cfquery>
 							<cfquery name="loc.QUpdateItemDR" datasource="#args.database#">
 								UPDATE tblNomItems
-								SET niAmount = #loc.netpay#
+								SET niAmount = #loc.netpay - loc.lotSub#
 								WHERE niTranID = #loc.paytran.trnID#
 								AND niNomID = #loc.staffWages#
 							</cfquery>

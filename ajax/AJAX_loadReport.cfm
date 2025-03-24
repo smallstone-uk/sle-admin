@@ -406,6 +406,7 @@
 	</cfoutput>
 
 <cfelseif parm.form.reportType eq "postTrans">
+	<cfdump var="#report#" label="report" expand="false">
 	<cfoutput>
 		<table border="1" class="tableList">
 		<cfloop collection="#report.nomTitles#" item="key">

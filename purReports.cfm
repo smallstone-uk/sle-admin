@@ -352,12 +352,12 @@
 											<td valign="top" align="right">#DecimalFormat(tran.trnAmnt1)#</td>
 											<td valign="top" align="right">#DecimalFormat(tran.trnAmnt2)#</td>
 											<td>
-												<table border="1" class="tableList">
+												<table border="0" class="tableList">
 													<tr>
-														<td width="50">Code</td>
-														<td width="150">Title</td>
-														<td width="70" align="right">DR</td>
-														<td width="70" align="right">CR</td>
+														<th width="50">Code</th>
+														<th width="150">Title</th>
+														<th width="70" align="right">DR</th>
+														<th width="70" align="right">CR</th>
 													</tr>
 													<cfset gTrn1Total += tran.trnAmnt1>
 													<cfset gTrn2Total += tran.trnAmnt2>
@@ -392,19 +392,11 @@
 														<cfif tran.trnType eq 'inv' AND niAmount gt 0>
 															<cfset gNomDrTotal += niAmount>
 														<cfelseif tran.trnType eq 'crn' AND niAmount lt 0>
-															<cfset gNomDrTotal += niAmount>
+															<cfset gNomDrTotal -= niAmount>
 														</cfif>
 													</cfloop>
-													<cfset diff = abs((gTrn1Total + gTrn2Total) - gNomDrTotal)>
-													<cfif diff gt 0.001>
-														<tr>
-															<td colspan="4" bgcolor="##FF0000">ERROR: #gTrn1Total + gTrn2Total - gNomDrTotal#</td>
-														</tr>
-													<cfelse>
-														<cfset diff = 0>
-													</cfif>
 													<tr>
-														<td>
+														<th>
 															<cfif rec.penceSum eq 0>
 																<cfset msg="<strong>Total</strong>">
 															<cfelse>
@@ -414,15 +406,21 @@
 																<cfset msg='<span style="color:##FF0000"><strong>Error #rec.penceSum#</strong></span>'>
 															</cfif>
 															<!---<cfdump var="#rec#" label="rec" expand="no">--->
-														</td>
-														<td>#msg#</td>
-														<td align="right">#DecimalFormat(rec.drTotal)#</td>
-														<td align="right">#DecimalFormat(rec.crTotal)#</td>
+														</th>
+														<th>#msg#</th>
+														<th align="right">#DecimalFormat(rec.drTotal)#</th>
+														<th align="right">#DecimalFormat(rec.crTotal)#</th>
 													</tr>
 												</table>
 											</td>
 										</tr>
 									</cfloop>
+									<cfset diff = abs((gTrn1Total + gTrn2Total) - gNomDrTotal)>
+									<cfif diff gt 0.001>
+										<tr>
+											<td colspan="4" bgcolor="##FF0000">ERROR: #(gTrn1Total + gTrn2Total) - gNomDrTotal#</td>
+										</tr>
+									</cfif>
 									<tr>
 										<td colspan="7">
 											<table>

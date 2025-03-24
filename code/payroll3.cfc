@@ -545,26 +545,290 @@
 		
 		<cfreturn loc.result>
 	</cffunction>
+
+	<cffunction name="CheckTran" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfargument name="data" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.msgs = []>
+		<cftry>
+			<cfquery name="loc.QCheckTranExists" datasource="#args.database#">
+				SELECT trnID
+				FROM tblTrans
+				WHERE trnRef = '#data.trnRef#'
+				AND trnDate = '#data.trnDate#'
+				AND trnAccountID = #val(data.trnAccountID)#
+			</cfquery>
+			<cfif loc.QCheckTranExists.recordcount is 0>
+				<cfset loc.tranID = 0>
+			<cfelse>
+				<cfset loc.tranID = loc.QCheckTranExists.trnID>
+			</cfif>
+			<cfif loc.tranID is 0>
+				<cfquery name="loc.QInsertTran" datasource="#args.database#" result="loc.QInsertTranResult">
+					INSERT INTO tblTrans
+						(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+					VALUES
+						('#data.trnRef#','#data.trnDate#','#data.trnDesc#','#data.trnLedger#',
+							#data.trnAccountID#,'#data.trnType#',#data.trnAlloc#,'#data.trnMethod#')
+				</cfquery>
+				<cfset loc.tranID = loc.QInsertTranResult.generatedkey>
+				<cfset ArrayAppend(loc.result.msgs,"Tran inserted #loc.tranID#")>
+			<cfelse>
+				<cfquery name="loc.QUpdateTran" datasource="#args.database#">
+					UPDATE tblTrans
+					SET
+						trnRef = '#data.trnRef#',
+						trnDate = '#data.trnDate#',
+						trnDesc = '#data.trnDesc#',
+						trnLedger = '#data.trnLedger#',
+						trnAccountID = #data.trnAccountID#,
+						trnType = '#data.trnType#',
+						trnAlloc = #data.trnAlloc#,
+						trnMethod = '#data.trnMethod#'
+					WHERE trnID = #loc.tranID#
+				</cfquery>
+				<cfset ArrayAppend(loc.result.msgs,"Tran updated #loc.tranID#")>
+			</cfif>
+			<cfquery name="loc.QItemsExist" datasource="#args.database#">	<!--- see if any tran items exist --->
+				SELECT niID,niNomID,niAmount
+				FROM tblNomItems 
+				WHERE niTranID = #loc.tranID#
+			</cfquery>
+			<cfif loc.QItemsExist.recordcount is 0>
+				<cfset loc.insertStr = "">
+				<cfset loc.itemCount = 0>
+				<cfloop array="#data.nomItems#" index="loc.item">
+					<cfset loc.itemCount++>
+					<cfif loc.item.value neq 0>
+						<cfset loc.insertStr = "#loc.insertStr# (#loc.tranID#,#loc.item.nomID#,#loc.item.value#)">
+						<cfif loc.itemCount lt ArrayLen(data.nomItems)><cfset loc.insertStr = "#loc.insertStr#,"></cfif>
+					</cfif>
+				</cfloop>
+				<cfset ArrayAppend(loc.result.msgs,loc.insertStr)>
+				<cfif Len(loc.insertStr)>
+					<cfquery name="loc.QInsertItem" datasource="#args.database#" result="loc.QInsertItemResult">
+						INSERT INTO tblNomItems 
+							(niTranID,niNomID,niAmount)
+						VALUES
+							#loc.insertStr#
+					</cfquery>
+				</cfif>
+				<cfset ArrayAppend(loc.result.msgs,"#loc.itemCount# Tran items added to #loc.tranID#")>
+			<cfelse>
+				<!--- update items --->
+				<cfset loc.result.itemStruct = {}>		
+				<cfset loc.result.recordStruct = {}>		
+				<cfloop array="#data.nomItems#" index="loc.item">
+					<cfset StructInsert(loc.result.itemStruct,loc.item.nomID,loc.item.value)>
+				</cfloop>
+				<cfloop query="loc.QItemsExist">	<!--- loop existing records --->
+					<cfset StructInsert(loc.result.recordStruct,niNomID,niAmount)>	<!--- save for later --->
+					<cfset loc.itemID = niID>
+					<cfset loc.itemNomID = niNomID>
+					<cfif StructKeyExists(loc.result.itemStruct,niNomID)>
+						<cfset loc.itemValue = StructFind(loc.result.itemStruct,niNomID)>
+						<cfif loc.itemValue neq niAmount>	<!--- value changed --->
+							<cfquery name="loc.QUpdateItem" datasource="#args.database#">
+								UPDATE tblNomItems
+								SET niAmount = #loc.itemValue#
+								WHERE niID = #loc.itemID#
+							</cfquery>
+							<cfset ArrayAppend(loc.result.msgs,"Tran item updated #loc.itemID#")>
+						</cfif>
+					<cfelse>	<!--- item no longer required --->
+						<cfquery name="loc.QDeleteItem" datasource="#args.database#">
+							DELETE FROM tblNomItems WHERE niID = #loc.itemID#
+						</cfquery>
+						<cfset ArrayAppend(loc.result.msgs,"Tran item deleted #loc.itemID#")>
+					</cfif>
+				</cfloop>
+				<cfloop array="#data.nomItems#" index="loc.item">	<!--- loop array --->
+					<cfif !StructKeyExists(loc.result.recordStruct,loc.item.nomID)>	<!--- new item found --->
+						<cfquery name="loc.QInsertItem" datasource="#args.database#">
+							INSERT INTO tblNomItems
+								(niTranID,niNomID,niAmount)
+							VALUES
+								(#loc.tranID#,#loc.item.nomID#,#loc.item.value#)
+						</cfquery>
+						<cfset ArrayAppend(loc.result.msgs,"New item added #loc.tranID#")>
+					</cfif>
+				</cfloop>
+				<cfset ArrayAppend(loc.result.msgs,"Tran items updated #loc.tranID#")>
+			</cfif>
+			<cfset loc.result.trnID = loc.tranID>
+			
+		<cfcatch type="any">
+			<cfdump var="#data.nomItems#" label="nomItems" expand="false">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
 	
 	<cffunction name="ImportPayrollData" access="public" returntype="struct">	<!--- Import data from Payroll to accounts system 27/02/2025 --->
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.result.trans = []>
-		<cfset loc.result.paytrans = []>
-		<cfset loc.result.lotTrans = []>
-		<cfset loc.tran = {}>
-		<cfset loc.paytran = {}>
 		<cfset loc.cashAccount = 181>
 		<cfset loc.netPayAccount = 1881>
 		<cfset loc.staffWages = 3082>
 		<cfset loc.lotteryAccount = 1422>
+		<cfset loc.lisaPR = 82>
+		<cfset loc.lisaDrawings = 2262>
+		<cfset loc.lisaPartner = 3322>
+		<cftry>
+			<cfquery name="loc.QNomTitles" datasource="#args.database#">
+				SELECT nomID, nomTitle
+				FROM tblNominal
+				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, #loc.lisaPartner#, #loc.lisaDrawings#, #loc.lotteryAccount#, 2102, 2182, 2172, 3272, 3282, 2332, 3302)
+			</cfquery>
+			<cfset loc.result.nomTitles = {}>
+			<cfloop query="loc.QNomTitles">
+				<cfset StructInsert(loc.result.nomTitles, nomID ,nomTitle)>
+			</cfloop>
+			<cfquery name="loc.QPayHeaders" datasource="#args.database#">
+				SELECT tblpayheader.*, empID,empFirstName,empLastName
+				FROM tblpayheader 
+				INNER JOIN tblEmployee ON empID = phEmployee
+				WHERE phDate BETWEEN '#args.form.srchDateFrom#'
+								 AND '#args.form.srchDateTo#'
+			</cfquery>
+
+			<cfloop query="loc.QPayHeaders">
+				<cfset loc.netpay = 0>
+				<cfset loc.lotSub = phLotterySubs>
+				<cfif phEmployee NEQ loc.lisaPR>
+					<!--- Staff payroll entry --->
+					<cfset loc.tran = {}>
+					<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "PR #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.netPayAccount, status = '', value = phNP})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2182, status = '', value = phPAYE})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2172, status = '', value = phNI})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI) })>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution) })>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP) })>
+					<cfset loc.tran.test = CheckTran(args,loc.tran)>
+					<cfset loc.tran.trnID = loc.tran.test.trnID>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				<cfelse>
+					<!--- Lisa payroll entry --->
+					<cfset loc.tran = {}>
+					<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "LK #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lisaPartner, status = '', value = phNP})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lisaDrawings, status = '', value = -phNP})>
+					<cfset loc.tran.test = CheckTran(args,loc.tran)>
+					<cfset loc.tran.trnID = loc.tran.test.trnID>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				</cfif>
+				<cfif phMethod eq 'cash'>
+					<cfset loc.tran = {}>
+					<cfset loc.tran.trnRef = "PAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "CASH Payment #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = phNP - loc.lotSub})>
+					<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = loc.lotSub})>--->
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.cashAccount, status = '', value = -phNP})>
+					<cfset loc.tran.test = CheckTran(args,loc.tran)>
+					<cfset loc.tran.trnID = loc.tran.test.trnID>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				</cfif>
+				<cfif phLotterySubs neq 0>	<!--- lottery played --->
+					<cfset loc.tran = {}>
+					<cfset loc.tran.trnRef = "LOT #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "Lottery Sub #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = loc.lotSub})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = -loc.lotSub})>
+					<cfset loc.tran.test = CheckTran(args,loc.tran)>
+					<cfset loc.tran.trnID = loc.tran.test.trnID>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+					
+					<cfset loc.tran = {}>
+					<cfset loc.tran.trnRef = "LOTPAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "Lottery Payment #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = loc.lotSub})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.cashAccount, status = '', value = -loc.lotSub})>
+					<cfset loc.tran.test = CheckTran(args,loc.tran)>
+					<cfset loc.tran.trnID = loc.tran.test.trnID>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				</cfif>
+			</cfloop>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="ImportPayrollDataOld" access="public" returntype="struct">	<!--- Import data from Payroll to accounts system 27/02/2025 --->
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.trans = []>
+		<cfset loc.result.paytrans = []>
+		<cfset loc.result.lotTrans = []>
+		<cfset loc.result.lisaTrans = []>
+		<cfset loc.cashAccount = 181>
+		<cfset loc.netPayAccount = 1881>
+		<cfset loc.staffWages = 3082>
+		<cfset loc.lotteryAccount = 1422>
+		<cfset loc.lisaPR = 82>
+		<cfset loc.lisaDrawings = 2262>
+		<cfset loc.lisaPartner = 3322>
 		
 		<cftry>
 			<cfquery name="loc.QNomTitles" datasource="#args.database#">
 				SELECT nomID, nomTitle
 				FROM tblNominal
-				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332, 3302)
+				WHERE nomID IN(#loc.cashAccount#, #loc.netPayAccount#, #loc.staffWages#, 1422, 2102, 2182, 2172, 3272, 3282, 2332, 3302, 2262)
 			</cfquery>
 			<cfset loc.result.nomTitles = {}>
 			<cfloop query="loc.QNomTitles">
@@ -578,234 +842,376 @@
 								AND  '#args.form.srchDateTo#'
 			</cfquery>
 			<cfloop query="loc.QPayHeaders">
-				<cfset loc.netpay = 0>
-				<cfset loc.lotSub = phLotterySubs>
-				<cfset loc.tran = {}>
-				<cfset loc.paytran = {}>
-				<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
-				<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
-				<cfset loc.tran.trnPayDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
-				<cfset loc.tran.trnDesc = "PR #empFirstName# #empLastName#">
-				<cfset loc.tran.trnLedger = 'nom'>
-				<cfset loc.tran.trnAccountID = 3>
-				<cfset loc.tran.trnMethod = phMethod>
-				<cfset loc.tran.trnType = 'nom'>
-				<cfset loc.tran.trnAlloc = 1>
-				<cfset loc.tran.phID = phID>
-				<cfset loc.tran.nomItems = []>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.netPayAccount, status = '', value = phNP})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2182, status = '', value = phPAYE})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2172, status = '', value = phNI})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
-				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = phLotterySubs})>--->
-				<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3302, status = '', value = -phAdjustment})> - phAdjustment --->
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI) })>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution) })>
-				<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP) })>	<!--- + phLotterySubs--->
-				<!--- Payroll transaction --->
-				<cfquery name="loc.QTranExists" datasource="#args.database#">
-					SELECT trnID
-					FROM tblTrans
-					WHERE trnRef = '#loc.tran.trnRef#'
-					AND trnDate = '#loc.tran.trnDate#'
-					AND trnAccountID = #loc.tran.trnAccountID#
-				</cfquery>
-				<cfif loc.QTranExists.recordcount is 0>
-					<cfset loc.tran.trnID = 0>
-				<cfelse>
-					<cfset loc.tran.trnID = loc.QTranExists.trnID>
-				</cfif>
-				<cfif args.importdata>
-					<cfif loc.tran.trnID is 0>
-						<cfquery name="loc.QInsertTran" datasource="#args.database#" result="loc.QInsertTranResult">
-							INSERT INTO tblTrans
-								(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc)
-							VALUES
-								('#loc.tran.trnRef#','#loc.tran.trnDate#','#loc.tran.trnDesc#','#loc.tran.trnLedger#',#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#)
-						</cfquery>
-						<cfset loc.tran.trnID = loc.QInsertTranResult.generatedkey>
-						<cfset loc.tran.msg = "tran added #loc.tran.trnID#">
+				<cfif phEmployee NEQ loc.lisaPR>
+					<cfset loc.netpay = 0>
+					<cfset loc.lotSub = phLotterySubs>
+					<cfset loc.tran = {}>
+					<cfset loc.paytran = {}>
+					<cfset loc.tran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnPayDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
+					<cfset loc.tran.trnDesc = "PR #empFirstName# #empLastName#">
+					<cfset loc.tran.trnLedger = 'nom'>
+					<cfset loc.tran.trnAccountID = 3>
+					<cfset loc.tran.trnMethod = phMethod>
+					<cfset loc.tran.trnType = 'nom'>
+					<cfset loc.tran.trnAlloc = 1>
+					<cfset loc.tran.phID = phID>
+					<cfset loc.tran.nomItems = []>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.netPayAccount, status = '', value = phNP})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2182, status = '', value = phPAYE})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2172, status = '', value = phNI})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3282, status = '', value = phMemberContribution})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 3272, status = '', value = phEmployerContribution})>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2102, status = '', value = -(phPAYE + phNI) })>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = 2332, status = '', value = -(phMemberContribution + phEmployerContribution) })>
+					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = -(phNP) })>	<!--- + phLotterySubs--->
+					<!--- Payroll transaction --->
+					<cfquery name="loc.QTranExists" datasource="#args.database#">
+						SELECT trnID
+						FROM tblTrans
+						WHERE trnRef = '#loc.tran.trnRef#'
+						AND trnDate = '#loc.tran.trnDate#'
+						AND trnAccountID = #loc.tran.trnAccountID#
+					</cfquery>
+					<cfif loc.QTranExists.recordcount is 0>
+						<cfset loc.tran.trnID = 0>
 					<cfelse>
-						<cfquery name="loc.QUpdateTran" datasource="#args.database#">
-							UPDATE tblTrans
-							SET
-								trnRef = '#loc.tran.trnRef#',
-								trnDate = '#loc.tran.trnDate#',
-								trnDesc = '#loc.tran.trnDesc#',
-								trnLedger = '#loc.tran.trnLedger#',
-								trnAccountID = #loc.tran.trnAccountID#,
-								trnType = '#loc.tran.trnType#',
-								trnAlloc = #loc.tran.trnAlloc#
-							WHERE trnID = #loc.tran.trnID#
-						</cfquery>
-						<cfset loc.tran.msg = "tran updated #loc.tran.trnID#">
+						<cfset loc.tran.trnID = loc.QTranExists.trnID>
 					</cfif>
-					<cfset loc.tran.checkSum = 0>
-					<cfloop array="#loc.tran.nomItems#" index="loc.item">
-						<cfset loc.tran.checkSum += loc.item.value>
-						<cfif loc.item.nomID eq loc.netPayAccount><cfset loc.netpay = loc.item.value></cfif>		<!--- save net pay for later --->
-						<!---<cfif loc.item.nomID eq loc.lotteryAccount><cfset loc.lotSub = loc.item.value></cfif>--->
-						<cfquery name="loc.QItemExists" datasource="#args.database#">
-							SELECT niID 
-							FROM tblNomItems 
-							WHERE niTranID = #loc.tran.trnID#
-							AND niNomID = #loc.item.nomID#
-						</cfquery>
-						<cfif loc.QItemExists.recordcount is 0>
-							<cfif loc.item.value neq 0>
-								<cfquery name="loc.QInsertItem" datasource="#args.database#" result="loc.QInsertItemResult">
-									INSERT INTO tblNomItems
-										(niTranID,niNomID,niAmount)
-									VALUES
-										(#loc.tran.trnID#,#loc.item.nomID#,#loc.item.value#)
-								</cfquery>
-								<cfset loc.item.status = 'tran item added #loc.QInsertItemResult.generatedkey#'>
-							<cfelse>
-								<cfset loc.item.status = 'item ignored'>
-							</cfif>
-						<cfelse>
-							<cfquery name="loc.QUpdateItem" datasource="#args.database#">
-								UPDATE tblNomItems
-								SET niAmount = #loc.item.value#
-								WHERE niTranID = #loc.tran.trnID#
-								AND niNomID = #loc.item.nomID#
-							</cfquery>
-							<cfset loc.item.status = 'tran item updated #loc.tran.trnID#'>
-						</cfif>
-					</cfloop>
-					<!--- Cash Payment transaction --->
-					<cfif loc.tran.trnMethod eq 'cash'>
-						<cfquery name="loc.QPayTranExists" datasource="#args.database#">
-							SELECT trnID
-							FROM tblTrans
-							WHERE trnRef = 'PAY #loc.tran.trnRef#'
-							AND trnDate = '#loc.tran.trnPayDate#'
-							AND trnAccountID = #loc.tran.trnAccountID#
-						</cfquery>
-						<cfif loc.QPayTranExists.recordcount is 0>
-							<cfset loc.paytran.trnID = 0>
-						<cfelse>
-							<cfset loc.paytran.trnID = loc.QPayTranExists.trnID>
-						</cfif>
-						<cfif loc.paytran.trnID is 0>
-							<cfquery name="loc.QInsertPayTran" datasource="#args.database#" result="loc.QInsertPayTranResult">
+					<cfif args.importdata>
+						<cfif loc.tran.trnID is 0>
+							<cfquery name="loc.QInsertTran" datasource="#args.database#" result="loc.QInsertTranResult">
 								INSERT INTO tblTrans
-									(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+									(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc)
 								VALUES
-									('PAY #loc.tran.trnRef#','#loc.tran.trnPayDate#','cash payment','#loc.tran.trnLedger#',#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#,'#loc.tran.trnMethod#')
+									('#loc.tran.trnRef#','#loc.tran.trnDate#','#loc.tran.trnDesc#','#loc.tran.trnLedger#',
+										#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#)
 							</cfquery>
-							<cfset loc.paytran.trnID = loc.QInsertPayTranResult.generatedkey>
-							<cfset loc.paytran.msg = "paytran added #loc.paytran.trnID#">
+							<cfset loc.tran.trnID = loc.QInsertTranResult.generatedkey>
+							<cfset loc.tran.msg = "tran added #loc.tran.trnID#">
 						<cfelse>
-							<cfquery name="loc.QUpdatePayTran" datasource="#args.database#">
+							<cfquery name="loc.QUpdateTran" datasource="#args.database#">
 								UPDATE tblTrans
 								SET
-									trnRef = 'PAY #loc.tran.trnRef#',
-									trnDate = '#loc.tran.trnPayDate#',
-									trnDesc = 'cash payment',
+									trnRef = '#loc.tran.trnRef#',
+									trnDate = '#loc.tran.trnDate#',
+									trnDesc = '#loc.tran.trnDesc#',
 									trnLedger = '#loc.tran.trnLedger#',
 									trnAccountID = #loc.tran.trnAccountID#,
 									trnType = '#loc.tran.trnType#',
 									trnAlloc = #loc.tran.trnAlloc#
-								WHERE trnID = #loc.paytran.trnID#
+								WHERE trnID = #loc.tran.trnID#
 							</cfquery>
-							<cfset loc.paytran.msg = "paytran updated #loc.paytran.trnID#">
+							<cfset loc.tran.msg = "tran updated #loc.tran.trnID#">
 						</cfif>
-						<cfquery name="loc.QPayItemExists" datasource="#args.database#">	<!--- see if cash payment items exist --->
-							SELECT niID 
-							FROM tblNomItems 
-							WHERE niTranID = #loc.paytran.trnID#
-							AND niNomID = #loc.cashAccount#
-						</cfquery>
-						<cfif loc.QPayItemExists.recordcount is 0>
-							<cfquery name="loc.QInsertPayItem" datasource="#args.database#" result="loc.QInsertPayItemResult">
-								INSERT INTO tblNomItems
-									(niTranID,niNomID,niAmount)
-								VALUES
-									(#loc.paytran.trnID#,#loc.cashAccount#,#-(loc.netpay - loc.lotSub)#),
-									(#loc.paytran.trnID#,#loc.staffWages#,#loc.netpay - loc.lotSub#)
+						<cfset loc.tran.checkSum = 0>
+						<cfloop array="#loc.tran.nomItems#" index="loc.item">
+							<cfset loc.tran.checkSum += loc.item.value>
+							<cfif loc.item.nomID eq loc.netPayAccount><cfset loc.paytran.netpay = loc.item.value></cfif>		<!--- save net pay for later --->
+							<!---<cfif loc.item.nomID eq loc.lotteryAccount><cfset loc.lotSub = loc.item.value></cfif>--->
+							<cfquery name="loc.QItemExists" datasource="#args.database#">
+								SELECT niID 
+								FROM tblNomItems 
+								WHERE niTranID = #loc.tran.trnID#
+								AND niNomID = #loc.item.nomID#
 							</cfquery>
-							<cfset loc.paytran.trnID = loc.QInsertPayItemResult.generatedkey>
-							<cfset loc.paytran.msg = "pay items added #loc.paytran.trnID#">
-						<cfelse>
-							<cfquery name="loc.QUpdateItemCR" datasource="#args.database#">
-								UPDATE tblNomItems
-								SET niAmount = #-(loc.netpay - loc.lotSub)#
+							<cfif loc.QItemExists.recordcount is 0>
+								<cfif loc.item.value neq 0>
+									<cfquery name="loc.QInsertItem" datasource="#args.database#" result="loc.QInsertItemResult">
+										INSERT INTO tblNomItems
+											(niTranID,niNomID,niAmount)
+										VALUES
+											(#loc.tran.trnID#,#loc.item.nomID#,#loc.item.value#)
+									</cfquery>
+									<cfset loc.item.status = 'tran item added #loc.QInsertItemResult.generatedkey#'>
+								<cfelse>
+									<cfset loc.item.status = 'item ignored'>
+								</cfif>
+							<cfelse>
+								<cfquery name="loc.QUpdateItem" datasource="#args.database#">
+									UPDATE tblNomItems
+									SET niAmount = #loc.item.value#
+									WHERE niTranID = #loc.tran.trnID#
+									AND niNomID = #loc.item.nomID#
+								</cfquery>
+								<cfset loc.item.status = 'tran item updated #loc.tran.trnID#'>
+							</cfif>
+						</cfloop>
+						<!--- Cash Payment transaction --->
+						<cfif loc.tran.trnMethod eq 'cash'>
+							<cfset loc.tran.test = CheckTran(args,loc.tran)>
+							<cfquery name="loc.QPayTranExists" datasource="#args.database#">
+								SELECT trnID
+								FROM tblTrans
+								WHERE trnRef = 'PAY #loc.tran.trnRef#'
+								AND trnDate = '#loc.tran.trnPayDate#'
+								AND trnAccountID = #loc.tran.trnAccountID#
+							</cfquery>
+							<cfif loc.QPayTranExists.recordcount is 0>
+								<cfset loc.paytran.trnID = 0>
+							<cfelse>
+								<cfset loc.paytran.trnID = loc.QPayTranExists.trnID>
+							</cfif>
+							<cfif loc.paytran.trnID is 0>
+								<cfquery name="loc.QInsertPayTran" datasource="#args.database#" result="loc.QInsertPayTranResult">
+									INSERT INTO tblTrans
+										(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+									VALUES
+										('PAY #loc.tran.trnRef#','#loc.tran.trnPayDate#','cash payment','#loc.tran.trnLedger#',
+											#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#,'#loc.tran.trnMethod#')
+								</cfquery>
+								<cfset loc.paytran.trnID = loc.QInsertPayTranResult.generatedkey>
+								<cfset loc.paytran.msg = "paytran added #loc.paytran.trnID#">
+							<cfelse>
+								<cfquery name="loc.QUpdatePayTran" datasource="#args.database#">
+									UPDATE tblTrans
+									SET
+										trnRef = 'PAY #loc.tran.trnRef#',
+										trnDate = '#loc.tran.trnPayDate#',
+										trnDesc = 'cash payment',
+										trnLedger = '#loc.tran.trnLedger#',
+										trnAccountID = #loc.tran.trnAccountID#,
+										trnType = '#loc.tran.trnType#',
+										trnAlloc = #loc.tran.trnAlloc#
+									WHERE trnID = #loc.paytran.trnID#
+								</cfquery>
+								<cfset loc.paytran.msg = "paytran updated #loc.paytran.trnID#">
+							</cfif>
+							<cfset loc.paytran.ref = loc.tran.trnRef>
+							<cfif phEmployee eq loc.lisaPR>
+								<cfset loc.paytran.accDR = loc.lisaDrawings>
+							<cfelse>
+								<cfset loc.paytran.accDR = loc.staffWages>
+							</cfif>
+							<cfquery name="loc.QPayItemExists" datasource="#args.database#">	<!--- see if cash payment items exist --->
+								SELECT niID 
+								FROM tblNomItems 
 								WHERE niTranID = #loc.paytran.trnID#
 								AND niNomID = #loc.cashAccount#
 							</cfquery>
-							<cfquery name="loc.QUpdateItemDR" datasource="#args.database#">
-								UPDATE tblNomItems
-								SET niAmount = #loc.netpay - loc.lotSub#
-								WHERE niTranID = #loc.paytran.trnID#
-								AND niNomID = #loc.staffWages#
-							</cfquery>
+							<cfif loc.QPayItemExists.recordcount is 0>
+								<cfquery name="loc.QInsertPayItem" datasource="#args.database#" result="loc.QInsertPayItemResult">
+									INSERT INTO tblNomItems
+										(niTranID,niNomID,niAmount)
+									VALUES
+										(#loc.paytran.trnID#,#loc.paytran.accDR#,#loc.paytran.netpay - loc.lotSub#),
+										(#loc.paytran.trnID#,#loc.cashAccount#,#-(loc.paytran.netpay - loc.lotSub)#)
+								</cfquery>
+								<cfset loc.paytran.trnID = loc.QInsertPayItemResult.generatedkey>
+							<cfelse>
+								<cfquery name="loc.QUpdateItemCR" datasource="#args.database#">
+									UPDATE tblNomItems
+									SET niAmount = #-(loc.paytran.netpay - loc.lotSub)#
+									WHERE niTranID = #loc.paytran.trnID#
+									AND niNomID = #loc.cashAccount#
+								</cfquery>
+								<cfquery name="loc.QUpdateItemDR" datasource="#args.database#">
+									UPDATE tblNomItems
+									SET niAmount = #loc.paytran.netpay - loc.lotSub#
+									WHERE niTranID = #loc.paytran.trnID#
+									AND niNomID = #loc.staffWages#
+								</cfquery>
+							</cfif>
 							<cfset loc.paytran.msg = 'paytran items updated #loc.paytran.trnID#'>
-						</cfif>
-						<cfset ArrayAppend(loc.result.paytrans,loc.paytran)>
-					</cfif> <!--- end cash tran --->
-					<cfif phLotterySubs neq 0>	<!--- lottery played --->
-						<cfquery name="loc.QLotTranExists" datasource="#args.database#">
-							SELECT trnID
-							FROM tblTrans
-							WHERE trnRef = 'LOT #loc.tran.trnRef#'
-							AND trnDate = '#loc.tran.trnPayDate#'
-							AND trnAccountID = #loc.tran.trnAccountID#
-						</cfquery>
-						<cfif loc.QLotTranExists.recordcount is 0>
-							<cfset loc.lotTran.trnID = 0>
-						<cfelse>
-							<cfset loc.lotTran.trnID = loc.QLotTranExists.trnID>
-						</cfif>
-						<cfif loc.lotTran.trnID is 0>
-							<cfquery name="loc.QInsertLotTran" datasource="#args.database#" result="loc.QInsertLotTranResult">
-								INSERT INTO tblTrans
-									(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
-								VALUES
-									('LOT #loc.tran.trnRef#','#loc.tran.trnPayDate#','Lottery sub','#loc.tran.trnLedger#',#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#,'#loc.tran.trnMethod#')
+							<cfset ArrayAppend(loc.result.paytrans,loc.paytran)>
+						</cfif> <!--- end cash tran --->
+						<cfif phLotterySubs neq 0>	<!--- lottery played --->
+							<cfquery name="loc.QLotTranExists" datasource="#args.database#">
+								SELECT trnID
+								FROM tblTrans
+								WHERE trnRef = 'LOT #loc.tran.trnRef#'
+								AND trnDate = '#loc.tran.trnPayDate#'
+								AND trnAccountID = #loc.tran.trnAccountID#
 							</cfquery>
-							<cfset loc.lotTran.trnID = loc.QInsertLotTranResult.generatedkey>
-							<cfset loc.lotTran.msg = "lotTran added #loc.lotTran.trnID#">
-						<cfelse>
-							<!--- update lottery tran here if ness --->
-						</cfif>
-						<cfquery name="loc.QLotItemExists" datasource="#args.database#">	<!--- see if lottery subs items exist --->
-							SELECT niID 
-							FROM tblNomItems 
-							WHERE niTranID = #loc.lotTran.trnID#
-							AND niNomID = #loc.lotteryAccount#
-						</cfquery>
-						<cfif loc.QLotItemExists.recordcount is 0>
-							<cfquery name="loc.QInsertLotItem" datasource="#args.database#" result="loc.QInsertLotItemResult">
-								INSERT INTO tblNomItems
-									(niTranID,niNomID,niAmount)
-								VALUES
-									(#loc.lotTran.trnID#,#loc.lotteryAccount#,-#loc.lotSub#),
-									(#loc.lotTran.trnID#,#loc.staffWages#,#loc.lotSub#)
-							</cfquery>
-							<cfset loc.lotTran.trnID = loc.QInsertLotItemResult.generatedkey>
-							<cfset loc.lotTran.msg = "lottery items added #loc.lotTran.trnID#">
-						<cfelse>
-							<!--- update lottery items --->						
-							<cfquery name="loc.QUpdateLotItemCR" datasource="#args.database#">
-								UPDATE tblNomItems
-								SET niAmount = -#loc.lotSub#
+							<cfif loc.QLotTranExists.recordcount is 0>
+								<cfset loc.lotTran.trnID = 0>
+							<cfelse>
+								<cfset loc.lotTran.trnID = loc.QLotTranExists.trnID>
+							</cfif>
+							<cfif loc.lotTran.trnID is 0>
+								<cfquery name="loc.QInsertLotTran" datasource="#args.database#" result="loc.QInsertLotTranResult">
+									INSERT INTO tblTrans
+										(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+									VALUES
+										('LOT #loc.tran.trnRef#','#loc.tran.trnPayDate#','Lottery sub','#loc.tran.trnLedger#',
+											#loc.tran.trnAccountID#,'#loc.tran.trnType#',#loc.tran.trnAlloc#,'#loc.tran.trnMethod#')
+								</cfquery>
+								<cfset loc.lotTran.trnID = loc.QInsertLotTranResult.generatedkey>
+								<cfset loc.lotTran.msg = "lotTran added #loc.lotTran.trnID#">
+							<cfelse>
+								<!--- update lottery tran here if ness --->
+							</cfif>
+							<cfquery name="loc.QLotItemExists" datasource="#args.database#">	<!--- see if lottery subs items exist --->
+								SELECT niID 
+								FROM tblNomItems 
 								WHERE niTranID = #loc.lotTran.trnID#
 								AND niNomID = #loc.lotteryAccount#
 							</cfquery>
-							<cfquery name="loc.QUpdateLotItemDR" datasource="#args.database#">
-								UPDATE tblNomItems
-								SET niAmount = #loc.lotSub#
-								WHERE niTranID = #loc.lotTran.trnID#
-								AND niNomID = #loc.staffWages#
-							</cfquery>
-							<cfset loc.lotTran.msg = 'lottery items updated #loc.lotTran.trnID#'>
+							<cfif loc.QLotItemExists.recordcount is 0>
+								<cfquery name="loc.QInsertLotItem" datasource="#args.database#" result="loc.QInsertLotItemResult">
+									INSERT INTO tblNomItems
+										(niTranID,niNomID,niAmount)
+									VALUES
+										(#loc.lotTran.trnID#,#loc.lotteryAccount#,-#loc.lotSub#),
+										(#loc.lotTran.trnID#,#loc.staffWages#,#loc.lotSub#)
+								</cfquery>
+								<cfset loc.lotTran.trnID = loc.QInsertLotItemResult.generatedkey>
+								<cfset loc.lotTran.msg = "lottery items added #loc.lotTran.trnID#">
+							<cfelse>
+								<!--- update lottery items --->						
+								<cfquery name="loc.QUpdateLotItemCR" datasource="#args.database#">
+									UPDATE tblNomItems
+									SET niAmount = -#loc.lotSub#
+									WHERE niTranID = #loc.lotTran.trnID#
+									AND niNomID = #loc.lotteryAccount#
+								</cfquery>
+								<cfquery name="loc.QUpdateLotItemDR" datasource="#args.database#">
+									UPDATE tblNomItems
+									SET niAmount = #loc.lotSub#
+									WHERE niTranID = #loc.lotTran.trnID#
+									AND niNomID = #loc.staffWages#
+								</cfquery>
+								<cfset loc.lotTran.msg = 'lottery items updated #loc.lotTran.trnID#'>
+							</cfif>
+							<cfset ArrayAppend(loc.result.lotTrans,loc.lotTran)>
+						</cfif> <!--- end lottery subs --->
+					</cfif>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				<cfelse>
+					<!--- Lisa payment --->
+					<cfset loc.lisaTran = {}>
+					<cfset loc.lisaTran.trnRef = "#NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+					<cfset loc.lisaTran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.lisaTran.trnPayDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
+					<cfset loc.lisaTran.trnDesc = "LK #empFirstName# #empLastName#">
+					<cfset loc.lisaTran.trnLedger = 'nom'>
+					<cfset loc.lisaTran.trnAccountID = 3>
+					<cfset loc.lisaTran.trnMethod = phMethod>
+					<cfset loc.lisaTran.trnType = 'nom'>
+					<cfset loc.lisaTran.trnAlloc = 1>
+					<cfset loc.lisaTran.phID = phID>
+					
+					<cfset loc.lisaTran.test = CheckTran(args,loc.tran)>
+					
+					<cfquery name="loc.QLisaTranExists" datasource="#args.database#">
+						SELECT trnID
+						FROM tblTrans
+						WHERE trnRef = 'LK #loc.lisaTran.trnRef#'
+						AND trnDate = '#loc.lisaTran.trnDate#'
+						AND trnAccountID = #loc.lisaTran.trnAccountID#
+					</cfquery>
+					<cfif loc.QLisaTranExists.recordcount is 0>
+						<cfset loc.lisaTran.trnID = 0>
+					<cfelse>
+						<cfset loc.lisaTran.trnID = loc.QLisaTranExists.trnID>
+					</cfif>
+					<cfif loc.lisaTran.trnID is 0>
+						<cfquery name="loc.QInsertLisaTran" datasource="#args.database#" result="loc.QInsertLisaTranResult">
+							INSERT INTO tblTrans
+								(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+							VALUES
+								('LK #loc.lisaTran.trnRef#','#loc.lisaTran.trnDate#','Lisa Drawings','#loc.lisaTran.trnLedger#',
+									#loc.lisaTran.trnAccountID#,'#loc.lisaTran.trnType#',#loc.lisaTran.trnAlloc#,'#loc.lisaTran.trnMethod#')
+						</cfquery>
+						<cfset loc.lisaTran.trnID = loc.QInsertLisaTranResult.generatedkey>
+						<cfset loc.lisaTran.msg = "lisaTran added #loc.lisaTran.trnID#">
+					<cfelse>
+						<!--- update Lisa tran here if ness --->
+					</cfif>
+					<cfquery name="loc.QLisaItemExists" datasource="#args.database#">	<!--- see if Lisa items exist --->
+						SELECT niID 
+						FROM tblNomItems 
+						WHERE niTranID = #loc.lisaTran.trnID#
+						<!---AND niNomID = #loc.lisaDrawings#--->
+					</cfquery>
+					<cfif loc.QLisaItemExists.recordcount is 0>
+						<cfquery name="loc.QInsertLisaItem" datasource="#args.database#" result="loc.QInsertLisaItemResult">
+							INSERT INTO tblNomItems
+								(niTranID,niNomID,niAmount)
+							VALUES
+								(#loc.lisaTran.trnID#,#loc.lisaDrawings#,-#phNP#),
+								(#loc.lisaTran.trnID#,#loc.lisaPartner#,#phNP#)
+						</cfquery>
+						<cfset loc.lisaTran.trnID = loc.QInsertLisaItemResult.generatedkey>
+						<cfset loc.lisaTran.msg = "Lisa items added #loc.lisaTran.trnID#">
+					<cfelse>
+						<!--- update Lisa items here --->
+						<cfquery name="loc.QUpdateLisaItemCR" datasource="#args.database#">
+							UPDATE tblNomItems
+							SET niAmount = -#phNP#
+							WHERE niTranID = #loc.lisaTran.trnID#
+							AND niNomID = #loc.lisaDrawings#
+						</cfquery>
+						<cfquery name="loc.QUpdateLisaItemDR" datasource="#args.database#">
+							UPDATE tblNomItems
+							SET niAmount = #phNP#
+							WHERE niTranID = #loc.lisaTran.trnID#
+							AND niNomID = #loc.lisaPartner#
+						</cfquery>
+						<cfset loc.lisaTran.msg = 'Lisa items updated #loc.lisaTran.trnID#'>
+					</cfif>
+					<cfif loc.lisaTran.trnMethod eq 'cash'>
+						<cfquery name="loc.QLisaCashPayTranExists" datasource="#args.database#">
+							SELECT trnID
+							FROM tblTrans
+							WHERE trnRef = 'PAY #loc.lisaTran.trnRef#'
+							AND trnDate = '#loc.lisaTran.trnDate#'
+							AND trnAccountID = #loc.lisaTran.trnAccountID#
+						</cfquery>
+						<cfif loc.QLisaCashPayTranExists.recordcount is 0>
+							<cfset loc.lisaTran.trnID = 0>
+						<cfelse>
+							<cfset loc.lisaTran.trnID = loc.QLisaCashPayTranExists.trnID>
 						</cfif>
-						<cfset ArrayAppend(loc.result.lotTrans,loc.lotTran)>
-					</cfif> <!--- end lottery subs --->
+						<cfif loc.lisaTran.trnID is 0>
+							<cfquery name="loc.QInsertLisaPayTran" datasource="#args.database#" result="loc.QInsertLisaPayTranResult">
+								INSERT INTO tblTrans
+									(trnRef,trnDate,trnDesc,trnLedger,trnAccountID,trnType,trnAlloc,trnMethod)
+								VALUES
+									('PAY #loc.lisaTran.trnRef#','#loc.lisaTran.trnPayDate#','cash payment','#loc.lisaTran.trnLedger#',
+										#loc.lisaTran.trnAccountID#,'#loc.lisaTran.trnType#',#loc.lisaTran.trnAlloc#,'#loc.lisaTran.trnMethod#')
+							</cfquery>
+							<cfset loc.lisaPayTran.trnID = loc.QInsertLisaPayTranResult.generatedkey>
+							<cfset loc.lisaPayTran.msg = "lisaPayTran added #loc.lisaPayTran.trnID#">
+						<cfelse>
+							<!--- edit lisa cash pay tran --->
+						</cfif>
+						<cfquery name="loc.QLisaPayItemExists" datasource="#args.database#">	<!--- see if cash payment items exist --->
+							SELECT niID 
+							FROM tblNomItems 
+							WHERE niTranID = #loc.lisaPayTran.trnID#
+							AND niNomID = #loc.cashAccount#
+						</cfquery>
+						<cfif loc.QLisaPayItemExists.recordcount is 0>
+							<cfquery name="loc.QInsertLisaPayItem" datasource="#args.database#" result="loc.QInsertLisaPayItemResult">
+								INSERT INTO tblNomItems
+									(niTranID,niNomID,niAmount)
+								VALUES
+									(#loc.lisaPayTran.trnID#,#loc.cashAccount#,-#phNP#),
+									(#loc.lisaPayTran.trnID#,#loc.lisaDrawings#,#phNP#)
+							</cfquery>
+							<cfset loc.lisaPayTran.trnID = loc.QInsertLisaPayItemResult.generatedkey>
+							<cfset loc.lisaPayTran.msg = "Lisa pay items added #loc.lisaPayTran.trnID#">
+						<cfelse>
+							<!--- update Lisa pay items here --->
+							<cfquery name="loc.QUpdateLisaPayItemCR" datasource="#args.database#">
+								UPDATE tblNomItems
+								SET niAmount = -#phNP#
+								WHERE niTranID = #loc.lisaPayTran.trnID#
+								AND niNomID = #loc.cashAccount#
+							</cfquery>
+							<cfquery name="loc.QUpdateLisaPayItemDR" datasource="#args.database#">
+								UPDATE tblNomItems
+								SET niAmount = #phNP#
+								WHERE niTranID = #loc.lisaPayTran.trnID#
+								AND niNomID = #loc.lisaDrawings#
+							</cfquery>
+							<cfset loc.lisaPayTran.msg = 'Lisa pay items updated #loc.lisaPayTran.trnID#'>
+						</cfif>
+					</cfif>
+					<cfset ArrayAppend(loc.result.lisaTrans,loc.lisaTran)>
 				</cfif>
-				<cfset ArrayAppend(loc.result.trans,loc.tran)>
 			</cfloop>
 
 		<cfcatch type="any">

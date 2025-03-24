@@ -26,7 +26,7 @@
 				type: "POST",
 				url: "ajax/AJAX_loadReport.cfm",
 				data: $(this).serialize(),
-				beforeSend: function() {},
+				beforeSend: function() {$('#PRContent').html('<b>loading...</b>');},
 				success: function(data) {
 					$('#PRContent').html(data);
 				}

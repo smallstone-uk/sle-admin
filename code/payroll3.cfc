@@ -636,6 +636,11 @@
 								WHERE niID = #loc.itemID#
 							</cfquery>
 							<cfset ArrayAppend(loc.result.msgs,"Tran item updated #loc.itemID#")>
+						<cfelseif loc.itemValue is 0> <!--- empty value saved in earlier version --->
+							<cfquery name="loc.QDeleteItem" datasource="#args.database#">
+								DELETE FROM tblNomItems WHERE niID = #loc.itemID#
+							</cfquery>
+							<cfset ArrayAppend(loc.result.msgs,"Zero item deleted #loc.itemID#")>
 						</cfif>
 					<cfelse>	<!--- item no longer required --->
 						<cfquery name="loc.QDeleteItem" datasource="#args.database#">
@@ -646,13 +651,15 @@
 				</cfloop>
 				<cfloop array="#data.nomItems#" index="loc.item">	<!--- loop array --->
 					<cfif !StructKeyExists(loc.result.recordStruct,loc.item.nomID)>	<!--- new item found --->
-						<cfquery name="loc.QInsertItem" datasource="#args.database#">
-							INSERT INTO tblNomItems
-								(niTranID,niNomID,niAmount)
-							VALUES
-								(#loc.tranID#,#loc.item.nomID#,#loc.item.value#)
-						</cfquery>
-						<cfset ArrayAppend(loc.result.msgs,"New item added #loc.tranID#")>
+						<cfif loc.item.value neq 0>
+							<cfquery name="loc.QInsertItem" datasource="#args.database#">
+								INSERT INTO tblNomItems
+									(niTranID,niNomID,niAmount)
+								VALUES
+									(#loc.tranID#,#loc.item.nomID#,#loc.item.value#)
+							</cfquery>
+							<cfset ArrayAppend(loc.result.msgs,"New item added #loc.item.nomID#")>
+						</cfif>
 					</cfif>
 				</cfloop>
 				<cfset ArrayAppend(loc.result.msgs,"Tran items updated #loc.tranID#")>

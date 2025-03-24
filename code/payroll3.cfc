@@ -725,6 +725,24 @@
 					<cfset loc.tran.test = CheckTran(args,loc.tran)>
 					<cfset loc.tran.trnID = loc.tran.test.trnID>
 					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+					<cfif phMethod eq 'cash'>
+						<cfset loc.tran = {}>
+						<cfset loc.tran.trnRef = "PAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+						<cfset loc.tran.trnDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
+						<cfset loc.tran.trnDesc = "CASH Payment #empFirstName# #empLastName#">
+						<cfset loc.tran.trnLedger = 'nom'>
+						<cfset loc.tran.trnAccountID = 3>
+						<cfset loc.tran.trnMethod = phMethod>
+						<cfset loc.tran.trnType = 'nom'>
+						<cfset loc.tran.trnAlloc = 1>
+						<cfset loc.tran.phID = phID>
+						<cfset loc.tran.nomItems = []>
+						<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = phNP - loc.lotSub})>
+						<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.cashAccount, status = '', value = -phNP})>
+						<cfset loc.tran.test = CheckTran(args,loc.tran)>
+						<cfset loc.tran.trnID = loc.tran.test.trnID>
+						<cfset ArrayAppend(loc.result.trans,loc.tran)>
+					</cfif>
 				<cfelse>
 					<!--- Lisa payroll entry --->
 					<cfset loc.tran = {}>
@@ -743,25 +761,24 @@
 					<cfset loc.tran.test = CheckTran(args,loc.tran)>
 					<cfset loc.tran.trnID = loc.tran.test.trnID>
 					<cfset ArrayAppend(loc.result.trans,loc.tran)>
-				</cfif>
-				<cfif phMethod eq 'cash'>
-					<cfset loc.tran = {}>
-					<cfset loc.tran.trnRef = "PAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
-					<cfset loc.tran.trnDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
-					<cfset loc.tran.trnDesc = "CASH Payment #empFirstName# #empLastName#">
-					<cfset loc.tran.trnLedger = 'nom'>
-					<cfset loc.tran.trnAccountID = 3>
-					<cfset loc.tran.trnMethod = phMethod>
-					<cfset loc.tran.trnType = 'nom'>
-					<cfset loc.tran.trnAlloc = 1>
-					<cfset loc.tran.phID = phID>
-					<cfset loc.tran.nomItems = []>
-					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.staffWages, status = '', value = phNP - loc.lotSub})>
-					<!---<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lotteryAccount, status = '', value = loc.lotSub})>--->
-					<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.cashAccount, status = '', value = -phNP})>
-					<cfset loc.tran.test = CheckTran(args,loc.tran)>
-					<cfset loc.tran.trnID = loc.tran.test.trnID>
-					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+					<cfif phMethod eq 'cash'>
+						<cfset loc.tran = {}>
+						<cfset loc.tran.trnRef = "PAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
+						<cfset loc.tran.trnDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
+						<cfset loc.tran.trnDesc = "CASH Payment #empFirstName# #empLastName#">
+						<cfset loc.tran.trnLedger = 'nom'>
+						<cfset loc.tran.trnAccountID = 3>
+						<cfset loc.tran.trnMethod = phMethod>
+						<cfset loc.tran.trnType = 'nom'>
+						<cfset loc.tran.trnAlloc = 1>
+						<cfset loc.tran.phID = phID>
+						<cfset loc.tran.nomItems = []>
+						<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.lisaDrawings, status = '', value = phNP})>
+						<cfset ArrayAppend(loc.tran.nomItems, {"nomID" = loc.cashAccount, status = '', value = -phNP})>
+						<cfset loc.tran.test = CheckTran(args,loc.tran)>
+						<cfset loc.tran.trnID = loc.tran.test.trnID>
+						<cfset ArrayAppend(loc.result.trans,loc.tran)>
+					</cfif>
 				</cfif>
 				<cfif phLotterySubs neq 0>	<!--- lottery played --->
 					<cfset loc.tran = {}>

@@ -177,6 +177,12 @@
 									<input type="button" id="btnView" value="Preview" style="float:right;" />
 								</td>
 							</tr>
+							<tr>
+								<td></td>
+								<td colspan="3">
+									<a href="index.cfm?restart=true">Reload Settings</a>
+								</td>
+							</tr>
 						</table>
 						</div>
 						<div style="float:right">

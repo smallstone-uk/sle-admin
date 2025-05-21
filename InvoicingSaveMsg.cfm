@@ -3,13 +3,13 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
-		
+
 		<cftry>
 			<cfquery name="loc.QControl" datasource="#args.datasource#" result="loc.QControlResult">
 				UPDATE tblControl
 				SET
 					<cfif StructKeyExists(args.form,"advance")>
-						ctlNextInvDate = '#toDate#',
+						ctlNextInvDate = '#invDate#',
 					</cfif>
 					ctlInvMessage = '#args.form.ctlInvMessage#'
 				WHERE

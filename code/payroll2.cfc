@@ -327,7 +327,26 @@
 	<cffunction name="GetPayrollWeekNumber" access="public" returntype="numeric">
 		<cfargument name="dateStr" type="string" required="yes">
 		<cfset var loc = {}>
+		<cfset loc.weekNo = 0>
+		<cfset loc.dateStr = dateStr>
+		
 		<cfif len(dateStr)>
+			<cfset loc.currYear = Year(dateStr)>
+			<cfset loc.tys = CreateDate(loc.currYear,4,6)>
+			<cfset loc.firstDiff = DateDiff("d",loc.tys,dateStr)>
+			<cfif DateDiff("d",dateStr,loc.tys) gt 0>
+				<cfset loc.tys = CreateDate(loc.currYear-1,4,6)>
+			</cfif>
+			<cfset loc.days = DateDiff("d",loc.tys,dateStr)>
+			<cfset loc.weekNo = int(loc.days / 7) + 1>
+<!---
+				<cfdump var="#loc#" label="GetPayrollWeekNumber" expand="yes" format="html"
+					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+--->
+		</cfif>
+		<cfreturn loc.weekNo>
+		
+<!---
 			<cfset loc.passedDate = LSParseDateTime(dateStr)>
 			<cfset loc.controlMonth = DateFormat(application.controls.weekNoStartDate, 'mm')>
 			<cfset loc.controlDay = DateFormat(application.controls.weekNoStartDate, 'dd')>
@@ -340,6 +359,7 @@
 		<cfelse>
 			<cfreturn 0>
 		</cfif>
+--->
 	</cffunction>
 
 	<cffunction name="LoadEmployeeDetails" access="public" returntype="struct">

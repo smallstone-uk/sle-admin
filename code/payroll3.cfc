@@ -807,7 +807,7 @@
 					
 					<cfset loc.tran = {}>
 					<cfset loc.tran.trnRef = "LOTPAY #NumberFormat(empID,'000')#-#LSDateFormat(phDate,'yymmdd')#">
-					<cfset loc.tran.trnDate = LSDateFormat(phDate,'yyyy-mm-dd')>
+					<cfset loc.tran.trnDate = LSDateFormat(DateAdd("d",5,phDate),'yyyy-mm-dd')>
 					<cfset loc.tran.trnDesc = "Lottery Payment #empFirstName# #empLastName#">
 					<cfset loc.tran.trnLedger = 'nom'>
 					<cfset loc.tran.trnAccountID = 3>

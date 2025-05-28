@@ -291,6 +291,7 @@
 	<cfelse>
 		<cfset payMethod = 'cash'>
 	</cfif>
+
 	<div class="pr2-table">
 		<table class="tableList" border="1" width="100%">
 			<tr>

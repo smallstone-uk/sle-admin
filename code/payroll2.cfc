@@ -338,7 +338,7 @@
 				<cfset loc.tys = CreateDate(loc.currYear-1,4,6)>
 			</cfif>
 			<cfset loc.days = DateDiff("d",loc.tys,dateStr)>
-			<cfset loc.weekNo = int(loc.days / 7)>
+			<cfset loc.weekNo = int(loc.days / 7) + 1>
 <!---
 				<cfdump var="#loc#" label="GetPayrollWeekNumber" expand="yes" format="html"
 					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

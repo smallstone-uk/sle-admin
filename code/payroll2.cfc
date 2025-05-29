@@ -329,21 +329,28 @@
 		<cfset var loc = {}>
 		<cfset loc.weekNo = 0>
 		<cfset loc.dateStr = dateStr>
+		<cfset loc.week53 = 0>
 		
 		<cfif len(dateStr)>
-			<cfset loc.currYear = Year(dateStr)>
+			<cfset loc.currYear = Year(dateStr)> 
 			<cfset loc.tys = CreateDate(loc.currYear,4,6)>
-			<cfset loc.firstDiff = DateDiff("d",loc.tys,dateStr)>
-			<cfif DateDiff("d",dateStr,loc.tys) gt 0>
-				<cfset loc.tys = CreateDate(loc.currYear-1,4,6)>
+			<cfset loc.firstDiff = DateDiff("d",loc.tys,dateStr)>	<!--- tax year start after our date --->
+			<cfif loc.firstDiff lt 0>
+				<cfset loc.tys = CreateDate(loc.currYear-1,4,6)>	<!--- go back to previous tax year start --->
+			</cfif>
+			<cfset loc.adjustedYear = Year(loc.tys)>
+			<cfset loc.dayNumber = DayofWeek(loc.tys)>
+			<cfif loc.adjustedYear MOD 4 eq 0 AND (loc.dayNumber eq 4) 
+				AND dateStr eq DateFormat(CreateDate(loc.adjustedYear,4,5),"yyyy-mm-dd")>	<!--- check if week 53 applies --->
+					<cfset loc.week53 = 1>
 			</cfif>
 			<cfset loc.days = DateDiff("d",loc.tys,dateStr)>
-			<cfset loc.weekNo = int(loc.days / 7) + 1>
+			<cfset loc.weekNo = int(loc.days / 7) + 1 + loc.week53>
 <!---
-				<cfdump var="#loc#" label="GetPayrollWeekNumber" expand="yes" format="html"
-					output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
---->
-		</cfif>
+			<cfdump var="#loc#" label="GetPayrollWeekNumber" expand="yes" format="html"
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+
+--->		</cfif>
 		<cfreturn loc.weekNo>
 		
 <!---

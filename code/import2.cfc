@@ -538,7 +538,7 @@
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>
 				<!---<cfset loc.result.action="#loc.result.action##loc.prodExists.prodLastBought# LTE #header.orderDate# AND NOT #loc.prodExists.prodLocked#<br>">--->
-				<cfif loc.prodExists.prodLastBought LTE header.orderDate AND NOT loc.prodExists.prodLocked>
+				<cfif loc.prodExists.prodLastBought LTE header.orderDate AND NOT val(loc.prodExists.prodLocked)>
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#" result="loc.QUpdateProductResult">
 						UPDATE tblProducts
 						SET

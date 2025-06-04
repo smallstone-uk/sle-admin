@@ -110,7 +110,9 @@
 				</li>
 				<li><a href="##" tabindex="-1">Accounting</a>
 					<ul>
-						<li><a href="salesMain3.cfm">Sales v3</a></li>
+						<li><a href="salesMain3.cfm">Sales Transactions</a></li>
+						<li><a href="http://tweb.epos.co.uk/reportdaysheet3.cfm" target="_blank">Import Till Data</a></li>
+						<li class="spacer"></li>
 						<li><a href="tranMain2.cfm">Supplier Transactions</a></li>
 						<li><a href="purReports.cfm">Transaction Reports</a></li>
 						<li><a href="vatReport.cfm">VAT Reports</a></li>

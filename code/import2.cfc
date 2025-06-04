@@ -538,6 +538,7 @@
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>
 				<!---<cfset loc.result.action="#loc.result.action##loc.prodExists.prodLastBought# LTE #header.orderDate# AND NOT #loc.prodExists.prodLocked#<br>">--->
+				<!--- fix lock flag issue 04/06/25 --->
 				<cfif loc.prodExists.prodLastBought LTE header.orderDate AND NOT val(loc.prodExists.prodLocked)>
 					<cfquery name="loc.QUpdateProduct" datasource="#application.site.datasource1#" result="loc.QUpdateProductResult">
 						UPDATE tblProducts

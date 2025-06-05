@@ -187,8 +187,9 @@
 									<th width="60" align="right">84 Days</th>
 									<th width="60" align="right">112+ Days</th>
 									<th width="60" align="right">Balance</th>
-									<th width="40" align="left">Level</th>
+									<th width="90" align="left">Avg. Lag</th>
 									<th width="90" align="left">Chased</th>
+									<th width="40" align="left">Level</th>
 									<th width="90" align="left">Alloc</th>
 								</tr>
 								<cfif parms.form.srchSort eq "cltBalance">
@@ -224,8 +225,8 @@
 											<td class="#style#">#showNum(item.balance3)#</td>
 											<td class="#style#">#showNum(item.balance4)#</td>
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-											<td align="center">#item.cltChase#</td>
 											<td>#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center">#item.cltChase#</td>
 											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>
@@ -248,6 +249,16 @@
 											<cfset totals[4]=totals[4]+item.balance4>
 											<cfset totals[5]=totals[5]+item.balance0>
 										</cfif>
+										<cfset dayCount = 0>
+										<cfset dayDiff = 0>
+										<cfset dayAvg = 0>
+										<cfloop array="#item.lags#" index="lagitem">
+											<cfif lagitem.diff neq 0>
+												<cfset dayDiff += lagitem.diff>
+												<cfset dayCount++>
+												<cfset dayAvg = int(dayDiff / dayCount)>
+											</cfif>
+										</cfloop>
 										<tr>
 											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
@@ -260,8 +271,9 @@
 											<td class="#style#">#showNum(item.balance3)#</td>
 											<td class="#style#">#showNum(item.balance4)#</td>
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-											<td align="center">#item.cltChase#</td>
+											<td align="center">#dayAvg# days</td>
 											<td>#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center">#item.cltChase#</td>
 											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>

@@ -87,11 +87,19 @@
 					FROM tblTrans
 					WHERE trnClientRef=#val(item.ref)#
 					<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc=0</cfif>
+					<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 					<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 					ORDER BY trnDate
 				</cfquery>
-				
+<!---
+				<cfif QTrans.recordcount gt 0>
+					<cfdump var="#QTrans#" label="QTrans #item.ref#" expand="false">
+				</cfif>
+--->
+				<cfset item.lags = []>
 				<cfloop query="QTrans">
+					<cfset item.lag = {trnType = #trnType#, trnDate = #trnDate#, trnAmnt1 = #trnAmnt1#, DIFF=0}>
+					<cfset ArrayAppend(item.lags,item.lag)>
 					<cfset item.balance0=item.balance0+trnAmnt1>
 					<cfif DateCompare(trnDate,DateAdd("d",-28,result.dateTo)) gt 0>
 						<cfset item.balance1=item.balance1+trnAmnt1>
@@ -111,6 +119,21 @@
 						</cfif>
 					</cfif>
 				</cfloop>
+				<cfif ArrayLen(item.lags)>
+					<cfset item.invdate = "">
+					<cfset item.paydate = "">
+					<cfloop array="#item.lags#" index="item.lagitem">
+						<cfif item.lagitem.trnType eq 'inv'>
+							<cfset item.invdate = item.lagitem.trnDate>
+						<cfelseif Find(item.lagitem.trnType,'pay,jnl',1)>
+							<cfset item.paydate = item.lagitem.trnDate>
+							<cfif len(item.invdate) AND len(item.paydate)>
+								<cfset item.lagitem.diff = DateDiff("d",item.invdate,item.paydate)>
+								<cfset item.paydate = "">
+							</cfif>
+						</cfif>
+					</cfloop>
+				</cfif>
 				<cfif StructKeyExists(args.form,"srchUpdate")>
 					<cfset method=0>
 					<cfloop collection="#item.methods#" item="methodItem">
@@ -129,6 +152,7 @@
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				</cfif>
+				<!---<cfdump var="#item#" label="item #item.ref#" expand="true">--->
 				
 				<!---<cfif currentrow gt 10><cfbreak></cfif>--->
 				

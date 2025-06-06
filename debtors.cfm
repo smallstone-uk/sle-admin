@@ -37,6 +37,7 @@
 <cfparam name="srchSort" default="">
 <cfparam name="srchSkipAllocated" default="true">
 <cfparam name="srchSkipZeros" default="true">
+<cfparam name="srchUpdate" default="true">
 <cfparam name="srchActive" default="true">
 <body>
 	<div id="wrapper">
@@ -130,6 +131,10 @@
 								<tr>
 									<td>Skip Zero Balance</td>
 									<td><input type="checkbox" name="srchSkipZeros" value="1"<cfif StructKeyExists(form,"srchSkipZeros")> checked="checked"</cfif> /></td>
+								</tr>
+								<tr>
+									<td>Update Payment Methods</td>
+									<td><input type="checkbox" name="srchUpdate" value="1"<cfif StructKeyExists(form,"srchUpdate")> checked="checked"</cfif> /></td>
 								</tr>
 								<tr>
 									<td>Sort By</td>

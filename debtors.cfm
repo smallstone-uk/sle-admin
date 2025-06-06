@@ -187,7 +187,7 @@
 									<th width="60" align="right">84 Days</th>
 									<th width="60" align="right">112+ Days</th>
 									<th width="60" align="right">Balance</th>
-									<th width="90" align="left">Avg. Lag</th>
+									<th width="90" align="center">Avg. Lag</th>
 									<th width="90" align="left">Chased</th>
 									<th width="40" align="left">Level</th>
 									<th width="90" align="left">Alloc</th>
@@ -252,13 +252,18 @@
 										<cfset dayCount = 0>
 										<cfset dayDiff = 0>
 										<cfset dayAvg = 0>
+										<cfset payFound = false>
 										<cfloop array="#item.lags#" index="lagitem">
 											<cfif lagitem.diff neq 0>
 												<cfset dayDiff += lagitem.diff>
 												<cfset dayCount++>
 												<cfset dayAvg = int(dayDiff / dayCount)>
+												<cfset payFound = true>
 											</cfif>
 										</cfloop>
+										<cfif NOT payFound>
+											<cfset dayAvg = item.diff>
+										</cfif>
 										<tr>
 											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>

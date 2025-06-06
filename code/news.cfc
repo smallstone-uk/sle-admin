@@ -72,6 +72,7 @@
 				<cfset item.balance4=0>
 				<cfset item.date1=DateAdd("d",-28,result.dateTo)>
 				<cfset item.allocTotal = -1>
+				<cfset item.diff = -1>
 				<cfquery name="QTranAllocBalance" datasource="#args.datasource#">
 					SELECT SUM(trnAmnt1+trnAmnt2) AS total
 					FROM tblTrans
@@ -120,7 +121,8 @@
 					</cfif>
 				</cfloop>
 				<cfif ArrayLen(item.lags)>
-					<cfset item.invdate = "">
+					<cfset item.paymentFound = 0>
+					<cfset item.invdate = DateFormat(Now(),'yyyy-mm-dd')>
 					<cfset item.paydate = "">
 					<cfloop array="#item.lags#" index="item.lagitem">
 						<cfif item.lagitem.trnType eq 'inv'>
@@ -130,9 +132,14 @@
 							<cfif len(item.invdate) AND len(item.paydate)>
 								<cfset item.lagitem.diff = DateDiff("d",item.invdate,item.paydate)>
 								<cfset item.paydate = "">
+								<cfset item.paymentFound = 1>
 							</cfif>
 						</cfif>
 					</cfloop>
+					<cfif NOT item.paymentFound>
+						<cfset item.paydate = DateFormat(Now(),'yyyy-mm-dd')>
+						<cfset item.diff = DateDiff("d",item.invdate,item.paydate)>
+					</cfif>
 				</cfif>
 				<cfif StructKeyExists(args.form,"srchUpdate")>
 					<cfset method=0>
@@ -152,9 +159,9 @@
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				</cfif>
-				<!---<cfdump var="#item#" label="item #item.ref#" expand="true">--->
+				<cfdump var="#item#" label="item #item.ref#" expand="true">
 				
-				<!---<cfif currentrow gt 10><cfbreak></cfif>--->
+				<cfif currentrow gt 10><cfbreak></cfif>
 				
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>

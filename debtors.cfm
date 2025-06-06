@@ -218,6 +218,21 @@
 											<cfset totals[4]=totals[4]+item.balance4>
 											<cfset totals[5]=totals[5]+item.balance0>
 										</cfif>
+										<cfset dayCount = 0>
+										<cfset dayDiff = 0>
+										<cfset dayAvg = 0>
+										<cfset payFound = false>
+										<cfloop array="#item.lags#" index="lagitem">
+											<cfif lagitem.diff neq 0>
+												<cfset dayDiff += lagitem.diff>
+												<cfset dayCount++>
+												<cfset dayAvg = int(dayDiff / dayCount)>
+												<cfset payFound = true>
+											</cfif>
+										</cfloop>
+										<cfif NOT payFound>
+											<cfset dayAvg = item.diff>
+										</cfif>
 										<tr>
 											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
 											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
@@ -230,6 +245,7 @@
 											<td class="#style#">#showNum(item.balance3)#</td>
 											<td class="#style#">#showNum(item.balance4)#</td>
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
+											<td align="center">#dayAvg# days</td>
 											<td>#LSDateFormat(item.cltChaseDate)#</td>
 											<td align="center">#item.cltChase#</td>
 											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
@@ -297,7 +313,7 @@
 										<td class="amountTotal">#showNum(totals[3])#</td>
 										<td class="amountTotal">#showNum(totals[4])#</td>
 										<td class="amountTotal">#showNum(totals[5])#</td>
-										<td></td>
+										<td colspan="4"></td>
 									</tr>
 								</cfif>
 								<cfif creditCount gt 0>
@@ -309,7 +325,7 @@
 										<td class="amountTotal">#showNum(credits[3])#</td>
 										<td class="amountTotal">#showNum(credits[4])#</td>
 										<td class="amountTotal">#showNum(credits[5])#</td>
-										<td></td>
+										<td colspan="4"></td>
 									</tr>
 								</cfif>
 							</table>

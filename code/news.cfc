@@ -154,7 +154,7 @@
 						WHERE cltRef=#cltRef#
 					</cfquery>
 				</cfif>
-				<cfif item.balance0 eq 0 AND skipZeros>
+				<cfif item.balance0 lt 0.001 AND skipZeros>
 				<cfelseif (item.balance0 gt minVal OR minVal eq 0)>
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
@@ -162,7 +162,8 @@
 <!---
 				<cfdump var="#item#" label="item #item.ref#" expand="true">
 				<cfif currentrow gt 10><cfbreak></cfif>
---->				
+				
+--->
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>
 			

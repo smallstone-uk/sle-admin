@@ -73,6 +73,7 @@
 				<cfset item.date1=DateAdd("d",-28,result.dateTo)>
 				<cfset item.allocTotal = -1>
 				<cfset item.diff = -1>
+				<cfset item.lastMethod = "unknown">
 				<cfquery name="QTranAllocBalance" datasource="#args.datasource#">
 					SELECT SUM(trnAmnt1+trnAmnt2) AS total
 					FROM tblTrans
@@ -112,6 +113,8 @@
 						<cfset item.balance4=item.balance4+trnAmnt1>
 					</cfif>
 					<cfif trnType eq "pay">
+						<cfset item.lastMethod = trnMethod>
+					
 						<cfif StructKeyExists(item.methods,trnMethod)>
 							<cfset method=StructFind(item.methods,trnMethod)>
 							<cfset StructUpdate(item.methods,trnMethod,method+1)>
@@ -142,15 +145,16 @@
 					</cfif>
 				</cfif>
 				<cfif StructKeyExists(args.form,"srchUpdate")>
-					<cfset method=0>
+					<!---<cfset method=0>
 					<cfloop collection="#item.methods#" item="methodItem">
 						<cfif StructFind(item.methods,methodItem) gt method>
 							<cfset item.methodKey=methodItem>
+							<cfset method=item.methodKey>
 						</cfif>
-					</cfloop>
+					</cfloop>--->
 					<cfquery name="QTrans" datasource="#args.datasource#">
 						UPDATE tblClients
-						SET cltPayMethod='#item.methodKey#'
+						SET cltPayMethod='#item.lastMethod#'
 						WHERE cltRef=#cltRef#
 					</cfquery>
 				</cfif>
@@ -159,11 +163,11 @@
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				</cfif>
-<!---
-				<cfdump var="#item#" label="item #item.ref#" expand="true">
-				<cfif currentrow gt 10><cfbreak></cfif>
+
+				<!---<cfdump var="#item#" label="item" expand="true">--->
+				<cfif currentrow gt 50><cfbreak></cfif>
 				
---->
+
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>
 			

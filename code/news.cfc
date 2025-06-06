@@ -159,10 +159,10 @@
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				</cfif>
+<!---
 				<cfdump var="#item#" label="item #item.ref#" expand="true">
-				
 				<cfif currentrow gt 10><cfbreak></cfif>
-				
+--->				
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>
 			

@@ -260,7 +260,8 @@
 		<cfreturn loc.result>
 		</cffunction>
 
-		<cffunction name="EditAccount" access="public" returntype="void">
+<!--- Revised 13/06/2025 ---> 
+	<cffunction name="EditAccount" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfquery name="loc.edit" datasource="#args.datasource#">

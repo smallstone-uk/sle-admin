@@ -33,7 +33,6 @@
 						AND cltAccountType="#args.form.srchType#"
 					</cfif>
 				</cfif>
-				<!---<cfif len(StructFind(args.form,"srchType"))>AND cltAccountType="#args.form.srchType#"</cfif>--->
 				<cfif len(StructFind(args.form,"srchPayType"))>AND cltPayType="#args.form.srchPayType#"</cfif>
 				<cfif len(StructFind(args.form,"srchMethod"))>AND cltPayMethod="#args.form.srchMethod#"</cfif>
 				<cfif len(StructFind(args.form,"srchName"))>AND (cltName LIKE "%#args.form.srchName#%" 
@@ -93,11 +92,11 @@
 					<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 					ORDER BY trnDate
 				</cfquery>
-<!---
-				<cfif QTrans.recordcount gt 0>
+
+				<!---<cfif QTrans.recordcount gt 0>
 					<cfdump var="#QTrans#" label="QTrans #item.ref#" expand="false">
-				</cfif>
---->
+				</cfif>--->
+
 				<cfset item.lags = []>
 				<cfloop query="QTrans">
 					<cfset item.lag = {trnType = #trnType#, trnDate = #trnDate#, trnAmnt1 = #trnAmnt1#, DIFF=0}>
@@ -113,16 +112,18 @@
 						<cfset item.balance4=item.balance4+trnAmnt1>
 					</cfif>
 					<cfif trnType eq "pay">
-						<cfset item.lastMethod = trnMethod>
-					
+						<cfset item.lastMethod = trnMethod>					
+<!---
 						<cfif StructKeyExists(item.methods,trnMethod)>
 							<cfset method=StructFind(item.methods,trnMethod)>
 							<cfset StructUpdate(item.methods,trnMethod,method+1)>
 						<cfelse>
 							<cfset StructInsert(item.methods,trnMethod,1)>
 						</cfif>
+--->
 					</cfif>
 				</cfloop>
+				<!---<cfoutput>#item.lastMethod#<br></cfoutput>--->
 				<cfif ArrayLen(item.lags)>
 					<cfset item.paymentFound = 0>
 					<cfset item.invdate = DateFormat(Now(),'yyyy-mm-dd')>
@@ -145,13 +146,6 @@
 					</cfif>
 				</cfif>
 				<cfif StructKeyExists(args.form,"srchUpdate")>
-					<!---<cfset method=0>
-					<cfloop collection="#item.methods#" item="methodItem">
-						<cfif StructFind(item.methods,methodItem) gt method>
-							<cfset item.methodKey=methodItem>
-							<cfset method=item.methodKey>
-						</cfif>
-					</cfloop>--->
 					<cfquery name="QTrans" datasource="#args.datasource#">
 						UPDATE tblClients
 						SET cltPayMethod='#item.lastMethod#'

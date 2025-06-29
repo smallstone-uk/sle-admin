@@ -222,14 +222,17 @@
 										<cfset dayDiff = 0>
 										<cfset dayAvg = 0>
 										<cfset payFound = false>
+										<tr><th colspan="14">
 										<cfloop array="#item.lags#" index="lagitem">
 											<cfif lagitem.diff neq 0>
-												<cfset dayDiff += lagitem.diff>
+												<cfset dayDiff += lagitem.diff> #lagitem.diff# &nbsp;
 												<cfset dayCount++>
 												<cfset dayAvg = int(dayDiff / dayCount)>
 												<cfset payFound = true>
 											</cfif>
 										</cfloop>
+										</th>
+										<th>#dayAvg#</th></tr>
 										<cfif NOT payFound>
 											<cfset dayAvg = item.diff>
 										</cfif>
@@ -239,7 +242,7 @@
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
 											<td align="center">#item.cltPayType#</td>
-											<td align="center">#item.methodKey#</td>
+											<td align="center">#item.methodKey# <cfif StructKeyExists(form,"srchUpdate")>#item.lastMethod#</cfif></td>
 											<td class="#style#">#showNum(item.balance1)#</td>
 											<td class="#style#">#showNum(item.balance2)#</td>
 											<td class="#style#">#showNum(item.balance3)#</td>
@@ -291,7 +294,7 @@
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
 											<td align="center">#item.cltPayType#</td>
-											<td align="center">#item.methodKey#</td>
+											<td align="center">#item.methodKey# <cfif StructKeyExists(form,"srchUpdate")>#item.lastMethod#</cfif></td>
 											<td class="#style#">#showNum(item.balance1)#</td>
 											<td class="#style#">#showNum(item.balance2)#</td>
 											<td class="#style#">#showNum(item.balance3)#</td>

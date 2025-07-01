@@ -544,7 +544,7 @@
 					prodLocked = '#int(StructKeyExists(args.form,"prodLocked"))#',
 					prodStatus = '#args.form.prodStatus#',
 					prodUnitSize = '#args.form.prodUnitSize#',
-					prodUnitTrade = '#args.form.prodUnitTrade#',
+					prodUnitTrade = '#val(args.form.prodUnitTrade)#',
 					prodReorder = '#args.form.prodReorder#'
 				WHERE prodID = #val(args.form.prodID)#
 			</cfquery>

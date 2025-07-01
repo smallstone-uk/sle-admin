@@ -44,7 +44,7 @@
 					<option value="3">Transaction Ref</option>
 				</select>
 				&nbsp;&nbsp;Records
-				<select name="srchRange" data-placeholder="Select..." id="srchRange" tabindex="4">
+				<select name="srchRange" data-placeholder="Select..." id="srchRange">
 					#acc.DateRangeOptions()#
 				</select>
 				<label>

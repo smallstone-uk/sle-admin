@@ -736,9 +736,10 @@
 								
 								<cfcase value="8">
 									<cfset data=pur.VATReturn(parms)>
+<!---
 									<cfdump var="#data#" label="VATReturn" expand="yes" format="html" 
 										output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
-
+--->
 									<cfset summary = {
 										"box1" = {"title" = "VAT due on sales and other outputs", "value" = 0},
 										"box2" = {"title" = "VAT due on acquisitions from other EC States", "value" = 0},

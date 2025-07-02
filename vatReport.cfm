@@ -20,6 +20,33 @@
 			$(".srchAccount, .srchTranType").chosen({width: "300px"});
 		});
 	</script>
+	<style type="text/css">
+		.header {font-size:16px; font-weight:bold;}
+		.amount {text-align:right}
+		.amountTotal {text-align:right; font-weight:bold;}
+		.tranList {	
+			font-family:Arial, Helvetica, sans-serif;
+			font-size:13px;
+			border-collapse:collapse;
+		}
+		.tranList th, .tranList td {
+			padding:2px 4px; 
+			border: solid 1px #ccc;
+			background-color:#fff;
+		}
+		.vatTable {
+			margin:10px;
+			border-spacing: 0px;
+			border-collapse: collapse;
+			border: 1px solid #CCC;
+			font-size: 12px;
+		}
+		.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
+		.vatTable td {padding: 5px; border-color: #ccc;}
+		.err {background-color:#FF0000}
+		.ok {background-color:#00DF00}
+		.summary {font-size:11px; color:#0033FF;}
+	</style>
 </head>
 <cfset parms={}>
 <cfset parms.datasource=application.site.datasource1>
@@ -119,6 +146,18 @@
 							</cfquery>
 							<!---<cfdump var="#QSaleItemsResult#" label="QItems" expand="false">--->
 							
+							<cfset summary = {
+								"box1" = {"title" = "VAT due on sales and other outputs", "value" = 0},
+								"box2" = {"title" = "VAT due on acquisitions from other EC States", "value" = 0},
+								"box3" = {"title" = "Total VAT due (sum of boxes 1 & 2)", "value" = 0},
+								"box4" = {"title" = "VAT reclaimed on purchases", "value" = 0},
+								"box5" = {"title" = "Net VAT payable or repayable", "value" = 0},
+								"box6" = {"title" = "Total value of sales", "value" = 0},
+								"box7" = {"title" = "Total value of purchases", "value" = 0},
+								"box8" = {"title" = "Total value of supplies from EC States", "value" = 0},
+								"box9" = {"title" = "Total value of acquisitions from EC States", "value" = 0}
+							}>
+
 							<cfset totNet = 0>
 							<cfset totVAT = 0>
 							<cfset totQty = 0>
@@ -174,6 +213,9 @@
 									<th>#POR#%</th>
 								</tr>
 							</table>
+							<cfset summary.box1.value = totVAT>				
+							<cfset summary.box3.value = totVAT>				
+							<cfset summary.box6.value = totNet>				
 							<div style="page-break-before:always"></div>
 							<h1>Purchases</h1>
 							<cfquery name="QPurItems" datasource="#parms.datasource#">
@@ -217,6 +259,9 @@
 										<tr>
 											<th colspan="7"><h1>Costs</h1></th>
 										</tr>
+										<cfset summary.box4.value += totVAT>
+										<cfset summary.box7.value += totNet>				
+										
 										<cfset lineCount = 0>
 										<cfset totNet = 0>
 										<cfset totVAT = 0>
@@ -235,6 +280,9 @@
 										<tr>
 											<th colspan="7"><h1>Nominal</h1></th>
 										</tr>
+										<cfset summary.box4.value += totVAT>
+										<cfset summary.box7.value += totNet>	
+													
 										<cfset lineCount = 0>
 										<cfset totNet = 0>
 										<cfset totVAT = 0>
@@ -275,7 +323,28 @@
 									<th align="right">#totVAT#</th>
 								</tr>
 							</table>
+							<cfset summary.box4.value += totVAT>
+							<cfset summary.box5.value = summary.box1.value + summary.box4.value>
+							<cfset summary.box7.value += totNet>				
 							<!---<cfdump var="#QPurItems#" label="QPurItems" expand="false">--->
+							<h1>VAT Summary</h1>
+							<table class="vatTable" border="1">
+								<cfset boxKeys = ListSort(StructKeyList(summary,","),"text","asc",",")>
+								<cfloop list="#boxKeys#" index="boxKey">
+									<cfset box = StructFind(summary,boxKey)>
+									<cfif boxKey eq "box5" and box.value gt 0>
+										<cfset style = "color:red;">
+										<cfset title = "(refund)">
+									<cfelse>
+										<cfset style = "">
+										<cfset title = "">
+									</cfif>
+									<tr>
+										<td style="#style#">#box.title# #title#</td><td style="#style#" align="right">#DecimalFormat(box.value)#</td>
+									</tr>
+								</cfloop>
+							</table>
+							<br /><br />
 						</cfcase>
 						
 						<cfcase value="2">

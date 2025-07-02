@@ -164,8 +164,10 @@
 							<cfset totTrd = 0>
 							<cfset totPrf = 0>
 							<cfset POR = 0>
-							<h1>Sales Income</h1>
 							<table border="1" class="tableList">
+								<tr>
+									<th colspan="8"><h1>Sales Income</h1></th>
+								</tr>
 								<tr>
 									<th>Group</th>
 									<th>Description</th>
@@ -217,7 +219,6 @@
 							<cfset summary.box3.value = totVAT>				
 							<cfset summary.box6.value = totNet>				
 							<div style="page-break-before:always"></div>
-							<h1>Purchases</h1>
 							<cfquery name="QPurItems" datasource="#parms.datasource#">
 								SELECT trnDate, nomID,nomGroup,nomCode,nomTitle, SUM(niAmount) AS Amount, SUM(niVATAmount) AS VATAmount, Count(*) AS Num
 								FROM `tbltrans` 
@@ -237,6 +238,9 @@
 							<cfset totQty = 0>
 							<table border="1" class="tableList">
 								<tr>
+									<th colspan="8"><h1>Purchases</h1></th>
+								</tr>
+								<tr>
 									<th>Group</th>
 									<th>Code</th>
 									<th>Description</th>
@@ -244,6 +248,7 @@
 									<th>DR</th>
 									<th>CR</th>
 									<th>VAT</th>
+									<th width="30"></th>
 								</tr>
 								<cfloop query="QPurItems">
 									<cfset lineCount++>
@@ -255,9 +260,10 @@
 											<th align="right">#totNet#</th>
 											<th></th>
 											<th align="right">#totVAT#</th>
+											<th width="30"></th>
 										</tr>
 										<tr>
-											<th colspan="7"><h1>Costs</h1></th>
+											<th colspan="8"><h1>Costs</h1></th>
 										</tr>
 										<cfset summary.box4.value += totVAT>
 										<cfset summary.box7.value += totNet>				
@@ -268,7 +274,7 @@
 										<cfset totQty = 0>
 										<cfset nomFlag++>
 									</cfif>
-									<cfif nomGroup gte "P" AND nomFlag eq 1>
+									<cfif nomGroup gt "F" AND nomFlag eq 1>
 										<tr>
 											<th align="center">#lineCount#</th>
 											<th colspan="2">TOTALS</th>
@@ -276,9 +282,10 @@
 											<th align="right">#totNet#</th>
 											<th></th>
 											<th align="right">#totVAT#</th>
+											<th width="30"></th>
 										</tr>
 										<tr>
-											<th colspan="7"><h1>Nominal</h1></th>
+											<th colspan="8"><h1>Nominal</h1></th>
 										</tr>
 										<cfset summary.box4.value += totVAT>
 										<cfset summary.box7.value += totNet>	
@@ -301,6 +308,7 @@
 											<td align="right">#AMOUNT#</td>
 											<td align="right"></td>
 											<td align="right">#VATAmount#</td>
+											<td align="right"></td>
 										</tr>
 									<cfelse>
 										<tr>
@@ -310,6 +318,7 @@
 											<td align="center">#NUM#</td>
 											<td align="right"></td>
 											<td align="right">#AMOUNT#</td>
+											<td align="right"></td>
 											<td align="right"></td>
 										</tr>
 									</cfif>
@@ -321,6 +330,7 @@
 									<th align="right">#totNet#</th>
 									<th></th>
 									<th align="right">#totVAT#</th>
+									<th width="30"></th>
 								</tr>
 							</table>
 							<cfset summary.box4.value += totVAT>

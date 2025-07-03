@@ -273,8 +273,7 @@
 								</tr>
 							</table>
 							<cfset summary.box6.value += totNet>
-								
-								
+															
 							<!--- Purchases --->		
 							<div style="page-break-before:always"></div>
 							<cfquery name="QPurItems" datasource="#parms.datasource#">
@@ -285,7 +284,8 @@
 								INNER JOIN tblNominal ON niNomID = nomID
 								WHERE nomID NOT IN (11,201)
 								AND `trnLedger` IN ('purch','nom')
-								AND `trnType` IN ('inv','crn','nom') 
+								AND `trnType` IN ('inv','crn','nom')
+								AND nomGroup > 'A' AND nomGroup < 'C'
 								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
 								GROUP BY nomGroup, nomCode
 							</cfquery>
@@ -310,6 +310,153 @@
 								</tr>
 								<cfloop query="QPurItems">
 									<cfset lineCount++>
+									<cfset totNet += Amount>
+									<cfset totQty += Num>
+									<cfset totVAT += VATAmount>
+									<tr>
+										<td>#nomGroup#</td>
+										<td>#nomCode#</td>
+										<td>#nomTitle#</td>
+										<td align="center">#NumberFormat(Num,",")#</td>
+										<td align="right">#DecimalFormat(Amount)#</td>
+										<td align="right"></td>
+										<td align="right">#DecimalFormat(VATAmount)#</td>
+										<td align="right"></td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th align="center">#lineCount#</th>
+									<th colspan="2">TOTALS</th>
+									<th align="center">#NumberFormat(totQty,",")#</th>
+									<th align="right">#DecimalFormat(totNet)#</th>
+									<th></th>
+									<th align="right">#DecimalFormat(totVAT)#</th>
+									<th width="30"></th>
+								</tr>
+							</table>
+							<cfset summary.box4.value += totVAT>
+							<cfset summary.box7.value += totNet>				
+							
+							<!--- Running Costs --->
+							<cfquery name="QCostItems" datasource="#parms.datasource#">
+								SELECT trnDate, nomID,nomGroup,nomCode,nomTitle, SUM(niAmount) AS Amount, SUM(niVATAmount) AS VATAmount, Count(*) AS Num
+								FROM `tbltrans` 
+								INNER JOIN tblAccount ON accID = trnAccountID
+								INNER JOIN tblnomitems ON niTranID = trnID
+								INNER JOIN tblNominal ON niNomID = nomID
+								WHERE nomID NOT IN (11,201)
+								AND `trnLedger` IN ('purch','nom')
+								AND `trnType` IN ('inv','crn','nom')
+								AND nomGroup >= 'C' AND nomGroup <= 'F'
+								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+								GROUP BY nomGroup, nomCode
+							</cfquery>
+							<cfset lineCount = 0>
+							<cfset totNet = 0>
+							<cfset totVAT = 0>
+							<cfset totQty = 0>
+							<table border="1" class="tableList">
+								<tr>
+									<td class="nomHeader" colspan="8"><h1>Operating Costs</h1></td>
+								</tr>
+								<tr>
+									<th width="60">Group</th>
+									<th width="60">Code</th>
+									<th>Description</th>
+									<th width="60">QTY</th>
+									<th width="60">DR</th>
+									<th width="60">CR</th>
+									<th width="60">VAT</th>
+									<th width="60"></th>
+								</tr>
+								<cfloop query="QCostItems">
+									<cfset lineCount++>
+									<cfset totNet += AMOUNT>
+									<cfset totQty += NUM>
+									<cfset totVAT += VATAmount>
+									<tr>
+										<td>#nomGroup#</td>
+										<td>#nomCode#</td>
+										<td>#nomTitle#</td>
+										<td align="center">#NumberFormat(NUM,",")#</td>
+										<td align="right">#DecimalFormat(AMOUNT)#</td>
+										<td align="right"></td>
+										<td align="right">#DecimalFormat(VATAmount)#</td>
+										<td align="right"></td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th width="60" align="center">#lineCount#</th>
+									<th colspan="2">TOTALS</th>
+									<th width="60" align="center">#NumberFormat(totQty,",")#</th>
+									<th width="60" align="right">#DecimalFormat(totNet)#</th>
+									<th></th>
+									<th width="60" align="right">#DecimalFormat(totVAT)#</th>
+									<th width="60"></th>
+								</tr>
+							</table>
+							<cfset summary.box4.value += totVAT>
+							<cfset summary.box7.value += totNet>
+
+							<!--- Other Nominal Accounts --->
+							<cfquery name="QOtherItems" datasource="#parms.datasource#">
+								SELECT trnDate, nomID,nomGroup,nomCode,nomTitle, SUM(niAmount) AS Amount, SUM(niVATAmount) AS VATAmount, Count(*) AS Num
+								FROM `tbltrans` 
+								INNER JOIN tblAccount ON accID = trnAccountID
+								INNER JOIN tblnomitems ON niTranID = trnID
+								INNER JOIN tblNominal ON niNomID = nomID
+								WHERE nomID NOT IN (11,201)
+								AND `trnLedger` IN ('purch','nom')
+								AND `trnType` IN ('inv','crn','nom')
+								AND nomGroup > 'F'
+								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+								GROUP BY nomGroup, nomCode
+							</cfquery>
+							<cfset lineCount = 0>
+							<cfset totNet = 0>
+							<cfset totVAT = 0>
+							<cfset totQty = 0>
+							<table border="1" class="tableList">
+								<tr>
+									<td class="nomHeader" colspan="8"><h1>Other Nominal Accounts</h1></td>
+								</tr>
+								<tr>
+									<th width="60">Group</th>
+									<th width="60">Code</th>
+									<th>Description</th>
+									<th width="60">QTY</th>
+									<th width="60">DR</th>
+									<th width="60">CR</th>
+									<th width="60">VAT</th>
+									<th width="60"></th>
+								</tr>
+								<cfloop query="QOtherItems">
+									<cfset lineCount++>
+									<cfset totNet += AMOUNT>
+									<cfset totQty += NUM>
+									<cfset totVAT += VATAmount>
+									<tr>
+										<td>#nomGroup#</td>
+										<td>#nomCode#</td>
+										<td>#nomTitle#</td>
+										<td align="center">#NumberFormat(NUM,",")#</td>
+										<td align="right">#DecimalFormat(AMOUNT)#</td>
+										<td align="right"></td>
+										<td align="right">#DecimalFormat(VATAmount)#</td>
+										<td align="right"></td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th align="center">#lineCount#</th>
+									<th colspan="2">TOTALS</th>
+									<th align="center">#NumberFormat(totQty,",")#</th>
+									<th align="right">#DecimalFormat(totNet)#</th>
+									<th></th>
+									<th align="right">#DecimalFormat(totVAT)#</th>
+									<th width="60"></th>
+								</tr>
+							</table>
+<!---
 									<cfif nomGroup gte "C" AND nomFlag eq 0>
 										<tr>
 											<th align="center">#lineCount#</th>
@@ -345,16 +492,15 @@
 										<tr>
 											<td class="nomHeader" colspan="8"><h1>Nominal</h1></td>
 										</tr>
-										<cfset summary.box4.value += totVAT>
-										<cfset summary.box7.value += totNet>	
+										<!---<cfset summary.box4.value += totVAT>
+										<cfset summary.box7.value += totNet>	--->
 													
 										<cfset lineCount = 0>
 										<cfset totNet = 0>
 										<cfset totVAT = 0>
 										<cfset totQty = 0>
 										<cfset nomFlag++>
-									</cfif>
-									<cfif nomCode neq "VAT">
+									<cfelseif nomCode neq "VAT">
 										<cfset totNet += AMOUNT>
 										<cfset totQty += NUM>
 										<cfset totVAT += VATAmount>
@@ -392,8 +538,9 @@
 								</tr>
 							</table>
 							<cfset summary.box4.value += totVAT>
-							<cfset summary.box5.value = summary.box1.value - summary.box4.value>
 							<cfset summary.box7.value += totNet>				
+--->
+							<cfset summary.box5.value = summary.box1.value - summary.box4.value>
 							<table class="vatTable" border="1">
 								<tr>
 									<td class="vatHeader" colspan="2"><h1>VAT Summary</h1></td>

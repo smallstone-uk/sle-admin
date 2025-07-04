@@ -6,10 +6,20 @@
 <cfset parm.url = application.site.normal>
 <cfset parm.form = form>
 <cfset transactions = acc.LoadNominalTransactions(parm)>
-	<style type="text/css">
-		.shaded { background-color:#ddd; border:#ff0000;}
-		.normal { background-color:#fff; border:#ccc;}
-	</style>
+<style type="text/css">
+	.shaded { background-color:#ddd; border:#ff0000;}
+	.normal { background-color:#fff; border:#ccc;}
+	@media print {
+		.noPrint {display:none;}
+		.tableList {font-size:14px; white-space: nowrap;}
+		.description {width:300px;}
+		body {
+			font-family: serif;
+			color: black;
+			background-color: white;
+		}
+	}
+</style>
 
 <cfoutput>
 	<script>
@@ -60,24 +70,34 @@
 		});
 	</script>
 	<cfif !ArrayIsEmpty(transactions.tranList)>
-		<input value="Export" type="button" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">
-		<table id="tranTable" class="tableList" border="1" width="100%">
+		<input value="Export" type="button" class="noPrint" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">
+		<table id="tranTable" class="tableList" border="1">
 			<tr>
-				<th width="10"></th>
-				<th width="100">ID</th>
-				<th width="100">Date</th>
-				<th width="100">Type</th>
-				<th width="100">Paid In</th>
-				<th width="160">Ref</th>
-				<th>Description</th>
-				<th width="100" align="right">DR</th>
-				<th width="100" align="right">CR</th>
-				<th width="100" align="right">Balance</th>
+				<th class="noPrint"></th>
+				<th class="noPrint"></th>
+				<th>#transactions.nomAccount.nomCode#</th>
+				<th class="noPrint"></th>
+				<th colspan="5">#transactions.nomAccount.nomTitle#</th>
+			</tr>
+			<tr>
+				<th width="10" class="noPrint"></th>
+				<th width="90" class="noPrint">ID</th>
+				<th width="90">Date</th>
+				<th width="60" class="noPrint">Type</th>
+				<th width="100">Ref</th>
+				<th width="400" class="description">Description</th>
+				<th width="80" align="right">DR</th>
+				<th width="80" align="right">CR</th>
+				<th width="80" align="right">Balance</th>
 			</tr>
 			<cfset balance=transactions.bfwd>
 			<cfif balance NEQ 0>
 				<tr>
-					<td colspan="9" align="right"><strong>Brought Forward</strong>&nbsp;</td>
+					<td class="noPrint"></td>
+					<td class="noPrint"></td>
+					<td></td>
+					<td class="noPrint"></td>
+					<td colspan="4" align="right"><strong>Brought Forward</strong>&nbsp;</td>
 					<td align="right"><strong>#DecimalFormat(balance)#</strong></td>
 				</tr>
 			</cfif>
@@ -101,7 +121,7 @@
 				<cfset lastDate = item.trnDate>
 
 				<tr class="#rowStyle#">
-					<td width="10" align="center">
+					<td width="10" align="center" class="noPrint">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>
 						<cfelseif accID IS 0>
@@ -110,7 +130,7 @@
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>
 						</cfif>
 					</td>
-					<td align="center">
+					<td align="center" class="noPrint">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="nomTranList_editLink">#item.trnID#</a>
 						<cfelseif accID IS 0>
@@ -126,10 +146,9 @@
 						</cfif>
 					</td>
 					<td align="center">#LSDateFormat(item.trnDate, "dd/mm/yyyy")#</td>
-					<td align="center">#item.trnType# &nbsp; #item.trnMethod#</td>
-					<td>#item.trnPaidIn#</td>
+					<td align="center" class="noPrint">#item.trnType# &nbsp; #item.trnMethod#</td>
 					<td>#item.trnRef# <cfif item.trnClientRef GT 0>#item.trnClientRef#</cfif></td>
-					<td>#item.trnDesc#</td>
+					<td>#ReReplace(item.trnDesc,"\d+","")#</td>
 					<cfif item.niAmount GT 0>
 						<cfset drTotal += item.niAmount>
 						<td align="right">#item.niAmount#</td>
@@ -144,9 +163,14 @@
 				</tr>
 			</cfloop>
 			<tr>
-				<td colspan="7">#tranCount#</td>
+				<td class="noPrint"></td>
+				<td class="noPrint"></td>
+				<td></td>
+				<td class="noPrint"></td>
+				<td colspan="2">#tranCount# transactions</td>
 				<td align="right">#DecimalFormat(drTotal)#</td>
 				<td align="right">#DecimalFormat(crTotal)#</td>
+				<td></td>
 			</tr>
 		</table>
 	<cfelse>
@@ -159,7 +183,7 @@
 		</table>
 	</cfif>
 	<div style="padding:5px 0;"></div>
-	<button class="NT_New">New Transaction</button>
+	<button class="NT_New noPrint">New Transaction</button>
 </cfoutput>
 
 <cfcatch type="any">

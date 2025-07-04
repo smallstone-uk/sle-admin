@@ -23,6 +23,11 @@
 		.amountTotal {text-align:right; font-weight:bold;}
 	@media print {
 		.noPrint {display:none;}
+		body {
+			font-family: serif;
+			color: black;
+			background-color: white;
+		}
 	}
 	</style>
 </head>

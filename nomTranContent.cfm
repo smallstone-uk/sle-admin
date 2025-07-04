@@ -26,7 +26,7 @@
 				
 			});
 		</script>
-		<div class="module">
+		<div class="module noPrint">
 			<h1>Nominal Transactions</h1>
 			<form method="post" enctype="multipart/form-data" id="NomTranSrchForm">		
 				Account

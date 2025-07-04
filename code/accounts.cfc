@@ -173,7 +173,7 @@
 		<cfset loc.result.args=args>
 		<cfset loc.result.trans=loc.trans>
 		<cfquery name="loc.broughtforward" datasource="#args.datasource#" result="loc.result.bfwdResult">
-			SELECT SUM(niAmount) AS bfwdTotal
+			SELECT SUM(niAmount) AS bfwdTotal, nomCode, nomTitle
 			FROM tblTrans, tblNominal, tblNomItems
 			WHERE niTranID = trnID
 			AND niNomID = nomID
@@ -182,6 +182,7 @@
 			GROUP BY nomID
 		</cfquery>
 		<cfset loc.result.bfwd=val(loc.broughtforward.bfwdTotal)>
+		<cfset loc.result.nomAccount = {"nomCode" = "#loc.broughtforward.nomCode#", "nomTitle" = "#loc.broughtforward.nomTitle#"}>
 		<cfquery name="loc.sorted" dbtype="query">
 			SELECT *
 			FROM loc.trans
@@ -2830,7 +2831,7 @@
 					<cfset result.tickList=ListAppend(result.tickList,StructFind(args.form,"tick#i#"),",")>
 				</cfif>
 			</cfloop>
-			<cfif args.form.trnMethod eq "chqx">
+			<cfif args.form.trnMethod eq "chqx">		<!--- bounced cheque --->
 				<cfset loc.amnt1 = val(args.form.trnAmnt1)>
 				<cfset loc.amnt2 = val(args.form.trnAmnt2)>
 			<cfelse>

@@ -20,7 +20,7 @@
 			}
 		}
 	</style>
-
+<cfdump var="#transactions#" label="transactions" expand="false">
 <cfoutput>
 	<script>
 		$(document).ready(function(e) {

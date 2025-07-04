@@ -1,25 +1,25 @@
 <cftry>
-<cfsetting showdebugoutput="no">
-<cfobject component="code/accounts" name="acc">
-<cfset parm = {}>
-<cfset parm.datasource = application.site.datasource1>
-<cfset parm.url = application.site.normal>
-<cfset parm.form = form>
-<cfset transactions = acc.LoadNominalTransactions(parm)>
-<style type="text/css">
-	.shaded { background-color:#ddd; border:#ff0000;}
-	.normal { background-color:#fff; border:#ccc;}
-	@media print {
-		.noPrint {display:none;}
-		.tableList {font-size:14px; white-space: nowrap;}
-		.description {width:300px;}
-		body {
-			font-family: serif;
-			color: black;
-			background-color: white;
+	<cfsetting showdebugoutput="no">
+	<cfobject component="code/accounts" name="acc">
+	<cfset parm = {}>
+	<cfset parm.datasource = application.site.datasource1>
+	<cfset parm.url = application.site.normal>
+	<cfset parm.form = form>
+	<cfset transactions = acc.LoadNominalTransactions(parm)>
+	<style type="text/css">
+		.shaded { background-color:#ddd; border:#ff0000;}
+		.normal { background-color:#fff; border:#ccc;}
+		@media print {
+			.noPrint {display:none;}
+			.tableList {font-size:14px; white-space: nowrap;}
+			.description {width:300px;}
+			body {
+				font-family: serif;
+				color: black;
+				background-color: white;
+			}
 		}
-	}
-</style>
+	</style>
 
 <cfoutput>
 	<script>

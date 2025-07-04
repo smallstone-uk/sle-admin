@@ -172,8 +172,8 @@
 		<cfset loc.filter="AND trnDate < '#loc.startdate#'">
 		<cfset loc.result.args=args>
 		<cfset loc.result.trans=loc.trans>
-		<cfquery name="loc.broughtforward" datasource="#args.datasource#" result="loc.result.bfwdResult">
-			SELECT SUM(niAmount) AS bfwdTotal, nomCode, nomTitle
+		<cfquery name="loc.broughtforward" datasource="#args.datasource#">
+			SELECT SUM(niAmount) AS bfwdTotal
 			FROM tblTrans, tblNominal, tblNomItems
 			WHERE niTranID = trnID
 			AND niNomID = nomID
@@ -182,7 +182,12 @@
 			GROUP BY nomID
 		</cfquery>
 		<cfset loc.result.bfwd=val(loc.broughtforward.bfwdTotal)>
-		<cfset loc.result.nomAccount = {"nomCode" = "#loc.broughtforward.nomCode#", "nomTitle" = "#loc.broughtforward.nomTitle#"}>
+		<cfquery name="loc.nomTitles" datasource="#args.datasource#">
+			SELECT nomCode, nomTitle
+			FROM tblNominal
+			WHERE nomID = #val(args.form.nominal_account)#
+		</cfquery>
+		<cfset loc.result.nomAccount = {"nomCode" = "#loc.nomTitles.nomCode#", "nomTitle" = "#loc.nomTitles.nomTitle#"}>
 		<cfquery name="loc.sorted" dbtype="query">
 			SELECT *
 			FROM loc.trans

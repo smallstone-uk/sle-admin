@@ -143,7 +143,7 @@
 						<input type="checkbox" name="checkNotIDs" id="checkNotIDs" tabindex="-1" title="De-select only those trans that have not already been assigned an allocation ID." />
 						<br>Alloc ID
 					</th>
-					<th width="50"><span title="This is the currently stored Allocation ID.">Alloc ID</span></th>
+					<th><span title="This is the currently stored Allocation ID.">Alloc ID</span></th>
 					<th width="50">Paid In</th>
 				</tr>
 				<cfif trans.bfwd neq 0>
@@ -204,7 +204,9 @@
 			<tr>
 				<td colspan="8">#trans.tranCount# Transactions.</td>
 				<td><input name="total" id="total" type="text" size="6" value="0.00" tabindex="-1" /></td>
-				<td colspan="4"><button id="SaveAllocBtn">Save Allocation</button></td>
+				<td colspan="2"></td>
+				<td><button id="SaveAllocBtn">Save Allocation</button></td>
+				<td></td>
 			</tr>
 			</table>	
 			<input type="hidden" size="4" name="clientIndex" id="clientIndex" value="#allocCount#" />

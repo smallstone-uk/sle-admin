@@ -211,6 +211,7 @@
 			</table>	
 			<input type="hidden" size="4" name="clientIndex" id="clientIndex" value="#allocCount#" />
 			<input type="hidden" size="4" name="maxTrans" id="maxTrans" value="#trans.tranCount#" />
+			<input type="text" size="4" name="bfwd" id="bfwd" value="#trans.bfwd#" />
 		</form>
 	</cfif>
 	<div id="resultContainer"></div>

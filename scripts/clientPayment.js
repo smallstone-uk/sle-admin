@@ -16,7 +16,7 @@ function checkTotal() {
 		}
 	});
 //	balance = balance / 100;
-//	balance = balance.toFixed(2);
+	balance = balance.toFixed(2);
 	$('#total').val(balance);
 	//console.log(' balance: ' + balance);
 	if (balance == 0.00)	{

@@ -109,6 +109,7 @@
 			<cfset totalValue=0>
 			<cfset category="">
 			<cfset noBarcodeCount = 0>
+			<cfset barcodeArray = []>
 			<cfloop array="#records.basket#" index="rec">
 <!---					<tr>
 						<td colspan="16" style="background-color:##eeeeee"><cfdump var="#rec#" expand="false"></td>
@@ -139,6 +140,7 @@
 					<td>
 						<cfif StructKeyExists(recResult,"barcode")>
 							<a href="https://www.booker.co.uk/products/product-list?keywords=#recResult.barcode#" target="booker">#recResult.barcode#</a>
+							<cfset ArrayAppend(barcodeArray,recResult.barcode)>
 						<cfelse><span class="noBarcode">NO BARCODE</span><cfset noBarcodeCount ++></cfif>
 					</td>
 					<td><a href="productStock6.cfm?product=#recResult.productID#" target="product">#rec.code#</a></td>
@@ -170,6 +172,11 @@
 				</tr>
 			</cfif>
 		</table>
+		Barcodes used:-<br />
+		<!--- 03/27/00,16:51:43,0B,9322214006328 --->
+		<cfloop array="#barcodeArray#" index="bcode">
+		#DateFormat(now(),"mm/dd/yy")#,#TimeFormat(now(),"HH:MM:SS")#,OB,#bcode#<br />
+		</cfloop>
 	</cfoutput>
 
     <cfcatch type="any">

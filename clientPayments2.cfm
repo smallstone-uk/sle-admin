@@ -65,6 +65,16 @@
 		#feedback {border:solid 1px #999999; height:20px; width:450px; float:left;}
 		#feedback2 {border:solid 1px #999999; height:20px; width:450px; float:left;}
 	</style>
+</head>
+<cfparam name="rec" default="">
+<cfif rec neq "">
+	<script>
+		$(document).ready(function() {
+			LoadData();
+		});
+	</script>
+</cfif>
+
 <cfoutput>
 <body>
 	<div id="wrapper">
@@ -88,7 +98,7 @@
 								<tr>
 									<td width="160">Customer Reference</td>
 									<td>
-										<input type="text" name="clientRef" id="clientRef" class="inputfield" size="6" maxlength="4" onBlur="LoadData()" />
+										<input type="text" name="clientRef" id="clientRef" class="inputfield" size="6" maxlength="4" value="#rec#" onBlur="LoadData()" />
 									</td>
 									<td>
 										<input type="checkbox" name="allTrans" id="allTrans" value="1" onClick="LoadData()" /> &nbsp; All transactions from: 

@@ -296,9 +296,9 @@
 											<cfset dayAvg = item.diff>
 										</cfif>
 										<tr>
-											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view statement">#item.ref#</a></td>
+											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view Client Details">#item.ref#</a></td>
 											<td><a href="clientPayments2.cfm?rec=#item.ref#" target="#item.ref#3" title="New Client Payments">#item.ref#</a></td>
-											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view statement">#item.name#</a></td>
+											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view Client Payments">#item.name#</a></td>
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
 											<td align="center">#item.cltPayType#</td>

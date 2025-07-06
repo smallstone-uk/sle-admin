@@ -194,8 +194,8 @@ input[type="button"]:disabled {opacity: 0.5;cursor: default;}
 .form-wrap .form-bar {background: #E7E7E7;padding: 10px;margin: -10px -10px 10px -10px;border-bottom: 1px solid #DDD;}
 .form-wrap .form-box {border: 1px solid #ddd;padding: 10px;border-radius: 5px;margin: 0 0 10px 0;}
 
-.form-wrap .form-col1 {float:left;width:49%;margin-bottom:20px;}
-.form-wrap .form-col2 {float:right;width:49%;margin-bottom:20px;}
+.form-wrap .form-col1 {float:left;width:59%;margin-bottom:20px;}
+.form-wrap .form-col2 {float:right;width:39%;margin-bottom:20px;}
 .form-wrap input[type=text], .form-wrap input[type=number], .form-wrap select {padding: 4px;border: 1px solid #B6B6B6;border-radius: 3px;color: #222;font-size: 12px;margin:0;}
 .form-footer {background: #F0F0F0;margin: 20px -20px -20px -20px;padding: 10px;border-top: 1px solid #ddd;border-radius: 0 0 4px 4px;}
 .form-footer img {width: 14px;float: left;}
@@ -210,7 +210,7 @@ input[type="button"]:disabled {opacity: 0.5;cursor: default;}
     background: -linear-gradient(top, #FAFAFA 00%, #EEE 100%);
 }
 #customer-search .client td {border-bottom: 1px solid #ccc;}
-
+/*
 #clientResult {border: 1px solid #ddd;border-radius: 5px;padding: 5px;}
 #clientResult th {background: #eee;border-bottom: 1px solid #CCC;padding: 4px 0;text-align: center;}
 #clientResult td {border-bottom: 1px solid #CCC;padding: 2px 0;text-align: center;}
@@ -223,7 +223,7 @@ background: -ms-linear-gradient(top, #FAFAFA 00%, #EEE 100%);
 background: -linear-gradient(top, #FAFAFA 00%, #EEE 100%);
 }
 #clientResult .check-header span {font-size: 14px;padding:0 10px 0 0;}
-
+*/
 .quick-bar {position: fixed;left: 0;right: 0;bottom: 0;background: rgba(0, 0, 0, 0.85);height: 40px;border-top: 1px solid #000;}
 .quick-bar-inner {width: 1000px;margin: 0 auto;}
 .quick-bar-detail {display:none;position:absolute;bottom:41px;font-size:11px;background:#eee;color:#000;border-radius:4px 4px 0 0;border:1px solid #0A161A;border-width:1px 1px 0 1px;padding:10px;}
@@ -540,4 +540,7 @@ input.selectitem, input.selectAllOnList {
     background-size: 16px;
     background-position: center;
     background-repeat: no-repeat;
+}
+.centre {
+	text-align:center;
 }

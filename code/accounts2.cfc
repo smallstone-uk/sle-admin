@@ -155,6 +155,7 @@
 					<cfelse>
 						AND trnAlloc = 0
 					</cfif>
+					AND trnAllocID != 0
 					ORDER BY trnAllocID, trnDate ASC, trnID	<!--- show all payments before invoices on same date --->
 					<!---LIMIT 100;--->
 				</cfquery>

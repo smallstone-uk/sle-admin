@@ -96,7 +96,8 @@
 			</cfif>
 			<cfloop query="trans.QTrans">
 				<cfset balance = balance + trnAmnt1 + trnAmnt2>
-				<cfset tipple = ReReplace(trnDesc,"\d+","","all")>
+				<!---<cfset tipple = ReReplace(trnDesc,"\d+","","all")>--->
+				<cfset tipple = ReReplace(trnDesc,"\d{7,}","","all")>
 				<tr>
 					<td>#trnRef#</td>
 					<td>#tipple#</td>

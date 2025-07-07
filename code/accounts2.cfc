@@ -111,6 +111,63 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="LoadAllocatedTrans" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.args = args>
+		<cfset loc.result.bfwd = 0>
+		<cfset loc.clientRef = val(args.form.clientRef)>
+		<cfset loc.allTrans = int(StructKeyExists(args.form,"allTrans"))>
+		<cftry>
+			<cfif loc.clientRef eq 0>
+				<cfset loc.result.msg = "customer reference not found. (#loc.clientRef#)">
+			<cfelse>
+				<cfif loc.allTrans>
+					<!--- Get bfwd balance --->
+					<cfquery name="loc.QBfwd" datasource="#args.datasource1#"> 
+						SELECT SUM(trnAmnt1 + trnAmnt2) AS total
+						FROM tblTrans
+						WHERE trnClientRef = #loc.clientRef#
+						AND trnDate < '#args.form.srchDateFrom#'
+					</cfquery>
+					<cfset loc.result.bfwd = val(loc.QBfwd.total)>				
+				</cfif>
+				<!--- Get last allocID --->
+				<cfquery name="loc.QClient" datasource="#args.datasource1#">
+					SELECT cltID,cltRef,cltAllocID
+					FROM tblClients
+					WHERE cltRef = #loc.clientRef#
+					LIMIT 1;
+				</cfquery>	
+				<cfset loc.result.cltID = val(loc.QClient.cltID)>				
+				<cfset loc.result.cltRef = val(loc.QClient.cltRef)>				
+				<cfset loc.result.cltAllocID = val(loc.QClient.cltAllocID) + 1>				
+				<!--- Get transaction records --->
+				<cfquery name="loc.result.QTrans" datasource="#args.datasource1#"> 
+					SELECT *
+					FROM tblTrans
+					WHERE trnClientRef = #loc.clientRef#
+					<cfif loc.allTrans>
+						<cfif len(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+						<cfif len(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+					<cfelse>
+						AND trnAlloc = 0
+					</cfif>
+					ORDER BY trnAllocID, trnDate ASC, trnID	<!--- show all payments before invoices on same date --->
+					<!---LIMIT 100;--->
+				</cfquery>
+				<cfset loc.result.tranCount = loc.result.QTrans.recordcount>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="SavePayment" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>

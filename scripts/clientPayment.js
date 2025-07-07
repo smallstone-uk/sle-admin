@@ -172,6 +172,35 @@ $(document).ready(function() {
 		}, 100);
 	});
 
+	$('#viewAllocButton').on('click', function (e) {
+	//	console.log(isSubmitting);
+		if (isSubmitting) return; // prevent double submission - didn't work
+		isSubmitting = true;
+		e.preventDefault();
+		e.stopImmediatePropagation();	// stop multiple pages appearing - solved the problem
+			
+		const $form = $('#srchForm');
+		const originalTarget = $form.attr('target');
+		const originalAction = $form.attr('action');
+		const originalEnctype = $form.attr('enctype');
+		
+		// Temporarily set attributes
+		$form.attr({
+			action: 'clientAllocCheck.cfm', // ✅ Replace with actual endpoint
+			target: '_blank',
+			enctype: 'multipart/form-data'
+		});
+		
+		$form[0].submit();
+		// Restore original attributes after a short delay
+		setTimeout(function () {
+			$form.attr('target', originalTarget);
+			$form.attr('action', originalAction);
+			$form.attr('enctype', originalEnctype);
+			isSubmitting = false;
+		}, 100);
+	});
+
  	$('#btnCancel').on('click', function(e) {	<!--- hide payment panel --->
 		$('#payPanel').slideUp(300);
 		e.preventDefault();

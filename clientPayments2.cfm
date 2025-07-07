@@ -111,6 +111,7 @@
 									</td>
 									<td><button type="button" id="addPaymentButton">Add Payment</button></td>
 									<td><button type="button" id="viewStatementButton">View Statement</button></td>
+									<td><button type="button" id="viewAllocButton">View Allocation</button></td>
 								</tr>
 							</table>
 						</form>

@@ -3,7 +3,8 @@
 var busy = false;
 
 function checkTotal() {
-	var balance = Number($('#bfwd').val());
+//	var balance = Number($('#bfwd').val());
+	var balance = 0;
 	var tranAmount = 0;
 	//console.log(' balance: ' + balance);
 	// total transaction values if checked

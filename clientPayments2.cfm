@@ -119,7 +119,7 @@
 					</div> 
 					<div id="clientResult" class="module"></div>
 					<div id="payPanel"><cfinclude template="clientPaymentPanel.cfm"><div class="clear"></div></div>
-					<div id="payResult" class="module">payResult</div>
+					<div id="payResult" class="module"></div>
 					<div id="tranResult" class="module"></div>
 					<!---<div id="lettersload" class="module">lettersload</div>--->
 				</div>

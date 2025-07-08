@@ -225,6 +225,7 @@ $(document).ready(function() {
 			$('#loadingDiv').html("Busy...")
 			return false;
 		}
+		var autoReload = true;
 		$(this).prop('disabled', true);
 		$('#feedback').html("Saving Payment...")
 		if (checkPayForm()) {
@@ -243,7 +244,19 @@ $(document).ready(function() {
 					$('#clientRef').val(clientRef);
 					$('#clientRef').focus();
 					$('#payResult').html(data);
-				},
+					if (autoReload) {
+						setTimeout(function() {	// wait for DB to catch up
+							$.ajax({
+								type: 'POST',
+								url: 'clientLoadTrans.cfm',
+								data: $("#srchForm").serialize(),
+								success: function(result) {
+									$('#tranResult').html(result);
+									$('#loadingDiv').html("").fadeOut();
+								}
+							});
+						}, 500);
+					}				},
 				error:function(data){
 					$('#loadingDiv').html(data).fadeIn();
 				},

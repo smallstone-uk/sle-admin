@@ -113,6 +113,7 @@
 <style type="text/css">
 	#SaveAllocBtn {display:none;}
 	#total {text-align:right; font-weight:bold; font-size:14px; margin:4px;}
+	.tinynum {font-size:10px}
 </style>
 
 <cfoutput>
@@ -124,7 +125,8 @@
 		<cfset balance = trans.bfwd>
 		<cfset totalDebit = 0>
 		<cfset totalCredit = 0>
-	
+		<cfset rowCount = 0>
+		
 		<form id="AllocForm">
 			<input type="hidden" name="clientID" id="clientID" value="#trans.cltID#" />
 			<input type="hidden" name="clientRef" id="clientRef" value="#trans.cltRef#" />
@@ -137,6 +139,7 @@
 					<th width="120">Date</th>
 					<th width="60">Type</th>
 					<th width="60">Method</th>
+					<th width="50">Paid In</th>
 					<th width="80" align="right">Debits<br />(invoices)</th>
 					<th width="80" align="right">Credits<br />(payments)</th>
 					<th width="80" align="right">Balance</th>
@@ -146,26 +149,27 @@
 						<input type="checkbox" name="checkNotIDs" id="checkNotIDs" tabindex="-1" title="De-select only those trans that have not already been assigned an allocation ID." />
 						<br>Alloc ID
 					</th>
-					<th><span title="This is the currently stored Allocation ID.">Alloc ID</span></th>
-					<th width="50">Paid In</th>
+					<th><span title="This is the currently stored Allocation ID.">Saved<br />Alloc</span></th>
 				</tr>
 				<cfif trans.bfwd neq 0>
 					<tr>
 						<td colspan="3" height="30"></td>
-						<td colspan="5" align="right"><strong>Brought Forward from #DateFormat(trans.args.form.srchDateFrom,'dd-mmm-yyyy')#</strong></td>
+						<td colspan="6" align="right"><strong>Brought Forward from #DateFormat(trans.args.form.srchDateFrom,'dd-mmm-yyyy')#</strong></td>
 						<td align="right"><strong>#DecimalFormat(trans.bfwd)#</strong></td>
 						<td>&nbsp;</td>
 						<td align="center"><input type="checkbox" name="includeBfwd" id="includeBfwd" tabindex="-1" title="Include this balance when allocating." /></td>
 					</tr>
 				</cfif>
 				<cfloop query="trans.QTrans">
+					<cfset rowCount++>
 					<tr>
 						<td>#trnID#</td>
 						<td>#trnRef#</td>
-						<td>#trnDesc#</td>
+						<td><span class="tinynum">#rowCount# - </span>#trnDesc#</td>
 						<td>#DateFormat(trnDate,"dd-mmm-yyyy")#</td>
 						<td>#acc.trantype(trnType)#</td>
 						<td class="centre"><cfif trnMethod eq "sv">VOUCHERS<cfelse>#trnMethod#</cfif></td>
+						<td class="centre">#trnPaidin#</td>
 						<cfset gross = trnAmnt1 + trnAmnt2>
 						<cfset balance += gross>
 						<cfif gross gt 0>
@@ -194,27 +198,25 @@
 							<input type="checkbox" name="tick#rowNo#" id="tick#rowNo#" class="trans" tabindex="-1" value="#trnID#"<cfif trnAlloc> checked="checked"</cfif> />
 						</td>
 						<td class="centre">
-							#allocID#
 							<input type="hidden" name="trnID#rowNo#" class="IDs" value="#trnID#" />
 							<input type="hidden" name="amnt#rowNo#" id="amnt#rowNo#" class="amounts" value="#trnAmnt1#" />
 							<input type="checkbox" name="alloc#rowNo#" id="alloc#rowNo#" class="allocs" tabindex="-1" value="#trnID#,#allocID#"
 								data-allocid="#trnAllocID#" data-id="#trnID#" data-row="#rowNo#" data-amount="#trnAmnt1#" data-assigned="#allocID#"<cfif allocID> checked="checked"</cfif> />
+							#allocID#
 						</td>
 						<td class="centre">#trnAllocID#</td>
-						<td class="centre">#trnPaidin#</td>
 					</tr>
 				</cfloop>
 			<tr>
-				<td colspan="8">#trans.tranCount# Transactions.</td>
-				<td><input name="total" id="total" type="text" size="6" value="0.00" tabindex="-1" /></td>
+				<td colspan="9">#trans.tranCount# Transactions.</td>
+				<td><input name="total" id="total" type="text" size="6" value="0.00" tabindex="-1" disabled="disabled" /></td>
 				<td colspan="2"></td>
 				<td><button id="SaveAllocBtn">Save Allocation</button></td>
-				<td></td>
 			</tr>
 			</table>	
 			<input type="hidden" size="4" name="clientIndex" id="clientIndex" value="#allocCount#" />
 			<input type="hidden" size="4" name="maxTrans" id="maxTrans" value="#trans.tranCount#" />
-			<input type="text" size="4" name="bfwd" id="bfwd" value="#trans.bfwd#" />
+			<input type="hidden" size="4" name="bfwd" id="bfwd" value="#trans.bfwd#" />
 		</form>
 	</cfif>
 	<div id="resultContainer"></div>

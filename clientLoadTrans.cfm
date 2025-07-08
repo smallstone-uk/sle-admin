@@ -97,6 +97,9 @@
 				});				
 			}
 		});
+		$('#includeBfwd').click(function() {	// 
+			checkTotal();
+		});
 		$('#checkAll').click(function() {	// toggle all new tick boxes
 			if ($('#checkAll').prop('checked')) {
 				$('.allocs').prop('checked', true);
@@ -152,7 +155,7 @@
 						<td colspan="5" align="right"><strong>Brought Forward from #DateFormat(trans.args.form.srchDateFrom,'dd-mmm-yyyy')#</strong></td>
 						<td align="right"><strong>#DecimalFormat(trans.bfwd)#</strong></td>
 						<td>&nbsp;</td>
-						<td>&nbsp;</td>
+						<td align="center"><input type="checkbox" name="includeBfwd" id="includeBfwd" tabindex="-1" title="Include this balance when allocating." /></td>
 					</tr>
 				</cfif>
 				<cfloop query="trans.QTrans">

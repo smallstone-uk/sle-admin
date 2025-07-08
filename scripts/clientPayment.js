@@ -6,20 +6,24 @@ function checkTotal() {
 //	var balance = Number($('#bfwd').val());
 	var balance = 0;
 	var tranAmount = 0;
-	console.log(' balance: ' + balance);
+	var includeBfwd = $('#includeBfwd').is(':checked')
+	if (includeBfwd) {
+		balance = Number($('#bfwd').val());
+	}
+	//console.log(' balance: ' + balance);
 	// total transaction values if checked
 	$('.allocs').each(function(index) {
 		if ($(this).is(':checked')) {
 			tranAmount = Number($(this).data('amount'));
 		//	balance = balance + Math.round(tranAmount * 100);
 			balance = balance + tranAmount;
-			console.log(' tranAmount:', tranAmount + ' balance: ' + balance);
+		//	console.log(' tranAmount:', tranAmount + ' balance: ' + balance);
 		}
 	});
 //	balance = balance / 100;
 	balance = balance.toFixed(2);
 	$('#total').val(balance);
-	console.log(' balance: ' + balance);
+//	console.log(' balance: ' + balance);
 	if (balance == 0.00)	{
 		$('#SaveAllocBtn').show();
 	} else {

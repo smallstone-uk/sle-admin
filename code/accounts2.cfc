@@ -74,6 +74,7 @@
 						FROM tblTrans
 						WHERE trnClientRef = #loc.clientRef#
 						AND trnDate < '#args.form.srchDateFrom#'
+						AND trnAllocID = 0	<!--- ignore allocated trans --->
 					</cfquery>
 					<cfset loc.result.bfwd = val(loc.QBfwd.total)>				
 				</cfif>
@@ -88,7 +89,7 @@
 				<cfset loc.result.cltRef = val(loc.QClient.cltRef)>				
 				<cfset loc.result.cltAllocID = val(loc.QClient.cltAllocID) + 1>				
 				<!--- Get transaction records --->
-				<cfquery name="loc.result.QTrans" datasource="#args.datasource1#"> 
+				<cfquery name="loc.result.QTrans" datasource="#args.datasource1#" result="loc.result.QTransResult"> 
 					SELECT *
 					FROM tblTrans
 					WHERE trnClientRef = #loc.clientRef#
@@ -96,7 +97,7 @@
 						<cfif len(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 						<cfif len(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 					<cfelse>
-						AND trnAlloc = 0
+						AND (trnAlloc = 0 OR trnAllocID =0 )	<!--- either old or new system --->
 					</cfif>
 					ORDER BY trnDate, trnType DESC, trnID	<!--- show all payments before invoices on same date --->
 					<!---LIMIT 100;--->

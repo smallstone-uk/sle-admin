@@ -132,6 +132,7 @@
 						FROM tblTrans
 						WHERE trnClientRef = #loc.clientRef#
 						AND trnDate < '#args.form.srchDateFrom#'
+						AND trnAllocID = 0	<!--- ignore allocated trans --->
 					</cfquery>
 					<cfset loc.result.bfwd = val(loc.QBfwd.total)>				
 				</cfif>
@@ -150,12 +151,12 @@
 					SELECT *
 					FROM tblTrans
 					WHERE trnClientRef = #loc.clientRef#
-					<cfif loc.allTrans>
+					<!---<cfif loc.allTrans>--->
 						<cfif len(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 						<cfif len(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
-					<cfelse>
-						AND trnAlloc = 0
-					</cfif>
+					<!---<cfelse>--->
+						<!---AND trnAlloc = 0--->
+					<!---</cfif>--->
 					AND trnAllocID != 0
 					ORDER BY trnAllocID, trnDate ASC, trnID	<!--- show all payments before invoices on same date --->
 					<!---LIMIT 100;--->

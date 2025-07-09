@@ -39,38 +39,6 @@
 	</style>
 	
 	<body>
-		<cfinclude template="busHeader.cfm">
-		<cfloop query="customer.QClient">
-			<div style="float:left;width:310px;margin:20px 0 40px 50px;">
-				<cfset ln=0>
-				<table border="0" cellspacing="0" cellpadding="2" style="font-size:16px;">
-					<cfif len(cltName)>
-						<cfset ln++>
-						<tr>
-							<td valign="top">
-								<cfif len(cltTitle)>#cltTitle#</cfif>
-								<cfif len(cltInitial)>#cltInitial#</cfif>
-								#cltName#
-							</td>
-						</tr>
-					</cfif>
-					<cfif len(cltDept)><cfset ln++><tr><td valign="top">#cltDept#</td></tr></cfif>
-					<cfif len(cltCompanyName)><cfset ln++><tr><td valign="top">#cltCompanyName#</td></tr></cfif>
-					<cfif len(cltAddr1)><cfset ln++><tr><td valign="top">#cltAddr1#</td></tr></cfif>
-					<cfif len(cltAddr2)><cfset ln++><tr><td valign="top">#cltAddr2#</td></tr></cfif>
-					<cfif len(cltTown)><cfset ln++><tr><td valign="top">#cltTown#</td></tr></cfif>
-					<cfif len(cltPostcode)><cfset ln++><tr><td valign="top">#cltPostcode#</td></tr></cfif>
-					<cfloop from="#ln+1#" to="9" index="i">
-						<tr><td>&nbsp;</td></tr>
-					</cfloop>
-					<tr><td>Date: #DateFormat(Now(),"dd-mmm-yyyy")#</td></tr>
-					<tr><td>Account: #cltRef#</td></tr>
-				</table>
-			</div>
-			<div style="clear:both;"></div>
-			<div class="statementTitle">Statement</div>
-		</cfloop>
-
 		<table id="tranTable" class="tableList" border="1" style="font-size:14px; margin-left:50px;">
 			<tr class="tranTable">
 				<th width="40">Reference</th>

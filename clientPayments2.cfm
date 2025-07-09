@@ -7,7 +7,8 @@
 	<link href="css/chosen.css" rel="stylesheet" type="text/css">
 	<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
 	<script src="common/scripts/common.js"></script>
-	<script src="scripts/jquery-1.9.1.js"></script>
+	<!---<script src="scripts/jquery-1.9.1.js"></script>--->
+	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
 	<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>
 	<script src="scripts/jquery.hoverIntent.minified.js"></script>

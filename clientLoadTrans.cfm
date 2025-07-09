@@ -108,6 +108,25 @@
 			}
 			checkTotal();
 		});
+
+		$('#quicksearch').on("keyup",function() {
+			var srch=$(this).val();
+			var hidetotals = false;
+			$('.searchrow').each(function() {
+				var id=$(this).attr("data-trnID");
+				var str=$(this).attr("data-trnDesc");
+				
+				if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
+					$(this).hide();
+					hidetotals = true;
+				} else {
+					$(this).show();
+				}
+				
+			});
+			if (hidetotals) $('#pagetotals').hide()
+				else $('#pagetotals').show();
+		});
 	});
 </script>
 <style type="text/css">
@@ -132,6 +151,9 @@
 			<input type="hidden" name="clientRef" id="clientRef" value="#trans.cltRef#" />
 			<input type="hidden" name="cltAllocID" id="cltAllocID" value="#trans.cltAllocID#" />
 			<table id="tranTable" class="tableList" border="1">
+				<tr class="noPrint">
+					<th align="left" colspan="13"><input type="text" id="quicksearch" value="" placeholder="Search list" /></th>
+				</tr>
 				<tr>
 					<th width="40">ID</th>
 					<th width="40">Reference</th>
@@ -162,7 +184,7 @@
 				</cfif>
 				<cfloop query="trans.QTrans">
 					<cfset rowCount++>
-					<tr>
+					<tr class="searchrow" data-trnDesc="#trnDesc#" data-trnID="#trnID#">
 						<td>#trnID#</td>
 						<td>#trnRef#</td>
 						<td><span class="tinynum">#rowCount# - </span>#trnDesc#</td>

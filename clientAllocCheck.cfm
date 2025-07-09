@@ -95,16 +95,6 @@
 				<td class="amountTotal-box">#DecimalFormat(balance)#</td>
 				<td class="noPrint"></td>
 			</tr>
-			<tr>
-				<td height="40" colspan="8" style="padding:7px; font-size:12px">
-					Please make payment to <strong>#application.company.companyName#.</strong><br />
-					Payment can also be made online using internet banking.<br />
-					Bank: #application.company.bankname#. Sort Code: <strong>#application.company.sortcode#</strong> Account: <strong>#application.company.accountno#.</strong><br />
-					Please quote your account number <strong>"#trans.cltRef#"</strong> with your payment.<br />
-					If you have already paid this amount or believe there is an error on your account, please let us know.
-				</td>
-				<td class="noPrint"></td>
-			</tr>
 		</table>
 	</body>
 	</html>

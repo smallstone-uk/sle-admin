@@ -93,10 +93,10 @@
 					SELECT *
 					FROM tblTrans
 					WHERE trnClientRef = #loc.clientRef#
-					<cfif loc.allTrans>
+					<!---<cfif loc.allTrans>--->
 						<cfif len(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 						<cfif len(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
-					<cfelse>
+					<cfif !loc.allTrans>
 						AND (trnAlloc = 0 OR trnAllocID =0 )	<!--- either old or new system --->
 					</cfif>
 					ORDER BY trnDate, trnType DESC, trnID	<!--- show all payments before invoices on same date --->

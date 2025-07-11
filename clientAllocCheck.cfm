@@ -20,7 +20,7 @@
 	<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Statement-#trans.cltRef#-#DateFormat(Now(),"yyyy-mm")#</title>
+		<title>Allocation Check-#trans.cltRef#-#DateFormat(Now(),"yyyy-mm")#</title>
 		<link rel="stylesheet" type="text/css" href="css/invoice.css"/>
 	</head>
 	<style type="text/css">
@@ -91,7 +91,7 @@
 				<cfset allocCount = trnAllocID>
 			</cfloop>
 			<tr>
-				<td height="40" colspan="7" class="amountTotal"><cfif balance lt 0>Account in credit<cfelse>Account Balance</cfif></td>
+				<td height="40" colspan="7" class="amountTotal">Transaction Total</td>
 				<td class="amountTotal-box">#DecimalFormat(balance)#</td>
 				<td class="noPrint"></td>
 			</tr>

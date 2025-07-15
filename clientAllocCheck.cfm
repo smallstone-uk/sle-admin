@@ -41,7 +41,7 @@
 	
 	<body>
 		<div id="content">
-			<table id="tranTable" class="tableList" border="1" style="font-size:14px; margin-left:50px;">
+			<table id="tranTable" class="tableList" border="1" style="font-size:14px; margin-left:20px;">
 				<tr>
 					<th colspan="2" align="right">Account Ref: </th>
 					<th>#customer.QClient.cltRef#</th>
@@ -58,7 +58,7 @@
 					<th width="40" align="right">Debits<br />(invoices)</th>
 					<th width="40" align="right">Credits<br />(payments)</th>
 					<th width="40" align="right">Balance</th>
-					<th width="80" class="noPrint">Allocation</th>
+					<th width="80">Allocation</th>
 				</tr>
 				<cfset balance = 0>
 				<cfset totalDebit = 0>
@@ -69,7 +69,7 @@
 					<tr>
 						<td colspan="7" align="right" height="40"><span class="broughtFwd">Balance brought forward</span></td>
 						<td align="right">#DecimalFormat(trans.bfwd)#</td>
-						<th width="10" class="noPrint"></th>
+						<th width="10"></th>
 					</tr>
 				</cfif>
 				<cfloop query="trans.QTrans">
@@ -94,14 +94,14 @@
 							<td align="right" style="color:##FF0000">#DecimalFormat(trnAmnt1 + trnAmnt2)#</td>
 						</cfif>
 						<td align="right">#DecimalFormat(balance)#</td>
-						<td class="centre noPrint">#trnAllocID#</td>
+						<td class="centre">#trnAllocID#</td>
 					</tr>
 					<cfset allocCount = trnAllocID>
 				</cfloop>
 				<tr>
 					<td height="40" colspan="7" class="amountTotal">Transaction Total</td>
 					<td class="amountTotal-box">#DecimalFormat(balance)#</td>
-					<td class="noPrint"></td>
+					<td></td>
 				</tr>
 			</table>
 		</div>

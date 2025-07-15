@@ -105,10 +105,10 @@
 										<input type="checkbox" name="allTrans" id="allTrans" value="1" onClick="LoadData()" /> &nbsp; All transactions from: 
 									</td>
 									<td>
-										<input type="text" name="srchDateFrom" id="srchDateFrom" class="datepicker" size="15" value="" onChange="LoadData()" />&nbsp; To: 
+										<input type="text" name="srchDateFrom" id="srchDateFrom" class="datepicker" size="15" value="" autocomplete="off" onChange="LoadData()" />&nbsp; To: 
 									</td>
 									<td>
-										<input type="text" name="srchDateTo" id="srchDateTo" class="datepicker" size="15" value="" onChange="LoadData()" />
+										<input type="text" name="srchDateTo" id="srchDateTo" class="datepicker" size="15" value="" autocomplete="off" onChange="LoadData()" />
 									</td>
 									<td><button type="button" id="addPaymentButton">Add Payment</button></td>
 									<td><button type="button" id="viewStatementButton">View Statement</button></td>

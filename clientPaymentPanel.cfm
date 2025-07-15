@@ -63,13 +63,15 @@
 						<tr>
 							<td align="right">Net Amount</td>
 							<td>
-								<input type="text" class="inputfield" name="trnAmnt1" id="trnAmnt1" size="20" maxlength="7" onBlur="checkPayForm();" />
+								<input type="text" class="inputfield" name="trnAmnt1" id="trnAmnt1" 
+									size="20" maxlength="7" autocomplete="off" onBlur="checkPayForm();" />
 							</td>
 						</tr>
 						<tr>
 							<td align="right">Discount</td>
 							<td>
-								<input type="text" class="inputfield" name="trnAmnt2" id="trnAmnt2" size="20" maxlength="7" onBlur="checkPayForm();" />
+								<input type="text" class="inputfield" name="trnAmnt2" id="trnAmnt2" 
+									size="20" maxlength="7" autocomplete="off" onBlur="checkPayForm();" />
 							</td>
 						</tr>
 						<tr>
@@ -125,13 +127,15 @@
 						<tr>
 							<td align="right">Net Amount</td>
 							<td>
-								<input type="text" class="inputfield" name="crnAmnt1" id="crnAmnt1" value="" size="20" maxlength="20" onBlur="checkCreditForm();" />
+								<input type="text" class="inputfield" name="crnAmnt1" id="crnAmnt1"
+									size="20" maxlength="20" autocomplete="off" onBlur="checkCreditForm();" />
 							</td>
 						</tr>
 						<tr>
 							<td align="right">VAT/Discount</td>
 							<td>
-								<input type="text" class="inputfield" name="crnAmnt2" id="crnAmnt2" value="" size="20" maxlength="20" onBlur="checkCreditForm();" />
+								<input type="text" class="inputfield" name="crnAmnt2" id="crnAmnt2"
+									size="20" maxlength="20" autocomplete="off" onBlur="checkCreditForm();" />
 							</td>
 						</tr>
 					</table>

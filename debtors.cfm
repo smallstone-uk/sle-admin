@@ -18,9 +18,11 @@
 		});
 	</script>
 	<style type="text/css">
+		.header {font-size:18px; font-weight:bold; margin:10px; padding:10px;}
 		.drAmount {text-align:right; color:#000;}
 		.crAmount {text-align:right; color:#F00;}
 		.amountTotal {text-align:right; font-weight:bold;}
+		.clear {clear:both;}
 	@media print {
 		.noPrint {display:none;}
 		body {
@@ -178,16 +180,19 @@
 					
 					<cfif form.srchReport eq 1>
 						<cfset debtors=news.AgedDebtors(parms)>
-
 						<cfset totals=[0,0,0,0,0]>
 						<cfset credits=[0,0,0,0,0]>
 						<cfset debitCount=0>
 						<cfset creditCount=0>
 						<cfoutput>
+							<div class="header">
+								<span>Aged Debtors as at: #DateFormat(Now(),"dd-mmm-yyyy")#</span>
+								<div class="clear"></div>
+							</div>
 							<table border="1" class="tableList">
 								<tr>
 									<th height="24" align="right">Ref</th>
-									<th height="24" align="right">New</th>
+									<th height="24" align="right" class="noPrint">New</th>
 									<th>Name</th>
 									<th>Address</th>
 									<th>Type</th>
@@ -198,10 +203,10 @@
 									<th width="60" align="right">84 Days</th>
 									<th width="60" align="right">112+ Days</th>
 									<th width="60" align="right">Balance</th>
-									<th width="90" align="center">Avg. Lag</th>
-									<th width="90" align="left">Chased</th>
-									<th width="40" align="left">Level</th>
-									<th width="90" align="left">Alloc</th>
+									<th width="90" align="center" class="noPrint">Avg. Lag</th>
+									<th width="90" align="left" class="noPrint">Chased</th>
+									<th width="40" align="left" class="noPrint">Level</th>
+									<th width="90" align="left" class="noPrint">Alloc</th>
 								</tr>
 								<cfif parms.form.srchSort eq "cltBalance">
 									<cfloop array="#debtors.balances#" index="key">
@@ -244,7 +249,7 @@
 										</cfif>
 										<tr>
 											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view Client Details">#item.ref#</a></td>
-											<td><a href="clientPayments2.cfm?rec=#item.ref#" target="#item.ref#3" title="New Client Payments">#item.ref#</a></td>
+											<td class="noPrint"><a href="clientPayments2.cfm?rec=#item.ref#" target="#item.ref#3" title="New Client Payments">#item.ref#</a></td>
 											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view Client Payments">#item.name#</a></td>
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
@@ -255,10 +260,10 @@
 											<td class="#style#">#showNum(item.balance3)#</td>
 											<td class="#style#">#showNum(item.balance4)#</td>
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-											<td align="center">#dayAvg# days</td>
-											<td>#LSDateFormat(item.cltChaseDate)#</td>
-											<td align="center">#item.cltChase#</td>
-											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
+											<td align="center" class="noPrint">#dayAvg# days</td>
+											<td class="noPrint">#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center" class="noPrint">#item.cltChase#</td>
+											<td align="center" class="noPrint"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>
 								<cfelse>
@@ -297,7 +302,7 @@
 										</cfif>
 										<tr>
 											<td><a href="clientDetails.cfm?ref=#item.ref#" target="#item.ref#1" title="view Client Details">#item.ref#</a></td>
-											<td><a href="clientPayments2.cfm?rec=#item.ref#" target="#item.ref#3" title="New Client Payments">#item.ref#</a></td>
+											<td class="noPrint"><a href="clientPayments2.cfm?rec=#item.ref#" target="#item.ref#3" title="New Client Payments">#item.ref#</a></td>
 											<td><a href="clientPayments.cfm?rec=#item.ref#" target="#item.ref#2" title="view Client Payments">#item.name#</a></td>
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
@@ -308,23 +313,25 @@
 											<td class="#style#">#showNum(item.balance3)#</td>
 											<td class="#style#">#showNum(item.balance4)#</td>
 											<td class="#style#"><strong>#showNum(item.balance0)#</strong></td>
-											<td align="center">#dayAvg# days</td>
-											<td>#LSDateFormat(item.cltChaseDate)#</td>
-											<td align="center">#item.cltChase#</td>
-											<td align="center"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
+											<td align="center" class="noPrint">#dayAvg# days</td>
+											<td class="noPrint">#LSDateFormat(item.cltChaseDate)#</td>
+											<td align="center" class="noPrint">#item.cltChase#</td>
+											<td align="center" class="noPrint"><cfif item.allocTotal neq 0>#item.allocTotal#</cfif></td>
 										</tr>
 									</cfloop>
 								</cfif>
 								<cfif debitCount gt 0>
 									<tr>
-										<td colspan="4">#debitCount# in debit</td>
+										<td></td>
+										<td class="noPrint"></td>
+										<td colspan="2">#debitCount# in debit</td>
 										<td colspan="3">Debit Totals</td>
 										<td class="amountTotal">#showNum(totals[1])#</td>
 										<td class="amountTotal">#showNum(totals[2])#</td>
 										<td class="amountTotal">#showNum(totals[3])#</td>
 										<td class="amountTotal">#showNum(totals[4])#</td>
 										<td class="amountTotal">#showNum(totals[5])#</td>
-										<td colspan="4"></td>
+										<td colspan="4" class="noPrint"></td>
 									</tr>
 								</cfif>
 								<cfif creditCount gt 0>
@@ -336,7 +343,7 @@
 										<td class="amountTotal">#showNum(credits[3])#</td>
 										<td class="amountTotal">#showNum(credits[4])#</td>
 										<td class="amountTotal">#showNum(credits[5])#</td>
-										<td colspan="4"></td>
+										<td colspan="4" class="noPrint"></td>
 									</tr>
 								</cfif>
 							</table>

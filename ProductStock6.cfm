@@ -71,7 +71,7 @@
 					bcode = newscanner(e);
 				//	console.log("code " + bcode);
 					if (bcode) {
-						$('#bcode').html(bcode);
+						$('#bcode').val(bcode);
 						$('#result').html("");
 						LookupBarcode("product",bcode,0,"#productdiv");
 						$("#tabs").tabs({
@@ -83,7 +83,7 @@
 				$('#manual').click(function(e) {
 					bcode = $('#barcodefld').val()
 					if (bcode) {
-						$('#bcode').html(bcode);
+						$('#bcode').val(bcode);
 						$('#result').html("");
 						$('#barcodefld').val("");
 						LookupBarcode("product",bcode,0,"#productdiv");
@@ -95,36 +95,43 @@
 				});
 			});
 			
-			$('.datepicker').datepicker({dateFormat: "dd-mm-yy",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: 0});
+			$('.datepicker').datepicker({dateFormat: "dd-mm-yy",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 			$(function() {
 				$("#tabs").tabs();
 			});
 			$('#productTab').click(function() {
-				var	bcode = $('#bcode').html()
-				var	productID = $('#productID').html()
+				var	bcode = $('#bcode').val()
+				var	productID = $('#productID').val()
 				LookupBarcode("product",bcode,productID,"#productdiv");
 				$('#productTab').blur();
 			});
 			$('#stockTab').click(function() {
-				var	bcode = $('#bcode').html()
-				var	productID = $('#productID').html()
+				var	bcode = $('#bcode').val()
+				var	productID = $('#productID').val()
 				var	allStock = $('#allStock').is(':checked')
 				LoadStockItems(bcode,productID,allStock,'#stockdiv');
 				$('#stockTab').blur();
 			});
 			$('#salesTab').click(function() {
-				var	bcode = $('#bcode').html()
-				var	productID = $('#productID').html()
+				var	bcode = $('#bcode').val()
+				var	productID = $('#productID').val()
 				var	allStock = $('#allStock').is(':checked')
 				LoadSales(bcode,productID,allStock,'#salesdiv');
 				$('#salesTab').blur();
 			});
 			$('#itemsTab').click(function() {
-				var	bcode = $('#bcode').html()
-				var	productID = $('#productID').html()
+				var	bcode = $('#bcode').val()
+				var	productID = $('#productID').val()
 				var	allStock = $('#allStock').is(':checked')
 				LoadItems(bcode,productID,allStock,'#itemsdiv');
 				$('#itemsTab').blur();
+			});
+			$('#analysisTab').click(function() {
+				var	bcode = $('#bcode').val()
+				var	productID = $('#productID').val()
+				var	allStock = $('#allStock').is(':checked')
+				LoadAnalysis(bcode,productID,allStock,'#analysisdiv');
+				$('#analysisTab').blur();
 			});
 			$('#groupsBtn').click(function() {
 				window.open( 'ProductStock6GroupsMain.cfm' );
@@ -160,35 +167,69 @@
 	<div id="wrapper">
 		<cfinclude template="sleHeader.cfm">
 		<div id="content">
+			<!---<div id="loadingDiv">loadingDiv</div>
+			<div id="feedback">feedback</div>--->
 			<div id="content-inner">
-				<div class="title">
-					<form method="post">
-						<span class="lookup">Manual Entry: </span><input name="barcodefld" id="barcodefld" class="lookup" type="text" size="15" maxlength="20" />
-						<input type="button" name="manual" id="manual" class="lookup" style="float:left" value="Look-up" />
+				<form method="post" id="prodSearch">
+					<table class="tableList" border="1">
+						<tr>
+							<td><input type="hidden" name="bcode" id="bcode" size="10" /></td>
+							<td><input type="hidden" name="productID" id="productID" size="10" /></td>
+							<td colspan="3"></td>
+						</tr>
+						<tr>
+							<td><span class="lookup">Enter or scan barcode: &nbsp;</span></td>
+							<td>
+								<input type="text" name="barcodefld" id="barcodefld" class="lookup" size="15" maxlength="20" />
+							</td>
+							<td>
+								<input type="button" name="manual" id="manual" class="lookup" style="float:left" value="Look-up" />						
+							</td>
+							<td>
+								<button type="button" id="newProduct">Add New Product</button> &nbsp;
+							</td>
+							<td>
+								<button type="button" id="groupsBtn">Groups & Categories</button>											
+							</td>
+						</tr>
+						<tr>
+							<td align="right">Search Date From</td>
+							<td>
+								<input type="text" name="srchDateFrom" id="srchDateFrom" class="datepicker" size="10" autoComplete="off"  />
+							</td>
+							<td align="right">Search Date To</td>
+							<td>
+								<input type="text" name="srchDateTo" id="srchDateTo" class="datepicker" size="10" autocomplete="off"  />
+							</td>
+							<td><input type="checkbox" name="allStock" id="allStock" value="1" />Show all stock records</td>
+						</tr>
+					</table>
+				</form>
+
+<!---					<div class="title">
+						<div style="clear:both"></div>
+					</div>
+					<div id="content-header">
+						<div id="bcode"></div>
+						<div id="productID"></div>
 						
-					</form>
-					<div style="clear:both"></div>
-					<button id="newProduct">New Product</button>
-					<button id="groupsBtn">Groups</button>					
-				</div>
-				<div id="content-header">
-					<div id="bcode"></div>
-					<div id="productID"></div>
-					<input type="checkbox" id="allStock" name="allStock" value="1" />Show all stock records
-					<div style="clear:both"></div>
-				</div>
+						<div style="clear:both"></div>
+					</div>
+--->	
 				<div id="tabs">
 					<ul>
 						<li><a href="##productdiv" id="productTab">Product</a></li>
-						<li><a href="##stockdiv" id="stockTab">Stock</a></li>
-						<li><a href="##salesdiv" id="salesTab">Sales</a></li>
+						<li><a href="##stockdiv" id="stockTab">Purchases</a></li>
+						<li><a href="##salesdiv" id="salesTab">Monthly Sales</a></li>
 						<li><a href="##itemsdiv" id="itemsTab">Sales Items</a></li>
+						<li><a href="##analysisdiv" id="analysisTab">Analysis</a></li>
 					</ul>
 					<div id="productdiv"><div class="title">Scan product...</div></div>
 					<div id="stockdiv"></div>
 					<div id="groupsdiv"></div>
 					<div id="salesdiv"></div>
 					<div id="itemsdiv"></div>
+					<div id="analysisdiv"></div>
 					<div style="clear:both"></div>
 					<div id="result"></div>
 				</div>

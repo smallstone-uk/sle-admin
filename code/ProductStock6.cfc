@@ -771,6 +771,232 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="AnalysisStockItems" access="public" returntype="struct" hint="stock items for a given product record">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.data = 
+			{" BFwd" = {"key" = "00", "stockQty" = 0, "stockValue" = 0, "salesQty" = 0, "salesValue" = 0,"tradeValue" = 0,"unitTrade" = 0,"profit" = 0,"POR" = 0},
+			 "Total" = {"key" = "00", "stockQty" = 0, "stockValue" = 0, "salesQty" = 0, "salesValue" = 0,"tradeValue" = 0,"unitTrade" = 0,"profit" = 0,"POR" = 0}
+		}>		
+		<cfif len(args.form.srchDateTo) IS 0>
+			<cfset args.form.srchDateTo = Now()>
+		</cfif>
+		<cfset loc.midnight = DateFormat(DateAdd("d",1,args.form.srchDateTo),'yyyy-mm-dd')>
+		
+		<cfset loc.lastDate = DateFormat(args.form.srchDateTo,'yyyy-mm')>
+		<cfloop from="1" to="12" index="loc.i">
+			<cfset StructInsert(loc.data,loc.lastDate,{
+				"Key" = NumberFormat(loc.i,'00'),
+				"stockQty" = 0,
+				"stockValue" = 0,
+				"salesQty" = 0,
+				"salesValue" = 0,
+				"tradeValue" = 0,
+				"unitTrade" = 0,
+				"profit" = 0,
+				"POR" = 0
+			})>
+			<cfset loc.lastDate = DateFormat(DateAdd("m",-1,loc.lastDate),'yyyy-mm')>
+		</cfloop>
+		<cfset loc.result.data = loc.data>
+		<cfset loc.result.datalist = ListSort(StructKeyList(loc.data,","),"text","ASC")>
+		
+		<cfquery name="loc.result.QStockBFwd" datasource="#args.datasource#">	<!--- items purchased prior to first date --->
+			SELECT SUM(siQtyItems) AS purchQty, SUM(siWSP) AS WSP
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+			AND soDate < '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#'
+			AND siStatus = 'closed'
+		</cfquery>
+		<cfquery name="loc.result.QStockReceived" datasource="#args.datasource#">	<!--- stock purchases in specified period --->
+			SELECT SUM(siQtyItems) AS Received, SUM(siUnitTrade * siQtyItems) AS WSP, DATE_FORMAT( soDate, '%Y-%m' ) AS YYMM
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+			AND soDate BETWEEN '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#' AND '#loc.midnight#'
+			GROUP BY YYMM
+		</cfquery>
+		<cfloop query="loc.result.QStockReceived">
+			<cfif !StructKeyExists(loc.data,YYMM)>
+				<cfset loc.prd = StructFind(loc.data," BFwd")>
+				<cfset loc.prd.stockQty += Received>
+				<cfset loc.prd.stockValue += WSP>
+				<cfif loc.prd.stockQty neq 0><cfset loc.prd.unitTrade = loc.prd.stockValue / loc.prd.stockQty></cfif>
+			<cfelse>
+				<cfset loc.prd = StructFind(loc.data,YYMM)>
+				<cfset loc.prd.stockQty += Received>
+				<cfset loc.prd.stockValue += WSP>
+				<cfif loc.prd.stockQty neq 0><cfset loc.prd.unitTrade = loc.prd.stockValue / loc.prd.stockQty></cfif>
+			</cfif>
+			<cfset loc.prd = StructFind(loc.data,"Total")>
+			<cfset loc.prd.stockQty += Received>
+			<cfset loc.prd.stockValue += WSP>
+			<cfif loc.prd.stockQty neq 0><cfset loc.prd.unitTrade = loc.prd.stockValue / loc.prd.stockQty></cfif>
+		</cfloop>
+		
+		<cfquery name="loc.result.QStockHistory" datasource="#args.datasource#">	<!--- overall history of this product --->
+			SELECT SUM(siQtyItems) AS totalReceived, MIN(soDate) AS firstDate, MAX(soDate) AS lastDate
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+		</cfquery>
+		<cfquery name="loc.result.QProdInfo" datasource="#args.datasource#">	<!--- general info of this product --->
+			SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodCountDate,prodStockLevel,prodStatus,
+				pcatID,pgID,pcatTitle,pgTitle,pgTarget, 
+				siID,siUnitSize,siUnitTrade,siOurPrice
+			FROM tblProducts
+			LEFT JOIN tblStockItem ON prodID = siProduct
+			AND tblStockItem.siID = (
+				SELECT MAX( siID )
+				FROM tblStockItem
+				WHERE prodID = siProduct )
+			INNER JOIN tblProductCats ON prodCatID = pcatID
+			INNER JOIN tblProductGroups ON pgID = pcatGroup
+			WHERE prodID = #val(args.form.productID)#
+		</cfquery>
+		<cfquery name="loc.result.QSalesBFwd" datasource="#args.datasource#">	<!--- sales in specified period --->
+			SELECT SUM(eiQty) AS salesQty, SUM(eiNet) AS salesValue, SUM(eiTrade) AS tradeValue
+			FROM tblepos_items
+			INNER JOIN tblEpos_Header ON ehID = eiParent
+			WHERE eiProdID = #val(args.form.productID)#
+			AND eiTimeStamp < '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#'
+		</cfquery>
+		<cfquery name="loc.result.QSalesItems" datasource="#args.datasource#">	<!--- sales in specified period --->
+			SELECT SUM(eiQty) AS salesQty, SUM(-eiNet) AS salesValue, SUM(eiTrade) AS tradeValue, DATE_FORMAT( eiTimeStamp, '%Y-%m' ) AS YYMM
+			FROM tblepos_items
+			INNER JOIN tblEpos_Header ON ehID = eiParent
+			WHERE eiProdID = #val(args.form.productID)#
+			AND eiTimeStamp BETWEEN '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#' AND '#loc.midnight#'
+			GROUP BY YYMM
+		</cfquery>
+		<cfloop query="loc.result.QSalesItems">
+			<cfif !StructKeyExists(loc.data,YYMM)>
+				<cfset loc.prd = StructFind(loc.data," BFwd")>
+				<cfset loc.prd.salesQty += salesQty>
+				<cfset loc.prd.tradeValue += tradeValue>
+				<cfset loc.prd.salesValue += salesValue>
+				<cfset loc.prd.profit = loc.prd.salesValue - loc.prd.tradeValue>
+				<cfif loc.prd.salesValue neq 0><cfset loc.prd.POR = Round((loc.prd.profit / loc.prd.salesValue) * 100) & "%"></cfif>
+			<cfelse>
+				<cfset loc.prd = StructFind(loc.data,YYMM)>
+				<cfset loc.prd.salesQty += salesQty>
+				<cfset loc.prd.tradeValue += tradeValue>
+				<cfset loc.prd.salesValue += salesValue>
+				<cfset loc.prd.profit = loc.prd.salesValue - loc.prd.tradeValue>
+				<cfif loc.prd.salesValue neq 0><cfset loc.prd.POR = Round((loc.prd.profit / loc.prd.salesValue) * 100) & "%"></cfif>
+			</cfif>
+			<cfset loc.prd = StructFind(loc.data,"Total")>
+			<cfset loc.prd.salesQty += salesQty>
+			<cfset loc.prd.tradeValue += tradeValue>
+			<cfset loc.prd.salesValue += salesValue>
+			<cfset loc.prd.profit = loc.prd.salesValue - loc.prd.tradeValue>
+			<cfif loc.prd.salesValue neq 0><cfset loc.prd.POR = Round((loc.prd.profit / loc.prd.salesValue) * 100) & "%"></cfif>
+		</cfloop>
+		<cfreturn loc.result>
+	</cffunction>
+<!---
+	<cffunction name="AnalysisStockItems" access="public" returntype="struct" hint="stock items for a given product record">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.stock = {" BFwd" = {"key" = "00", "qty" = 0, "value" = 0}}>
+		<cfset loc.sales = {" BFwd" = {"key" = "00", "qty" = 0, "value" = 0}}>
+		
+		<cfif len(args.form.srchDateTo) IS 0>
+			<cfset args.form.srchDateTo = Now()>
+		</cfif>
+		<cfset loc.midnight = DateFormat(DateAdd("d",1,args.form.srchDateTo),'yyyy-mm-dd')>
+		
+		<cfset loc.lastDate = DateFormat(args.form.srchDateTo,'yyyy-mm')>
+		<cfloop from="1" to="12" index="loc.i">
+			<cfset StructInsert(loc.stock,loc.lastDate,{"Key" = NumberFormat(loc.i,'00'), "qty" = 0,"Value" = 0})>
+			<cfset StructInsert(loc.sales,loc.lastDate,{"Key" = NumberFormat(loc.i,'00'), "qty" = 0,"Value" = 0})>
+			<cfset loc.lastDate = DateFormat(DateAdd("m",-1,loc.lastDate),'yyyy-mm')>
+		</cfloop>
+		<cfset loc.result.sales = loc.sales>
+		<cfset loc.result.saleslist = ListSort(StructKeyList(loc.sales,","),"text","ASC")>
+		<cfset loc.result.stock = loc.stock>
+		<cfset loc.result.stocklist = ListSort(StructKeyList(loc.stock,","),"text","ASC")>
+		
+		<cfquery name="loc.result.QStockBFwd" datasource="#args.datasource#">	<!--- items purchased prior to first date --->
+			SELECT SUM(siQtyItems) AS purchQty, SUM(siWSP) AS WSP
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+			AND soDate < '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#'
+			AND siStatus = 'closed'
+		</cfquery>
+		<cfquery name="loc.result.QStockReceived" datasource="#args.datasource#">	<!--- stock purchases in specified period --->
+			SELECT SUM(siQtyItems) AS Received, SUM(siWSP) AS WSP, DATE_FORMAT( soDate, '%Y-%m' ) AS YYMM
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+			AND soDate BETWEEN '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#' AND '#loc.midnight#'
+			GROUP BY YYMM
+		</cfquery>
+		<cfloop query="loc.result.QStockReceived">
+			<cfif !StructKeyExists(loc.stock,YYMM)>
+				<cfset loc.prd = StructFind(loc.stock," BFwd")>
+				<cfset loc.qty = loc.prd.qty += Received>
+				<cfset loc.value = loc.prd.value += WSP>
+			<cfelse>
+				<cfset loc.prd = StructFind(loc.stock,YYMM)>
+				<cfset loc.qty = loc.prd.qty += Received>
+				<cfset loc.value = loc.prd.value += WSP>
+			</cfif>
+		</cfloop>
+		
+		<cfquery name="loc.result.QStockHistory" datasource="#args.datasource#">	<!--- overall history of this product --->
+			SELECT SUM(siQtyItems) AS totalReceived, MIN(soDate) AS firstDate, MAX(soDate) AS lastDate
+			FROM tblStockItem
+			INNER JOIN tblstockorder ON soID = siOrder
+			WHERE siProduct = #val(args.form.productID)#
+		</cfquery>
+		<cfquery name="loc.result.QProdInfo" datasource="#args.datasource#">	<!--- general info of this product --->
+			SELECT prodID,prodRef,prodTitle,prodPriceMarked,prodCatID,prodVATRate,prodCountDate,prodStockLevel,prodStatus,
+				pcatID,pgID,pcatTitle,pgTitle,pgTarget, 
+				siID,siUnitSize,siOurPrice
+			FROM tblProducts
+			LEFT JOIN tblStockItem ON prodID = siProduct
+			AND tblStockItem.siID = (
+				SELECT MAX( siID )
+				FROM tblStockItem
+				WHERE prodID = siProduct )
+			INNER JOIN tblProductCats ON prodCatID = pcatID
+			INNER JOIN tblProductGroups ON pgID = pcatGroup
+			WHERE prodID = #val(args.form.productID)#
+		</cfquery>
+		<cfquery name="loc.result.QSalesBFwd" datasource="#args.datasource#">	<!--- sales in specified period --->
+			SELECT SUM(eiQty) AS salesQty, SUM(eiNet) AS salesValue, SUM(eiTrade) AS tradeValue
+			FROM tblepos_items
+			INNER JOIN tblEpos_Header ON ehID = eiParent
+			WHERE eiProdID = #val(args.form.productID)#
+			AND eiTimeStamp < '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#'
+		</cfquery>
+		<cfquery name="loc.result.QSalesItems" datasource="#args.datasource#">	<!--- sales in specified period --->
+			SELECT SUM(eiQty) AS salesQty, SUM(eiNet) AS salesValue, SUM(eiTrade) AS tradeValue, DATE_FORMAT( eiTimeStamp, '%Y-%m' ) AS YYMM
+			FROM tblepos_items
+			INNER JOIN tblEpos_Header ON ehID = eiParent
+			WHERE eiProdID = #val(args.form.productID)#
+			AND eiTimeStamp BETWEEN '#DateFormat(args.form.srchDateFrom,'yyyy-mm-dd')#' AND '#loc.midnight#'
+			GROUP BY YYMM
+		</cfquery>
+		<cfloop query="loc.result.QSalesItems">
+			<cfif !StructKeyExists(loc.sales,YYMM)>
+				<cfset loc.prd = StructFind(loc.sales," BFwd")>
+				<cfset loc.qty = loc.prd.qty += salesQty>
+				<cfset loc.value = loc.prd.value += salesValue>
+			<cfelse>
+				<cfset loc.prd = StructFind(loc.sales,YYMM)>
+				<cfset loc.qty = loc.prd.qty += salesQty>
+				<cfset loc.value = loc.prd.value += salesValue>
+			</cfif>
+		</cfloop>
+		<cfreturn loc.result>
+	</cffunction>
+--->
 	<cffunction name="StockItemList" access="public" returntype="struct" hint="stock items for a given product record">
 		<cfargument name="args" type="struct" required="yes">
 

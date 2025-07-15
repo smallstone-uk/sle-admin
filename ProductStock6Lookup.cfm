@@ -11,8 +11,8 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			<cfoutput>
-				$('##bcode').html("#lookup.barcode#");
-				$('##productID').html("#lookup.productID#");
+				$('##bcode').val("#lookup.barcode#");
+				$('##productID').val("#lookup.productID#");
 			</cfoutput>
 			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, maxDate: new Date, minDate: new Date(2012, 1 - 1, 1)});
 			

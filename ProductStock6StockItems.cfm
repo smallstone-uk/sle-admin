@@ -7,9 +7,10 @@
 	<cfset parm.barcode = bcode>
 	<cfset parm.productID = productID>
 	<cfset parm.allStock = StructKeyExists(form,"allStock")>
+
 	<cfset records = pstock.StockItemList(parm)>
-	<!---<cfdump var="#records#" label="records" expand="false">--->
 	<cfset suppliers=pstock.LoadSuppliers(parm)>
+	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			rates = [0,0,20,5];

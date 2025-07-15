@@ -196,10 +196,26 @@ function LoadItems(bcode,productID,allStock,result) {
 //	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
 	$.ajax({
 		type: 'POST',
-		url: 'ProductStock6Items.cfm',
+		url: 'ProductStock6SalesItems.cfm',
 		data : {"bcode":bcode,"productID":productID,"allStock": allStock},
 		beforeSend:function(){
 			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales...");
+		},
+		success:function(data){
+			$(result).html(data);
+		}
+	});
+}
+
+function LoadAnalysis(bcode,productID,allStock,result) {
+	 console.log("LoadAnalysis - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	$.ajax({
+		type: 'POST',
+		url: 'ProductStock6Analysis.cfm',
+		data: $('#prodSearch').serialize(),
+	//	data : {"bcode":bcode,"productID":productID,"allStock": allStock},
+		beforeSend:function(){
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Analysis...");
 		},
 		success:function(data){
 			$(result).html(data);

@@ -53,7 +53,7 @@ function checkPayForm()	{
 		return false;							
 	}
 	
-	let trnAmnt1 = $('#trnAmnt1').val().trim();
+	var trnAmnt1 = $('#trnAmnt1').val().trim();
 	if (isNaN(trnAmnt1) || trnAmnt1 === "") {
 		$('#feedback').html("Invalid Net Amount entered.");
 		return false;
@@ -63,9 +63,9 @@ function checkPayForm()	{
 		$('#feedback').html("Transaction Amount entered is too high.");
 		return false;	
 	}
-	trnAmnt1 = Math.round(trnAmnt1);
-	
-	let trnAmnt2 = $('#trnAmnt2').val().trim();
+	//trnAmnt1 = Math.round(trnAmnt1);
+	//console.log(trnAmnt1)
+	var trnAmnt2 = $('#trnAmnt2').val().trim();
 	if (isNaN(trnAmnt2) || trnAmnt2 === "") {
 		trnAmnt2 = 0; // assume empty discount = 0
 	} else {
@@ -74,7 +74,7 @@ function checkPayForm()	{
 			$('#feedback').html("Discount Amount entered is too high.");
 			return false;	
 		}
-		trnAmnt2 = Math.round(trnAmnt2);
+	//	trnAmnt2 = Math.round(trnAmnt2);
 	}
 	
 	if (trnAmnt1 + trnAmnt2 == 0)	{
@@ -102,19 +102,20 @@ function checkCreditForm()	{
 		}
 	}
 	
-	let crnAmnt1 = $('#crnAmnt1').val().trim();
+	var crnAmnt1 = $('#crnAmnt1').val().trim();
 	if (isNaN(crnAmnt1) || crnAmnt1 === "") {
 		$('#feedback2').html("Invalid Net Amount entered.");
 		return false;
 	}
-	crnAmnt1 = Math.round(crnAmnt1);
+	crnAmnt1 = Number(crnAmnt1);
+	//crnAmnt1 = Math.round(crnAmnt1);
 	if (crnAmnt1 > 999.99)	{
 		$('#feedback2').html("Transaction Amount entered is too high.")
 		return false;	
 	}
-	crnAmnt1 = Math.round(crnAmnt1);
+//	crnAmnt1 = Math.round(crnAmnt1);
 	
-	let crnAmnt2 = $('#crnAmnt2').val().trim();
+	var crnAmnt2 = $('#crnAmnt2').val().trim();
 	if (isNaN(crnAmnt2) || crnAmnt2 === "") {
 		crnAmnt2 = 0; // assume empty discount = 0
 	} else {
@@ -123,7 +124,7 @@ function checkCreditForm()	{
 			$('#feedback2').html("Discount Amount entered is too high.");
 			return false;	
 		}
-		crnAmnt2 = Math.round(crnAmnt2);
+		//crnAmnt2 = Math.round(crnAmnt2);
 	}
 	
 	if (crnAmnt1 + crnAmnt2 == 0)	{
@@ -256,7 +257,8 @@ $(document).ready(function() {
 								}
 							});
 						}, 500);
-					}				},
+					}
+				},
 				error:function(data){
 					$('#loadingDiv').html(data).fadeIn();
 				},
@@ -280,6 +282,7 @@ $(document).ready(function() {
 			$('#loadingDiv').html("Busy...")
 			return false;
 		}
+		var autoReload = true;
 		$(this).prop('disabled', true);
 		$('#feedback2').html("Saving credit...")
 		if (checkCreditForm()) {
@@ -298,6 +301,19 @@ $(document).ready(function() {
 					$('#clientRef').val(clientRef);
 					$('#clientRef').focus();
 					$('#payResult').html(data);
+					if (autoReload) {
+						setTimeout(function() {	// wait for DB to catch up
+							$.ajax({
+								type: 'POST',
+								url: 'clientLoadTrans.cfm',
+								data: $("#srchForm").serialize(),
+								success: function(result) {
+									$('#tranResult').html(result);
+									$('#loadingDiv').html("").fadeOut();
+								}
+							});
+						}, 500);
+					}
 				},
 				error:function(data){
 					$('#loadingDiv').html(data).fadeIn();

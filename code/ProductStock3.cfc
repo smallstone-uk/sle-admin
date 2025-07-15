@@ -32,6 +32,7 @@
 				<cfset i.prodRef=prodRef>
 				<cfset i.Title=prodTitle>
 				<cfset i.OrderRef=soRef>
+				<cfset i.OrderDate=soDate>
 				<cfset i.boxes=val(siQtyPacks)-val(siReceived)>
 				<cfset i.UnitSize=prodUnitSize>
 				<cfset i.RRP=siOurPrice>

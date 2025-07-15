@@ -37,8 +37,17 @@
 				$('#controls').hide();
 			}
 		});
-		$('#btnMark').click(function(e) {
+/*		$('#btnMark').click(function(e) {
 			MarkStockItems('#listForm','#marking');
+			e.preventDefault();
+		});
+*/
+		$('#btnMark').click(function(e) {
+			if (confirm('Are you sure these items are out of stock? Please ensure they are not charged on the invoice or substituted.')) {
+				MarkStockItems('#listForm','#marking');
+			} else {
+				alert('Operation cancelled');
+			}
 			e.preventDefault();
 		});
 	});
@@ -56,14 +65,14 @@
 							<cfset ref=i.orderref>
 							<tr>
 								<th width="5%"><input type="checkbox" class="selectAll" value="#i.orderref#" /></th>
-								<th align="left" style="background:##FF8080">#i.orderref#</th>
+								<th align="left" style="background:##FF8080">#i.orderref# - &nbsp; #DateFormat(i.orderdate,"ddd dd-mmm-yy")#</th>
 								<th>Info</th>
 								<th width="15%">Packs</th>
 							</tr>
 						</cfif>
 						<tr>
 							<td><input type="checkbox" name="selectitem" class="item selectitem#i.orderref#" value="#i.ID#" /></td>
-							<td><b>#i.title#</b> #i.UnitSize# - &pound;#DecimalFormat(i.RRP)#</td>
+							<td><b>#i.title#</b> - #i.UnitSize# - &pound;#DecimalFormat(i.RRP)#</td>
 							<td><a href="productStock6.cfm?product=#i.prodID#" target="_blank"><img src="images/icons/info.jpg" width="25" /></a></td>
 							<td align="center">#i.boxes#</td>
 						</tr>

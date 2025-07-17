@@ -565,7 +565,12 @@
 			</cfif>
 				
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+		    <cfset var err = {
+				"args" = args,
+				"header" = header,
+				"exception" = cfcatch,
+			}>
+			<cfdump var="#err#" label="err" expand="yes" format="html"
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>

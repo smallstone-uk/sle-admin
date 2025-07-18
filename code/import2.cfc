@@ -410,7 +410,7 @@
 							UPDATE tblProducts
 							SET prodPriceMarked = #int(args.pm)#,
 								prodOurPrice = #loc.result.ourPrice#,
-								prodRecordTitle = '#args.description#',
+								prodRecordTitle = <cfqueryparam cfsqltype="cf_sql_varchar" value="#args.description#">,
 								prodTitle = '#Left(args.description,40)#'
 							WHERE prodID = #loc.result.productID#
 						</cfquery>
@@ -544,7 +544,7 @@
 						UPDATE tblProducts
 						SET
 							prodCatID=#loc.categoryID#,
-							prodRecordTitle='#args.description#',
+							prodRecordTitle=<cfqueryparam cfsqltype="cf_sql_varchar" value="#args.description#">,
 							<!---prodPriceMarked=#int(args.pm)#,	LEAVE FLAG ALONE UNTIL BUG IS FIXED 24/01/21 --->
 							prodPackQty=#args.packQty#,
 							prodUnitSize='#args.packSize#',

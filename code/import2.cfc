@@ -384,8 +384,8 @@
 							#header.supplierID#,
 							#loc.categoryID#,
 							'#args.code#',
-							'#args.description#',
-							'#Left(args.description,40)#',
+							<cfqueryparam value="#args.description#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#Left(args.description,40)#" cfsqltype="cf_sql_varchar">,
 							#int(args.pm)#,
 							#args.packQty#,
 							'#args.packsize#',
@@ -565,12 +565,12 @@
 			</cfif>
 				
 		<cfcatch type="any">
-		    <cfset var err = {
+		    <cfset loc.err = {
 				"args" = args,
 				"header" = header,
-				"exception" = cfcatch,
+				"exception" = cfcatch
 			}>
-			<cfdump var="#err#" label="err" expand="yes" format="html"
+			<cfdump var="#loc.err#" label="err" expand="yes" format="html"
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>

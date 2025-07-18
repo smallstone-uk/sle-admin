@@ -411,7 +411,7 @@
 							SET prodPriceMarked = #int(args.pm)#,
 								prodOurPrice = #loc.result.ourPrice#,
 								prodRecordTitle = <cfqueryparam cfsqltype="cf_sql_varchar" value="#args.description#">,
-								prodTitle = '#Left(args.description,40)#'
+								prodTitle = <cfqueryparam cfsqltype="cf_sql_varchar" value="#Left(args.description,40)#">
 							WHERE prodID = #loc.result.productID#
 						</cfquery>
 						<cfset loc.result.action = "#loc.result.action#Product Update 1<br>">

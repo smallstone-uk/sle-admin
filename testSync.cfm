@@ -7,6 +7,6 @@
 
 <body>
 	Test Sync.
-	I changed this on Lenny
+	I changed this on Lenny, twice
 </body>
 </html>

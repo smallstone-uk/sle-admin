@@ -6,7 +6,7 @@
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.form = form>
 <cfset productData = pstock.ListSalesItems(parm)>
-<cfdump var="#productData#" label="productData" expand="false">
+
 <cfoutput>
 	<cfloop query="productData.QProdInfo">
 		<table class="tableList" border="1" width="100%">
@@ -34,7 +34,7 @@
 			</tr>
 		</table>
 	</cfloop>
-	<table class="tableList" border="1" width="50%">
+	<table class="tableList" border="1" width="70%">
 		<tr>
 			<th align="center">Tran ID</th>
 			<th align="right">Date &amp; Time</th>

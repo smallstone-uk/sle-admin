@@ -817,7 +817,7 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.result.action = "">
-		<cfset loc.tot = {count=0,sold=0,waste=0,net=0,VAT=0,trade=0,wasteValue=0,profit=0}>
+		<cfset loc.tot = {count=0,sold=0,waste=0,net=0,VAT=0,trade=0,wasteValue=0,profit=0,POR=0}>
 		<cfset loc.data = {}>
 		<cftry>
 			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>

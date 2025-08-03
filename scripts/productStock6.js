@@ -162,14 +162,16 @@ function AmendProduct(form,result) {
 	});
 }
 
+//  ------------------------ revised Jul 2025 -----------------------------
 function LoadStockItems(bcode,productID,allStock,result) {
-	 console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// console.log("LoadStockItems - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// only result is now used
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6StockItems.cfm',
-		data : {"bcode":bcode,"productID":productID,"allStock": allStock },
+		data: $('#prodSearch').serialize(),
 		beforeSend:function(){
-			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Stock Items...");
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading stock items...");
 		},
 		success:function(data){
 			$(result).html(data);
@@ -178,13 +180,14 @@ function LoadStockItems(bcode,productID,allStock,result) {
 }
 
 function LoadSales(bcode,productID,allStock,result) {
-	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	//	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// only result is now used
 	$.ajax({
 		type: 'POST',
-		url: 'ProductStock6Sales.cfm',
-		data : {"bcode":bcode,"productID":productID,"allStock": allStock},
+		url: 'ProductStock6Sales2.cfm',
+		data: $('#prodSearch').serialize(),
 		beforeSend:function(){
-			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales...");
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading sales...");
 		},
 		success:function(data){
 			$(result).html(data);
@@ -192,14 +195,15 @@ function LoadSales(bcode,productID,allStock,result) {
 	});
 }
 
-function LoadItems(bcode,productID,allStock,result) {
-//	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+function LoadSalesItems(bcode,productID,allStock,result) {
+	//	 console.log("LoadSales - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// only result is now used
 	$.ajax({
 		type: 'POST',
-		url: 'ProductStock6SalesItems.cfm',
-		data : {"bcode":bcode,"productID":productID,"allStock": allStock},
+		url: 'ProductStock6SalesItems2.cfm',
+		data: $('#prodSearch').serialize(),
 		beforeSend:function(){
-			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Sales...");
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading sales items...");
 		},
 		success:function(data){
 			$(result).html(data);
@@ -208,20 +212,22 @@ function LoadItems(bcode,productID,allStock,result) {
 }
 
 function LoadAnalysis(bcode,productID,allStock,result) {
-	 console.log("LoadAnalysis - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// console.log("LoadAnalysis - bcode " + bcode + " productID " + productID + " allStock " + allStock + " result " + result);
+	// only result is now used
 	$.ajax({
 		type: 'POST',
 		url: 'ProductStock6Analysis.cfm',
 		data: $('#prodSearch').serialize(),
 	//	data : {"bcode":bcode,"productID":productID,"allStock": allStock},
 		beforeSend:function(){
-			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading Analysis...");
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading analysis...");
 		},
 		success:function(data){
 			$(result).html(data);
 		}
 	});
 }
+// ------------------------------- End of changes ----------------------------------
 
 function LoadGroups(result) {
 	$.ajax({

@@ -42,6 +42,7 @@
 		#newProduct {float:right}
 		.lookup {float:left}
 		#textBox {line-height:1em; z-index:99999999}
+		.negativeNum {color:#FF0000}
 	</style>
 	
 	<!---<script src="common/scripts/common.js" type="text/javascript"></script>--->
@@ -123,7 +124,7 @@
 				var	bcode = $('#bcode').val()
 				var	productID = $('#productID').val()
 				var	allStock = $('#allStock').is(':checked')
-				LoadItems(bcode,productID,allStock,'#itemsdiv');
+				LoadSalesItems(bcode,productID,allStock,'#itemsdiv');
 				$('#itemsTab').blur();
 			});
 			$('#analysisTab').click(function() {

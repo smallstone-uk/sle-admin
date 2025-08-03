@@ -344,6 +344,21 @@
 		<cfset loc.result.recordcount=loc.result.QCategories.recordcount>
 		<cfreturn loc.result>
 	</cffunction>
+	
+	<cffunction name="LoadEPOSCategories" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc={}>
+		<cfset loc.result={}>
+		
+		<cfquery name="loc.result.QEPOSCategories" datasource="#args.datasource#">
+			SELECT * 
+			FROM tblepos_cats 
+			WHERE epcParent > 0
+			ORDER BY epcTitle
+		</cfquery>
+		<cfset loc.result.recordcount=loc.result.QEPOSCategories.recordcount>
+		<cfreturn loc.result>
+	</cffunction>
 
 <!---
 SELECT * FROM tblProducts 
@@ -439,6 +454,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			SELECT *
 			FROM tblProducts
 			INNER JOIN tblProductCats ON prodCatID = pcatID
+			INNER JOIN tblepos_cats ON prodEPOSCatID = epcID
 			LEFT JOIN tblStockItem ON prodID = siProduct
 			AND tblStockItem.siID = (
 				SELECT MAX( siID )
@@ -460,6 +476,7 @@ ORDER BY prodCatID,prodTitle  ASC
 			<cfif StructKeyExists(args.form,"srchReorder")>AND prodReorder IN (#PreserveSingleQuotes(loc.Reorder)#)</cfif>
 			<cfif StructKeyExists(args.form,"srchSupplier") AND len(args.form.srchSupplier) GT 0>AND accID IN (#args.form.srchSupplier#)</cfif>
 			<cfif StructKeyExists(args.form,"srchCategory") AND len(args.form.srchCategory) GT 0>AND prodCatID IN (#args.form.srchCategory#)</cfif>
+			<cfif StructKeyExists(args.form,"srchEPOSCategory") AND len(args.form.srchEPOSCategory) GT 0>AND prodEPOSCatID IN (#args.form.srchEPOSCategory#)</cfif>
 			ORDER BY pcatTitle, prodTitle
 		</cfquery>
 		<cfset loc.result.recCount=loc.result.StockItems.recordcount>

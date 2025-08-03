@@ -237,7 +237,7 @@
 					<input type="hidden" name="catID" id="catID" value="#lookup.catID#" />
 					<table border="1" class="tableList3">
 						<tr><td width="150">Reference</td><td>
-							<input type="text" name="prodRef" id="prodRef" class="field" size="15" value="#lookup.product.prodRef#" /></td></tr>
+							<input type="text" name="prodRef" id="prodRef" class="field" size="15" value="#lookup.product.prodRef#" autocomplete="off" /></td></tr>
 						<tr><td>Description</td><td>
 							<input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="40" value="#lookup.product.prodRecordTitle#" /></td></tr>
 						<tr><td>Display As</td><td>
@@ -252,11 +252,11 @@
 						</td></tr>
 						<tr><td>Category</td><td><div id="category"></div></td></tr>
 						<tr><td>Minimum Price</td><td>
-							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" /></td></tr>
+							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" value="#lookup.product.prodMinPrice#" autocomplete="off" /></td></tr>
 						<tr><td>Our Price</td><td>
-							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" /> (if no stock records)</td></tr>
+							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" value="#lookup.product.prodOurPrice#" autocomplete="off" /> (if no stock records)</td></tr>
 						<tr><td>Unit Trade</td><td>
-							<input type="text" name="prodUnitTrade" id="prodUnitTrade" class="field" size="10" value="#lookup.product.prodUnitTrade#" /> (ex. VAT)</td></tr>
+							<input type="text" name="prodUnitTrade" id="prodUnitTrade" class="field" size="10" value="#lookup.product.prodUnitTrade#" autocomplete="off" /> (ex. VAT)</td></tr>
 						<tr>
 							<td>VAT Rate</td>
 							<td>
@@ -332,7 +332,7 @@
 					<input type="hidden" name="prodID" id="prodID" value="0" />
 					<input type="hidden" name="catID" id="catID" value="1" />
 					<table border="1" class="tableList3">
-						<tr><td width="150">Reference</td><td><input type="text" name="prodRef" id="prodRef" class="field" size="15" value="" /></td></tr>
+						<tr><td width="150">Reference</td><td><input type="text" name="prodRef" id="prodRef" class="field" size="15" value="" autocomplete="off" /></td></tr>
 						<tr><td>Description</td><td><input type="text" name="prodRecordTitle" id="prodRecordTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Display As</td><td><input type="text" name="prodTitle" id="prodTitle" class="field" size="30" value="" /></td></tr>
 						<tr><td>Group</td><td>
@@ -345,9 +345,9 @@
 						</td></tr>
 						<tr><td height="33">Category</td><td><div id="category"></div></td></tr>
 						<tr><td>Minimum Price</td><td>
-							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" /></td></tr>
+							<input type="text" name="prodMinPrice" id="prodMinPrice" class="field" size="10" autocomplete="off" /></td></tr>
 						<tr><td>Our Price</td><td>
-							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" /> (if no stock records)</td></tr>
+							<input type="text" name="prodOurPrice" id="prodOurPrice" class="field" size="10" autocomplete="off" /> (if no stock records)</td></tr>
 						<tr><td>Price Description</td><td>
 							<input type="text" name="prodUnitSize" id="prodUnitSize" class="field" size="20" value="" /></td></tr>
 						<tr><td height="33">Options</td><td>

@@ -73,6 +73,7 @@
 						<li class="spacer"></li>
 						<li><a href="rounds6.cfm">Rounds v6</a></li>
 						<li><a href="Invoicing.cfm">Invoicing</a></li>
+						<li><a href="importDelWages.cfm">Import Wage Data</a></li>
 						<li><a href="https://mapsengine.google.com/map/edit?mid=zePprILBGHcg.k1zT53hH1b0M" target="_blank">Rounds Map</a></li>
 						<li class="spacer"></li>
 						<li><a href="pubStockReport.cfm">Publication Report</a></li>

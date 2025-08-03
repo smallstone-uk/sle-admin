@@ -27,6 +27,7 @@
 			$(".srchReport").chosen({width: "200px",disable_search_threshold:10});
 			$(".srchGroup").chosen({width: "300px"});
 			$(".srchCategory").chosen({width: "300px"});
+			$(".srchEPOSCategory").chosen({width: "300px"});
 			$(".srchSupplier").chosen({width: "300px"});
 			$(".srchStatus").chosen({width: "300px"});
 			$(".srchReorder").chosen({width: "300px"});
@@ -81,7 +82,7 @@
 				});
 				e.preventDefault();
 			});
-			$('#quicksearch').on("keyup",function() {
+			$('#productSearch').on("keyup",function() {
 				var srch=$(this).val();
 				$('.searchrow').each(function() {
 					var id=$(this).attr("data-prodID");
@@ -261,11 +262,13 @@
 <cfset parm={}>
 <cfset parm.datasource=application.site.datasource1>
 <cfset categories=stock.LoadCategories(parm)>
+<cfset EPOScategories=stock.LoadEPOSCategories(parm)>
 <cfset supps=prod.LoadSuppiers(parm)>
 <cfset groups = sales.LoadGroups(parm)>
 <cfparam name="srchReport" default="">
 <cfparam name="srchGroup" default="">
 <cfparam name="srchCategory" default="">
+<cfparam name="srchEPOSCategory" default="">
 <cfparam name="srchSupplier" default="">
 <cfparam name="srchCatStr" default="">
 <cfparam name="srchProdStr" default="">
@@ -316,11 +319,21 @@
 									</td>
 								</tr>
 								<tr>
-									<td><b>Category</b></td>
+									<td><b>Product Category</b></td>
 									<td>
 										<select name="srchCategory" class="srchCategory" multiple="multiple" data-placeholder="Select...(optional)">
 											<cfloop query="categories.QCategories">
 												<option value="#pcatID#"<cfif ListFind(srchCategory,pcatID)> selected="selected"</cfif>>#pcatTitle#</option>
+											</cfloop>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td><b>EPOS Category</b></td>
+									<td>
+										<select name="srchEPOSCategory" class="srchEPOSCategory" multiple="multiple" data-placeholder="Select...(optional)">
+											<cfloop query="EPOScategories.QEPOSCategories">
+												<option value="#epcID#"<cfif ListFind(srchEPOSCategory,epcID)> selected="selected"</cfif>>#epcTitle#</option>
 											</cfloop>
 										</select>
 									</td>
@@ -451,9 +464,10 @@
 													<th width="10"></th>
 													<th>ID</th>
 													<th>Reference</th>
-													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
+													<th align="left"><input type="text" id="productSearch" value="" placeholder="Search products" style="width:90%;"></th>
 													<th>Size</th>
 													<th>Price Desc.</th>
+													<th>EPOS Category</th>
 													<th>Product<br>Status</th>
 													<th>Discountable</th>
 													<th>Lock</th>
@@ -467,7 +481,7 @@
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 												<cfif prodCatID neq category>
-													<tr class="searchrow" data-title="">
+													<tr class="searchrowheader" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
 														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong>
 															<cfif pcatShow><span class="catActive">Active</span>
@@ -476,13 +490,14 @@
 													</tr>
 													<cfset category=prodCatID>
 												</cfif>
-												<tr class="searchrow" data-title="#prodTitle#" data-prodID="#prodID#">
+												<tr class="searchrow" data-title="#prodTitle# #prodUnitSize#" data-prodID="#prodID#">
 													<td><input type="checkbox" name="selectitem" class="selectitem item#prodCatID# searchrowselect#prodID#" value="#prodID#"></td>
-													<td><a href="productStock6.cfm?product=#prodID#" target="_blank">#prodID#</a></td>
+													<td><a href="productStock6.cfm?product=#prodID#" target="prod_#prodID#">#prodID#</a></td>
 													<td><a href="stockItems.cfm?ref=#prodID#" target="_blank">#prodRef#</a></td>
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
 													<td>#prodUnitSize#</td>
+													<td>#epcTitle#</td>
 													<td align="center" class="sod_status disable-select" data-id="#prodID#">#prodStatus#</td>
 													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
 													<td align="center" class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
@@ -505,6 +520,7 @@
 								</cfcase>
 								<cfcase value="2">
 									<cfset stocklist=stock.StockSearch(parm)>
+									<!---<cfdump var="#stocklist#" label="stocklist" expand="false">--->
 									<cfif stocklist.recCount GT 0>
 										<cfset colspan=13>
 										<cfoutput>
@@ -529,11 +545,12 @@
 											<cfloop query="stocklist.stockItems">
 												<cfset ourPrice = val(siOurPrice) eq 0 ? prodOurPrice : siOurPrice>
 												<cfset ourPrice = val(ourPrice) eq 0 ? 0.01 : ourPrice>
+												<cfset tradePrice = val(siUnitTrade) eq 0 ? prodUnitTrade : siUnitTrade>
 												<!---<cfset profit = ourPrice - siUnitTrade>
 												<cfset POR = int((profit / ourPrice) * 100)>--->
 
-													<cfset unitVAT = val(siUnitTrade) * (prodVATRate / 100)>
-													<cfset unitGross = val(siUnitTrade) + unitVAT>
+													<cfset unitVAT = val(tradePrice) * (prodVATRate / 100)>
+													<cfset unitGross = val(tradePrice) + unitVAT>
 													<cfset profit = ourPrice - unitGross>
 													<cfset POR = int((profit / ourPrice) * 100)>
 
@@ -553,7 +570,7 @@
 													<td class="sod_title disable-select" data-id="#prodID#">#prodTitle#</td>
 													<td>#siUnitSize#</td>
 													<td align="right">#prodVATRate#%</td>
-													<td>&pound;#siWSP#</td>
+													<td>&pound;#tradePrice#</td>
 													<td align="center">#siPackQty#</td>
 													<td align="right">&pound;#DecimalFormat(unitGross)#</td>
 													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
@@ -580,7 +597,7 @@
 														<th width="10"></th>
 														<th>ID</th>
 														<th>Reference</th>
-														<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:96%;"></th>
+														<th align="left"><input type="text" id="productSearch" value="" placeholder="Search products" style="width:96%;"></th>
 														<th width="80">Unit Size</th>
 														<th width="80">Our Price</th>
 														<th width="40">Price Marked</th>
@@ -626,7 +643,7 @@
 													<th width="10"></th>
 													<th>ID</th>
 													<th width="40">Reference</th>
-													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:76%;"></th>
+													<th align="left"><input type="text" id="productSearch" value="" placeholder="Search products" style="width:76%;"></th>
 													<th width="40">Unit Size</th>
 													<th width="160">Category</th>
 													<th width="40">Our Price</th>
@@ -755,7 +772,7 @@
 													<th width="10"></th>
 													<th>ID</th>
 													<th>Reference</th>
-													<th align="left"><input type="text" id="quicksearch" value="" placeholder="Search products" style="width:90%;"></th>
+													<th align="left"><input type="text" id="productSearch" value="" placeholder="Search products" style="width:90%;"></th>
 													<th>Size</th>
 													<th>Pack Qty</th>
 													<th>Our Price</th>

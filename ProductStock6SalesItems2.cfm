@@ -34,7 +34,7 @@
 			</tr>
 		</table>
 	</cfloop>
-	<table class="tableList" border="1" width="70%">
+	<table class="tableList" border="1" width="100%">
 		<tr>
 			<th align="center">Tran ID</th>
 			<th align="right">Date &amp; Time</th>

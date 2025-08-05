@@ -15,6 +15,7 @@
 				WHERE trnLedger = 'purch' 
 				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
 				AND trnType IN ('inv','crn')
+				AND nomID NOT IN (11,21,201)
 				ORDER BY nomGroup,nomCode, accCode, trnDate;
 			</cfquery>
 			<cfset loc.result.QTrans = loc.QTrans>

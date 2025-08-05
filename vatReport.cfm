@@ -738,7 +738,7 @@
 										<td>#ACCCODE#</td>
 										<td>#ACCNAME#</td>
 										<td>#TRNID#</td>
-										<td>#TRNDATE#</td>
+										<td>#LSDateFormat(TRNDATE,"dd-mmm-yy")#</td>
 										<td>#TRNREF#</td>
 										<td>#TRNDESC#</td>
 										<!---<td align="right">#DecimalFormat(TRNAMNT1)#</td>

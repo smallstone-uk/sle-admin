@@ -52,14 +52,18 @@
 		.vatHeader {background-color:#FC9;}
 	</style>
 </head>
-<cfset parms={}>
-<cfset parms.datasource=application.site.datasource1>
 <cfsetting requesttimeout="900">
 <cfparam name="srchReport" default="1">
 <cfparam name="srchAccount" default="">
 <cfparam name="srchExclude" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
+
+<cfobject component="code/vatReport" name="report">
+<cfset parms = {}>
+<cfset parms.datasource = application.site.datasource1>
+<cfset parms.form = form>
+
 
 <cfquery name="QAccounts" datasource="#parms.datasource#">
 	SELECT eaID, eaTitle
@@ -88,6 +92,7 @@
 											<option value="">Select...</option>
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>VAT Report</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Daily VAT Report</option>
+											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>VAT Transactions</option>
 										</select>
 									</td>
 								</tr>
@@ -695,6 +700,72 @@
 										<td align="right">#keyTotal#</td>
 									</tr>
 								</cfloop>
+							</table>
+						</cfcase>
+						<cfcase value="3">
+							<!--- VAT Transactions --->
+							<cfset data = report.TransactionList(parms)>
+							<cfset nominalCode = "">
+							<!---<cfdump var="#data#" label="data" expand="false">--->
+							<table border="1" class="tableList" width="100%">
+								<tr>
+									<th>Account Code</th>
+									<th>Account Name</th>
+									<th>Tran ID</th>
+									<th width="100">Date</th>
+									<th>Reference</th>
+									<th>Description</th>
+									<!---<th align="right">Tran Net</th>
+									<th align="right">Tran VAT</th>--->
+									<th align="right">Item Net</th>
+									<th align="right">Item VAT</th>
+									<th align="right">VAT Rate</th>
+									<th>Nom Code</th>
+									<th>Description</th>
+								</tr>
+								<cfloop query="data.QTrans">
+									<cfif len(nominalCode) AND nominalCode neq NOMCODE>
+										<cfset tots = StructFind(data.totals,nominalCode)>
+										<tr>
+											<th colspan="6">#tots.num# transactions</th>
+											<th align="right">#DecimalFormat(tots.net)#</th>
+											<th align="right">#DecimalFormat(tots.vat)#</th>
+											<th colspan="3"></th>
+										</tr>
+									</cfif>
+									<cfset nominalCode = NOMCODE>
+									<tr>
+										<td>#ACCCODE#</td>
+										<td>#ACCNAME#</td>
+										<td>#TRNID#</td>
+										<td>#TRNDATE#</td>
+										<td>#TRNREF#</td>
+										<td>#TRNDESC#</td>
+										<!---<td align="right">#DecimalFormat(TRNAMNT1)#</td>
+										<td align="right">#DecimalFormat(TRNAMNT2)#</td>--->
+										<td align="right">#DecimalFormat(NIAMOUNT)#</td>
+										<td align="right">#DecimalFormat(NIVATAMOUNT)#</td>
+										<td align="right">#NIVATRATE#%</td>
+										<td>#NOMCODE#</td>
+										<td>#NOMTITLE#</td>
+									</tr>
+								</cfloop>
+								<!--- last one --->
+								<cfset tots = StructFind(data.totals,nominalCode)>
+								<tr>
+									<th colspan="6">#tots.num# transactions</th>
+									<th align="right">#DecimalFormat(tots.net)#</th>
+									<th align="right">#DecimalFormat(tots.vat)#</th>
+									<th colspan="3"></th>
+								</tr>
+								<!--- grand total --->
+								<cfset tots = StructFind(data.totals,"zzGrand")>
+								<tr>
+									<th colspan="6">#tots.num# transactions</th>
+									<th align="right">#DecimalFormat(tots.net)#</th>
+									<th align="right">#DecimalFormat(tots.vat)#</th>
+									<th colspan="3"></th>
+								</tr>
 							</table>
 						</cfcase>
 					</cfswitch>

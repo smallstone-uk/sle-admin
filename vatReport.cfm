@@ -26,7 +26,7 @@
 		.amountTotal {text-align:right; font-weight:bold;}
 		.tranList {	
 			font-family:Arial, Helvetica, sans-serif;
-			font-size:13px;
+			font-size:12px;
 			border-collapse:collapse;
 		}
 		.tranList th, .tranList td {
@@ -58,6 +58,7 @@
 <cfparam name="srchExclude" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
+<cfparam name="srchSort" default="1">
 
 <cfobject component="code/vatReport" name="report">
 <cfset parms = {}>
@@ -122,6 +123,15 @@
 									<td><b>Options</b></td>
 									<td>
 										<input type="checkbox" name="srchExclude" value="1" /> Exclude the above accounts?
+									</td>
+								</tr>
+								<tr>
+									<td><b>Sort By</b></td>
+									<td>
+										<select name="srchSort">
+											<option value="1"<cfif srchSort eq "1"> selected="selected"</cfif>>Nominal Code</option>
+											<option value="2"<cfif srchSort eq "2"> selected="selected"</cfif>>Account Code</option>
+										</select>
 									</td>
 								</tr>
 							</table>
@@ -705,7 +715,7 @@
 						<cfcase value="3">
 							<!--- VAT Transactions --->
 							<cfset data = report.TransactionList(parms)>
-							<cfset nominalCode = "">
+							<cfset sortCode = "">
 							<!---<cfdump var="#data#" label="data" expand="false">--->
 							<table border="1" class="tableList" width="100%">
 								<tr>
@@ -721,19 +731,23 @@
 									<th align="right">Item VAT</th>
 									<th align="right">VAT Rate</th>
 									<th>Nom Code</th>
-									<th>Description</th>
+									<th width="180">Description</th>
 								</tr>
 								<cfloop query="data.QTrans">
-									<cfif len(nominalCode) AND nominalCode neq NOMCODE>
-										<cfset tots = StructFind(data.totals,nominalCode)>
+									<cfif srchSort eq 1><cfset thisCode = NOMCODE>
+										<cfelse><cfset thisCode = ACCCODE></cfif>
+									<cfif len(sortCode) AND sortCode neq thisCode>
+										<cfset tots = StructFind(data.totals,sortCode)>
 										<tr>
-											<th colspan="6">#tots.num# transactions</th>
+											<th colspan="3">#tots.title#</th>
+											<th colspan="3">#tots.num# transactions</th>
 											<th align="right">#DecimalFormat(tots.net)#</th>
 											<th align="right">#DecimalFormat(tots.vat)#</th>
 											<th colspan="3"></th>
 										</tr>
 									</cfif>
-									<cfset nominalCode = NOMCODE>
+									<cfif srchSort eq 1><cfset sortCode = NOMCODE>
+										<cfelse><cfset sortCode = ACCCODE></cfif>
 									<tr>
 										<td>#ACCCODE#</td>
 										<td>#ACCNAME#</td>
@@ -751,9 +765,10 @@
 									</tr>
 								</cfloop>
 								<!--- last one --->
-								<cfset tots = StructFind(data.totals,nominalCode)>
+								<cfset tots = StructFind(data.totals,sortCode)>
 								<tr>
-									<th colspan="6">#tots.num# transactions</th>
+									<th colspan="3">#tots.title#</th>
+									<th colspan="3">#tots.num# transactions</th>
 									<th align="right">#DecimalFormat(tots.net)#</th>
 									<th align="right">#DecimalFormat(tots.vat)#</th>
 									<th colspan="3"></th>
@@ -761,7 +776,8 @@
 								<!--- grand total --->
 								<cfset tots = StructFind(data.totals,"zzGrand")>
 								<tr>
-									<th colspan="6">#tots.num# transactions</th>
+									<th colspan="3">#tots.title#</th>
+									<th colspan="3">#tots.num# transactions</th>
 									<th align="right">#DecimalFormat(tots.net)#</th>
 									<th align="right">#DecimalFormat(tots.vat)#</th>
 									<th colspan="3"></th>

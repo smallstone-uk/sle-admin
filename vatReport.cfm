@@ -142,6 +142,9 @@
 					<cfswitch expression="#srchReport#">
 						<cfcase value="1">
 							<!--- Shop Sales --->
+							<cfset loc = {}>
+							<cfset loc.srchDateTo = DateAdd("d",1,srchDateTo)>
+							<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
 							<cfquery name="QSaleItems" datasource="#parms.datasource#" result="QSaleItemsResult">
 								SELECT ehMode, ehPayAcct,
 								eiTimestamp,eiType,eiPayType,eiRetail,eiTrade, SUM(eiQty) AS Qty, -SUM(eiNet) AS Net, -SUM(eiVAT) AS VAT, SUM(eiTrade) AS Trade,
@@ -151,7 +154,7 @@
 								INNER JOIN tblProducts ON prodID = eiProdID
 								INNER JOIN tblProductCats ON pcatID = prodCatID
 								INNER JOIN tblProductGroups ON pgID = pcatGroup
-								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#loc.midnight#'
 								AND eiClass = 'sale'
 								<!---AND ehMode != 'wst'--->
 								<cfif len(srchAccount)>

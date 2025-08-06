@@ -240,7 +240,60 @@
 							</table>
 							<cfset summary.box1.value = totVAT>				
 							<cfset summary.box3.value = totVAT>				
-							<cfset summary.box6.value = totNet>
+							<cfset summary.box6.value = totNet>						
+			
+							<!--- Catering sales --->
+							<cfquery name="QInvoicedSales" datasource="#parms.datasource#">
+								SELECT accID,accName,tbltrans.*  
+								FROM tbltrans 
+								INNER JOIN tblAccount ON trnAccountID = accID
+								WHERE trnLedger = 'sales' 
+								AND trnAccountID NOT IN (1,4) 
+								AND trnType IN ('inv', 'crn') 
+								AND trnDate BETWEEN '#srchDateFrom#' AND '#srchDateTo#'
+							</cfquery>
+							<table border="1" class="tableList">
+								<tr>
+									<td class="salesHeader" colspan="7"><h1>Catering Sales</h1></td>
+								</tr>
+								<tr>
+									<th width="40">Line</th>
+									<th width="100">Date</th>
+									<th width="40">Type</th>
+									<th width="60">Net</th>
+									<th width="60">VAT</th>
+									<th width="40">Account</th>
+									<th width="180">Name</th>
+								</tr>
+								<cfset totNet = 0>
+								<cfset totVAT = 0>
+								<cfset lineCount = 0>
+								<cfloop query="QInvoicedSales">
+									<cfset lineCount++>
+									<cfset totNet += trnAmnt1>
+									<cfset totVAT += trnAmnt2>
+									<tr>
+										<td align="center">#lineCount#</td>
+										<td>#LSDateFormat(trnDate,"dd-mmm-yyyy")#</td>
+										<td>#trnType#</td>
+										<td align="right">#DecimalFormat(trnAmnt1)#</td>
+										<td align="right">#DecimalFormat(trnAmnt2)#</td>
+										<td>#accID#</td>
+										<td>#accName#</td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th></th>
+									<th></th>
+									<th></th>
+									<th>#DecimalFormat(totNet)#</th>
+									<th>#DecimalFormat(totVAT)#</th>
+									<th colspan="2"></th>
+								</tr>
+							</table>
+							<cfset summary.box1.value += totVAT>
+							<cfset summary.box3.value += totVAT>
+							<cfset summary.box6.value += totNet>				
 							
 							<!--- News Sales --->
 							<cfquery name="QNewTrans" datasource="#parms.datasource#">
@@ -273,7 +326,7 @@
 									<cfset newsCount += NUM>
 									<cfset totNet += TOTAL>
 									<tr>
-										<td>#lineCount#</td>
+										<td align="center">#lineCount#</td>
 										<td>#LSDateFormat(trnDate,"dd-mmm-yyyy")#</td>
 										<td>#trnType#</td>
 										<td align="center">#NumberFormat(NUM,",")#</td>
@@ -474,6 +527,8 @@
 									<th width="60"></th>
 								</tr>
 							</table>
+							<cfset summary.box4.value += totVAT>
+							<cfset summary.box7.value += totNet>				
 <!---
 									<cfif nomGroup gte "C" AND nomFlag eq 0>
 										<tr>
@@ -719,7 +774,7 @@
 							<!--- VAT Transactions --->
 							<cfset data = report.TransactionList(parms)>
 							<cfset sortCode = "">
-							<!---<cfdump var="#data#" label="data" expand="false">--->
+							<cfdump var="#data#" label="data" expand="false">
 							<table border="1" class="tableList" width="100%">
 								<tr>
 									<th>Account Code</th>

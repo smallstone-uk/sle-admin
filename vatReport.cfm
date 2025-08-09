@@ -50,6 +50,9 @@
 		.purchHeader { background-color:#09F;}
 		.nomHeader { background-color:#FF3;}
 		.vatHeader {background-color:#FC9;}
+		.reg {background-color:#FFFFFF;}
+		.rfd {background-color:#FFCCFF;}
+		.wst {background-color:#FFFF99;}
 	</style>
 </head>
 <cfsetting requesttimeout="900">
@@ -143,6 +146,80 @@
 						<cfcase value="1">
 							<!--- Shop Sales --->
 							<cfset loc = {}>
+							<cfset result = report.VATSummary(parms)>
+							<cfset totNet = 0>
+							<cfset totVAT = 0>
+							<cfset totQty = 0>
+							<cfset totTrd = 0>
+							<cfset totPrf = 0>
+							<cfset POR = 0>
+							<cfset loc.datakeys = ListSort(StructKeyList(result.data,","),"text","asc")>
+							<cfset summary = {
+								"box1" = {"title" = "VAT due on sales and other outputs", "value" = 0},
+								"box2" = {"title" = "VAT due on acquisitions from other EC States", "value" = 0},
+								"box3" = {"title" = "Total VAT due (sum of boxes 1 & 2)", "value" = 0},
+								"box4" = {"title" = "VAT reclaimed on purchases", "value" = 0},
+								"box5" = {"title" = "Net VAT payable or repayable", "value" = 0},
+								"box6" = {"title" = "Total value of sales", "value" = 0},
+								"box7" = {"title" = "Total value of purchases", "value" = 0},
+								"box8" = {"title" = "Total value of supplies from EC States", "value" = 0},
+								"box9" = {"title" = "Total value of acquisitions from EC States", "value" = 0}
+							}>
+
+							<table border="1" class="tableList">
+								<tr>
+									<td class="salesHeader" colspan="9"><h1>Shop Sales</h1></td>
+								</tr>
+								<tr>
+									<th width="60">Mode</th>
+									<th width="60">Group</th>
+									<th>Description</th>
+									<th width="60">QTY</th>
+									<th width="60">NET</th>
+									<th width="60">VAT</th>
+									<th width="60">Trade</th>
+									<th width="60">Profit</th>
+									<th width="60">POR%</th>
+								</tr>
+								<cfset lineCount = 0>
+								<cfloop list="#loc.datakeys#" index="loc.key">
+									<cfset loc.item = StructFind(result.data,loc.key)>
+									<cfset lineCount++>
+									<cfset totNet += loc.item.net>
+									<cfset totVAT += loc.item.VAT>
+									<cfset totQty += loc.item.qty>
+									<cfset totTrd += loc.item.trade>
+									<cfset totPrf = totNet - totTrd>
+									<cfif loc.item.net neq 0><cfset totPOR = int((totPrf / totNet) * 10000) / 100></cfif>
+									<tr class="#loc.item.mode#">
+										<td>#loc.item.mode#</td>
+										<td>#loc.item.group#</td>
+										<td>#loc.item.title#</td>
+										<td align="center">#NumberFormat(loc.item.qty,",")#</td>
+										<td align="right">#DecimalFormat(loc.item.net)#</td>
+										<td align="right">#DecimalFormat(loc.item.VAT)#</td>
+										<td align="right">#DecimalFormat(loc.item.trade)#</td>
+										<td align="right">#DecimalFormat(loc.item.profit)#</td>
+										<td align="right">#loc.item.POR#%</td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th></th>
+									<th align="center">#lineCount#</th>
+									<th>TOTALS</th>
+									<th align="center">#NumberFormat(totQty,",")#</th>
+									<th align="right">#DecimalFormat(totNet)#</th>
+									<th align="right">#DecimalFormat(totVAT)#</th>
+									<th align="right">#DecimalFormat(totTrd)#</th>
+									<th align="right">#DecimalFormat(totPrf)#</th>
+									<th>#totPOR#%</th>
+								</tr>
+							</table>
+							<cfset summary.box1.value = totVAT>				
+							<cfset summary.box3.value = totVAT>				
+							<cfset summary.box6.value = totNet>						
+
+<!---							
 							<cfset loc.srchDateTo = DateAdd("d",1,srchDateTo)>
 							<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
 							<cfquery name="QSaleItems" datasource="#parms.datasource#" result="QSaleItemsResult">
@@ -156,7 +233,6 @@
 								INNER JOIN tblProductGroups ON pgID = pcatGroup
 								WHERE eiTimestamp BETWEEN '#srchDateFrom#' AND '#loc.midnight#'
 								AND eiClass = 'sale'
-								<!---AND ehMode != 'wst'--->
 								<cfif len(srchAccount)>
 									<cfif StructKeyExists(form,"srchExclude")>
 										AND ehPayAcct NOT IN (#srchAccount#)
@@ -164,10 +240,9 @@
 										AND ehPayAcct IN (#srchAccount#)
 									</cfif>
 								</cfif>
-								GROUP BY pgNomGroup, pgTitle
+								GROUP BY ehMode, pgNomGroup,pgTitle
 								ORDER BY pgNomGroup, pgTitle
 							</cfquery>
-							<!---<cfdump var="#QSaleItemsResult#" label="QItems" expand="false">--->
 							
 							<cfset summary = {
 								"box1" = {"title" = "VAT due on sales and other outputs", "value" = 0},
@@ -192,6 +267,7 @@
 									<td class="salesHeader" colspan="8"><h1>Shop Sales</h1></td>
 								</tr>
 								<tr>
+									<th width="60">Mode</th>
 									<th width="60">Group</th>
 									<th>Description</th>
 									<th width="60">QTY</th>
@@ -203,9 +279,15 @@
 								</tr>
 								<cfset lineCount = 0>
 								<cfloop query="QSaleItems">
-									<cfset totNet += Net>
-									<cfset totVAT += VAT>
-									<cfset totQty += Qty>
+									<cfif ehMode eq 'wst'>
+										<cfset totNet += -Net>
+										<cfset totVAT += -VAT>
+										<cfset totQty += -Qty>
+									<cfelse>
+										<cfset totNet += Net>
+										<cfset totVAT += VAT>
+										<cfset totQty += Qty>
+									</cfif>
 									<cfset totTrd += Trade>
 									<cfset profit = (Net - Trade)>
 									<cfset totPrf += profit>
@@ -214,6 +296,7 @@
 										<cfset POR = Round((profit / Net) * 100)>
 									</cfif>
 									<tr>
+										<td>#ehMode#</td>
 										<td>#pgNomGroup#</td>
 										<td>#pgTitle#</td>
 										<td align="center">#NumberFormat(Qty,",")#</td>
@@ -228,6 +311,7 @@
 									<cfset POR = Round((totPrf / totNet) * 100)>
 								</cfif>
 								<tr>
+									<th></th>
 									<th align="center">#lineCount#</th>
 									<th>TOTALS</th>
 									<th align="center">#NumberFormat(totQty,",")#</th>
@@ -242,6 +326,7 @@
 							<cfset summary.box3.value = totVAT>				
 							<cfset summary.box6.value = totNet>						
 			
+--->
 							<!--- Catering sales --->
 							<cfquery name="QInvoicedSales" datasource="#parms.datasource#">
 								SELECT accID,accName,tbltrans.*  
@@ -408,7 +493,7 @@
 							<cfset summary.box4.value += totVAT>
 							<cfset summary.box7.value += totNet>				
 							
-							<!--- Running Costs --->
+							<!--- Operating Costs --->
 							<cfquery name="QCostItems" datasource="#parms.datasource#">
 								SELECT trnDate, nomID,nomGroup,nomCode,nomTitle, SUM(niAmount) AS Amount, SUM(niVATAmount) AS VATAmount, Count(*) AS Num
 								FROM `tbltrans` 
@@ -489,7 +574,9 @@
 							<cfset totQty = 0>
 							<table border="1" class="tableList">
 								<tr>
-									<td class="nomHeader" colspan="8"><h1>Other Nominal Accounts</h1></td>
+									<td class="nomHeader" colspan="8">
+										<h1>Other Nominal Accounts</h1> Not part of the VAT calculations
+									</td>
 								</tr>
 								<tr>
 									<th width="60">Group</th>

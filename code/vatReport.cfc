@@ -36,7 +36,6 @@
 				<cfset loc.x.key = "#pgNomGroup#-#NumberFormat(pgID,'000')#-#ehMode#">
 				<!---<cfset loc.x.key = pgID>--->
 				<cfset loc.x.waste = 0>
-				<cfset loc.x.qty = qty>
 				<cfif ehMode eq "wst">
 					<cfset loc.x.net = 0>
 					<cfset loc.x.VAT = 0>
@@ -59,12 +58,13 @@
 				<cfif !StructKeyExists(loc.data,loc.x.key)>
 					<cfset StructInsert(loc.data,loc.x.key, {
 						"mode" = ehMode,
+						"groupID" = pgID,
 						"group" = pgNomGroup,
 						"title" = pgTitle,
 						"qty" = Qty,
 						"net" = loc.x.net,
 						"VAT" = loc.x.VAT,
-						"trade" = trade,
+						"trade" = loc.x.trade,
 						"waste" = loc.x.waste,
 						"profit" = loc.x.profit,
 						"POR" = loc.x.POR
@@ -161,6 +161,133 @@
 				</cfloop>
 			</cfif>
 			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="VATDetail" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.products = {}>
+		
+		<cftry>
+			<cfif StructKeyExists(args.form,"group")>
+				<cfquery name="loc.QGroup" datasource="#args.datasource#">
+					SELECT pgID,pgTitle
+					FROM tblProductGroups
+					WHERE pgID = #val(args.form.group)#
+				</cfquery>
+				<cfset loc.result.Group = loc.QGroup.pgtitle>
+				<cfset loc.srchDateTo = DateAdd("d",1,args.form.srchDateTo)>
+				<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
+				<cfquery name="loc.QSales" datasource="#args.datasource#">
+					SELECT ehMode, pcatID,pcatTitle,prodID,prodTitle, SUM(eiNet) AS net, SUM(eiVAT) AS VAT, SUM(eiTrade) AS trade, SUM(eiQty) AS qty,
+					siUnitSize,siOurPrice
+					FROM tblepos_items
+					INNER JOIN tblepos_header ON ehID = eiParent
+					INNER JOIN tblProducts ON prodID = eiProdID
+					INNER JOIN tblproductcats ON pcatID = prodCatID
+					LEFT JOIN tblStockItem ON siProduct = prodID
+						AND tblStockItem.siID = (
+							SELECT MAX( siID )
+							FROM tblStockItem
+							WHERE prodID = siProduct
+							AND siStatus = 'closed' )
+					WHERE pcatGroup = #val(args.form.group)#
+					AND eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#loc.midnight#'
+					GROUP BY ehMode,prodID
+					ORDER BY CAST(ehMode AS CHAR), prodTitle
+				</cfquery>
+				<cfset loc.result.QSales = loc.QSales>
+				
+				<cfset loc.x = {}>
+				<cfset loc.tot = {net=0,vat=0,trade=0,qty=0,profit=0}>
+				<cfloop query="loc.QSales">
+					<cfset loc.x.key = "#ehMode#-#prodID#">
+					<cfif ehMode eq "wst">
+						<cfset loc.x.net = 0>
+						<cfset loc.x.VAT = 0>
+						<cfset loc.x.trade = trade>
+						<cfset loc.x.profit = loc.x.net - loc.x.trade>
+						<cfset loc.x.POR = 0>
+					<cfelseif ehMode eq "rfd">
+						<cfset loc.x.net = -net>
+						<cfset loc.x.VAT = -VAT>
+						<cfset loc.x.trade = -trade>
+						<cfset loc.x.profit = loc.x.net - loc.x.trade>
+						<cfif loc.x.net neq 0><cfset loc.x.POR = -int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
+					<cfelse>
+						<cfset loc.x.net = -net>
+						<cfset loc.x.VAT = -VAT>
+						<cfset loc.x.trade = trade>
+						<cfset loc.x.profit = loc.x.net - loc.x.trade>				
+						<cfif loc.x.net neq 0><cfset loc.x.POR = int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
+					</cfif>	
+					<cfif !StructKeyExists(loc.products,loc.x.key)>
+						<cfset StructInsert(loc.products,loc.x.key, {
+							"mode" = ehMode,
+							"prodID" = prodID,
+							"prodTitle" = prodTitle,
+							"pcatTitle" = pcatTitle,
+							"siUnitSize" = siUnitSize,
+							"siOurPrice" = siOurPrice,
+							"qty" = Qty,
+							"net" = loc.x.net,
+							"VAT" = loc.x.VAT,
+							"trade" = loc.x.trade,
+							"profit" = loc.x.profit,
+							"POR" = loc.x.POR
+						})>
+					<cfelse>
+						<cfset loc.item = StructFind(loc.products,loc.x.key)>
+						<cfset loc.item.net += loc.x.net>
+						<cfset loc.item.VAT += loc.x.VAT>
+						<cfset loc.item.trade += loc.x.trade>
+						<cfset loc.item.profit = (loc.item.net - loc.item.trade)>
+						<cfif loc.item.net neq 0><cfset loc.x.POR = loc.item.profit / loc.item.net></cfif>
+					</cfif>
+
+<!---
+					<cfif !StructKeyExists(loc.products,loc.key)>
+						<cfset StructInsert(loc.products,loc.key, {
+							"mode" = ehMode,
+							"prodID" = prodID,
+							"prodTitle" = prodTitle,
+							"pcatTitle" = pcatTitle,
+							"siUnitSize" = siUnitSize,
+							"siOurPrice" = siOurPrice,
+							"net" = net,
+							"VAT" = VAT,
+							"trade" = trade,
+							"qty" = qty,
+							"profit" = net - trade
+						})>
+					<cfelse>
+						<cfset loc.item = StructFind(loc.products,loc.key)>
+						<cfset loc.item.net = net>
+						<cfset loc.item.VAT = VAT>
+						<cfset loc.item.trade = trade>
+						<cfset loc.item.qty = qty>
+						<cfset loc.item.profit = net - trade>
+					</cfif>
+					
+--->
+					<cfset loc.tot.net += loc.x.net>
+					<cfset loc.tot.VAT += loc.x.VAT>
+					<cfset loc.tot.trade += loc.x.trade>
+					<cfset loc.tot.qty += qty>
+					<cfset loc.tot.profit += (loc.x.net - loc.x.trade)>
+					<cfif loc.tot.net neq 0><cfset loc.tot.POR = int((loc.tot.profit / loc.tot.net) * 10000) / 100></cfif>
+				</cfloop>
+				<cfset loc.result.products = loc.products>	
+				<cfset loc.result.totals = loc.tot>
+			</cfif>
+
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

@@ -18,6 +18,42 @@
 		$(document).ready(function() {
 			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 			$(".srchAccount, .srchTranType").chosen({width: "300px"});
+			
+			$(".openModal").click(function() {
+				$("#overlay").fadeIn(200);
+				$("#modal").fadeIn(200);
+		
+				// Show loading text
+				$("#modal-content").html("<p>Loading content...</p>");
+				var ref = $(this).data("ref");
+				var group = $(this).data("group");
+				var mode = $(this).data("mode");
+				var srchDateFrom = $('#srchDateFrom').val();
+				var srchDateTo = $('#srchDateTo').val();
+				LoadSales(ref,mode,group,srchDateFrom,srchDateTo,"#modal-content")
+  			});
+			function closeModal() {
+				$("#overlay, #modal").fadeOut(150, function () {
+					$("body").removeClass("modal-open");
+				});
+			}
+	
+			$("#closeModal").on("click", closeModal);
+			
+			function LoadSales(ref,mode,group,srchDateFrom,srchDateTo,result) {
+				$.ajax({
+					type: 'POST',
+					url: 'ajax/AJAX_vatDetail.cfm',
+					data: {"ref":ref,"mode":mode,"group":group,"srchDateFrom":srchDateFrom,"srchDateTo":srchDateTo},
+					beforeSend:function(){
+						$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Loading sales...");
+					},
+					success:function(data){
+						$(result).html(data);
+					}
+				});
+			}
+
 		});
 	</script>
 	<style type="text/css">
@@ -53,6 +89,37 @@
 		.reg {background-color:#FFFFFF;}
 		.rfd {background-color:#FFCCFF;}
 		.wst {background-color:#FFFF99;}
+		/* Overlay */
+		#overlay {
+		  display: none;
+		  position: fixed;
+		  top: 0; left: 0;
+		  width: 100%; height: 100%;
+		  background: rgba(0,0,0,0.5);
+		  z-index: 1000;
+		}
+		/* Modal */
+		#modal {
+		  display: none;
+		  position: fixed;
+		  top: 50%; left: 50%;
+		  transform: translate(-50%, -50%);
+		  background: #fff;
+		  padding: 20px;
+		  border-radius: 8px;
+		  z-index: 1001;
+		  min-width: 300px;
+		  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+		}
+		#modal h2 {
+		  margin-top: 0;
+		}	
+		#modal-content {
+		  margin: 15px 0;
+		  max-height: 80vh; 
+		  overflow-y: auto;
+		  border: solid 1px #CCCCCC;
+		}
 	</style>
 </head>
 <cfsetting requesttimeout="900">
@@ -79,6 +146,12 @@
 <body>
 	<div id="wrapper">
 		<cfinclude template="sleHeader.cfm">
+		<!-- Modal -->
+		<div id="modal">
+		  <div id="modal-content">Loading…</div>
+		  <button id="closeModal">Close</button>
+		</div>
+		<div id="overlay"></div>
 		<div id="content">
 			<div id="content-inner">
 				<div class="form-wrap">
@@ -103,13 +176,13 @@
 								<tr>
 									<td><b>Date From</b></td>
 									<td>
-										<input type="text" name="srchDateFrom" value="#srchDateFrom#" class="datepicker" />
+										<input type="text" name="srchDateFrom" id="srchDateFrom" value="#srchDateFrom#" class="datepicker" />
 									</td>
 								</tr>
 								<tr>
 									<td><b>Date To</b></td>
 									<td>
-										<input type="text" name="srchDateTo" value="#srchDateTo#" class="datepicker" />
+										<input type="text" name="srchDateTo" id="srchDateTo" value="#srchDateTo#" class="datepicker" />
 									</td>
 								</tr>
 								<tr>
@@ -168,7 +241,7 @@
 
 							<table border="1" class="tableList">
 								<tr>
-									<td class="salesHeader" colspan="9"><h1>Shop Sales</h1></td>
+									<td class="salesHeader" colspan="10"><h1>Shop Sales</h1></td>
 								</tr>
 								<tr>
 									<th width="60">Mode</th>
@@ -180,6 +253,7 @@
 									<th width="60">Trade</th>
 									<th width="60">Profit</th>
 									<th width="60">POR%</th>
+									<th width="60">Detail</th>
 								</tr>
 								<cfset lineCount = 0>
 								<cfloop list="#loc.datakeys#" index="loc.key">
@@ -201,6 +275,7 @@
 										<td align="right">#DecimalFormat(loc.item.trade)#</td>
 										<td align="right">#DecimalFormat(loc.item.profit)#</td>
 										<td align="right">#loc.item.POR#%</td>
+										<td><button class="openModal" data-group="#loc.item.groupID#" data-ref="#loc.key#" data-mode="#loc.item.mode#">Details</button></td>
 									</tr>
 								</cfloop>
 								<tr>
@@ -213,6 +288,7 @@
 									<th align="right">#DecimalFormat(totTrd)#</th>
 									<th align="right">#DecimalFormat(totPrf)#</th>
 									<th>#totPOR#%</th>
+									<th></th>
 								</tr>
 							</table>
 							<cfset summary.box1.value = totVAT>				

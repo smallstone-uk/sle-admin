@@ -32,7 +32,7 @@
 		</tr>
 		<cfloop collection="#data.products#" item="key">
 			<cfset item = StructFind(data.products,key)>
-			<tr>
+			<tr class="#item.mode#">
 				<td>#item.mode#</td>
 				<td><a href="productStock6.cfm?product=#item.prodID#" target="product-#item.prodID#">#item.prodID#</td>
 				<td>#item.pcatTitle#</td>

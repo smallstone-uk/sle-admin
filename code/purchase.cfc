@@ -77,6 +77,7 @@
 							<cfset loc.class = "missing">	<!--- assume it wont be found --->
 							<cfif ABS(trnAmnt1) eq loc.tillAmount>	<!--- found it --->
 								<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
+								<cfset loc.tran.trnRef = loc.QSuppPayment.trnRef>
 								<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
 								<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
 								<cfset loc.class = "drifted">
@@ -104,6 +105,7 @@
 					"eiSuppID" = eiSuppID,
 					"found" = loc.QSuppPayment.recordcount,
 					"trnID" = val(loc.tran.trnID),
+					"trnRef" = loc.tran.trnRef,
 					"trnDate" = loc.tran.trnDate,
 					"trnAmnt1" = loc.tran.trnAmnt1,
 					"class" = loc.class
@@ -130,7 +132,7 @@
 					<cfset loc.supp = StructFind(args.data.suppliers,loc.key)>
 					<tr class="header">
 						<th>#loc.key#</th>
-						<th colspan="8">#loc.supp.accName#</th>
+						<th colspan="9">#loc.supp.accName#</th>
 					</tr>
 					<tr>
 						<th>eiID</th>
@@ -139,6 +141,7 @@
 						<th>eiNet</th>
 						<th></th>
 						<th>trnID</th>
+						<th>trnRef</th>
 						<th>Tran Date</th>
 						<th>Tran Amount</th>
 						<th>found</th>
@@ -154,6 +157,7 @@
 							<td align="right">#loc.tran.eiNet#</td>
 							<td>&nbsp;</td>
 							<td align="right">#loc.tran.trnID#</td>
+							<td align="right">#loc.tran.trnRef#</td>
 							<td align="right">#DateFormat(loc.tran.trnDate,"ddd dd-mmm-yyyy")#</td>
 							<td align="right">#loc.tran.trnAmnt1#</td>
 							<td align="center">#loc.tran.found#</td>
@@ -161,7 +165,7 @@
 					</cfloop>
 				</cfloop>
 				<tr>
-					<th colspan="9">#loc.errors# errors found.</th>
+					<th colspan="10">#loc.errors# errors found.</th>
 				</tr>
 				</table>
 			</cfoutput>

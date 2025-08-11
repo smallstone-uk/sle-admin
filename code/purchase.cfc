@@ -52,6 +52,7 @@
 				<cfset loc.class = "normal">
 				<cfset loc.tran = {}>
 				<cfset loc.tran.trnID = 0>
+				<cfset loc.tran.trnRef = "">
 				<cfset loc.tran.trnDate = "">
 				<cfset loc.tran.trnAmnt1 = 0.00>
 				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">	<!--- look for matching payment --->
@@ -89,6 +90,7 @@
 					</cfif>
 				<cfelse>	<!--- found it first time --->
 					<cfset loc.tran.trnID = loc.QSuppPayment.trnID>
+					<cfset loc.tran.trnRef = loc.QSuppPayment.trnRef>
 					<cfset loc.tran.trnDate = loc.QSuppPayment.trnDate>
 					<cfset loc.tran.trnAmnt1 = loc.QSuppPayment.trnAmnt1>
 				</cfif>

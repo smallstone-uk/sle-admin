@@ -3,7 +3,7 @@
 
 <cftry>
 	<cfsetting requesttimeout="300">
-	<cfparam name="driverRate" default="0.75">
+	<cfparam name="driverRate" default="0.65">
 	<cfparam name="fuelRate" default="0.30">
 
 	<cffunction name="loadRoundData" access="public" returntype="struct">

@@ -149,8 +149,11 @@
 						<li><a href="pubSales.cfm">Publication Sales Analysis</a></li>
 						<li class="spacer"></li>
 						<li><a href="birthday.cfm">Staff Birthdays</a></li>
-						<li><a href="http://tweb.epos.co.uk/reportdaysheet.cfm" target="_blank">EPOS Day Report</a></li>
-						<li><a href="http://tweb.epos.co.uk/reportaccounts.cfm" target="_blank">EPOS Accounts</a></li>
+						<li class="spacer"></li>
+						<li><a href="#application.site.url2#reportdaysheet.cfm" target="_blank">EPOS Day Report</a></li>
+						<li><a href="#application.site.url2#reportaccounts.cfm" target="_blank">EPOS Accounts</a></li>
+						<li><a href="#application.site.url2#reportAnalysis.cfm" target="_blank">EPOS Analysis</a></li>
+						<li><a href="#application.site.url2#reportAnalysis2.cfm" target="_blank">EPOS Analysis by Hour</a></li>
 						<li class="spacer"></li>
 						<li><a href="logs.cfm" tabindex="-1">Logs</a></li>
 					</ul>

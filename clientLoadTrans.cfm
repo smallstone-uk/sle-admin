@@ -15,7 +15,7 @@
 			var formData = $('#AllocForm').serialize();
 			var result = $('#resultContainer');
 			var maxCheck = $('#maxTrans').val();
-			if (maxCheck > 100)	{
+			if (maxCheck > 200)	{
 				$(result).html('Too many transactions to allocate. Use the dates to reduce the range.');
 				return false;	
 			}

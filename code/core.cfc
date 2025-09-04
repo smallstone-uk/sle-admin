@@ -1110,6 +1110,7 @@
 				<option value="4">From Previous Month</option>
 				<option value="5">Previous Quarter</option>
 				<option value="6">Last 6 Months</option>
+				<option value="12">Last 12 Months</option>
 				<cfset dateKeys=ListSort(StructKeyList(application.site.FYDates,","),"text","DESC")>
 				<cfloop list="#dateKeys#" index="key">
 					<cfset item=StructFind(application.site.FYDates,key)>

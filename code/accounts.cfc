@@ -144,6 +144,9 @@
 				<cfcase value="6">
 					AND trnDate >= '#LSDateFormat(DateAdd("m",-6,loc.thisMonth),"yyyy-mm-dd")#'
 				</cfcase>
+				<cfcase value="12">
+					AND trnDate >= '#LSDateFormat(DateAdd("m",-12,loc.thisMonth),"yyyy-mm-dd")#'
+				</cfcase>
 				<cfdefaultcase>
 					<cfif len(args.form.srchRange)>
 						<cfif Left(args.form.srchRange,2) eq 'FY'>
@@ -1749,6 +1752,9 @@
 				<cfcase value="6">
 					AND trnDate >= '#LSDateFormat(DateAdd("m",-6,loc.thisMonth),"yyyy-mm-dd")#'
 				</cfcase>
+				<cfcase value="12">
+					AND trnDate >= '#LSDateFormat(DateAdd("m",-12,loc.thisMonth),"yyyy-mm-dd")#'
+				</cfcase>
 				<cfdefaultcase>
 					<cfif len(args.form.srchRange)>
 						<cfif Left(args.form.srchRange,2) eq 'FY'>
@@ -1784,6 +1790,9 @@
 					</cfcase>
 					<cfcase value="pay">
 						AND trnType='pay'
+					</cfcase>
+					<cfcase value="rfd">
+						AND trnType='rfd'
 					</cfcase>
 					<cfcase value="jnl">
 						AND trnType='jnl'

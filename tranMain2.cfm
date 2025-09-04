@@ -319,8 +319,9 @@
 				<option value="crn">Credit Notes</option>
 				<option value="ic">Invoices &amp; Credit Notes</option>
 				<option value="pay">Payments</option>											
+				<option value="rfd">Refunds</option>											
 				<option value="jnl">Journals</option>
-				<option value="pj">Payments &amp; Journals</option>											
+				<option value="pj">Payments, Journals &amp; Refunds</option>											
 			</select>
 		</div>
 		<div class="element">

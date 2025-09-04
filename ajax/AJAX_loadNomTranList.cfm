@@ -67,6 +67,9 @@
 				});
 				event.preventDefault();
 			});
+			if (document.title != "#transactions.nomAccount.nomTitle#") {
+				document.title = "#transactions.nomAccount.nomTitle#";
+			}
 		});
 	</script>
 	<cfif !ArrayIsEmpty(transactions.tranList)>

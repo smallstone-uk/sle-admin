@@ -171,6 +171,9 @@
 						}
 					});
 				});
+				if (document.title != "#acctData.Account.accName#") {
+					document.title = "#acctData.Account.accName#";
+				}
 			</script>
 			<table border="1" class="tableList" width="100%">
 				<tr>

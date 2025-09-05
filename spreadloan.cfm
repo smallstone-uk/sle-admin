@@ -39,6 +39,7 @@
 	</style>
 </head>
 
+<cfparam name="srchBank" default="">
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchFile" default="">
@@ -46,7 +47,7 @@
 <cfparam name="srchNominal" default="on">
 <cfparam name="srchCustomers" default="on">
 <cfparam name="srchUnknown" default="">
-<cfparam name="srchFilter" default="">
+<cfparam name="srchFilter" default="INT">
 
 <body>
 	<cfset refs={}>
@@ -82,6 +83,35 @@
 		<cfreturn loc.result>
 	</cffunction>
 	
+	<cffunction name="GetBanks" access="public" returntype="struct">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.nomIDs = "41,1441,3092">
+		<cftry>
+			<cfquery name="loc.QNominals" datasource="#application.site.datasource1#">
+				SELECT nomID,nomCode,nomTitle,nomKey,nomGroup
+				FROM tblNominal
+				WHERE nomID IN (#loc.nomIDs#)
+			</cfquery>
+			<cfif loc.QNominals.recordcount gt 0>
+				<cfloop query="loc.QNominals">
+					<cfset StructInsert(loc.result,nomCode,{
+						nomID = #nomID#,
+						nomCode = #nomCode#,
+						nomTitle = #nomTitle#,
+						nomGroup = #nomGroup#,
+						nomKey = #nomKey#
+					})>
+				</cfloop>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cffunction name="GetPostingAccount" access="public" returntype="struct">
 		<cfargument name="key" type="string" required="yes">
 		<cfset var loc={}>
@@ -96,7 +126,6 @@
 		<cfset loc.lengths=[]>
 		<cfif len(key)>
 			<cfloop condition="len(loc.newIndex) gt 0">
-				<cfoutput>key #loc.newIndex#<br></cfoutput>
 				<cfset ArrayAppend(loc.tries,loc.newIndex)>
 				<cfquery name="loc.QAccount" datasource="#application.site.datasource1#">
 					SELECT accID,accCode,accGroup,accName,accType,accPayAcc,accNomAcct
@@ -104,7 +133,6 @@
 					WHERE accIndex LIKE '#trim(loc.newIndex)#'
 				</cfquery>
 				<cfif loc.QAccount.recordcount EQ 1>
-					<cfoutput>account #loc.QAccount.accCode#<br></cfoutput>
 					<cfbreak>
 				<cfelse>
 					<cfquery name="loc.QNominal" datasource="#application.site.datasource1#">
@@ -113,7 +141,6 @@
 						WHERE nomKey LIKE '#trim(loc.newIndex)#'
 					</cfquery>
 					<cfif loc.QNominal.recordcount EQ 1>
-						<cfoutput>account #loc.QNominal.nomCode#<br></cfoutput>
 						<cfbreak>
 					<cfelse>
 						<cfquery name="loc.QClient" datasource="#application.site.datasource1#">
@@ -122,7 +149,6 @@
 							WHERE cltKey LIKE '#trim(loc.newIndex)#'
 						</cfquery>					
 						<cfif loc.QClient.recordcount EQ 1>
-							<cfoutput>account #loc.QClient.cltRef#<br></cfoutput>
 							<cfbreak>
 						</cfif>
 					</cfif>
@@ -130,7 +156,6 @@
 				<cfset loc.newIndex=ListDeleteAt(loc.newIndex,ListLen(loc.newIndex," .")," .")>
 				<cfset ArrayAppend(loc.lengths,ListLen(loc.newIndex," "))>
 			</cfloop>
-			<cfoutput>output #loc.newIndex#<br></cfoutput>	
 			<cfif loc.QAccount.recordcount EQ 1>
 				<cfset loc.result.class="blue">
 				<cfset loc.result.postType="account">
@@ -162,7 +187,7 @@
 				<cfset loc.result.Group="">
 				<cfset loc.result.Name="#loc.QClient.cltName# #loc.QClient.cltCompanyName#">
 				<cfset loc.result.Type="sales">
-				<cfset loc.result.PayAcc=41>
+				<cfset loc.result.PayAcc=#srchBank#>
 				<cfset loc.result.NomAcct=1>
 			<cfelseif loc.QAccount.recordcount EQ 0 OR loc.QNominal.recordcount EQ 0>
 				<cfset loc.result.class="red">
@@ -254,7 +279,6 @@
 							</cfcase>
 							<cfcase value="OTH|INT" delimiters="|">
 								<cfset rec.description="#rec.description# #rec.TYPE#">
-								<cfoutput>#rec.description#<br></cfoutput>
 								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 							</cfcase>
 							<cfcase value="CHQ">
@@ -339,7 +363,6 @@
 				<!---<cfdump var="#loc.paymentRecord#" label="paymentRecord" expand="no">--->
 				<cfset loc.result='<span class="insert">Created: #loc.paymentRecord.tranID#</span>'>
 			<cfelse>
-				<cfdump var="#loc#" label="INSERT" expand="false">
 				<cfset insertCount++>
 				<cfset loc.result='<span class="insert">to be inserted</span>'>
 			</cfif>
@@ -452,10 +475,12 @@
 				"nomCode"=acct.code,
 				"nomAmount"=tran.dr-tran.cr
 			})>
+			<cfset loc.banks = GetBanks()>	
+			<cfset loc.bank = StructFind(loc.banks,srchBank)>
 			<cfset ArrayAppend(loc.parm.items,{
-				"nomID"=41,
-				"nomCode"="BANK",
-				"nomAmount"=tran.cr-tran.dr
+				"nomID" = #loc.bank.nomID#,
+				"nomCode" = "#loc.bank.nomCode#",
+				"nomAmount" = tran.cr - tran.dr
 			})>
 			<cfif NOT acct.ignore>
 				<cfif acct.process>
@@ -559,29 +584,33 @@
 	<cfsetting requesttimeout="900">
 	<cfset dataDir="#application.site.dir_data#spreadsheets\">
 	<cfif StructKeyExists(form,"fieldnames")>
-		<cfif StructKeyExists(form,"srchFile")AND ListLen(form.srchFile,",") GT 0>
-			<cfloop list="#form.srchFile#" index="fileSrc">
-				<cfset parm={}>
-				<cfset parm.form=form>
-				<cfset parm.process=form.srchMode EQ 2>
-				<cfset parm.fileName="#application.site.dir_data#spreadsheets\#fileSrc#">
-				<cfoutput><p class="title">#parm.fileName#</p></cfoutput>
-				<cfset processSheet(parm)>
-				<cfif StructKeyExists(form,"srchSuppliers")><cfset outputData(parm,refs.suppliers)></cfif>
-				<cfif StructKeyExists(form,"srchNominal")><cfset outputData(parm,refs.nominal)></cfif>
-				<cfif StructKeyExists(form,"srchCustomers")><cfset outputData(parm,refs.customers)></cfif>
-			</cfloop>
-			<cfoutput>
-				<cfif form.srchMode eq "2">
-					<p>#insertCount# records inserted.</p>
-				<cfelse>
-					<p>#insertCount# records to insert.</p>
-				</cfif>
-			</cfoutput>
-			<cfset fileSrc="">
-			<!---<cfdump var="#refs#" label="refs" expand="false">--->
+		<cfif len(srchBank) IS 0>
+			<h1>No bank has been selected.</h1>
 		<cfelse>
-			No files selected.
+			<cfif StructKeyExists(form,"srchFile")AND ListLen(form.srchFile,",") GT 0>
+				<cfloop list="#form.srchFile#" index="fileSrc">
+					<cfset parm={}>
+					<cfset parm.form=form>
+					<cfset parm.process=form.srchMode EQ 2>
+					<cfset parm.fileName="#application.site.dir_data#spreadsheets\#fileSrc#">
+					<cfoutput><p class="title">#parm.fileName#</p></cfoutput>
+					<cfset processSheet(parm)>
+					<cfif StructKeyExists(form,"srchSuppliers")><cfset outputData(parm,refs.suppliers)></cfif>
+					<cfif StructKeyExists(form,"srchNominal")><cfset outputData(parm,refs.nominal)></cfif>
+					<cfif StructKeyExists(form,"srchCustomers")><cfset outputData(parm,refs.customers)></cfif>
+				</cfloop>
+				<cfoutput>
+					<cfif form.srchMode eq "2">
+						<p>#insertCount# records inserted.</p>
+					<cfelse>
+						<p>#insertCount# records to insert.</p>
+					</cfif>
+				</cfoutput>
+				<cfset fileSrc="">
+				<!---<cfdump var="#refs#" label="refs" expand="false">--->
+			<cfelse>
+				No files selected.
+			</cfif>
 		</cfif>
 	</cfif>
 <cfcatch type="any">
@@ -590,13 +619,33 @@
 </cfcatch>
 </cftry>
 
+<cfset banks = GetBanks()>
 <cfdirectory directory="#dataDir#" action="list" name="QDir">
-<h2><a href="spread.cfm">Import Spreadsheet</a></h2>
+<h2><a href="spreadLoan.cfm">Import Loan Spreadsheet</a></h2>
 <cfoutput>
 <form name="processForm" method="post" enctype="multipart/form-data">
 	<table class="tableStyle" border="1" width="500">
 		<tr>
-			<th colspan="2" align="left">Import Settings</th>
+			<th colspan="2" align="center"><h2>Import Settings</h2></th>
+		</tr>
+		<tr>
+			<th colspan="2" align="left">
+				For loans, you only need to import the interest charges.<br>
+				The loan payments will be imported from the bank account import.<br>
+				Enter 'INT' in the filter box to select just those items.
+			</th>
+		</tr>
+		<tr>
+			<td>Select Bank to Import data into</td>
+			<td>
+				<select name="srchBank" data-placeholder="Select..." id="srchBank" tabindex="1">
+					<option value="">Select...</option>
+					<cfloop collection="#banks#"item="key">
+						<cfset bank = StructFind(banks,key)>
+						<option value="#bank.nomCode#" <cfif bank.nomCode eq srchBank>selected="selected"</cfif>>#bank.nomTitle#</option>
+					</cfloop>
+				</select>
+			</td>
 		</tr>
 		<tr>
 			<td>Transaction Dates From</td>

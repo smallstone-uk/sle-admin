@@ -96,37 +96,41 @@
 		<cfset loc.lengths=[]>
 		<cfif len(key)>
 			<cfloop condition="len(loc.newIndex) gt 0">
+				<cfoutput>key #loc.newIndex#<br></cfoutput>
 				<cfset ArrayAppend(loc.tries,loc.newIndex)>
 				<cfquery name="loc.QAccount" datasource="#application.site.datasource1#">
 					SELECT accID,accCode,accGroup,accName,accType,accPayAcc,accNomAcct
 					FROM tblAccount
 					WHERE accIndex LIKE '#trim(loc.newIndex)#'
 				</cfquery>
-				<cfif loc.QAccount.recordcount IS 0>
+				<cfif loc.QAccount.recordcount EQ 1>
+					<cfoutput>account #loc.QAccount.accCode#<br></cfoutput>
+					<cfbreak>
+				<cfelse>
 					<cfquery name="loc.QNominal" datasource="#application.site.datasource1#">
 						SELECT *
 						FROM tblNominal
 						WHERE nomKey LIKE '#trim(loc.newIndex)#'
 					</cfquery>
 					<cfif loc.QNominal.recordcount EQ 1>
+						<cfoutput>account #loc.QNominal.nomCode#<br></cfoutput>
 						<cfbreak>
-					</cfif>
-					<cfif loc.QNominal.recordcount IS 0>
+					<cfelse>
 						<cfquery name="loc.QClient" datasource="#application.site.datasource1#">
 							SELECT cltID,cltRef,cltName,cltCompanyName
 							FROM tblClients
 							WHERE cltKey LIKE '#trim(loc.newIndex)#'
 						</cfquery>					
 						<cfif loc.QClient.recordcount EQ 1>
+							<cfoutput>account #loc.QClient.cltRef#<br></cfoutput>
 							<cfbreak>
 						</cfif>
 					</cfif>
-				<cfelse>
-					<cfbreak>
 				</cfif>
 				<cfset loc.newIndex=ListDeleteAt(loc.newIndex,ListLen(loc.newIndex," .")," .")>
 				<cfset ArrayAppend(loc.lengths,ListLen(loc.newIndex," "))>
 			</cfloop>
+			<cfoutput>output #loc.newIndex#<br></cfoutput>	
 			<cfif loc.QAccount.recordcount EQ 1>
 				<cfset loc.result.class="blue">
 				<cfset loc.result.postType="account">
@@ -188,12 +192,10 @@
 		<cfset loc.result={}>
 		<cfset loc.accountRef="">
 		<cfset loc.inFilter=true>
-		Loading.
 		<cfspreadsheet action="read" src="#args.fileName#" name="spready">
 		<cfset SpreadsheetSetActiveSheet(spready,"Bank Recon")>
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
 		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
-			.
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QRecon"
 				columns="1-8" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="false">
 			<!---<cfoutput>#args.fileName#<br>Lines #i# to #i+49# of #reconInfo.rowCount#<br></cfoutput>--->
@@ -210,48 +212,7 @@
 					<cfset rec.cr=val(CR)>
 					<cfset rec.description=Left(DESCRIPTION,50)>
 					<cfset rec.dr=val(DR)>
-					<cfset rec.type=TYPE>
-
-				<!---	<cfif Find("_",TYPE,1)>	--->
-						<cfswitch expression="#TYPE#"><!--- fix lloyds tinkering - arseholes! --->
-							<cfcase value="FASTER_PAYMENTS_INCOMING">
-								<cfset rec.type = "FPI">
-							</cfcase>
-							<cfcase value="BANK_GIRO_CREDIT">
-								<cfset rec.type = "BGC">
-							</cfcase>
-							<cfcase value="DIRECT_DEBIT">
-								<cfset rec.type = "DD">
-							</cfcase>
-							<cfcase value="FASTER_PAYMENTS_OUTGOING">
-								<cfset rec.type = "FPO">
-							</cfcase>
-							<cfcase value="DEBIT_CARD">
-								<cfset rec.type = "DEB">
-							</cfcase>
-							<cfcase value="PAYMENT">
-								<cfset rec.type = "PAY">
-							</cfcase>
-							<cfcase value="BILL_PAYMENT">
-								<cfset rec.type = "BP">
-							</cfcase>
-							<cfcase value="STANDING_ORDER">
-								<cfset rec.type = "STO">
-							</cfcase>
-							<cfcase value="DEPOSIT">
-								<cfset rec.type = "DEP">
-							</cfcase>
-							<cfcase value="TRANSFER">
-								<cfset rec.type = "TRN">
-							</cfcase>
-							<cfdefaultcase>
-								<cfset rec.type=Left(TYPE,10)>
-							</cfdefaultcase>
-						</cfswitch>
-					<!---<cfelse>
-						<cfset rec.type=TYPE>
-					</cfif>--->
-
+					<cfset rec.type=Left(TYPE,10)>
 					<cfif StructKeyExists(args,"form")>
 						<cfset loc.inRange=rec.date GTE args.form.srchDateFrom AND (rec.date LTE args.form.srchDateTo OR len(args.form.srchDateTo) IS 0)>
 					<cfelse>
@@ -273,8 +234,6 @@
 								<cfelseif ReFindNoCase("REFUND",rec.description,1,false)>
 									<cfset rec.description="CHARGES #rec.description#">
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
-								<cfelseif Find("AGENT COLLECTIONS",rec.description)>	<!--- Simple Payments --->
-									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								<cfelseif Find("HMRC",rec.description)>	<!--- HMRC VAT --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								<cfelseif rec.cr GT 0>
@@ -294,9 +253,9 @@
 								</cfif>
 							</cfcase>
 							<cfcase value="OTH|INT" delimiters="|">
-								<cfset rec.description="#rec.description#">
+								<cfset rec.description="#rec.description# #rec.TYPE#">
+								<cfoutput>#rec.description#<br></cfoutput>
 								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
-								<cfoutput>#loc.accountRef#</cfoutput>
 							</cfcase>
 							<cfcase value="CHQ">
 								<cfif rec.dr GT 900>

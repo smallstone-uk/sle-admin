@@ -188,13 +188,14 @@
 		<cfset loc.result={}>
 		<cfset loc.accountRef="">
 		<cfset loc.inFilter=true>
-		
+		Loading.
 		<cfspreadsheet action="read" src="#args.fileName#" name="spready">
 		<cfset SpreadsheetSetActiveSheet(spready,"Bank Recon")>
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
 		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
+			.
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QRecon"
-				columns="1-6" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="false">
+				columns="1-8" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="false">
 			<!---<cfoutput>#args.fileName#<br>Lines #i# to #i+49# of #reconInfo.rowCount#<br></cfoutput>--->
 			<cfloop query="QRecon">
 				<cfif len(TYPE) AND Left(DESCRIPTION,4) NEQ "SKIP">
@@ -269,9 +270,6 @@
 								<cfelseif Left(rec.description,3) EQ "500">		<!--- Banking --->
 									<cfset rec.description="DEPOSIT #rec.description#">
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
-								<cfelseif Find("PAYPOINT COLLECTIO",rec.description)>	<!--- PayPoint commission --->
-									<cfset rec.description="PPCOMM">
-									<cfset loc.accountRef=ExtractRef(refs.suppliers,rec)>
 								<cfelseif ReFindNoCase("REFUND",rec.description,1,false)>
 									<cfset rec.description="CHARGES #rec.description#">
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
@@ -288,15 +286,17 @@
 							<cfcase value="FPO|DD|DEB|PAY|DC|CHG" delimiters="|">
 								<cfif Find("LOAN",rec.description)> <!--- bank loan --->
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
-								<cfelseif Find("PAYPOINT COLLECTIO",rec.description)>
-									<cfset rec.description="#rec.description#-#rec.dr#">	<!--- paypoint collections --->
-									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								<cfelseif ReFindNoCase("Fee|Interest",rec.description,1,false)>
 									<cfset rec.description="CHARGES #rec.description#">
 									<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
 								<cfelse>
 									<cfset loc.accountRef=ExtractRef(refs.suppliers,rec)>
 								</cfif>
+							</cfcase>
+							<cfcase value="OTH|INT" delimiters="|">
+								<cfset rec.description="#rec.description#">
+								<cfset loc.accountRef=ExtractRef(refs.nominal,rec)>
+								<cfoutput>#loc.accountRef#</cfoutput>
 							</cfcase>
 							<cfcase value="CHQ">
 								<cfif rec.dr GT 900>

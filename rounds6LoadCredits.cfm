@@ -12,7 +12,7 @@
 				SELECT *
 				FROM tblDelItems
 				WHERE DICLIENTID = #args.credit.diClientID#
-				AND DIDATE = '#args.credit.DIDATE#'
+				AND DIDATE = '#DateFormat(args.credit.DIDATE,"yyyy-mm-dd")#'
 				AND DIPUBID = #args.credit.DIPUBID#
 				AND DIISSUE = '#args.credit.DIISSUE#'
 				AND DITYPE = 'credit'

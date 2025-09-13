@@ -64,7 +64,7 @@
 							#loc.item.DIBATCHID#,
 							#loc.item.DICHARGE#,
 							#loc.item.DICLIENTID#,
-							'#loc.item.DIDATE#',
+							'#DateFormat(loc.item.DIDATE,"yyyy-mm-dd")#',
 							#loc.item.DIINVOICEID#,
 							'#loc.item.DIISSUE#',
 							#loc.item.DIORDERID#,

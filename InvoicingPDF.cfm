@@ -494,10 +494,10 @@
 								<th align="left" valign="middle">Sub-Total</th>
 								<td align="right" valign="middle"><strong>&pound;#DecimalFormat(totalToPay)#</strong></td>
 							</tr>
-							<tr>
+							<!---<tr>
 								<th>&nbsp;</th>
 								<td>&nbsp;</td>
-							</tr>
+							</tr>--->
 							<cfif balanceDue neq 0>
 								<tr>
 									<th align="left" valign="middle">
@@ -537,7 +537,10 @@
 					</td>
 				</tr>
 			</table>
-			
+			<cfif invoice.statement.cltShowBal AND balanceDue neq 0>
+				<!--- if mini statement was included, tack message at the bottom --->
+				<div class="message">#QControl.ctlInvMessage#</div>
+			</cfif>
 			<cfdocumentitem type="footer" evalAtPrint="true">
 				<div style="font-size:12px;font-family: Arial, Helvetica, sans-serif;padding:10px 0 0 0;line-height:16px;border-top:1px solid ##999;">
 					<div style="float:right;font-size:12px;line-height:18px;font-weight:bold; text-align:left; width:300px;">

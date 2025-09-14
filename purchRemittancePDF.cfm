@@ -128,7 +128,7 @@
 					<tr>
 						<th colspan="9">
 							Please allocate our payment as shown above.<br />
-							If your records do not correspond with ours, please send a copy of your statement to accounts@shortlanesendstore.co.uk.
+							If your records do not correspond with ours, please send a copy of your statement to #application.company.email_accounts#.
 						</th>
 					</tr>
 				</table>

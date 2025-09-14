@@ -1,6 +1,6 @@
 component extends="App.Framework.App"
 {
-    this.name = "SLE_Dev";
+    this.name = "SLE_Production";
     this.clientStorage = "kcc_cf_sle";
     this.clientManagement = false;
     this.sessionManagement = true;

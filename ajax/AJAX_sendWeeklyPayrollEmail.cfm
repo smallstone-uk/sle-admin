@@ -2,12 +2,10 @@
 <!--- send payslip --->
 <cftry>
 	<cfobject component="code/clients" name="cust">
-	<cfparam name="sendTo" default="accounts@shortlanesendstore.co.uk">
+	<cfparam name="sendTo" default="#application.company.email_accounts#">
 	<cfparam name="msgText" default="Please see attached document">
 	<cfparam name="attachment" default="sample.txt">
 	<cfset filePath = "#application.site.dir_data#payslips\">
-	<!---  steven@shortlanesendstore.co.uk #sendTo#--->
-		<!---to="#sendTo#"--->
 	<cfif len(sendTo)>
 		<cfmail		
 			debug="yes"

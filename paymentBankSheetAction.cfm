@@ -21,7 +21,7 @@
 				#LSDateFormat(Now(),"dd/mm/yy")#
 			</cfif>
 		</span>
-		Shortlanesend Store 
+		#application.company.companyname# 
 	</h1>
 	<table border="1" class="tableList" width="350" style="float:left;">
 		<tr>

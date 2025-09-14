@@ -9,7 +9,7 @@
         	<cfpop
             	action="getall"
                 server="mail.shortlanesendstore.co.uk"
-                username="news@shortlanesendstore.co.uk"
+                username="#application.company.email_news#"
                 password="sle5946" attachmentpath="#loc.path#"
                 name="loc.QMsgs">
         	<cfset loc.result.msgs=loc.QMsgs>

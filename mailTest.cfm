@@ -6,7 +6,7 @@
 </head>
 
 <cfobject component="code/clients" name="cust">
-<cfparam name="sendto" default="news@shortlanesendstore.co.uk">
+<cfparam name="sendto" default="#application.company.email_news#">
 <body>
 	<cfoutput> 
 		to="#sendTo#" <br />

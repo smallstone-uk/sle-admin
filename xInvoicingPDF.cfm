@@ -569,16 +569,16 @@
 			</table>
 	--->		
 			<cfdocumentitem type="footer" evalAtPrint="true">
-				<div style="font-size:11px;font-family: Arial, Helvetica, sans-serif;padding:10px 0 0 0;line-height:16px;border-top:1px solid ##999;">
+				<div style="font-size:12px;font-family: Arial, Helvetica, sans-serif;padding:10px 0 0 0;line-height:16px;border-top:1px solid ##999;">
 					<div style="float:right;font-size:12px;line-height:18px;font-weight:bold; text-align:right; width:250px;">
-						Please quote your account reference "#invoice.Ref#" with your payment.<br />
+						Please quote your account reference "ACC #invoice.Ref#" with your payment.<br />
 						Any discrepancies must be reported within seven days of the invoice date.
 					</div>
 					<b>Terms</b><br />
 					Payment of this invoice is due within 14 days.<br />
-					Please make cheques payable to <b>Shortlanesend Store</b>.<br />
-					Bank: Lloyds Bank plc. Sort Code: <b>30-98-76</b> Account: <b>3534 5860</b><br />
-					VAT Registration: GB 152 5803 21
+					Bank: <strong>#application.company.bank_name#</strong><br />
+					Sort Code: <strong>#application.company.bank_sortcode#</strong>&nbsp; Account: <strong>#application.company.bank_accountno#</strong><br />
+					VAT Registration: #application.company.vat_number#
 				</div>
 				<div style="font-size:12px;font-family: Arial, Helvetica, sans-serif;text-align:right;">#cfdocument.currentpagenumber# of #cfdocument.totalpagecount#</div>
 			</cfdocumentitem>

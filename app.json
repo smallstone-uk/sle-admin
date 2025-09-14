@@ -1,15 +1,19 @@
 {
     "company": {
-        "name": "Shortlanesend Store.",
+        "name": "Shortlanesend Store",
         "companyname": "Shortlanesend Store",
         "financialyear": "01-04-2025",
-        "webmaster": "info@shortlanesendstore.co.uk",
         "telephone": "01872 275102",
         "po_telephone": "01872 223670",
-        "vat_number": "152 5803 21",
-		"bankname": "National Westminster Bank Plc",
-		"sortcode": "52-41-31",
-		"accountno": "4535 5266"
+        "vat_number": "GB 152 5803 21",
+		"bank_name": "National Westminster Bank Plc",
+		"bank_sortcode": "52-41-31",
+		"bank_accountno": "4535 5266",
+		"email_server": "mail.shortlanesendstore.co.uk",
+		"email_accounts": "accounts@shortlanesendstore.co.uk",
+		"email_news": "news@shortlanesendstore.co.uk",
+		"email_mailer": "cfmail@shortlanesendstore.co.uk",
+        "email_webmaster": "info@shortlanesendstore.co.uk"
     },
     "site": {
         "datasource0": "kcc_cms",
@@ -38,8 +42,8 @@
             "Saturday",
             "Sunday"
         ],
-		"url1": "http://tweb.sle-admin.co.uk//",
-		"url2": "http://tweb.epos.co.uk//"
+		"url1": "http://tweb.sle-admin.co.uk/",
+		"url2": "http://tweb.epos.co.uk/"
     },
     "core": {
         "imgSuffix": "jpeg|jpg|gif|png|tiff|psd|pcd|jpc|jp2|ico|bmp|mng|ptif|fax|fits|avs|pict|palm|pdb|mtv|sgi|sun|swf",

@@ -8,6 +8,6 @@
 </head>
 
 <body>
-	<h1>Shortlanesend Store</h1>
+	<h1>#application.company.companyname#</h1>
 	<h3 style="color:#666;">Newspaper Delivery</h3>
 	<hr />

@@ -8,7 +8,7 @@
 
 <body>
 <cftry>
-	<cfpop server="mail.shortlanesendstore.co.uk" username="news@shortlanesendstore.co.uk" password="sle5946" action="getall" name="QMsgs">
+	<cfpop server="mail.shortlanesendstore.co.uk" username="#application.company.email_news#" password="sle5946" action="getall" name="QMsgs">
 	<!---<cfdump var="#QMsgs#" label="QMsgs" expand="false">--->
 	<table class="tableList" width="100%">
 	<tr>

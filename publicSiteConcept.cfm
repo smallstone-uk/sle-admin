@@ -27,7 +27,7 @@
 	<section id="home" data-type="background" data-speed="10" class="pages">     
 		<article>
 			<div class="article-inner">
-				<h1>Shortlanesend Store</h1>
+				<h1>#application.company.companyname#</h1>
 				<ul class="front-links">
 					<li><a href="##">Example</a></li>
 					<li><a href="##">Example</a></li>

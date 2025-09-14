@@ -41,7 +41,7 @@
 		<div id="contact">
 			<span><b>Age Check: #DateFormat(minAgeDate,'yyyy mm dd')# &nbsp; <b>Tel</b>: 01872 275102</span>
 			<span><b>Post Office</b>: 01872 223670</span>
-			<span><b>Email</b>: news@shortlanesendstore.co.uk</span>
+			<span><b>Email</b>: #application.company.email_news#</span>
 		</div>
 		<div class="clear"></div>
 	</div>

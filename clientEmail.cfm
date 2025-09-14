@@ -80,7 +80,7 @@
 						<td><a href="#msg.url#" target="_blank"><img src="images/pdfIcon.gif" /></a></td>
 						<cfif sendMsgs AND ListFind(form.sendMe,msg.cltRef,",")>
 							<cfif StructKeyExists(form,"testMsgs")>
-								<cfset sendTo="news@shortlanesendstore.co.uk">
+								<cfset sendTo="#application.company.email_news#">
 							<cfelse><cfset sendTo=msg.email></cfif>
 							<cfset msgText = "Dear #msg.name#,<br />#ParagraphFormat(msg.text)#">
 							<cfmail 

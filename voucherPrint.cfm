@@ -58,7 +58,7 @@
 		</table>
 	<cfelse>
 		<h1 style="float:left;width:200px;line-height:30px;">222</h1>
-		<h1 style="float:left;width:200px;font-size:20px;line-height:30px;">Shortlanesend Store</h1>
+		<h1 style="float:left;width:200px;font-size:20px;line-height:30px;">#application.company.companyname#</h1>
 		<h1 style="float:right;font-size:14px;line-height:30px;">#LSDateFormat(parm.form.date,"dd-mmm-yy")#</h1>
 		<div style="clear:both;font-size:12px;">Church Road, Shortlanesend, Truro, TR4 9DY</div>
 		<div class="clear" style="padding:5px 0;"></div>

@@ -21,7 +21,7 @@
 		<div style="font-size:10px;text-align:center;">#stock.URN#</div>
 	</div>
 	<div style="float:left;">
-		<b>Shortlanesend Store</b><br>
+		<b>#application.company.companyname#</b><br>
 		Church Road<br>
 		Shortlanesend<br>
 		Truro<br>

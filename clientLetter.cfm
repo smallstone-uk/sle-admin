@@ -84,7 +84,7 @@
 							<p>
 								Yours sincerely,<br /><br /><br /><br /><br />
 								Steven Kingsley<br />
-								Shortlanesend Store
+								#application.company.companyname#
 							</p>							
 						</td>
 					</tr>

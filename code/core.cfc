@@ -1036,7 +1036,7 @@
 						</style>
 					</head>				
 					<body>
-						<h1>Shortlanesend Store</h1>
+						<h1>#application.company.companyname#</h1>
 						<h3 style="color:##666;">Newspaper Delivery</h3>
 						<hr />
 						<h3 style="padding:5px 0;">Hello #args.name#,</h3>
@@ -1046,7 +1046,7 @@
 						</div>
 						<hr>
 						<p style="color:##666;">
-							If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+							If any the information here is incorrect, please contact us on: #application.company.telephone# or email us at: #application.company.email_news#
 						</p>
 					</body>
 					</html>
@@ -1055,17 +1055,17 @@
 			<cfsavecontent variable="logit">
             	<cfoutput>
 				to="#args.email#" 
-				from="news@shortlanesendstore.co.uk" 
-				bcc="news@shortlanesendstore.co.uk" 
-				server="mail.shortlanesendstore.co.uk" 
-				username="cfmail@shortlanesendstore.co.uk" 
+				from="#application.company.email_news#" 
+				bcc="#application.company.email_news#" 
+				server="#application.company.email_server#" 
+				username="#application.company.email_mailer#" 
 				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
-				subject="#args.subject# - Shortlanesend Store X">
+				subject="#args.subject# - #application.company.companyname#">
 				cfmailpart type="plain">
 					Hello #args.name#,
 					#args.subject#
 					#args.text#
-					If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+					If any the information here is incorrect, please contact us on: #application.company.telephone# or email us at: #application.company.email_news#
 				/cfmailpart>
 				cfmailpart type="html">
 					#content#
@@ -1075,17 +1075,17 @@
 			<cflog text="#logit#">
 			<cfmail 
 				to="#args.email#" 
-				from="news@shortlanesendstore.co.uk" 
-				bcc="news@shortlanesendstore.co.uk" 
-				server="mail.shortlanesendstore.co.uk" 
-				username="cfmail@shortlanesendstore.co.uk" 
+				from="#application.company.email_news#" 
+				bcc="#application.company.email_news#" 
+				server="#application.company.email_server#" 
+				username="#application.company.email_mailer#" 
 				password="#DecryptStr(application.siteclient.cltMailPassword,application.siteRecord.scCode1)#"
-				subject="#args.subject# - Shortlanesend Store">
+				subject="#args.subject# - #application.company.companyname#">
 				<cfmailpart type="plain">
 					Hello #args.name#,
 					#args.subject#
 					#args.text#
-					If any the information here is incorrect, please contact us on: 01872 275102 or email us at: news@shortlanesendstore.co.uk
+					If any the information here is incorrect, please contact us on: #application.company.telephone# or email us at: #application.company.email_news#
 				</cfmailpart>
 				<cfmailpart type="html">
 					#content#

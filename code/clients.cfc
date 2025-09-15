@@ -76,7 +76,7 @@
 				WHERE trnRef = #args.tranRef#
 				AND	trnAccountID = 4
 				AND trnType = 'inv'
-				AND trnDate = '#args.srchDate#'
+				AND trnDate = '#DateFormat(args.srchDate,"yyyy-mm-dd")#'
 				LIMIT 1;
 			</cfquery>
 			<cfif loc.QClient.recordCount eq 1>

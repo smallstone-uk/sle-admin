@@ -112,6 +112,41 @@
 		<cfreturn str>
 	</cffunction>
 	
+	<cffunction name="FormatDate" returntype="string">
+		<cfargument name="dateStr" type="string" required="yes">
+		<cfargument name="returnStr" type="string" required="no" default="dd-mmm-yyyy">
+		
+		<cfset var loc = {}>
+		<cfset loc.result = "">
+		<!--- <cfset loc.pattern = "^(?:(\d{4})[-\/.](\d{2})[-\/.](\d{2})|(\d{2})[-\/.](\d{2})[-\/.](\d{4}))$">	--->
+		<cfset loc.pattern = "^(?:(\d{4})[-\/.](\d{2})[-\/.](\d{2})|(\d{2})[-\/.](\d{2})[-\/.](\d{4})|\{ts '\s*(\d{4})-(\d{2})-(\d{2})\s+\d{2}:\d{2}:\d{2}'\})$">
+		<cfset loc.matchGroups = REFind(loc.pattern, dateStr, 1, "TRUE")>
+		<cfif ArrayLen(loc.matchGroups.len) gt 1>
+			<cfif loc.matchGroups.len[2] GT 0>
+				<!--- Format is YYYY-MM-DD --->
+				<cfset loc.lyear  = Mid(dateStr, loc.matchGroups.pos[2], loc.matchGroups.len[2])>
+				<cfset loc.lmonth = Mid(dateStr, loc.matchGroups.pos[3], loc.matchGroups.len[3])>
+				<cfset loc.lday   = Mid(dateStr, loc.matchGroups.pos[4], loc.matchGroups.len[4])>
+			<cfelseif loc.matchGroups.len[5] GT 0>
+				<!--- Format is DD-MM-YYYY --->
+				<cfset loc.lday   = Mid(dateStr, loc.matchGroups.pos[5], loc.matchGroups.len[5])>
+				<cfset loc.lmonth = Mid(dateStr, loc.matchGroups.pos[6], loc.matchGroups.len[6])>
+				<cfset loc.lyear  = Mid(dateStr, loc.matchGroups.pos[7], loc.matchGroups.len[7])>
+			<cfelseif loc.matchGroups.len[8] GT 0>
+				<!--- Format is {ts '2025-03-07 00:00:00'} --->
+				<cfset loc.lday   = Mid(dateStr, loc.matchGroups.pos[10], loc.matchGroups.len[10])>
+				<cfset loc.lmonth = Mid(dateStr, loc.matchGroups.pos[9], loc.matchGroups.len[9])>
+				<cfset loc.lyear  = Mid(dateStr, loc.matchGroups.pos[8], loc.matchGroups.len[8])>
+			</cfif>
+			<cfset loc.dateCheck = loc.lyear & "-" & loc.lmonth & "-" & loc.lday>
+			<cfif IsDate(loc.dateCheck)>
+				<cfset loc.realDate = CreateDate(loc.lyear,loc.lmonth,loc.lday)>
+				<cfset loc.result = LSDateFormat(loc.realDate,returnStr)>
+			</cfif>
+		</cfif>
+		<cfreturn loc.result> 
+	</cffunction>
+	
 	<cffunction name="QueryToStruct" access="public" returntype="struct" output="false" hint="returns a struct for a single record from query.">
 		<cfargument name="queryname" type="query" required="true">
 		<cfset var qStruct={}>

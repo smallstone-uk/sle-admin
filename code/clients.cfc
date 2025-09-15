@@ -1,6 +1,6 @@
 <cfcomponent displayname="clientFunctions" extends="code/core" hint="clients functions 2015">
 
-	<cffunction name="EmailLatestInvoice" access="public" returntype="struct">
+	<cffunction name="LoadLatestInvoicesForEmail" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc={}>
 		<cfset loc.result={}>
@@ -56,6 +56,119 @@
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="EmailLatestInvoice" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="CheckInvoiceToEmail" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.status = "">
+		<cfset loc.result.name = "ehh">
+
+		<cftry>
+			<cfquery name="loc.QClient" datasource="#args.datasource#">
+				SELECT trnID,trnDate,trnRef, cltID,cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltEMail,cltInvDeliver
+				FROM tblTrans
+				INNER JOIN tblClients ON trnClientRef = cltRef
+				WHERE trnRef = #args.tranRef#
+				AND	trnAccountID = 4
+				AND trnType = 'inv'
+				AND trnDate = '#args.srchDate#'
+				LIMIT 1;
+			</cfquery>
+			<cfif loc.QClient.recordCount eq 1>
+				<cfloop query="loc.QClient">
+					<cfset loc.result.name = "#cltTitle# #cltInitial# #cltName# #cltCompanyName#">
+				</cfloop>
+				<cfset loc.result.status = "found">
+			<cfelse>
+				<cfset loc.result.name = "client missing">
+				<cfset loc.result.status = "failed">
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="SendInvoiceByEmail" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QControl" datasource="#args.datasource#">
+				SELECT ctlNextInvDate
+				FROM tblControl
+				WHERE ctlID = 1
+			</cfquery>
+			<cfquery name="loc.QEmail" datasource="#args.datasource#">
+				SELECT *
+				FROM tblEmail
+				WHERE mailRef = '#args.emailTemplate#'
+				LIMIT 1;
+			</cfquery>
+			<cfquery name="loc.QTran" datasource="#args.datasource#">
+				SELECT trnID,trnDate,trnRef, cltID,cltRef,cltTitle,cltInitial,cltName,cltCompanyName,cltEMail,cltInvDeliver
+				FROM tblTrans
+				INNER JOIN tblClients ON trnClientRef = cltRef
+				WHERE trnRef = #args.tranRef#
+				AND trnType = 'inv'
+				AND trnDate = '#DateFormat(loc.QControl.ctlNextInvDate,"yyyy-mm-dd")#'
+				LIMIT 1;
+			</cfquery>
+			<cfset loc.result.folderName = DateFormat(loc.QControl.ctlNextInvDate,"yy-mm-dd")>
+			<cfset loc.msg = {}>			
+			<cfif args.testMsgs>
+				<cfset loc.msg.address = "#application.company.email_news#">
+			<cfelse><cfset loc.msg.address = loc.QTran.cltEMail></cfif>
+					
+			<cfset loc.msg.name = "#loc.QTran.cltTitle# #loc.QTran.cltName#">
+			<cfset loc.msg.subject = loc.QEmail.mailSubject>
+			<cfset loc.msg.text = loc.QEmail.mailText>
+			<cfset loc.msg.email = loc.QTran.cltEMail>
+			<cfset loc.msg.cltRef = loc.QTran.cltRef>
+			<cfset loc.msg.trnRef = loc.QTran.trnRef>
+			<cfset loc.msg.url = "#application.site.url_invoices##loc.result.folderName#/inv-#loc.QTran.trnRef#.pdf">
+			<cfset loc.msg.attach = "#application.site.dir_invoices##loc.result.folderName#/inv-#loc.QTran.trnRef#.pdf">
+			<cfif FileExists(loc.msg.attach)>
+				<cfset loc.result.invoice = loc.msg.url>
+				<cfset loc.result.trnRef = loc.msg.trnRef>
+				<cfmail 
+					to="#loc.msg.address#"
+					bcc="#application.siteclient.cltMailOffice#"
+					from="#application.siteclient.cltMailOffice#"
+					server="#application.siteclient.cltMailServer#"
+					username="#application.siteclient.cltMailAccount#"
+					password="#args.srchPwd#"
+					subject="#loc.msg.subject# - #application.siteclient.cltCompanyName#">
+					<cfmailpart charset="utf-8" type="text/plain">#textMessage(loc.msg.text)#</cfmailpart>
+					<cfmailpart charset="utf-8" type="text/html">#loc.msg.text#</cfmailpart>
+					<cfmailparam type="application/pdf" disposition="attachment" file="#loc.msg.attach#"></cfmailparam>
+					<cfif len(args.attachFile)>
+						<cfmailparam type="application/pdf" disposition="attachment" file="#args.attachFile#"></cfmailparam>								
+					</cfif>
+				</cfmail>
+				<cfset loc.result.msg = "sent successfully">
+				<cffile action="append" addnewline="yes" 
+					file="#application.site.dir_logs#email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
+						output="Message sent to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# #loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
+			<cfelse>
+				<cfset loc.result.msg = "file missing">
+				<cffile action="append" addnewline="yes" 
+					file="#application.site.dir_logs#email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
+						output="Message failed to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# #loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
+			</cfif>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+			<cfset loc.result.msg = "an error occured">
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>

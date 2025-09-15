@@ -3,7 +3,7 @@ html {overflow-y:scroll;}
 body {margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
 a, a:visited {color:#244C58;}
 .clear {clear:both;}
-#loadingDiv {float: right;margin: 8px 5px 0 0;}
+#loadingDiv {float: left;margin: 8px 5px 0 0;}
 .loadingGif {float: left;margin: 0 5px 0 0;}
 .dropHandle {cursor:default;}
 .dropHandle:hover {cursor:move !important;background: #E5F7FF;}

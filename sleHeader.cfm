@@ -134,7 +134,7 @@
 				<li><a href="##" tabindex="-1">Reports</a>
 					<ul>
 						<li><a href="clientemail.cfm">Email Invoices</a></li>
-						<li><a href="spread.cfm">Import Bank Statement</a></li>
+						<li><a href="spread2.cfm">Import Bank Statement</a></li>
 						<li><a href="suppliers.cfm">Supplier Reports</a></li>
 						<li><a href="salesgraph.cfm">Sales Graphs</a></li>
 						<li class="spacer"></li>

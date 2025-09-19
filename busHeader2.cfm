@@ -12,6 +12,6 @@
 		<tr><td class="compAddr">#cltAddress2#</td><td class="compDetailTitle">#cltTelTitle2#</td><td class="compDetail">#cltTel2#</td></tr>
 		<tr><td class="compAddr">#cltTown#</td><td class="compDetailTitle">Website</td><td class="compDetail">#cltWebSite#</td></tr>
 		<tr><td class="compAddr">#cltPostcode#</td><td class="compDetailTitle"></td><td class="compDetail"></td></tr>
-		<tr><td class="compAddr"></td><td class="compDetailTitle">EMail</td><td class="compDetail">#application.company.accounts#</td></tr>
+		<tr><td class="compAddr"></td><td class="compDetailTitle">EMail</td><td class="compDetail">#application.company.email_accounts#</td></tr>
 	</table>
 </cfoutput>

@@ -173,7 +173,20 @@
 				});
 				if (document.title != "#acctData.Account.accName#") {
 					document.title = "#acctData.Account.accName#";
-				}
+				};
+				$('##tranSearch').on("keyup",function() {
+					var srch=$(this).val();
+					$('.searchrow').each(function() {
+						var id=$(this).attr("data-tranID");
+						var str=$(this).attr("data-title");
+						if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
+							$(this).hide();
+						} else {
+							$(this).show();
+						}
+						
+					});
+				});
 			</script>
 			<table border="1" class="tableList" width="100%">
 				<tr>
@@ -208,6 +221,12 @@
 							<span class="noPrint"><input type="checkbox" name="selectAllOnList" class="selectAllOnList" tabindex="-1" style="width:20px; height:20px;"></span>
 						</th>
 					</tr>
+					<tr class="noPrint">
+						<th></th>
+						<th>Search</th>
+						<th colspan="3"><input type="text" id="tranSearch" value="" placeholder="Search..." style="width:90%;"></th>
+						<th colspan="6"></th>
+					</tr>
 					<cfset balance=trans.bfwd>
 					<cfif balance NEQ 0>
 						<tr><td width="10" class="noPrint"></td>
@@ -239,7 +258,8 @@
 							</cfif>
 						</cfif>
 						<cfif ListFind("crn,pay,jnl",item.trnType,",")><cfset amountClass="creditAmount"></cfif>
-						<tr id="trnItem_#item.trnID#">
+						<tr class="searchrow" data-title="#item.trnRef# #item.trnDesc#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
+						<!---<tr id="trnItem_#item.trnID#">--->
 							<td class="noPrint"><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
 							<td id="trnItem_ID"><a href="javascript:void(0)" class="trnIDLink" data-id="#item.trnID#" data-type="#item.trnType#" tabindex="-1">#item.trnID#</a></td>
 							<td id="trnItem_Date" align="right">#LSDateFormat(item.trnDate,"ddd dd/mm/yy")#</td>
@@ -302,6 +322,7 @@
 						</tr>
 					</cfif>
 				</table>
+				<!--- <button type="button" onclick="tableToCSV()">download CSV</button>--->
 			<cfelse>
 				No records.
 			</cfif>

@@ -31,7 +31,7 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.result.suppliers = {}>
-		
+
 		<cftry>
 			<cfquery name="loc.QCODPayments" datasource="#args.datasource#">
 				SELECT 	accID,accCode,accGroup,accPayType,accIndex,accName,accType,
@@ -55,11 +55,12 @@
 				<cfset loc.tran.trnRef = "">
 				<cfset loc.tran.trnDate = "">
 				<cfset loc.tran.trnAmnt1 = 0.00>
-				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#">	<!--- look for matching payment --->
+				<cfquery name="loc.QSuppPayment" datasource="#args.datasource#" result="loc.QSuppPaymentResult">	<!--- look for matching payment --->
 					SELECT *
 					FROM tblTrans
 					WHERE trnAccountID = #eiSuppID#
 					AND trnType = 'pay'
+					AND trnPayAcc IN (181,491)	<!--- cash via till --->
 					AND trnDate = '#loc.tillDate#'
 					AND ABS(trnAmnt1) = #loc.tillAmount#
 					LIMIT 1;
@@ -70,6 +71,7 @@
 						FROM tblTrans
 						WHERE trnAccountID = #eiSuppID#
 						AND trnType = 'pay'
+						AND trnPayAcc IN (181,491)	<!--- cash via till  --->
 						AND trnDate BETWEEN '#LSDateFormat(DateAdd("d",-5,loc.tillDate),"yyyy-mm-dd")#' 
 							AND '#LSDateFormat(DateAdd("d",5,loc.tillDate),"yyyy-mm-dd")#'
 					</cfquery>

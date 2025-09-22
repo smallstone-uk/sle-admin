@@ -223,9 +223,9 @@
 					</tr>
 					<tr class="noPrint">
 						<th></th>
-						<th>Search</th>
-						<th colspan="3"><input type="text" id="tranSearch" value="" placeholder="Search..." tabindex="-1" style="width:90%;"></th>
-						<th colspan="6"></th>
+						<th colspan="3" align="right">Search</th>
+						<th colspan="2" align="left"><input type="text" id="tranSearch" value="" placeholder="Search..." tabindex="-1" style="width:80%;"></th>
+						<th colspan="5"></th>
 					</tr>
 					<cfset balance=trans.bfwd>
 					<cfif balance NEQ 0>

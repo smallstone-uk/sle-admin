@@ -67,7 +67,7 @@
 						<td>#nomCode#</td>
 						<td>#nomTitle#</td>
 						<td align="right">#NumberFormat(itemCount,',')#</td>
-						<td><button class="openModal" data-group="#nomID#" data-ref="#nomID#">Amend</button></td>
+						<td><button class="openModal" data-group="#nomGroup#" data-ref="#nomID#" data-mode="editGroup">Amend</button></td>
 					</tr>
 				</cfloop>
 			</table>

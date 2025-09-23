@@ -258,7 +258,7 @@
 							</cfif>
 						</cfif>
 						<cfif ListFind("crn,pay,jnl",item.trnType,",")><cfset amountClass="creditAmount"></cfif>
-						<tr class="searchrow" data-title="#item.trnRef# #item.trnDesc#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
+						<tr class="searchrow" data-title="#item.trnRef# #item.trnDesc# #item.trnAmnt1#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
 						<!---<tr id="trnItem_#item.trnID#">--->
 							<td class="noPrint"><a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" data-accType="#acctData.Account.accType#" tabindex="-1"></a></td>
 							<td id="trnItem_ID"><a href="javascript:void(0)" class="trnIDLink" data-id="#item.trnID#" data-type="#item.trnType#" tabindex="-1">#item.trnID#</a></td>

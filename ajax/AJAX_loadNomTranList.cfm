@@ -67,6 +67,19 @@
 				});
 				event.preventDefault();
 			});
+			$('##tranSearch').on("keyup",function() {
+				var srch=$(this).val();
+				$('.searchrow').each(function() {
+					var id=$(this).attr("data-tranID");
+					var str=$(this).attr("data-title");
+					if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
+						$(this).hide();
+					} else {
+						$(this).show();
+					}
+					
+				});
+			});
 			if (document.title != "#transactions.nomAccount.nomTitle#") {
 				document.title = "#transactions.nomAccount.nomTitle#";
 			}
@@ -92,6 +105,12 @@
 				<th width="80" align="right">DR</th>
 				<th width="80" align="right">CR</th>
 				<th width="80" align="right">Balance</th>
+			</tr>
+			<tr class="noPrint">
+				<th></th>
+				<th colspan="3" align="right">Search</th>
+				<th colspan="2" align="left"><input type="text" id="tranSearch" value="" placeholder="Search..." tabindex="-1" style="width:80%;"></th>
+				<th colspan="3"></th>
 			</tr>
 			<cfset balance=transactions.bfwd>
 			<cfif balance NEQ 0>
@@ -123,7 +142,8 @@
 				</cfif>
 				<cfset lastDate = item.trnDate>
 
-				<tr class="#rowStyle#">
+				<tr class="#rowStyle# searchrow" data-title="#item.trnRef# #item.trnDesc# #item.niAmount#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
+				<!---<tr class="#rowStyle#">--->
 					<td width="10" align="center" class="noPrint">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>

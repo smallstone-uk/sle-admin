@@ -86,7 +86,7 @@
 		});
 	</script>
 	<cfif !ArrayIsEmpty(transactions.tranList)>
-		<input value="Export" type="button" class="noPrint" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">
+		<!---<input value="Export" type="button" class="noPrint" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">--->
 		<table id="tranTable" class="tableList" border="1">
 			<tr>
 				<th class="noPrint"></th>

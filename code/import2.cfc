@@ -228,7 +228,7 @@
 									<cfset ArrayAppend(loc.barcodeArray,loc.rec.barcode)>
 								<cfelse><span class="noBarcode">NO BARCODE</span><cfset loc.noBarcodeCount++></cfif>
 							</td>
-							<td><a href="productStock6.cfm?product=#loc.rec.productID#" target="product">#loc.rec.code#</a></td>
+							<td><a href="productStock6.cfm?product=#loc.rec.productID#" target="product" title="edit product & stock records manually">#loc.rec.code#</a><br><br>#loc.rec.code#</td>
 							<td>#loc.rec.description#</td>
 							<td>#loc.rec.a_unitsize#</td>
 							<td align="center" class="#loc.pmClass# #loc.pmClassDiff#">

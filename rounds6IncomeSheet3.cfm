@@ -24,7 +24,7 @@
 				SELECT riRoundID,riDayEnum,riOrder,riOrderID,
 					rndID,rndRef,rndTitle,rndMileage,rndStyle,
 					cltID,cltRef,cltName,cltCompanyName,cltAccountType, 
-					ordID,ordHouseName,ordHouseNumber,
+					ordID,ordHouseName,ordHouseNumber,ordDeliveryCode,ordDelCodeNew,
 					oiSun,oiMon,oiTue,oiWed,oiThu,oiFri,oiSat,
 					ordSun,ordMon,ordTue,ordWed,ordThu,ordFri,ordSat,
 					delCode,delPrice1,
@@ -112,6 +112,8 @@
 						cltCompanyName = cltCompanyName,
 						address = "#ordHouseNumber# #ordHouseName# #stName#",
 						cltAccountType = cltAccountType,
+						ordDeliveryCode = ordDeliveryCode,
+						ordDelCodeNew = ordDelCodeNew,
 						ordID = ordID,
 						ordSun = ordSun,
 						ordMon = ordMon,
@@ -347,6 +349,7 @@
 								<th width="40" align="right">Retail Value</th>
 								<th width="40" align="right">Trade Total</th>
 								<th width="40" align="right">Profit</th>
+								<th width="40" align="right">Ticky</th>
 							</tr>
 						</cfif>
 						<!--- loop customers --->
@@ -365,10 +368,13 @@
 									<td>#loc.drop.cltName#</td>
 									<td colspan="6">#loc.drop.address#</td>
 									<td align="center">#loc.drop.cltAccountType#</td>
-									<td>#loc.drop.delCode#</td>
-									<td>#loc.drop.delPrice1#</td>
+									<td align="center"><i title="delCode - current delivery code">#loc.drop.delCode#</i></td>
+									<td align="center"><i title="ordDeliveryCode - current delivery code">#loc.drop.ordDeliveryCode#</i></td>
+									<td align="center"><i title="ordDelCodeNew - new delivery code">#loc.drop.ordDelCodeNew#</i></td>
+									<td align="center" class="delCharge"><i title="daily delivery charge">#loc.drop.delPrice1#</i></td>
 									<td>#loc.drop.ordID#</td>
-									<td colspan="3"><input name="dummy" type="checkbox" value="1" /></td>
+									<td></td>
+									<td align="center"><input name="dummy" type="checkbox" value="1" /></td>
 								</tr>
 							</cfif>
 							<cfif StructKeyExists(args.parms.form,"showDetail")>
@@ -406,7 +412,7 @@
 									<td align="center">#loc.drop.ordThu#</td>
 									<td align="center">#loc.drop.ordFri#</td>
 									<td align="center">#loc.drop.ordSat#</td>
-									<td colspan="4"></td>
+									<td colspan="5"></td>
 								</tr>
 								<tr class="info">
 									<td></td>
@@ -432,7 +438,7 @@
 									<td align="center">#StructFind(loc.drop.dayCharges,"thu")#</td>
 									<td align="center">#StructFind(loc.drop.dayCharges,"fri")#</td>
 									<td align="center">#StructFind(loc.drop.dayCharges,"sat")#</td>
-									<td align="center">#DecimalFormat(loc.drop.totalCharges)#</td>
+									<td align="center" class="delCharge"><i title="weekly delivery charge">#DecimalFormat(loc.drop.totalCharges)#</i></td>
 								</tr>
 								<tr class="footer">
 									<td></td>
@@ -485,7 +491,7 @@
 			<cfset loc.roundKeys = ListSort(StructKeyList(args.rounds,","),"text","asc")>
 			<cfoutput>
 				<!--- loop rounds --->
-				<table class="roundList" border="1" style="margin:10px">
+				<table class="summaryList" border="1" style="margin:10px">
 					<tr>
 						<th colspan="16" class="rndheader">Round Summary</th>
 					</tr>
@@ -828,6 +834,8 @@
 								</cfloop>
 								<tr>
 									<th>#loc.iCount# orders</th>
+									<th></th>
+									<th></th>
 								</tr>
 							</table>
 						</td>
@@ -852,6 +860,8 @@
 								</cfloop>
 								<tr>
 									<th>#loc.iCount# orders</th>
+									<th></th>
+									<th></th>
 								</tr>
 							</table>
 						</td>

@@ -38,21 +38,22 @@
 		$('#btnRun').show();
 	});
 </script>
-	<style type="text/css">
-		body {background-color:#FFFFFF;}
-		.roundList {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 12px;}
-		.roundList th {padding:4px; border-color: #ccc;}
-		.summaryList {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 14px;}
-		.summaryList th {padding:4px 5px; border-color: #ccc;}
-		.summaryList td {padding:2px 5px; border-color: #ccc;}
+<style type="text/css">
+	body {background-color:#FFFFFF;}
+	.roundList {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 12px;}
+	.roundList th {padding:4px; border-color: #ccc;}
+	.summaryList {border-spacing: 0px;border-collapse: collapse;border-color: #CCC;border: 1px solid #CCC;font-size: 14px;}
+	.summaryList th {padding:4px 5px; border-color: #ccc; background-color:#eee;}
+	.summaryList td {padding:2px 5px; border-color: #ccc;}
 
-		.header td {background-color:#55BFFF; padding:4px 5px;}
-		.header2 td {background-color:#fff; padding:4px 5px;}
-		.info {background-color:#eee;}
-		.footer {background-color:#AAFFFF}
-		.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}
-		.rndfooter td {background-color:#D6FE89; padding:4px 0px; font-weight:bold; font-size:14px !important}
-	</style>
+	.header td {background-color:#55BFFF; padding:4px 5px;}
+	.header2 td {background-color:#fff; padding:4px 5px;}
+	.info {background-color:#eee;}
+	.footer {background-color:#AAFFFF}
+	.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}
+	.rndfooter td {background-color:#D6FE89; padding:4px 0px; font-weight:bold; font-size:14px !important}
+	.delCharge {background-color:#FF6 !important}
+</style>
 </head>
 
 <cfset parm={}>

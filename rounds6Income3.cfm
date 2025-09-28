@@ -61,37 +61,17 @@
 <cfobject component="code/rounds6" name="rnd">
 <cfset roundList=rnd.LoadRoundList(parm)>
 
-	<cfparam name="showHeader" default="0">
-	<cfparam name="showDetail" default="0">
-	<cfparam name="showDumps" default="0">
-	<cfparam name="useNewCode" default="0">
-	<cfparam name="useSamples" default="0">
-	<cfparam name="DeliveryCode" default="">
+<cfparam name="showHeader" default="0">
+<cfparam name="showDetail" default="0">
+<cfparam name="showDumps" default="0">
+<cfparam name="useNewCode" default="0">
+<cfparam name="useSamples" default="0">
+<cfparam name="DeliveryCode" default="">
 	
 	<cfquery name="QDelRates" datasource="#application.site.datasource1#">
 		SELECT * FROM tbldelcharges
 		ORDER BY delCode
 	</cfquery>	
-
-	<cfquery name="QOrigCodeDelCounts" datasource="#application.site.datasource1#">
-		SELECT ordDeliveryCode, delPrice1, COUNT(*) AS delCount
-		FROM tblorder
-		INNER JOIN tblClients ON cltID=ordClientID
-		INNER JOIN tbldelcharges ON delCode=ordDeliveryCode
-		WHERE ordActive = 1 
-		AND cltAccountType NOT IN ('N','H')
-		GROUP BY ordDeliveryCode
-	</cfquery>
-
-	<cfquery name="QNewCodeDelCounts" datasource="#application.site.datasource1#">
-		SELECT ordDelCodeNew, delPrice1, COUNT(*) AS delCount
-		FROM tblorder
-		INNER JOIN tblClients ON cltID=ordClientID
-		INNER JOIN tbldelcharges ON delCode=ordDelCodeNew
-		WHERE ordActive = 1 
-		AND cltAccountType NOT IN ('N','H')
-		GROUP BY ordDelCodeNew
-	</cfquery>
 
 <cfoutput>
 <body>

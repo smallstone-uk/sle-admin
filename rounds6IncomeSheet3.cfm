@@ -779,30 +779,98 @@
 		<cfreturn loc.result>
 	</cffunction>
 
+	<cffunction name="DeliveryGrid" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.QOrigCodeDelCounts" datasource="#args.datasource1#">
+				SELECT ordDeliveryCode, delPrice1, COUNT(*) AS delCount
+				FROM tblorder
+				INNER JOIN tblClients ON cltID=ordClientID
+				INNER JOIN tbldelcharges ON delCode=ordDeliveryCode
+				WHERE ordActive = 1 
+				AND cltAccountType NOT IN ('N','H')
+				GROUP BY ordDeliveryCode
+			</cfquery>
+		
+			<cfquery name="loc.QNewCodeDelCounts" datasource="#args.datasource1#">
+				SELECT ordDelCodeNew, delPrice1, COUNT(*) AS delCount
+				FROM tblorder
+				INNER JOIN tblClients ON cltID=ordClientID
+				INNER JOIN tbldelcharges ON delCode=ordDelCodeNew
+				WHERE ordActive = 1 
+				AND cltAccountType NOT IN ('N','H')
+				GROUP BY ordDelCodeNew
+			</cfquery>
+			<cfoutput>
+				<table>
+					<tr>
+						<td valign="top">
+							<table class="summaryList" style="margin:10px">
+								<tr>
+									<th colspan="3">Original Delivery Charge Counter</th>
+								</tr>
+								<tr>
+									<th>Code</th>
+									<th>Price</th>
+									<th>Count</th>
+								</tr>
+								<cfset loc.iCount = 0>
+								<cfloop query="loc.QOrigCodeDelCounts">
+									<tr>
+										<td align="center">#ordDeliveryCode#</td>
+										<td align="right">#delPrice1#</td>
+										<td align="right">#delCount#</td>
+									</tr>
+									<cfset loc.iCount += delCount>
+								</cfloop>
+								<tr>
+									<th>#loc.iCount# orders</th>
+								</tr>
+							</table>
+						</td>
+						<td valign="top">
+							<table class="summaryList" style="margin:10px">
+								<tr>
+									<th colspan="3">New Delivery Charge Counter</th>
+								</tr>
+								<tr>
+									<th>Code</th>
+									<th>Price</th>
+									<th>Count</th>
+								</tr>
+								<cfset loc.iCount = 0>
+								<cfloop query="loc.QNewCodeDelCounts">
+									<tr>
+										<td align="center">#ordDelCodeNew#</td>
+										<td align="right">#delPrice1#</td>
+										<td align="right">#delCount#</td>
+									</tr>
+									<cfset loc.iCount += delCount>
+								</cfloop>
+								<tr>
+									<th>#loc.iCount# orders</th>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</cfoutput>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 	<cfquery name="QDelRates" datasource="#application.site.datasource1#">
 		SELECT * FROM tbldelcharges
 		ORDER BY delCode
 	</cfquery>	
-
-	<cfquery name="QOrigCodeDelCounts" datasource="#application.site.datasource1#">
-		SELECT ordDeliveryCode, delPrice1, COUNT(*) AS delCount
-		FROM tblorder
-		INNER JOIN tblClients ON cltID=ordClientID
-		INNER JOIN tbldelcharges ON delCode=ordDeliveryCode
-		WHERE ordActive = 1 
-		AND cltAccountType NOT IN ('N','H')
-		GROUP BY ordDeliveryCode
-	</cfquery>
-
-	<cfquery name="QNewCodeDelCounts" datasource="#application.site.datasource1#">
-		SELECT ordDelCodeNew, delPrice1, COUNT(*) AS delCount
-		FROM tblorder
-		INNER JOIN tblClients ON cltID=ordClientID
-		INNER JOIN tbldelcharges ON delCode=ordDelCodeNew
-		WHERE ordActive = 1 
-		AND cltAccountType NOT IN ('N','H')
-		GROUP BY ordDelCodeNew
-	</cfquery>
 	
 	<cfset parms = {}>
 	<cfset parms.form = form>
@@ -830,6 +898,7 @@
 	<cfset view = showRoundSummary(data)>
 	<cfset view = ShowDaySummary(data)>
 	<cfset view = ShowDriverSummary(data)>
+	<cfset view = DeliveryGrid(parms)>
 
 <cfcatch type="any">
 	<cfdump var="#cfcatch#" label="" expand="yes" format="html" 

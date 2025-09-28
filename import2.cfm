@@ -128,7 +128,8 @@
 		</cfif>
 
 		<p><a href="bookerProcess.cfm">Select File...</a></p>
-		<h1><a href="#application.site.url_data#stock/#parm.sourcefile#" target="_blank">#parm.sourcefile#</a></h1>
+		<!---<h1><a href="#application.site.url_data#stock/#parm.sourcefile#" target="_blank">#parm.sourcefile#</a></h1> content will appear empty--->
+		<h1>#parm.sourcefile#</h1>
 		<p>Price mark and case qty are the two items missing from the Booker web site data.<br />
 		After checking the price mark flags, REFRESH THE PAGE to correct any incorrect prices. Once set, PM flags remain set.<br />
 		ONLY THEN should you correct any case quantity errors. Changes are immediate. No need to edit stock manually.</p>

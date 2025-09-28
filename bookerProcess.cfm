@@ -94,6 +94,7 @@
 						<th align="left">#</td>
 						<th align="left">File</td>
 						<th align="left">Import</td>
+						<th align="left">New Import</td>
 						<th align="left">Date Modified</td>
 						<th align="left">Size (KB)</td>
 					</tr>
@@ -105,7 +106,8 @@
 								<tr>
 									<td>#recCount#</td>
 									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
-									<td><a href="import2.cfm?fileSrc=#name#" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#&mode=1" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#&mode=2" target="_blank">new import</a></td>
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>
@@ -120,7 +122,8 @@
 								<tr>
 									<td>#recCount#</td>
 									<td><a href="#application.site.url_data#stock/#name#" target="_blank">#name#</a></td>
-									<td><a href="import2.cfm?fileSrc=#name#" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#&mode=1" target="_blank">import</a></td>
+									<td><a href="import2.cfm?fileSrc=#name#&mode=2" target="_blank">new import</a></td>
 									<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
 									<td>#size#</td>
 								</tr>

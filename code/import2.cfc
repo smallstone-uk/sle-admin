@@ -4,8 +4,263 @@
 	Requires jsoup-1.8.2.jar (or later) file installed in C:\ColdFusion9\lib folder.
 	Make sure ColdFusion is restarted after copying the file in.
 	01/09/2024
-
 --->
+
+<!--- read new file format 27/09/2025. This is a temporary fix --->
+	
+	<cffunction name="processRecord" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.product = args.product>
+		<cftry>
+			<cfscript>			
+				loc.product.a_pm = (Find("PM",loc.product.description) gt 0) OR (Find("#chr(163)#",loc.product.description) gt 0);	// contains price mark or pound sign e.g. PM159
+				loc.product.a_caseQty = Trim(ListFirst(loc.product.packSize,"x"));	// get first item (qty)
+				loc.product.a_unitSize = Trim(ListRest(loc.product.packSize,"x")); // get unit size
+				if (Find("Now",loc.product.wsp)) { // found price change e.g. Was: £4.99 Now: £4.69 (this may no longer happen)
+					loc.product.a_WSP = ReReplace(ListLast(loc.product.wsp," "),"[^0-9.]","","all"); // get now price and remove £
+				} else {
+					loc.product.a_WSP = ReReplace(loc.product.wsp,"[^0-9.]","","all"); // remove £
+				}
+				loc.product.a_retail = ReReplace(loc.product.rsp,"[^0-9.]","","all"); // remove £
+				loc.product.a_vat = ReReplace(loc.product.vat,"[^0-9.]","","all");
+				
+				// legacy stuff
+				loc.product.code = loc.product.productCode;
+				loc.product.packqty = loc.product.a_caseQty;
+				loc.product.wsp = loc.product.a_WSP;
+				loc.product.vat = loc.product.a_vat;
+				loc.product.retail = loc.product.a_retail;
+				loc.product.packsize = loc.product.a_unitSize;
+				loc.product.qty1 = 1;
+				loc.product.qty1 = loc.product.qtyOrderedPrevWks[1];
+				loc.product.qty2 = loc.product.qtyOrderedPrevWks[2];
+				loc.product.qty3 = loc.product.qtyOrderedPrevWks[3];
+				loc.product.qty4 = loc.product.qtyOrderedPrevWks[4];
+				loc.product.pm = loc.product.a_pm;
+				if (loc.product.qty1 is 0 AND loc.product.qty2 is 0 AND loc.product.qty3 is 0 AND loc.product.qty4 is 0) {
+					loc.product.qty1 = 1;				
+				}
+			</cfscript>
+			<cfset loc.result = loc.product>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="setStockValue" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QUpdate" datasource="#application.site.datasource1#">
+				UPDATE tblStockItem
+				SET siQtyPacks = #val(args.form.caseQty)#
+				WHERE siID = #val(args.form.stockItemID)#
+			</cfquery>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="setValue" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QUpdate" datasource="#application.site.datasource1#">
+				UPDATE tblProducts
+				SET prodPriceMarked = #val(args.form.pm)#
+				WHERE prodID = #val(args.form.productID)#
+			</cfquery>
+			<cfset loc.result.pm = val(args.form.pm)>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<!--- extracts json product array from saved page source --->
+	<cffunction name="processFile2" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.count = 0>
+		<cfset loc.parm = args>
+
+		<cftry>
+			<cffile action="read" file="#args.fileDir##args.sourcefile#" variable="loc.content">
+
+			<cfscript>			
+				loc.result.header = {"supplierID"=args.supplierID,"stockOrderID"=args.stockOrderID,"markup"=args.markup,
+					"validTo"=args.validTo,"orderDate"=args.orderDate,"orderRef"=args.orderRef};	// struct to store data
+
+				loc.regex = "products:\s*(\[.*?\])\s*\}\)";
+				loc.match = REFind(loc.regex, loc.content, 1, true);
+				
+				if (loc.match.len[1] GT 0) {
+					loc.productsJson = Mid(loc.content, loc.match.pos[2], loc.match.len[2]);
+				
+					// Now it's proper JSON
+					loc.products = DeserializeJSON(loc.productsJson);
+				//	writedump(loc.products);
+			
+				//	loc.filePath = ExpandPath("./products.csv");
+				//	loc.fileObj = FileOpen(loc.filePath, "write");
+			
+					// Full header row
+					loc.headers = "category,barcode,productCode,description,packSize,wsp,rsp,vat,qtyOrderedPrevWks,stockLevel,qtyInTrolley,barcodeFormat";
+				//	FileWriteLine(loc.fileObj, loc.headers);
+			
+					for (loc.product in loc.products) {
+						loc.count++;
+						// Convert qtyOrderedPrevWks array to string
+						loc.qtyWeeks = ArrayToList(loc.product.qtyOrderedPrevWks, "|");
+			
+						// Escape description (wrap in quotes if needed)
+						loc.safeDescription = Replace(loc.product.description, '"', '""', "all");
+						
+						if (!StructKeyExists(loc.product,"rsp")) {
+							loc.product.rsp = -1;
+						}
+			
+						loc.line = "#loc.product.category#," &
+							   "#loc.product.barcode#," &
+							   "#loc.product.productCode#," &
+							   """#loc.safeDescription#"" ," &
+							   "#loc.product.packSize#," &
+							   "#loc.product.wsp#," &
+							   "#loc.product.rsp#," &
+							   "#loc.product.vat#," &
+							   """#loc.qtyWeeks#"" ," &
+							   "#loc.product.stockLevel#," &
+							   "#loc.product.qtyInTrolley#," &
+							   "#loc.product.barcodeFormat#";
+			
+				//		FileWriteLine(loc.fileObj, loc.line);
+						loc.parm.product = loc.product;
+						loc.cleanProduct = processRecord(loc.parm);
+				//		writedump(var="#loc.cleanProduct#",label="#loc.count# - #product.productCode#");
+						loc.rec = UpdateRecord(loc.result.header,loc.cleanProduct);
+				//		writedump(var="#loc.rec#",label="#loc.count# - #loc.rec.productID#");
+						loc.product.productID = loc.rec.productID;
+						loc.product.class = loc.rec.class;
+						loc.product.classqty = loc.rec.classqty;
+						loc.product.ourprice = loc.rec.ourprice;					
+						loc.product.profit = loc.rec.profit;					
+						loc.product.POR = loc.rec.POR;					
+						loc.product.netUnitPrice = loc.rec.netUnitPrice;					
+						loc.product.netTotalValue = loc.rec.netTotalValue;					
+						loc.product.action = loc.rec.action;					
+						loc.product.prevPM = loc.rec.prevPM;					
+						loc.product.stockItemID = loc.rec.stockItemID;					
+					}
+			
+				//	FileClose(loc.fileObj); & loc.filePath
+					WriteOutput("✅ Processed " & ArrayLen(loc.products) & " products.");
+				} else {
+					WriteOutput("❌ Could not find products array in page");
+				}
+				loc.result.products = loc.products;
+			</cfscript>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="outputData" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.lineCount = 0>
+		<cfset loc.noBarcodeCount = 0>
+		<cfset loc.barcodeArray = []>
+		<cfset loc.pmClass = "">
+		<cfset loc.pmClassDiff = "">               
+		<cfset loc.showRedclass = "">
+		
+		<cftry>
+			<!---<cfdump var="#args#" label="outputData" expand="false">--->
+			<cfoutput>
+				<table class="tableList">
+					<tr>
+						<th width="30">No.</th>
+						<th width="90">Barcode</th>
+						<th width="50">Product</th>
+						<th>Description</th>
+						<th width="40">Size</th>
+						<th width="40">PM</th>
+						<th width="40">Pack Qty</th>
+						<th width="40">RRP</th>
+						<th width="40">Cases</th>
+						<th width="40">VAT</th>
+						<th width="50">Our Price</th>
+						<th width="40">Profit / POR%</th>
+						<th width="80">WSP</th>
+						<th width="50">Retail Net</th>
+						<th width="50">Total Profit</th>
+						<th width="150">Action</th>
+					</tr>
+					<cfloop array="#args.products#" index="loc.rec">
+						<cfset loc.lineCount++>	
+						<tr>
+							<td align="center">#loc.lineCount#</td>
+							<td>
+								<cfif StructKeyExists(loc.rec,"barcode")>
+									<a href="https://www.booker.co.uk/products/product-list?keywords=#loc.rec.barcode#" target="booker">#loc.rec.barcode#</a>
+									<cfset ArrayAppend(loc.barcodeArray,loc.rec.barcode)>
+								<cfelse><span class="noBarcode">NO BARCODE</span><cfset loc.noBarcodeCount++></cfif>
+							</td>
+							<td><a href="productStock6.cfm?product=#loc.rec.productID#" target="product">#loc.rec.code#</a></td>
+							<td>#loc.rec.description#</td>
+							<td>#loc.rec.a_unitsize#</td>
+							<td align="center" class="#loc.pmClass# #loc.pmClassDiff#">
+								<span class="pm-flag" data-id="#loc.rec.productID#" data-pm="#loc.rec.pm#" title="click to toggle the price mark flag">
+    								<i class="icon-img <cfif loc.rec.pm>tick<cfelse>cross</cfif>"></i>	<!--- switch class --->
+									<i class="icon-text">#loc.rec.prevPM#</i> <!--- show previous setting --->
+								</span>
+							</td>
+							<td align="center">#loc.rec.packQty#</td>
+							<td align="right" class="#loc.showRedclass#">&pound;#loc.rec.retail#</td>
+							<td align="center" class="#loc.rec.classQty#">
+								<input type="number" min="1" max="99" size="3" data-id="#loc.rec.stockItemID#" name="caseQty" class="caseQty" value="#loc.rec.qty1#" autocomplete="off">
+							</td>
+							<td align="center">#loc.rec.vat#%</td>
+							<td align="right" class="#loc.rec.class#">&pound;#loc.rec.ourPrice#</td>
+							<td align="right">#DecimalFormat(loc.rec.profit)#<br />#loc.rec.POR#%</td>
+							<td align="right">&pound;#loc.rec.WSP#<br />(&pound;#loc.rec.netUnitPrice# each)</td>
+							<td align="right">&pound;#DecimalFormat(loc.rec.netTotalValue)#</td>
+							<td align="right">&pound;#DecimalFormat(loc.rec.netTotalValue - loc.rec.WSP)#</td>
+							<td align="right">#loc.rec.action#</td>
+						</tr>
+					</cfloop>
+				</table>
+			</cfoutput>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
 
 	<cffunction name="processFile" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
@@ -42,7 +297,7 @@
 									loc.pm = (Find("PM",loc.cell) gt 0) OR (Find("#chr(163)#",loc.cell) gt 0);	// contains price mark e.g. PM159
 									StructInsert(loc.record,"description",loc.cell);
 									StructInsert(loc.record,"PM",loc.pm);	// set the PM flag
-								} else if (loc.j eq 3) { // Booker added another cell for no reason??
+								} else if (loc.j eq 3) { // Booker added another cell for status flag
 								} else if (loc.j eq 4) { // qty field	e.g 12 x 100g
 									loc.packQty = Trim(ListFirst(loc.cell,"x"));	// get first item (qty)
 									StructInsert(loc.record,"packQty",loc.packQty);	// add pack qty to struct
@@ -136,7 +391,7 @@
 						ArrayAppend(loc.result.basket,loc.record);
 						//WriteOutput("<br />");
 					} else {
-						loc.category = ReReplace(loc.cols.text(),"\( \d+ \)","","all");// category title
+						loc.category = ReReplace(loc.cols.text(),"\( \d+ \)","","all");// category title (numbers) removed
 						if (len(loc.category)) 
 							loc.category = Replace(loc.category,"Retail","","one"); // remove 'Retail' title
 					//	WriteOutput("<br />" & loc.category & "<br />");
@@ -260,6 +515,7 @@
 				SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked,prodLocked
 				FROM tblProducts
 				WHERE prodRef='#args.code#'
+				<!--- AND current supplier --->
 				LIMIT 1;
 			</cfquery>
 			<cfif loc.prodExists.recordcount gt 0>
@@ -512,6 +768,7 @@
 				</cfquery>
 				<!---<cfset loc.qtyItems = args.packQty * args.qty1>--->
 				<cfif loc.stockItemExists.recordcount eq 1>
+					<cfset loc.result.stockItemID = loc.stockItemExists.siID>
 					<cfquery name="loc.QUpdateStockItem" datasource="#application.site.datasource1#">
 						UPDATE tblStockItem
 						SET 
@@ -530,11 +787,12 @@
 					</cfquery>
 					<cfset loc.result.action="#loc.result.action#stock item updated<br>">
 				<cfelse>
-					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#">
+					<cfquery name="loc.QAddStockItem" datasource="#application.site.datasource1#" result="loc.QAddStockItemResult">
 						INSERT INTO tblStockItem (siOrder,siProduct,siQtyPacks,siWSP,siUnitTrade,siRRP,siOurPrice,siPOR,siStatus,siUnitSize,siPackQty,siRef) 
 						VALUES (#header.stockOrderID#,#loc.result.productID#,#loc.result.qty1#,#args.WSP#,#loc.result.netUnitPrice#,
 							#loc.result.retail#,#loc.result.ourPrice#,#loc.result.POR#,'#loc.status#','#args.packsize#',#args.packQty#,'#args.code#')
 					</cfquery>
+					<cfset loc.result.stockItemID = loc.QAddStockItemResult.generatedkey>
 					<cfset loc.result.action="#loc.result.action#stock item added<br>">
 				</cfif>
 				<!---<cfset loc.result.action="#loc.result.action##loc.prodExists.prodLastBought# LTE #header.orderDate# AND NOT #loc.prodExists.prodLocked#<br>">--->
@@ -571,7 +829,7 @@
 				"exception" = cfcatch
 			}>
 			<cfdump var="#loc.err#" label="err" expand="yes" format="html"
-			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>

@@ -13,6 +13,26 @@
 		.noBarcode {color:#FF0000; font-weight:bold}
 		.pricemarked {color:#FF00ff; font-size:16px; font-weight:bold !Important}
 		.pricemarkdiff {color:#FF00ff; background-color:#6633FF; font-size:16px; font-weight:bold !Important}
+		.pm-flag {
+		  cursor: pointer;
+		  display: inline-block;
+		  width: 36px;
+		  height: 36px;
+		}
+		.pm-flag .tick {
+		  background: url("/images/icons/tick-round.png") no-repeat center center;
+		  background-size: contain;
+		  display: block;
+		  width: 100%;
+		  height: 100%;
+		}
+		.pm-flag .cross {
+		  background: url("/images/icons/cross-round.png") no-repeat center center;
+		  background-size: contain;
+		  display: block;
+		  width: 100%;
+		  height: 100%;
+		}
 	</style>
 	<script src="scripts/jquery-1.11.1.min.js"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
@@ -34,6 +54,43 @@
 					}
 				});
 			});
+			$(document).on("click", ".caseQty", function() {
+				var $el = $(this);
+				var id = $el.data("id");
+				var value = $(this).val();
+			//	console.log("id " + id + " value " + value);		
+				$.ajax({
+					url: "ajax/AJAX_stockSetValue.cfm",
+					method: "POST",
+					data: { stockItemID: id, caseQty: value },
+					success: function(response) {
+						// Update DOM only if CF update succeeded
+					}
+				});
+			});
+			$(document).on("click", ".pm-flag", function() {
+				var $el = $(this);
+				var id = $el.data("id");
+				var currentVal = $el.data("pm");
+				var newVal = currentVal == 1 ? 0 : 1;
+			
+				$.ajax({
+					url: "ajax/AJAX_productSetValue.cfm",
+					method: "POST",
+					data: { productID: id, pm: newVal },
+					success: function(response) {
+						// Update DOM only if CF update succeeded
+						$el.data("pm", newVal);
+						if (newVal == 1) {
+							$el.find("i.icon-img").removeClass("cross").addClass("tick");
+							$el.find("i.icon-text").html(response);
+						} else {
+							$el.find("i.icon-img").removeClass("tick").addClass("cross");
+							$el.find("i.icon-text").html(response);
+						}
+					}
+				});
+			});
 		});
 	</script>
 </head>
@@ -42,6 +99,7 @@
 <cftry>
 	<cfobject component="code/import2" name="import">
 	<cfparam name="fileSrc" default="">
+	<cfparam name="mode" default="1">
 	<cfparam name="silent" default="false">
 	<cfif len(fileSrc) IS 0>
 		<p>Please select a file <a href="bookerProcess.cfm">here</a></p>
@@ -69,18 +127,27 @@
 			<cfset parm.validTo="">
 		</cfif>
 
-		<cfset CheckStockOrder=import.CheckStockOrder(parm)>
-		<cfset parm.stockOrderID=CheckStockOrder.stockOrderID>
-		<cfset parm.validTo=CheckStockOrder.validTo>
-		<cfset parm.orderDate=CheckStockOrder.orderDate>
-		<cfset parm.orderRef=CheckStockOrder.orderRef>
 		<p><a href="bookerProcess.cfm">Select File...</a></p>
 		<h1><a href="#application.site.url_data#stock/#parm.sourcefile#" target="_blank">#parm.sourcefile#</a></h1>
-		<cfsetting requesttimeout="900">
+		<p>After checking the price mark flags, refresh the page to correct any incorrect prices.</p>
 		<cfflush interval="200">
-		<cfset records=import.processFile(parm)>
-		<!---<cfdump var="#records#" label="records" expand="no">--->
-		<!---<cfset qtyField=import.determineQtyFld(records)>--->
+		<cfsetting requesttimeout="900">
+		<cfset CheckStockOrder = import.CheckStockOrder(parm)>
+		<cfset parm.stockOrderID = CheckStockOrder.stockOrderID>
+		<cfset parm.validTo = CheckStockOrder.validTo>
+		<cfset parm.orderDate = CheckStockOrder.orderDate>
+		<cfset parm.orderRef = CheckStockOrder.orderRef>
+		<cfif mode eq 2>
+			<cfset dataImport = import.processFile2(parm)>
+			<!---<cfdump var="#dataImport#" label="dataImport" expand="false">--->
+			<cfset import.outputData(dataImport)>
+			<cfexit>
+		<cfelse>
+			<cfset records=import.processFile(parm)>
+			<!---<cfdump var="#records#" label="records" expand="no">--->
+			<!---<cfset qtyField=import.determineQtyFld(records)>--->
+		</cfif>
+
 	</cfoutput>
 
 	<cfoutput>

@@ -285,7 +285,7 @@
 			<cfloop query="args.QDrivers">
 				<cfif ListFind(args.parms.form.roundsTicked,rndID)>
 					<cfif !StructKeyExists(loc.result.drivers,rndRef)>
-						<cfset StructInsert(loc.result.drivers,rndRef, {"Round" = rndTitle, roundTotal = 0,
+						<cfset StructInsert(loc.result.drivers,rndRef, {"Round" = rndTitle, roundTotal = 0, dropTotal = 0,
 								sun = {},
 								mon = {},
 								tue = {},
@@ -299,6 +299,7 @@
 					<cfif StructKeyExists(args.rounds,rndRef)>
 						<cfset loc.rnd = StructFind(args.rounds,rndRef)>
 						<cfset loc.rota.roundTotal += loc.rnd.activeDays[drDay].total>
+						<cfset loc.rota.dropTotal += loc.rnd.activeDays[drDay].dropCount>
 						<cfset StructUpdate(loc.rota,drDay, {
 							"Driver" = drName, 
 							"driverPay" = loc.rnd.activeDays[drDay].total,
@@ -640,7 +641,7 @@
 									<td align="right"></td>
 								</cfif>
 							</cfloop>
-							<td align="right">#DecimalFormat(loc.rnd.roundTotal)#</td>
+							<td align="right">#DecimalFormat(loc.rnd.roundTotal)#<br />#showField(loc.rnd.dropTotal,0)#</td>
 						</tr>
 					</cfloop>
 					<cfset loc.dayGrandTotal = 0>
@@ -717,6 +718,14 @@
 								<th align="right">#loc.dayName#</th>
 							</cfloop>
 							<th align="right">Totals</th>
+						</tr>
+						<tr>
+							<td>Daily Drops</td>
+							<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
+								<cfset loc.dayData = StructFind(loc.roundData.activeDays,loc.dayName)>
+								<td width="60" align="right">#showField(loc.dayData.dropCount,0)#</td>
+							</cfloop>
+							<td width="60" align="right">#showField(loc.roundData.totals.dropCount,0)#</td>
 						</tr>
 						<tr>
 							<td>Media Retail</td>

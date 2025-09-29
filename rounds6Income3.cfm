@@ -35,7 +35,8 @@
 				$('#showSummaries').prop("checked",false);
 			}
 		});
-		$('#btnRun').show();
+		
+		$('#btnRun').show();	
 	});
 </script>
 <style type="text/css">

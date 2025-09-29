@@ -363,7 +363,8 @@
 								<cfset loc.header = "header">
 							</cfif>
 							<cfif StructKeyExists(args.parms.form,"showHeader")>
-								<tr class="#loc.header#">
+								<tr class="searchrow" data-title="#loc.drop.cltRef# #loc.drop.cltName# #loc.drop.address#" data-tranID="#loc.drop.ordID#" id="trnItem_#loc.drop.ordID#">
+								<!---<tr class="#loc.header#">--->
 									<td><a href="clientDetails.cfm?row=0&ref=#loc.drop.cltRef#" target="_new">#loc.drop.cltRef#</a></td>
 									<td>#loc.drop.cltName#</td>
 									<td colspan="6">#loc.drop.address#</td>
@@ -382,7 +383,7 @@
 								<cfset loc.pubKeys = ListSort(StructKeyList(loc.drop.pubs,","),"numeric","asc")>							
 								<cfloop list="#loc.pubKeys#" index="loc.pubKey" delimiters=",">
 									<cfset loc.pub = StructFind(loc.drop.pubs,loc.pubKey)>
-									<tr>
+									<tr class="">
 										<td></td>
 										<td width="200">#loc.pub.pubTitle#</td>
 										<td align="right">#loc.pub.pubPrice#</td>
@@ -427,7 +428,7 @@
 									<td align="center">#StructFind(loc.drop.activeDays,"sat")#</td>
 									<td colspan="6"></td>
 								</tr>
-								<tr>
+								<tr class="info">
 									<td></td>
 									<td></td>
 									<td colspan="2">Delivery Charges</td>
@@ -468,6 +469,7 @@
 								<td align="right">#DecimalFormat(loc.roundData.Totals.pubRetail)#</td>
 								<td align="right">#DecimalFormat(loc.roundData.Totals.pubTrade)#</td>
 								<td align="right">#DecimalFormat(loc.roundData.Totals.pubProfit)#</td>
+								<td></td>
 							</tr>
 						</cfif>
 					</table>
@@ -897,10 +899,32 @@
 
 	<!--- output data --->
 	<cfoutput>
+		<script>
+			$(document).ready(function() {
+				$('##tranSearch').on("keyup",function() {
+					var srch=$(this).val();
+					$('.searchrow').each(function() {
+						var id=$(this).attr("data-tranID");
+						var str=$(this).attr("data-title");
+					//	console.log(srch + " id " + id + " str " + str);
+						if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
+							$(this).hide();
+						} else {
+							$(this).show();
+						}
+						
+					});
+				});		
+			});		
+		</script>
 		<table class="summaryList" style="margin:10px">
 			<tr>
 				<td>Driver Rate</td><td>#driverRate#</td>
 				<td>Fuel Rate</td><td>#fuelRate#</td>
+				<cfif !StructKeyExists(form,"showDetail")>
+					<th colspan="3" align="right">Search</th>
+					<th colspan="2" align="left"><input type="text" id="tranSearch" value="" placeholder="Search..." tabindex="-1" style="width:80%;"></th>
+				</cfif>
 			</tr>
 		</table>
 	</cfoutput>

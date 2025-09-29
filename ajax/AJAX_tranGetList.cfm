@@ -131,60 +131,61 @@
 						});
 						event.preventDefault();
 					});
-				});
-				$('.selectAllOnList').click(function(event) {
-					var total = 0;
-					var amount = 0;
-					if (this.checked) {
-						$('.selectitem').prop({checked: true});
-						$('.selectAllOnList').prop({checked: true});
-	
-						$('.selectitem').each(function() {
-							if (this.checked) {
-								var id = $(this).val();
-								amount = Number($(this).attr("data-amount"));
-								total = +(total + amount).toFixed(2);
+					$('.selectAllOnList').click(function(event) {
+						var total = 0;
+						var amount = 0;
+						if (this.checked) {
+							$('.selectitem').prop({checked: true});
+							$('.selectAllOnList').prop({checked: true});
+		
+							$('.selectitem').each(function() {
+								if (this.checked) {
+									var id = $(this).val();
+									amount = Number($(this).attr("data-amount"));
+									total = +(total + amount).toFixed(2);
+								}
+								console.log("value " + amount + " ntotal " + total);
+							});
+							
+							// Display total
+							$('.amountAllocatedTotal').html(nf(total, "str"));
+							
+							if (total.toFixed(2) == 0) {
+								$('##btnAllocItems').show();
+							} else {
+								$('##btnAllocItems').hide();
 							}
-							console.log("value " + amount + " ntotal " + total);
-						});
-						
-						// Display total
-						$('.amountAllocatedTotal').html(nf(total, "str"));
-						
-						if (total.toFixed(2) == 0) {
-							$('##btnAllocItems').show();
+		
 						} else {
-							$('##btnAllocItems').hide();
-						}
-	
-					} else {
-						$('.selectitem').prop({checked: false});
-						$('.selectAllOnList').prop({checked: false});
-						$('.amountAllocatedTotal').html(nf(total, "str"));
-					}
-				});
-				$('.selectitem').click(function(event) {
-					$('.selectAllOnList').prop({checked: true});
-					$('.selectitem').each(function(i, e) {
-						if (!$(e).prop("checked")) {
+							$('.selectitem').prop({checked: false});
 							$('.selectAllOnList').prop({checked: false});
+							$('.amountAllocatedTotal').html(nf(total, "str"));
 						}
 					});
-				});
-				if (document.title != "#acctData.Account.accName#") {
-					document.title = "#acctData.Account.accName#";
-				};
-				$('##tranSearch').on("keyup",function() {
-					var srch=$(this).val();
-					$('.searchrow').each(function() {
-						var id=$(this).attr("data-tranID");
-						var str=$(this).attr("data-title");
-						if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
-							$(this).hide();
-						} else {
-							$(this).show();
-						}
-						
+					$('.selectitem').click(function(event) {
+						$('.selectAllOnList').prop({checked: true});
+						$('.selectitem').each(function(i, e) {
+							if (!$(e).prop("checked")) {
+								$('.selectAllOnList').prop({checked: false});
+							}
+						});
+					});
+					if (document.title != "#acctData.Account.accName#") {
+						document.title = "#acctData.Account.accName#";
+					};
+					$('##tranSearch').on("keyup",function() {
+						var srch=$(this).val();
+						$('.searchrow').each(function() {
+							var id=$(this).attr("data-tranID");
+							var str=$(this).attr("data-title");
+							console.log(srch + " id " + id + " str " + str);
+							if (str.toLowerCase().indexOf(srch.toLowerCase()) == -1) {
+								$(this).hide();
+							} else {
+								$(this).show();
+							}
+							
+						});
 					});
 				});
 			</script>

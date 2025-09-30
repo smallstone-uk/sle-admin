@@ -52,7 +52,7 @@
 	.info {background-color:#eee;}
 	.footer {background-color:#AAFFFF}
 	.rndheader {background-color:#55BF55; font-weight:bold; font-size:20px !important}
-	.rndfooter td {background-color:#D6FE89; padding:4px 0px; font-weight:bold; font-size:14px !important}
+	.rndfooter th {background-color:#D6FE89; padding:4px; font-weight:bold; font-size:14px !important}
 	.delCharge {background-color:#FF6 !important}
 </style>
 </head>

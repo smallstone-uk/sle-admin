@@ -661,7 +661,7 @@
 						</tr>
 					</cfloop>
 					<cfset loc.dayGrandTotal = 0>
-					<tr>
+					<tr class="rndfooter">
 						<th></th>
 						<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 							<cfset loc.dayTotal = StructFind(loc.dayTotals,loc.dayName)>
@@ -679,11 +679,11 @@
 						<cfset loc.driverPay = StructFind(loc.driverTotals,loc.driver)>
 						<cfset loc.driverTotal += loc.driverPay>
 						<tr>
-							<td width="80">#loc.driver#</td>
-							<td width="80" align="right">#DecimalFormat(showField(loc.driverPay,2))#</td>
+							<th width="80">#loc.driver#</th>
+							<th width="80" align="right">#DecimalFormat(showField(loc.driverPay,2))#</th>
 						</tr>
 					</cfloop>
-					<tr>
+					<tr class="rndfooter">
 						<th>Total</th>
 						<th align="right">#DecimalFormat(showField(loc.driverTotal,2))#</th>
 					</tr>
@@ -860,9 +860,9 @@
 									<cfset loc.iCount += delCount>
 								</cfloop>
 								<tr>
-									<th>#loc.iCount# orders</th>
 									<th></th>
 									<th></th>
+									<th align="right">#loc.iCount#</th>
 								</tr>
 							</table>
 						</td>
@@ -886,9 +886,9 @@
 									<cfset loc.iCount += delCount>
 								</cfloop>
 								<tr>
-									<th>#loc.iCount# orders</th>
 									<th></th>
 									<th></th>
+									<th align="right">#loc.iCount#</th>
 								</tr>
 							</table>
 						</td>

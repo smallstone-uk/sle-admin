@@ -636,7 +636,7 @@
 					<cfloop list="#loc.roundKeys#" index="loc.roundKey" delimiters=",">
 						<cfset loc.rnd = StructFind(args.drivers,loc.roundKey)>
 						<tr>
-							<td>#loc.rnd.round#</td>
+							<td>#loc.rnd.round#<br />Driver Pay<br />Drops</td>
 							<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 								<cfset loc.dayData = StructFind(loc.rnd,loc.dayName)>
 								<cfif !StructIsEmpty(loc.dayData)>

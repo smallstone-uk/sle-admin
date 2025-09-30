@@ -212,7 +212,6 @@
 				</cfloop>
 				<!--- loop customers --->
 				<cfloop list="#loc.customerKeys#" index="loc.customerKey" delimiters=",">
-					<cfset loc.roundData.totals.dropCount++>
 					<cfset loc.drop = StructFind(loc.roundData.customers,loc.customerKey)>
 					<cfset loc.drop.totRetail = 0>
 					<cfset loc.drop.totTrade = 0>
@@ -270,6 +269,7 @@
 				<!--- calculate fuel --->
 				<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 					<cfset loc.roundData.totals.fuel += loc.roundData.activeDays[loc.dayName].fuel>
+					<cfset loc.roundData.totals.dropCount += loc.roundData.activeDays[loc.dayName].dropCount>
 				</cfloop>
 				<!--- calculate final totals --->
 				<cfset loc.roundData.totals.grossIncome = loc.roundData.totals.pubRetail + loc.roundData.totals.charges>
@@ -334,24 +334,40 @@
 								<th class="rndheader">#loc.roundKey#</th>
 								<th colspan="16" class="rndheader">#loc.roundData.roundTitle#</th>
 							</tr>
-							<tr>
-								<th width="10"></th>
-								<th>Publication</th>
-								<th align="right">Retail Price</th>
-								<th align="right">Trade Price</th>
-								<th width="30" align="center">Sun</th>
-								<th width="30" align="center">Mon</th>
-								<th width="30" align="center">Tue</th>
-								<th width="30" align="center">Wed</th>
-								<th width="30" align="center">Thu</th>
-								<th width="30" align="center">Fri</th>
-								<th width="30" align="center">Sat</th>
-								<th width="20" align="center">Weekly Total</th>
-								<th width="40" align="right">Retail Value</th>
-								<th width="40" align="right">Trade Total</th>
-								<th width="40" align="right">Profit</th>
-								<th width="40" align="right">Ticky</th>
-							</tr>
+							<cfif StructKeyExists(args.parms.form,"showDetail")>
+								<tr>
+									<th width="10"></th>
+									<th>Publication</th>
+									<th align="right">Retail Price</th>
+									<th align="right">Trade Price</th>
+									<th width="30" align="center">Sun</th>
+									<th width="30" align="center">Mon</th>
+									<th width="30" align="center">Tue</th>
+									<th width="30" align="center">Wed</th>
+									<th width="30" align="center">Thu</th>
+									<th width="30" align="center">Fri</th>
+									<th width="30" align="center">Sat</th>
+									<th width="20" align="center">Weekly Total</th>
+									<th width="40" align="right">Retail Value</th>
+									<th width="40" align="right">Trade Total</th>
+									<th width="40" align="right">Profit</th>
+									<th width="40" align="right">Ticky</th>
+								</tr>
+							<cfelse>
+								<tr>
+									<th>Reference</th>
+									<th>Name</th>
+									<th colspan="6">Address</th>
+									<th>Type</th>
+									<th>Del. Code</th>
+									<th>Del. Code</th>
+									<th>New Code</th>
+									<th>Price/day</th>
+									<th>Order ID</th>
+									<th></th>
+									<th>Ticky</th>
+								</tr>
+							</cfif>
 						</cfif>
 						<!--- loop customers --->
 						<cfset loc.cumRetail = 0>
@@ -641,18 +657,18 @@
 									<td align="right"></td>
 								</cfif>
 							</cfloop>
-							<td align="right">#DecimalFormat(loc.rnd.roundTotal)#<br />#showField(loc.rnd.dropTotal,0)#</td>
+							<td align="right">&nbsp;<br />#DecimalFormat(loc.rnd.roundTotal)#<br />#showField(loc.rnd.dropTotal,0)#</td>
 						</tr>
 					</cfloop>
 					<cfset loc.dayGrandTotal = 0>
-					<tr class="rndfooter">
-						<td></td>
+					<tr>
+						<th></th>
 						<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 							<cfset loc.dayTotal = StructFind(loc.dayTotals,loc.dayName)>
 							<cfset loc.dayGrandTotal += loc.dayTotal>
-							<td align="right">#DecimalFormat(loc.dayTotal)#</td>
+							<th align="right">#DecimalFormat(loc.dayTotal)#</th>
 						</cfloop>
-						<td align="right">#DecimalFormat(loc.dayGrandTotal)#</td>
+						<th align="right">#DecimalFormat(loc.dayGrandTotal)#</th>
 					</tr>
 				</table>
 				<!--- output driver totals --->
@@ -667,9 +683,9 @@
 							<td width="80" align="right">#DecimalFormat(showField(loc.driverPay,2))#</td>
 						</tr>
 					</cfloop>
-					<tr class="rndfooter">
-						<td>Total</td>
-						<td align="right">#DecimalFormat(showField(loc.driverTotal,2))#</td>
+					<tr>
+						<th>Total</th>
+						<th align="right">#DecimalFormat(showField(loc.driverTotal,2))#</th>
 					</tr>
 				</table>
 			</cfoutput>

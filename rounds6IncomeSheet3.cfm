@@ -1,4 +1,4 @@
-<!--- revision 1.01	16/08/2024 --->
+<!--- revision 1.02	02/10/2025 --->
 <!--- added running total to publication totals --->
 
 <cftry>
@@ -64,7 +64,6 @@
 				<cfif StructKeyExists(args.form,"useSamples")>AND riOrderID IN (221,6131,951,6311,6371,7031,7121,8942,10662,12122)</cfif>
 				ORDER BY rndRef,riOrder,riDayEnum   
 			</cfquery>
-			<!---<cfif StructKeyExists(args.form,"showDumps")><cfdump var="#loc.QData#" label="loc.QData" expand="false"></cfif>--->
 			<cfloop query="loc.QData">
 				<!--- create round structure --->
 				<cfif !StructKeyExists(loc.result.rounds,rndRef)>
@@ -600,7 +599,6 @@
 						<th align="right">#DecimalFormat(loc.grand.netProfit)#</th>
 					</tr>
 				</table>
-				<!---<div class="summary" style="page-break-before:always;"></div>--->
 			</cfoutput>
 	
 		<cfcatch type="any">
@@ -617,75 +615,123 @@
 		<cfset loc.result = {}>
 		<cfset loc.driverTotals = {}>
 		<cfset loc.dayTotals = {}>
+		<cfset loc.drvTotals = {}>
 
 		<cftry>
 			<cfset loc.roundKeys = ListSort(StructKeyList(args.drivers,","),"text","asc")>
 			<cfoutput>
-				<table class="summaryList" style="margin:10px">
+				<table class="summaryList" style="margin:10px" border="1">
 					<tr>
 						<th colspan="4" class="rndheader">Driver Summary</th>
 						<th colspan="5" class="rndheader">as at #DateFormat(Now(),'dd-mmm-yy')#</th>
 					</tr>
 					<tr>
-						<th width="80"></th>
+						<th width="150"></th>
 						<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 							<th width="60" align="right">#loc.dayName#</th>
 						</cfloop>
-						<th width="60" align="right">Totals</th>
+						<th width="60" align="right">totals</th>
 					</tr>
 					<cfloop list="#loc.roundKeys#" index="loc.roundKey" delimiters=",">
 						<cfset loc.rnd = StructFind(args.drivers,loc.roundKey)>
 						<tr>
-							<td>#loc.rnd.round#<br />Driver Pay<br />Drops</td>
+							<td>
+								<table>
+									<tr><td align="right">#loc.rnd.round#</td></tr>
+									<tr><td align="right">Driver Pay</td></tr>
+									<tr><td align="right">Drops</td></tr>
+								</table>
+							</td>
 							<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 								<cfset loc.dayData = StructFind(loc.rnd,loc.dayName)>
 								<cfif !StructIsEmpty(loc.dayData)>
+									<cfif !StructKeyExists(loc.drvTotals,loc.dayData.driver)>
+										<cfset StructInsert(loc.drvTotals,loc.dayData.driver,{driverPay = 0,dropCount = 0})>
+									</cfif>
+									<cfset loc.drvTotal = StructFind(loc.drvTotals,loc.dayData.driver)>									
+									<cfset loc.drvTotal.driverPay += loc.dayData.driverPay>
+									<cfset loc.drvTotal.dropcount += loc.dayData.dropCount>
+
+								
 									<cfif !StructKeyExists(loc.driverTotals,loc.dayData.driver)>
-										<cfset StructInsert(loc.driverTotals,loc.dayData.driver,0)>
+										<cfset StructInsert(loc.driverTotals,loc.dayData.driver,{paytotal = 0,dropTotal = 0})>
 									</cfif>
+									<cfset loc.drvData = StructFind(loc.driverTotals,loc.dayData.driver)>
+									<cfset loc.drvData.paytotal = loc.dayData.driverPay>
+									<cfset loc.drvData.dropTotal = loc.dayData.dropCount>
 									<cfif !StructKeyExists(loc.dayTotals,loc.dayName)>
-										<cfset StructInsert(loc.dayTotals,loc.dayName,0)>
+										<cfset StructInsert(loc.dayTotals,loc.dayName,{paytotal = 0,dropTotal = 0})>
 									</cfif>
-									<cfset loc.balance = StructFind(loc.driverTotals,loc.dayData.driver)>
-									<cfset StructUpdate(loc.driverTotals,loc.dayData.driver,loc.balance + loc.dayData.driverPay)>
 									<cfset loc.dayTotal = StructFind(loc.dayTotals,loc.dayName)>
-									<cfset StructUpdate(loc.dayTotals,loc.dayName,loc.dayTotal + loc.dayData.driverPay)>
-									<td align="right">
-										#loc.dayData.driver#<br />#showField(loc.dayData.driverPay)#<br />#showField(loc.dayData.dropCount,0)#
-									</td>
+									<cfset loc.dayTotal.paytotal += loc.dayData.driverPay>
+									<cfset loc.dayTotal.dropTotal += loc.dayData.dropCount>
+									<td>
+										<table>
+											<tr><td align="right">#loc.dayData.driver#</td></tr>
+											<tr><td align="right">#showField(loc.dayData.driverPay)#</td></tr>
+											<tr><td align="right">#showField(loc.dayData.dropCount,0)#</td></tr>
+										</table>
+									</td>									
 								<cfelse>
 									<td align="right"></td>
 								</cfif>
 							</cfloop>
-							<td align="right">&nbsp;<br />#DecimalFormat(loc.rnd.roundTotal)#<br />#showField(loc.rnd.dropTotal,0)#</td>
+							<td align="right">
+								<table>
+									<tr><td align="right">&nbsp;</td></tr>
+									<tr><td align="right">#showField(loc.rnd.roundTotal)#</td></tr>
+									<tr><td align="right">#showField(loc.rnd.dropTotal,0)#</td></tr>
+								</table>
+							</td>
 						</tr>
 					</cfloop>
 					<cfset loc.dayGrandTotal = 0>
+					<cfset loc.dayDropTotal = 0>
 					<tr class="rndfooter">
 						<th></th>
 						<cfloop list="sun,mon,tue,wed,thu,fri,sat" index="loc.dayName">
 							<cfset loc.dayTotal = StructFind(loc.dayTotals,loc.dayName)>
-							<cfset loc.dayGrandTotal += loc.dayTotal>
-							<th align="right">#DecimalFormat(loc.dayTotal)#</th>
+							<cfset loc.dayGrandTotal += loc.dayTotal.payTotal>
+							<cfset loc.dayDropTotal += loc.dayTotal.dropTotal>
+							<th>
+								<table>
+									<tr><td align="right">#showField(loc.dayTotal.payTotal)#</td></tr>
+									<tr><td align="right">#showField(loc.dayTotal.dropTotal,0)#</td></tr>
+								</table>
+							</th>
 						</cfloop>
-						<th align="right">#DecimalFormat(loc.dayGrandTotal)#</th>
+						<th align="right">
+							<table>
+								<tr><td align="right">#showField(loc.dayGrandTotal)#</td></tr>
+								<tr><td align="right">#showField(loc.dayDropTotal,0)#</td></tr>
+							</table>
+						</th>
 					</tr>
 				</table>
 				<!--- output driver totals --->
 				<cfset loc.driverKeys = ListSort(StructKeyList(loc.driverTotals,","),"text","asc")>
-				<table class="summaryList" style="margin:10px">
-					<cfset loc.driverTotal = 0>
+				<table class="summaryList" style="margin:10px; width:300px;">
+					<tr>
+						<th>Driver</th>
+						<th align="right">Pay</th>
+						<th align="right">Drops</th>
+					</tr>
+					<cfset loc.totalPay = 0>
+					<cfset loc.totalDrops = 0>
 					<cfloop list="#loc.driverKeys#" index="loc.driver" delimiters=",">
-						<cfset loc.driverPay = StructFind(loc.driverTotals,loc.driver)>
-						<cfset loc.driverTotal += loc.driverPay>
+						<cfset loc.drvData = StructFind(loc.drvTotals,loc.driver)>
+						<cfset loc.totalPay += loc.drvData.driverPay>
+						<cfset loc.totalDrops += loc.drvData.dropCount>
 						<tr>
-							<th width="80">#loc.driver#</th>
-							<th width="80" align="right">#DecimalFormat(showField(loc.driverPay,2))#</th>
+							<td widtd="80">#loc.driver#</td>
+							<td widtd="80" align="right">#showField(loc.drvData.driverPay,2)#</td>
+							<td widtd="80" align="right">#showField(loc.drvData.dropCount,0)#</td>
 						</tr>
 					</cfloop>
 					<tr class="rndfooter">
 						<th>Total</th>
-						<th align="right">#DecimalFormat(showField(loc.driverTotal,2))#</th>
+						<th align="right">#showField(loc.totalPay,2)#</th>
+						<th align="right">#showField(loc.totalDrops,0)#</th>
 					</tr>
 				</table>
 			</cfoutput>
@@ -917,7 +963,6 @@
 	
 	<!--- load data --->
 	<cfset data = loadRoundData(parms)>
-	<!---<cfif StructKeyExists(form,"showDumps")><cfdump var="#data#" label="1st Pass" expand="false"></cfif>--->
 	<!--- process data --->
 	<cfset data = processRoundData(data)>
 	<cfif StructKeyExists(form,"showDumps")><cfdump var="#data#" label="2nd Pass" expand="true"></cfif>

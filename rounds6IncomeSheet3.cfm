@@ -713,18 +713,21 @@
 				<table class="summaryList" style="margin:10px; width:300px;">
 					<tr>
 						<th>Driver</th>
-						<th align="right">Pay</th>
+						<th align="right">Rounded Pay</th>
 						<th align="right">Drops</th>
 					</tr>
 					<cfset loc.totalPay = 0>
 					<cfset loc.totalDrops = 0>
 					<cfloop list="#loc.driverKeys#" index="loc.driver" delimiters=",">
 						<cfset loc.drvData = StructFind(loc.drvTotals,loc.driver)>
-						<cfset loc.totalPay += loc.drvData.driverPay>
+						<cfset loc.pay = int(loc.drvData.driverPay)>
+						<cfset loc.pence = loc.drvData.driverPay - loc.pay>
+						<cfset loc.pay += int(loc.pence gt 0)>
+						<cfset loc.totalPay += loc.pay>
 						<cfset loc.totalDrops += loc.drvData.dropCount>
 						<tr>
 							<td widtd="80">#loc.driver#</td>
-							<td widtd="80" align="right">#showField(loc.drvData.driverPay,2)#</td>
+							<td widtd="80" align="right">#showField(loc.pay,2)#</td>
 							<td widtd="80" align="right">#showField(loc.drvData.dropCount,0)#</td>
 						</tr>
 					</cfloop>

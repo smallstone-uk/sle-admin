@@ -172,7 +172,7 @@
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>VAT Report</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Daily VAT Report</option>
 											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>VAT Transactions</option>
-											<option title="careful - takes long" value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>EPOS Transactions</option>
+											<option value="4" title="careful - takes long"<cfif srchReport eq "4"> selected="selected"</cfif>>EPOS Transactions</option>
 										</select>
 									</td>
 								</tr>

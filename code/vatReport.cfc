@@ -178,7 +178,6 @@
 			<cfset loc.result.QEPOSTrans = loc.QEPOSTrans>
 			<cfset loc.result.analysis = {}>
 			<cfset loc.result.anTotals = {count = 0,eiNet = 0,eiVAT = 0,eiTrade = 0,profit = 0}>
-			<cfdump var="#loc#" label="loc" expand="false">
 			<cfloop query="loc.QEPOSTrans">
 				<cfset loc.hashKey = "#pgNomGroup#-#pcatID#">
 				<cfif !StructKeyExists(loc.result.analysis,loc.hashKey)>

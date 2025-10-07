@@ -955,8 +955,8 @@
 							<!--- VAT Transactions --->
 							<cfset data = report.TransactionList(parms)>
 							<cfset sortkey = "">
-							<!---<cfdump var="#form#" label="form" expand="false">
-							<cfdump var="#data#" label="data" expand="false">--->
+							<cfdump var="#form#" label="form" expand="false">
+							<cfdump var="#data#" label="data" expand="false">
 							<table border="1" class="tableList" width="100%">
 								<tr>
 									<th colspan="6"><h1>EPOS Sales</h1></th>

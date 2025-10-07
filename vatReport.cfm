@@ -959,10 +959,11 @@
 							<cfdump var="#data#" label="data" expand="false">--->
 							<table border="1" class="tableList" width="100%">
 								<tr>
-									<th colspan="6"><h1>EPOS Sales</h1></th>
+									<th colspan="7"><h1>EPOS Sales</h1></th>
 								</tr>
 								<tr>
 									<th align="right">Count</th>
+									<th>Group</th>
 									<th>Category</th>
 									<th align="right">Net</th>
 									<th align="right">VAT</th>
@@ -975,6 +976,7 @@
 									<cfif srchHeadings eq 0>
 										<tr>
 											<td align="right">#NumberFormat(anData.count,'0')#</td>
+											<td>#anData.pgNomGroup#</td>
 											<td>#anData.pcatTitle#</td>
 											<td align="right">#DecimalFormat(anData.eiNet)#</td>
 											<td align="right">#DecimalFormat(anData.eiVAT)#</td>
@@ -985,7 +987,8 @@
 								</cfloop>
 								<tr>
 									<th align="right">#NumberFormat(data.anTotals.count)#</th>
-									<th>Totals</th>
+									<th></th>
+									<th colspan="">Totals</th>
 									<th align="right">#DecimalFormat(data.anTotals.eiNet)#</th>
 									<th align="right">#DecimalFormat(data.anTotals.eiVAT)#</th>
 									<th align="right">#DecimalFormat(data.anTotals.eiTrade)#</th>

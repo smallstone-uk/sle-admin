@@ -1,5 +1,33 @@
 <cfcomponent>
 
+	<cffunction name="Correct" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.x = {}>
+		
+		<cfset loc.x.waste = 0>
+		<cfif args.ehMode eq "wst">
+			<cfset loc.x.eiNet = 0>
+			<cfset loc.x.eiVAT = 0>
+			<cfset loc.x.eiTrade = args.eiTrade>
+			<cfset loc.x.profit = loc.x.eiNet - loc.x.eiTrade>
+			<cfset loc.x.POR = 0>
+		<cfelseif args.ehMode eq "rfd">
+			<cfset loc.x.eiNet = -args.eiNet>
+			<cfset loc.x.eiVAT = -args.eiVAT>
+			<cfset loc.x.eiTrade = -args.eiTrade>
+			<cfset loc.x.profit = loc.x.eiNet - loc.x.eiTrade>
+			<cfif loc.x.eiNet neq 0><cfset loc.x.POR = -int((loc.x.profit / loc.x.eiNet) * 10000) / 100></cfif>
+		<cfelse>
+			<cfset loc.x.eiNet = -args.eiNet>
+			<cfset loc.x.eiVAT = -args.eiVAT>
+			<cfset loc.x.eiTrade = args.eiTrade>
+			<cfset loc.x.profit = loc.x.eiNet - loc.x.eiTrade>				
+			<cfif loc.x.eiNet neq 0><cfset loc.x.POR = int((loc.x.profit / loc.x.eiNet) * 10000) / 100></cfif>
+		</cfif>	
+		<cfreturn loc.x>
+	</cffunction>
+	
 	<cffunction name="VATSummary" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
@@ -38,27 +66,13 @@
 			<cfset loc.x = {}>
 			<cfloop query="loc.QSaleItems">
 				<cfset loc.x.key = "#pgNomGroup#-#NumberFormat(pgID,'000')#-#ehMode#">
-				<!---<cfset loc.x.key = pgID>--->
-				<cfset loc.x.waste = 0>
-				<cfif ehMode eq "wst">
-					<cfset loc.x.net = 0>
-					<cfset loc.x.VAT = 0>
-					<cfset loc.x.trade = trade>
-					<cfset loc.x.profit = loc.x.net - loc.x.trade>
-					<cfset loc.x.POR = 0>
-				<cfelseif ehMode eq "rfd">
-					<cfset loc.x.net = -net>
-					<cfset loc.x.VAT = -VAT>
-					<cfset loc.x.trade = -trade>
-					<cfset loc.x.profit = loc.x.net - loc.x.trade>
-					<cfif loc.x.net neq 0><cfset loc.x.POR = -int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
-				<cfelse>
-					<cfset loc.x.net = -net>
-					<cfset loc.x.VAT = -VAT>
-					<cfset loc.x.trade = trade>
-					<cfset loc.x.profit = loc.x.net - loc.x.trade>				
-					<cfif loc.x.net neq 0><cfset loc.x.POR = int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
-				</cfif>	
+				<cfset loc.rec = {}>
+				<cfset loc.rec.ehMode = ehMode>
+				<cfset loc.rec.eiNet = Net>
+				<cfset loc.rec.eiVAT = VAT>
+				<cfset loc.rec.eiTrade = Trade>
+				<cfset loc.clean = Correct(loc.rec)>
+
 				<cfif !StructKeyExists(loc.data,loc.x.key)>
 					<cfset StructInsert(loc.data,loc.x.key, {
 						"mode" = ehMode,
@@ -66,20 +80,20 @@
 						"group" = pgNomGroup,
 						"title" = pgTitle,
 						"qty" = Qty,
-						"net" = loc.x.net,
-						"VAT" = loc.x.VAT,
-						"trade" = loc.x.trade,
-						"waste" = loc.x.waste,
-						"profit" = loc.x.profit,
-						"POR" = loc.x.POR
+						"net" = loc.clean.eiNet,
+						"VAT" = loc.clean.eiVAT,
+						"trade" = loc.clean.eiTrade,
+						"waste" = loc.clean.waste,
+						"profit" = loc.clean.profit,
+						"POR" = loc.clean.POR
 					})>
 				<cfelse>
 					<cfset loc.item = StructFind(loc.data,loc.x.key)>
-					<cfset loc.item.waste += loc.x.waste>
-					<cfset loc.item.net += loc.x.net>
-					<cfset loc.item.VAT += loc.x.VAT>
-					<cfset loc.item.trade += loc.x.trade>
-					<cfset loc.item.profit = (loc.item.net - loc.item.trade)>
+					<cfset loc.item.waste += loc.clean.waste>
+					<cfset loc.item.net += loc.clean.eiNet>
+					<cfset loc.item.VAT += loc.clean.eiVAT>
+					<cfset loc.item.trade += loc.clean.eiTrade>
+					<cfset loc.item.profit = (loc.clean.eiNet - loc.clean.eiTrade)>
 					<cfif loc.item.net neq 0><cfset loc.x.POR = loc.item.profit / loc.item.net></cfif>
 				</cfif>
 			</cfloop>
@@ -99,6 +113,8 @@
 		<cfset loc.result = {}>
 
 		<cftry>
+			<cfset loc.srchDateTo = DateAdd("d",1,args.form.srchDateTo)>
+			<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
 			<cfquery name="loc.QPurTrans" datasource="#args.datasource#">
 				SELECT nomID,nomCode,nomTitle, trnID,trnDate,trnRef,trnDesc,trnAmnt1,trnAmnt2, niAmount,niVATAmount,niVATRate, accID,accCode,accName
 				FROM tbltrans 
@@ -166,19 +182,27 @@
 			</cfif>
 			
 			<cfquery name="loc.QEPOSTrans" datasource="#args.datasource#">
-				SELECT pgNomGroup,pcatID,pcatTitle, prodID,prodTitle, eiTimeStamp,eiClass,eiType,eiNet,eiVAT,eiTrade, -(eiNet + eiTrade) AS profit
+				SELECT pgNomGroup,pcatID,pcatTitle, prodID,prodTitle, ehMode, eiTimeStamp,eiClass,eiType,eiNet,eiVAT,eiTrade, -(eiNet + eiTrade) AS profit
 				FROM tblepos_items
+				INNER JOIN tblepos_header ON eiParent = ehID
 				INNER JOIN tblProducts ON prodID = eiProdID
 				INNER JOIN tblproductcats ON pcatID = prodCatID
 				INNER JOIN tblProductGroups ON pcatGroup = pgID
-				WHERE eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
-				AND eiClass NOT IN ('pay','supp')
-				ORDER BY eiClass, prodCatID, eiTimeStamp;
+				WHERE eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#loc.midnight#'
+				AND eiClass = 'sale'
+				ORDER BY eiClass, pcatTitle, eiTimeStamp;
 			</cfquery>
 			<cfset loc.result.QEPOSTrans = loc.QEPOSTrans>
 			<cfset loc.result.analysis = {}>
 			<cfset loc.result.anTotals = {count = 0,eiNet = 0,eiVAT = 0,eiTrade = 0,profit = 0}>
 			<cfloop query="loc.QEPOSTrans">
+				<cfset loc.rec = {}>
+				<cfset loc.rec.ehMode = ehMode>
+				<cfset loc.rec.eiNet = eiNet>
+				<cfset loc.rec.eiVAT = eiVAT>
+				<cfset loc.rec.eiTrade = eiTrade>
+				<cfset loc.rec.profit = profit>
+				<cfset loc.clean = Correct(loc.rec)>
 				<cfset loc.hashKey = "#pgNomGroup#-#pcatID#">
 				<cfif !StructKeyExists(loc.result.analysis,loc.hashKey)>
 					<cfset StructInsert(loc.result.analysis,loc.hashKey, {
@@ -187,20 +211,22 @@
 						eiVAT = 0,
 						eiTrade = 0,
 						profit = 0,
-						pcatTitle = pcatTitle
+						pgNomGroup = pgNomGroup,
+						pcatTitle = pcatTitle,
+						eiClass = eiClass
 					})>
 				</cfif>
 				<cfset loc.annie = StructFind(loc.result.analysis,loc.hashKey)>
 				<cfset loc.annie.count++>
-				<cfset loc.annie.eiNet += eiNet>
-				<cfset loc.annie.eiVAT += eiVAT>
-				<cfset loc.annie.eiTrade += eiTrade>
-				<cfset loc.annie.profit += profit>
+				<cfset loc.annie.eiNet += loc.clean.eiNet>
+				<cfset loc.annie.eiVAT += loc.clean.eiVAT>
+				<cfset loc.annie.eiTrade += loc.clean.eiTrade>
+				<cfset loc.annie.profit += loc.clean.profit>
 				<cfset loc.result.anTotals.count++>
-				<cfset loc.result.anTotals.eiNet += eiNet>
-				<cfset loc.result.anTotals.eiVAT += eiVAT>
-				<cfset loc.result.anTotals.eiTrade += eiTrade>
-				<cfset loc.result.anTotals.profit += profit>
+				<cfset loc.result.anTotals.eiNet += loc.clean.eiNet>
+				<cfset loc.result.anTotals.eiVAT += loc.clean.eiVAT>
+				<cfset loc.result.anTotals.eiTrade += loc.clean.eiTrade>
+				<cfset loc.result.anTotals.profit += loc.clean.profit>
 			</cfloop>
 
 		<cfcatch type="any">
@@ -247,29 +273,16 @@
 				</cfquery>
 				<cfset loc.result.QSales = loc.QSales>
 				
-				<cfset loc.x = {}>
 				<cfset loc.tot = {net=0,vat=0,trade=0,qty=0,profit=0}>
+				<cfset loc.x = {}>
 				<cfloop query="loc.QSales">
 					<cfset loc.x.key = "#ehMode#-#prodID#">
-					<cfif ehMode eq "wst">
-						<cfset loc.x.net = 0>
-						<cfset loc.x.VAT = 0>
-						<cfset loc.x.trade = trade>
-						<cfset loc.x.profit = loc.x.net - loc.x.trade>
-						<cfset loc.x.POR = 0>
-					<cfelseif ehMode eq "rfd">
-						<cfset loc.x.net = -net>
-						<cfset loc.x.VAT = -VAT>
-						<cfset loc.x.trade = -trade>
-						<cfset loc.x.profit = loc.x.net - loc.x.trade>
-						<cfif loc.x.net neq 0><cfset loc.x.POR = -int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
-					<cfelse>
-						<cfset loc.x.net = -net>
-						<cfset loc.x.VAT = -VAT>
-						<cfset loc.x.trade = trade>
-						<cfset loc.x.profit = loc.x.net - loc.x.trade>				
-						<cfif loc.x.net neq 0><cfset loc.x.POR = int((loc.x.profit / loc.x.net) * 10000) / 100></cfif>
-					</cfif>	
+					<cfset loc.rec = {}>
+					<cfset loc.rec.ehMode = ehMode>
+					<cfset loc.rec.eiNet = Net>
+					<cfset loc.rec.eiVAT = VAT>
+					<cfset loc.rec.eiTrade = Trade>
+					<cfset loc.clean = Correct(loc.rec)>
 					<cfif !StructKeyExists(loc.products,loc.x.key)>
 						<cfset StructInsert(loc.products,loc.x.key, {
 							"mode" = ehMode,
@@ -279,51 +292,25 @@
 							"siUnitSize" = siUnitSize,
 							"siOurPrice" = siOurPrice,
 							"qty" = Qty,
-							"net" = loc.x.net,
-							"VAT" = loc.x.VAT,
-							"trade" = loc.x.trade,
-							"profit" = loc.x.profit,
-							"POR" = loc.x.POR
+							"net" = loc.clean.eiNet,
+							"VAT" = loc.clean.eiVAT,
+							"trade" = loc.clean.eiTrade,
+							"profit" = loc.clean.profit,
+							"POR" = loc.clean.POR
 						})>
 					<cfelse>
 						<cfset loc.item = StructFind(loc.products,loc.x.key)>
-						<cfset loc.item.net += loc.x.net>
-						<cfset loc.item.VAT += loc.x.VAT>
-						<cfset loc.item.trade += loc.x.trade>
+						<cfset loc.item.net += loc.clean.eiNet>
+						<cfset loc.item.VAT += loc.clean.eiVAT>
+						<cfset loc.item.trade += loc.clean.eiTrade>
 						<cfset loc.item.profit = (loc.item.net - loc.item.trade)>
 						<cfif loc.item.net neq 0><cfset loc.x.POR = loc.item.profit / loc.item.net></cfif>
 					</cfif>
-
-<!---
-					<cfif !StructKeyExists(loc.products,loc.key)>
-						<cfset StructInsert(loc.products,loc.key, {
-							"mode" = ehMode,
-							"prodID" = prodID,
-							"prodTitle" = prodTitle,
-							"pcatTitle" = pcatTitle,
-							"siUnitSize" = siUnitSize,
-							"siOurPrice" = siOurPrice,
-							"net" = net,
-							"VAT" = VAT,
-							"trade" = trade,
-							"qty" = qty,
-							"profit" = net - trade
-						})>
-					<cfelse>
-						<cfset loc.item = StructFind(loc.products,loc.key)>
-						<cfset loc.item.net = net>
-						<cfset loc.item.VAT = VAT>
-						<cfset loc.item.trade = trade>
-						<cfset loc.item.qty = qty>
-						<cfset loc.item.profit = net - trade>
-					</cfif>
-					
---->
-					<cfset loc.tot.net += loc.x.net>
-					<cfset loc.tot.VAT += loc.x.VAT>
-					<cfset loc.tot.trade += loc.x.trade>
+					<cfset loc.tot.net += loc.clean.eiNet>
+					<cfset loc.tot.VAT += loc.clean.eiVAT>
+					<cfset loc.tot.trade += loc.clean.eiTrade>
 					<cfset loc.tot.qty += qty>
-					<cfset loc.tot.profit += (loc.x.net - loc.x.trade)>
+					<cfset loc.tot.profit += (loc.clean.eiNet - loc.clean.eiTrade)>
 					<cfif loc.tot.net neq 0><cfset loc.tot.POR = int((loc.tot.profit / loc.tot.net) * 10000) / 100></cfif>
 				</cfloop>
 				<cfset loc.result.products = loc.products>	
@@ -377,7 +364,6 @@
 				WHERE eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#loc.midnight#'
 				AND eiVAT != 0
 				ORDER BY eiParent
-				<!---LIMIT 0,100--->
 			</cfquery>
 			<cfset loc.result.QEPOSTrans = loc.QEPOSTrans>
 			<cfset loc.result.trans = {}>
@@ -408,27 +394,8 @@
 					EIVAT = EIVAT				
 				})>
 			</cfloop>
-			
-			
-<!---			<cfloop query="loc.QEPOSTrans">
-				<cfset loc.deal = {}>
-				<cfif StructKeyExists(loc.result.deals,eiProdID)>
-					<cfset loc.deal = StructFind(loc.result.deals,eiProdID)>
-				</cfif>
-				<cfset StructInsert(loc.result.trans,eiID, {
-					NET = NET,
-					VAT = VAT,
-					deal = loc.deal,
-					EIPARENT = EIPARENT,
-					EIPRODID = EIPRODID,
-					EIQTY = EIQTY,
-					EIRETAIL = EIRETAIL,
-					EITRADE = EITRADE,
-					EITYPE = EITYPE,
-					EIVAT = EIVAT
-				})>
-			</cfloop>
---->		<cfcatch type="any">
+
+		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>

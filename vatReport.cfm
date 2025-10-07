@@ -159,7 +159,7 @@
 				<div class="form-wrap">
 					<form method="post">
 						<div class="form-header no-print">
-							VAT Reports #srchHeadings#
+							VAT Reports
 							<span><input type="submit" name="btnSearch" value="Search" /></span>
 						</div>
 						<div class="module no-print">
@@ -172,7 +172,7 @@
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>VAT Report</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Daily VAT Report</option>
 											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>VAT Transactions</option>
-											<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>EPOS Transactions</option>
+											<option title="careful - takes long" value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>EPOS Transactions</option>
 										</select>
 									</td>
 								</tr>
@@ -230,6 +230,7 @@
 							<cfset totQty = 0>
 							<cfset totTrd = 0>
 							<cfset totPrf = 0>
+							<cfset totPOR = 0>
 							<cfset POR = 0>
 							<cfset loc.datakeys = ListSort(StructKeyList(result.data,","),"text","asc")>
 							<cfset summary = {
@@ -805,6 +806,10 @@
 						</cfcase>
 						
 						<cfcase value="2">
+							<cfif !IsDate(srchDateTo)>
+								<h1>Please specify the date range</h1>
+								<cfexit>
+							</cfif>
 							<cfset salKeys = {}>
 							<cfset purKeys = {}>
 							<cfset dateTo = LSDateFormat(DateAdd("d",1,srchDateTo),"yyyy-mm-dd")>
@@ -939,6 +944,10 @@
 							</table>
 						</cfcase>
 						<cfcase value="3">
+							<cfif !IsDate(srchDateTo)>
+								<h1>Please specify the date range</h1>
+								<cfexit>
+							</cfif>
 							<!--- VAT Transactions --->
 							<cfset data = report.TransactionList(parms)>
 							<cfset sortkey = "">
@@ -1069,6 +1078,10 @@
 							</table>
 						</cfcase>
 						<cfcase value="4">
+							<cfif !IsDate(srchDateTo)>
+								<h1>Please specify the date range</h1>
+								<cfexit>
+							</cfif>
 							<cfset result = "">
 							<cfset totalDiff = 0>
 							<cfset data = report.EPOSTrans(parms)>

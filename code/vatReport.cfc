@@ -4,8 +4,12 @@
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.result.data = {}>
 
 		<cftry>
+			<cfif !IsDate(args.form.srchDateTo)>
+				<cfreturn loc.result>
+			</cfif>
 			<cfset loc.srchDateTo = DateAdd("d",1,args.form.srchDateTo)>
 			<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
 			<cfquery name="loc.QSaleItems" datasource="#args.datasource#">
@@ -95,7 +99,7 @@
 		<cfset loc.result = {}>
 
 		<cftry>
-			<cfquery name="loc.QTrans" datasource="#args.datasource#">
+			<cfquery name="loc.QPurTrans" datasource="#args.datasource#">
 				SELECT nomID,nomCode,nomTitle, trnID,trnDate,trnRef,trnDesc,trnAmnt1,trnAmnt2, niAmount,niVATAmount,niVATRate, accID,accCode,accName
 				FROM tbltrans 
 				INNER JOIN tblnomitems ON niTranID = trnID
@@ -111,7 +115,7 @@
 					ORDER BY accCode, nomGroup,nomCode, trnDate;
 				</cfif>
 			</cfquery>
-			<cfset loc.result.QTrans = loc.QTrans>
+			<cfset loc.result.QPurTrans = loc.QPurTrans>
 			<cfset loc.result.totals = {}>
 			<cfset StructInsert(loc.result.totals,"zzGrand", {
 				"Title" = "Grand Total",
@@ -120,7 +124,7 @@
 				"Num" = 0
 			})>
 			<cfif args.form.srchSort eq 1>
-				<cfloop query="loc.QTrans">
+				<cfloop query="loc.QPurTrans">
 					<cfif !StructKeyExists(loc.result.totals,nomCode)>
 						<cfset StructInsert(loc.result.totals,nomCode, {
 							"Title" = nomTitle,
@@ -161,6 +165,45 @@
 				</cfloop>
 			</cfif>
 			
+			<cfquery name="loc.QEPOSTrans" datasource="#args.datasource#">
+				SELECT pgNomGroup,pcatID,pcatTitle, prodID,prodTitle, eiTimeStamp,eiClass,eiType,eiNet,eiVAT,eiTrade, -(eiNet + eiTrade) AS profit
+				FROM tblepos_items
+				INNER JOIN tblProducts ON prodID = eiProdID
+				INNER JOIN tblproductcats ON pcatID = prodCatID
+				INNER JOIN tblProductGroups ON pcatGroup = pgID
+				WHERE eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
+				AND eiClass NOT IN ('pay','supp')
+				ORDER BY eiClass, prodCatID, eiTimeStamp;
+			</cfquery>
+			<cfset loc.result.QEPOSTrans = loc.QEPOSTrans>
+			<cfset loc.result.analysis = {}>
+			<cfset loc.result.anTotals = {count = 0,eiNet = 0,eiVAT = 0,eiTrade = 0,profit = 0}>
+			<cfdump var="#loc#" label="loc" expand="false">
+			<cfloop query="loc.QEPOSTrans">
+				<cfset loc.hashKey = "#pgNomGroup#-#pcatID#">
+				<cfif !StructKeyExists(loc.result.analysis,loc.hashKey)>
+					<cfset StructInsert(loc.result.analysis,loc.hashKey, {
+						count = 0,
+						eiNet = 0,
+						eiVAT = 0,
+						eiTrade = 0,
+						profit = 0,
+						pcatTitle = pcatTitle
+					})>
+				</cfif>
+				<cfset loc.annie = StructFind(loc.result.analysis,loc.hashKey)>
+				<cfset loc.annie.count++>
+				<cfset loc.annie.eiNet += eiNet>
+				<cfset loc.annie.eiVAT += eiVAT>
+				<cfset loc.annie.eiTrade += eiTrade>
+				<cfset loc.annie.profit += profit>
+				<cfset loc.result.anTotals.count++>
+				<cfset loc.result.anTotals.eiNet += eiNet>
+				<cfset loc.result.anTotals.eiVAT += eiVAT>
+				<cfset loc.result.anTotals.eiTrade += eiTrade>
+				<cfset loc.result.anTotals.profit += profit>
+			</cfloop>
+
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -295,5 +338,124 @@
 		</cftry>
 		<cfreturn loc.result>
 	</cffunction>
-	
+
+	<cffunction name="EPOSTrans" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfset loc.srchDateTo = DateAdd("d",1,args.form.srchDateTo)>
+			<cfset loc.midnight = DateFormat(loc.srchDateTo,'yyyy-mm-dd')>
+			<cfquery name="loc.result.QDeals" datasource="#args.datasource#">
+				SELECT prodTitle, tblepos_dealitems.*, tblepos_deals.*
+				FROM tblepos_deals
+				INNER JOIN tblepos_dealitems ON ediParent = edID
+				INNER JOIN tblproducts ON ediProduct = prodID
+				WHERE edStarts <= '#args.form.srchDateFrom#'
+				AND edEnds >= '#args.form.srchDateTo#'
+				AND edStatus = 'active'
+			</cfquery>
+			<cfset loc.result.deals = {}>
+			<cfloop query="loc.result.QDeals">
+				<cfif !StructKeyExists(loc.result.deals,ediProduct)>
+					<cfset StructInsert(loc.result.deals,ediProduct, {
+						edDealType = edDealType,
+						edAmount = edAmount,
+						edQty = edQty,
+						edTitle = edTitle,
+						edStarts = edStarts,
+						edEnds = edEnds
+					})>
+				</cfif>
+			</cfloop>
+			<cfquery name="loc.QEPOSTrans" datasource="#args.datasource#">
+				SELECT prodTitle,prodVATRate, tblepos_items.*,
+					-ROUND(eiRetail / (1 + (prodVATRate/100)),2) AS NET,
+					-(eiRetail - ROUND(eiRetail / (1 + (prodVATRate/100)),2)) AS VAT
+				FROM tblepos_items
+				INNER JOIN tblproducts ON eiProdID = prodID
+				WHERE eiTimestamp BETWEEN '#args.form.srchDateFrom#' AND '#loc.midnight#'
+				AND eiVAT != 0
+				ORDER BY eiParent
+				<!---LIMIT 0,100--->
+			</cfquery>
+			<cfset loc.result.QEPOSTrans = loc.QEPOSTrans>
+			<cfset loc.result.trans = {}>
+			<cfloop query="loc.QEPOSTrans">
+				<cfset loc.deal = {}>
+				<cfif StructKeyExists(loc.result.deals,eiProdID)>
+					<cfset loc.deal = StructFind(loc.result.deals,eiProdID)>
+				</cfif>
+				<cfif !StructKeyExists(loc.result.trans,eiParent)>
+					<cfset StructInsert(loc.result.trans,eiParent, {
+						items = {},
+						deals = {}
+					})>
+				</cfif>
+				<cfset loc.tran = StructFind(loc.result.trans,eiParent)>
+				<cfif !StructKeyExists(loc.tran.deals,EIPRODID) AND !StructIsEmpty(loc.deal)>
+					<cfset StructInsert(loc.tran.deals,EIPRODID,loc.deal)>
+				</cfif>
+				<cfset StructInsert(loc.tran.items,eiID,{
+					prodTitle = prodTitle,
+					prodVATRate = prodVATRate,
+					EIPRODID = EIPRODID,
+					EIQTY = EIQTY,
+					EIRETAIL = EIRETAIL,
+					EITRADE = EITRADE,
+					EITYPE = EITYPE,
+					EINET = EINET,
+					EIVAT = EIVAT				
+				})>
+			</cfloop>
+			
+			
+<!---			<cfloop query="loc.QEPOSTrans">
+				<cfset loc.deal = {}>
+				<cfif StructKeyExists(loc.result.deals,eiProdID)>
+					<cfset loc.deal = StructFind(loc.result.deals,eiProdID)>
+				</cfif>
+				<cfset StructInsert(loc.result.trans,eiID, {
+					NET = NET,
+					VAT = VAT,
+					deal = loc.deal,
+					EIPARENT = EIPARENT,
+					EIPRODID = EIPRODID,
+					EIQTY = EIQTY,
+					EIRETAIL = EIRETAIL,
+					EITRADE = EITRADE,
+					EITYPE = EITYPE,
+					EIVAT = EIVAT
+				})>
+			</cfloop>
+--->		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="EPOSUpdate" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.QEPOSUpdate" datasource="#args.datasource#">
+				UPDATE tblepos_items
+				SET eiNet = args.NET,
+					eiVAT = args.VAT
+				WHERE eiID = #val(args.EPOSID)#
+			</cfquery>
+			<cfset loc.result = {msg = "OK"}>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
 </cfcomponent>

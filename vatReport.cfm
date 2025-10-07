@@ -222,6 +222,10 @@
 				<cfif StructKeyExists(form,"fieldnames")>
 					<cfswitch expression="#srchReport#">
 						<cfcase value="1">
+							<cfif !IsDate(srchDateTo)>
+								<h1>Please specify the date range</h1>
+								<cfexit>
+							</cfif>
 							<!--- Shop Sales --->
 							<cfset loc = {}>
 							<cfset result = report.VATSummary(parms)>

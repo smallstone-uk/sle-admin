@@ -129,6 +129,8 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchSort" default="1">
+<cfparam name="srchUpdate" default="">
+<cfparam name="srchHeadings" default="#int(StructKeyExists(form,"srchHeadings"))#">
 
 <cfobject component="code/vatReport" name="report">
 <cfset parms = {}>
@@ -157,7 +159,7 @@
 				<div class="form-wrap">
 					<form method="post">
 						<div class="form-header no-print">
-							VAT Reports
+							VAT Reports #srchHeadings#
 							<span><input type="submit" name="btnSearch" value="Search" /></span>
 						</div>
 						<div class="module no-print">
@@ -170,6 +172,7 @@
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>VAT Report</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Daily VAT Report</option>
 											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>VAT Transactions</option>
+											<option value="4"<cfif srchReport eq "4"> selected="selected"</cfif>>EPOS Transactions</option>
 										</select>
 									</td>
 								</tr>
@@ -190,7 +193,7 @@
 									<td>
 										<select name="srchAccount" class="srchAccount" multiple="multiple" data-placeholder="Select...">
 											<cfloop query="QAccounts">
-												<option value="#eaID#"<cfif eaID eq srchAccount> selected="selected"</cfif>>#eaTitle#</option>
+												<option value="#eaID#"<cfif eaID eq srchAccount> checked="checked"</cfif>>#eaTitle#</option>
 											</cfloop>
 										</select>
 									</td>
@@ -198,7 +201,9 @@
 								<tr>
 									<td><b>Options</b></td>
 									<td>
-										<input type="checkbox" name="srchExclude" value="1" /> Exclude the above accounts?
+										<input type="checkbox" name="srchExclude" value="1" /> Exclude the above accounts?<br />
+										<input type="checkbox" name="srchUpdate" value="1" /> Update Records?<br />
+										<input type="checkbox" name="srchHeadings" value="1"<cfif srchHeadings> checked="checked"</cfif> /> Only Show Headings?<br />
 									</td>
 								</tr>
 								<tr>
@@ -936,72 +941,172 @@
 						<cfcase value="3">
 							<!--- VAT Transactions --->
 							<cfset data = report.TransactionList(parms)>
-							<cfset sortCode = "">
-							<cfdump var="#data#" label="data" expand="false">
+							<cfset sortkey = "">
+							<!---<cfdump var="#form#" label="form" expand="false">
+							<cfdump var="#data#" label="data" expand="false">--->
 							<table border="1" class="tableList" width="100%">
 								<tr>
-									<th>Account Code</th>
-									<th>Account Name</th>
-									<th>Tran ID</th>
-									<th width="100">Date</th>
-									<th>Reference</th>
+									<th colspan="6"><h1>EPOS Sales</h1></th>
+								</tr>
+								<tr>
+									<th align="right">Count</th>
+									<th>Category</th>
+									<th align="right">Net</th>
+									<th align="right">VAT</th>
+									<th align="right">Trade</th>
+									<th align="right">Profit</th>
+								</tr>
+								<cfset keyList = ListSort(StructKeyList(data.analysis,","),"text","asc")>
+								<cfloop list="#keyList#" index="key">
+									<cfset anData = StructFind(data.analysis,key)>
+									<cfif srchHeadings eq 0>
+										<tr>
+											<td align="right">#NumberFormat(anData.count,'0')#</td>
+											<td>#anData.pcatTitle#</td>
+											<td align="right">#DecimalFormat(anData.eiNet)#</td>
+											<td align="right">#DecimalFormat(anData.eiVAT)#</td>
+											<td align="right">#DecimalFormat(anData.eiTrade)#</td>
+											<td align="right">#DecimalFormat(anData.profit)#</td>
+										</tr>
+									</cfif>
+								</cfloop>
+								<tr>
+									<th align="right">#NumberFormat(data.anTotals.count)#</th>
+									<th>Totals</th>
+									<th align="right">#DecimalFormat(data.anTotals.eiNet)#</th>
+									<th align="right">#DecimalFormat(data.anTotals.eiVAT)#</th>
+									<th align="right">#DecimalFormat(data.anTotals.eiTrade)#</th>
+									<th align="right">#DecimalFormat(data.anTotals.profit)#</th>
+								</tr>
+							</table>
+							<div>&nbsp;</div>
+							<table border="1" class="tableList" width="100%">
+								<cfif srchHeadings eq 0><cfset colCount = 11><cfelse><cfset colCount = 7></cfif>
+								<tr>
+									<th colspan="#colCount#"><h1>Purchases</h1></th>
+								</tr>
+								<tr>
+									<cfif srchHeadings eq 0>
+										<th>Account Code</th>
+										<th>Account Name</th>
+										<th>Tran ID</th>
+										<th width="100">Date</th>
+										<th>Reference</th>
+									<cfelse>
+										<th>Count</th>
+									</cfif>
 									<th>Description</th>
-									<!---<th align="right">Tran Net</th>
-									<th align="right">Tran VAT</th>--->
 									<th align="right">Item Net</th>
 									<th align="right">Item VAT</th>
-									<th align="right">VAT Rate</th>
-									<th>Nom Code</th>
-									<th width="180">Description</th>
+									<cfif srchHeadings eq 0>
+										<th align="right">VAT Rate</th>
+										<th>Nom Code</th>
+										<th width="180">Description</th>
+									</cfif>
+									<th colspan="3"></th>
 								</tr>
-								<cfloop query="data.QTrans">
+								<cfloop query="data.QPurTrans">
 									<cfif srchSort eq 1><cfset thisCode = NOMCODE>
 										<cfelse><cfset thisCode = ACCCODE></cfif>
-									<cfif len(sortCode) AND sortCode neq thisCode>
-										<cfset tots = StructFind(data.totals,sortCode)>
+									<cfif len(sortkey) AND sortkey neq thisCode>
+										<cfset tots = StructFind(data.totals,sortkey)>
 										<tr>
-											<th colspan="3">#tots.title#</th>
-											<th colspan="3">#tots.num# transactions</th>
+											<th>#tots.num#</th>
+											<cfif srchHeadings eq 0>
+												<th colspan="5">#tots.title#</th>
+											<cfelse>
+												<th colspan="3">#tots.title#</th>
+											</cfif>
 											<th align="right">#DecimalFormat(tots.net)#</th>
 											<th align="right">#DecimalFormat(tots.vat)#</th>
 											<th colspan="3"></th>
 										</tr>
 									</cfif>
-									<cfif srchSort eq 1><cfset sortCode = NOMCODE>
-										<cfelse><cfset sortCode = ACCCODE></cfif>
-									<tr>
-										<td>#ACCCODE#</td>
-										<td>#ACCNAME#</td>
-										<td>#TRNID#</td>
-										<td>#LSDateFormat(TRNDATE,"dd-mmm-yy")#</td>
-										<td>#TRNREF#</td>
-										<td>#TRNDESC#</td>
-										<!---<td align="right">#DecimalFormat(TRNAMNT1)#</td>
-										<td align="right">#DecimalFormat(TRNAMNT2)#</td>--->
-										<td align="right">#DecimalFormat(NIAMOUNT)#</td>
-										<td align="right">#DecimalFormat(NIVATAMOUNT)#</td>
-										<td align="right">#NIVATRATE#%</td>
-										<td>#NOMCODE#</td>
-										<td>#NOMTITLE#</td>
-									</tr>
+									<cfif srchSort eq 1><cfset sortkey = NOMCODE>
+										<cfelse><cfset sortkey = ACCCODE></cfif>
+									<cfif srchHeadings eq 0>
+										<tr>
+											<td>#ACCCODE#</td>
+											<td>#ACCNAME#</td>
+											<td>#TRNID#</td>
+											<td>#LSDateFormat(TRNDATE,"dd-mmm-yy")#</td>
+											<td>#TRNREF#</td>
+											<td>#TRNDESC#</td>
+											<td align="right">#DecimalFormat(NIAMOUNT)#</td>
+											<td align="right">#DecimalFormat(NIVATAMOUNT)#</td>
+											<td align="right">#NIVATRATE#%</td>
+											<td>#NOMCODE#</td>
+											<td>#NOMTITLE#</td>
+										</tr>
+									</cfif>
 								</cfloop>
 								<!--- last one --->
-								<cfset tots = StructFind(data.totals,sortCode)>
+								<cfset tots = StructFind(data.totals,sortkey)>
 								<tr>
-									<th colspan="3">#tots.title#</th>
-									<th colspan="3">#tots.num# transactions</th>
+									<th>#tots.num#</th>
+									<cfif srchHeadings eq 0>
+										<th colspan="5">#tots.title#</th>
+									<cfelse>
+										<th colspan="3">#tots.title#</th>
+									</cfif>
 									<th align="right">#DecimalFormat(tots.net)#</th>
 									<th align="right">#DecimalFormat(tots.vat)#</th>
-									<th colspan="3"></th>
+									<th colspan="5"></th>
 								</tr>
 								<!--- grand total --->
 								<cfset tots = StructFind(data.totals,"zzGrand")>
 								<tr>
-									<th colspan="3">#tots.title#</th>
-									<th colspan="3">#tots.num# transactions</th>
+									<th>#tots.num#</th>
+									<cfif srchHeadings eq 0>
+										<th colspan="5">#tots.title#</th>
+									<cfelse>
+										<th colspan="3">#tots.title#</th>
+									</cfif>
 									<th align="right">#DecimalFormat(tots.net)#</th>
 									<th align="right">#DecimalFormat(tots.vat)#</th>
-									<th colspan="3"></th>
+									<th colspan="5"></th>
+								</tr>
+							</table>
+						</cfcase>
+						<cfcase value="4">
+							<cfset result = "">
+							<cfset totalDiff = 0>
+							<cfset data = report.EPOSTrans(parms)>
+							<cfdump var="#data#" label="EPOSTrans" expand="false">
+							<table border="1" class="tableList">
+								<tr>
+									<th>Product</th>
+									<th>Date</th>
+									<th>VAT Rate</th>
+									<th>Net</th>
+									<th>VAT</th>
+									<th>Net2</th>
+									<th>VAT2</th>
+									<th>Diff</th>
+								</tr>
+								<cfloop query="data.QEPOSTrans">
+									<cfif StructKeyExists(form,"srchUpdate")>
+										<cfset parms.EPOSID = eiID>
+										<cfset parms.NET = NET>
+										<cfset parms.VAT = VAT>
+										<cfset result = report.EPOSUpdate(parms)>
+									</cfif>
+									<cfset diff = eiNet - NET>
+									<cfset totalDiff += diff>
+									<tr>
+										<td>#prodTitle#</td>
+										<td>#LSDateFormat(eiTimestamp,"dd-mmm-yyyy")# #LSTimeFormat(eiTimestamp,"HH:MM:SS")#</td>
+										<td align="right">#prodVATRate#%</td>
+										<td align="right">#DecimalFormat(eiNet)#</td>
+										<td align="right">#DecimalFormat(eiVAT)#</td>
+										<td align="right">#DecimalFormat(NET)#</td>
+										<td align="right">#DecimalFormat(VAT)#</td>
+										<td align="right">#DecimalFormat(diff)#</td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th colspan="7">Total Difference</th>
+									<th>#DecimalFormat(totalDiff)#</th>
 								</tr>
 							</table>
 						</cfcase>

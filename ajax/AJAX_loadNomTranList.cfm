@@ -142,7 +142,7 @@
 				</cfif>
 				<cfset lastDate = item.trnDate>
 
-				<tr class="#rowStyle# searchrow" data-title="#item.trnRef# #item.trnDesc# #item.niAmount#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
+				<tr class="#rowStyle# searchrow" data-title="#item.trnRef# #item.trnClientRef# #item.trnDesc# #item.niAmount#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
 				<!---<tr class="#rowStyle#">--->
 					<td width="10" align="center" class="noPrint">
 						<cfif item.trnClientRef GT 0>

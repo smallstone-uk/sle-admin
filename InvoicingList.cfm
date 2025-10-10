@@ -17,7 +17,7 @@
 <cfoutput>
 	<h1>Data Check</h1>
 	<cfset keys = ListSort(StructKeyList(chargeCheck.grid,","),"numeric","asc")>
-	<table width="700" class="tableList" border="1">
+	<table width="900" class="tableList" border="1">
 		<tr>
 			<th align="right">Date</th>
 			<th></th>
@@ -44,7 +44,7 @@
 							#theDay.price#<br />
 							#theDay.charge#<br />
 							#theDay.count#<br />
-                            #theDay.date#
+                            #DateFormat(theDay.date,"dd-mmm-yy")#
 						</td>
 						<cfset wTotal.price += theDay.price>
 						<cfset wTotal.charge += theDay.charge>

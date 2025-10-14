@@ -91,16 +91,22 @@
 				<cfset parms.srchPwd = form.srchPwd>
 				<cfset parms.testMsgs = StructKeyExists(form,"testMsgs")>
 				<cfset detail = cust.CheckInvoiceToEmail(parms)>
-				<cfif StructKeyExists(form,"sendMsgs")><cfset result = cust.SendInvoiceByEmail(parms)></cfif>
-				<tr>
-					<td>To Address</td>
-					<td>#item# #detail.name#</td>
-					<td><a href="#result.invoice#" target="#result.trnRef#"><img src="images/pdfIcon.gif" /></a></td>
-					<td>
-						<cfif detail.status eq "found"><img src="images/icons/tick-green.png" width="36" height="36">
-							<cfelse><img src="images/icons/cross-red.png" width="36" height="36"></cfif>
-					</td>
-				</tr>
+				<cfif StructKeyExists(form,"sendMsgs")>
+					<cfset result = cust.SendInvoiceByEmail(parms)>
+					<tr>
+						<td>Sent to:</td>
+						<td>#item# - #result.data.name# - #result.data.address#</td>
+						<td><a href="#result.data.url#" target="#result.data.trnRef#"><img src="images/pdfIcon.gif" /></a></td>
+						<td>
+							<cfif detail.status eq "found"><img src="images/icons/tick-green.png" width="36" height="36">
+								<cfelse><img src="images/icons/cross-red.png" width="36" height="36"></cfif>
+						</td>
+					</tr>
+				<cfelse>
+					<tr>
+						<td>Send messages option not ticked.</td>
+					</tr>
+				</cfif>
 			</cfloop>
 		<cfelse>
 			<tr>

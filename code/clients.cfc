@@ -137,8 +137,6 @@
 			<cfset loc.msg.url = "#application.site.url_invoices##loc.result.folderName#/inv-#loc.QTran.trnRef#.pdf">
 			<cfset loc.msg.attach = "#application.site.dir_invoices##loc.result.folderName#/inv-#loc.QTran.trnRef#.pdf">
 			<cfif FileExists(loc.msg.attach)>
-				<cfset loc.result.invoice = loc.msg.url>
-				<cfset loc.result.trnRef = loc.msg.trnRef>
 				<cfmail 
 					to="#loc.msg.address#"
 					bcc="#application.siteclient.cltMailOffice#"
@@ -157,13 +155,16 @@
 				<cfset loc.result.msg = "sent successfully">
 				<cffile action="append" addnewline="yes" 
 					file="#application.site.dir_logs#email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
-						output="Message sent to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# #loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
+						output="Message sent to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# 
+							#loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
 			<cfelse>
 				<cfset loc.result.msg = "file missing">
 				<cffile action="append" addnewline="yes" 
 					file="#application.site.dir_logs#email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"
-						output="Message failed to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# #loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
+						output="Message failed to: #loc.msg.address# - #loc.msg.subject# - #loc.msg.trnRef# for #loc.msg.name# 
+							#loc.msg.cltRef# #application.siteclient.cltMailAccount# #loc.result.msg#">
 			</cfif>
+			<cfset loc.result.data = loc.msg>			
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

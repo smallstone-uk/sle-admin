@@ -43,6 +43,9 @@
 		})
 	});
 </script>
+<style>
+	#resultDiv {float:left; clear:both;}
+</style>
 </head>
 
 <cfparam name="sendMsgs" default="false">
@@ -52,7 +55,7 @@
 	<cfset parms.datasource = application.site.datasource1>
 	<cfset parms.emailTemplate = 'invoice'>
 	<cfset emailList = cust.LoadLatestInvoicesForEmail(parms)>
-	<cfset aFewDaysAgo = DateAdd("d",-3,now())>
+	<cfset aFewDaysAgo = DateAdd("d",-7,now())>
 	<cfdirectory action="list" directory="#application.site.dir_invoices#letters" name="QDir" filter="*.pdf">
 	<cfoutput>
 		<h1>Send invoices by email...</h1>
@@ -69,7 +72,7 @@
 						<cfif emailList.ctlNextInvDate lt aFewDaysAgo>
 							<cfset startDate = DateAdd("d",-27,emailList.ctlNextInvDate)>
 							<h1 class="warning">
-								WARNING: invoice date is too far in the past. <br />
+								WARNING: Current invoice date is too far in the past. <br />
 								The last invoice run was from #DateFormat(startDate,'ddd dd-mm-yyyy')# to #DateFormat(emailList.ctlNextInvDate,'ddd dd-mm-yyyy')#
 							</h1>
 						</cfif>		

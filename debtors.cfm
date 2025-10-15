@@ -346,6 +346,16 @@
 										<td colspan="4" class="noPrint"></td>
 									</tr>
 								</cfif>
+									<tr>
+										<td colspan="4">#creditCount + debitCount# transactions</td>
+										<td colspan="3">Aged Totals</td>
+										<td class="amountTotal">#showNum(credits[1] + totals[1])#</td>
+										<td class="amountTotal">#showNum(credits[2] + totals[2])#</td>
+										<td class="amountTotal">#showNum(credits[3] + totals[3])#</td>
+										<td class="amountTotal">#showNum(credits[4] + totals[4])#</td>
+										<td class="amountTotal">#showNum(credits[5] + totals[5])#</td>
+										<td colspan="4" class="noPrint"></td>
+									</tr>
 							</table>
 						</cfoutput>
 						

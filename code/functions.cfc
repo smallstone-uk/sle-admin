@@ -94,7 +94,7 @@
 				FROM cmssites
 				WHERE scID = 143
 			</cfquery>
-			<cfset loc.result=QueryToStruct(loc.site)>
+			<cfset loc.result=KQueryToStruct(loc.site)>
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="LoadSite" expand="yes" format="html" 
@@ -115,7 +115,7 @@
 				FROM cmsclients
 				WHERE cltSiteID = 143
 			</cfquery>
-			<cfset loc.result=QueryToStruct(loc.siteClient)>
+			<cfset loc.result=KQueryToStruct(loc.siteClient)>
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="LoadSiteClient" expand="yes" format="html" 

@@ -147,7 +147,29 @@
 		<cfreturn loc.result> 
 	</cffunction>
 	
-	<cffunction name="QueryToStruct" access="public" returntype="struct" output="false" hint="returns a struct for a single record from query.">
+	<cffunction name="showField" access="private" returntype="string">
+		<cfargument name="field" type="numeric" required="no" default="0">
+		<cfargument name="places" type="numeric" required="no" default="2">
+		<cfset var loc = {}>
+		<cfoutput>
+			<cfif field neq 0>
+				<cfif field lt 0>
+					<cfset loc.style = "color:red;">
+				<cfelse>
+					<cfset loc.style = "color:black;">
+				</cfif>
+				<cfif places eq 2>
+					<cfreturn '<span style="#loc.style#">#DecimalFormat(field)#</span>'>
+				<cfelse>
+					<cfreturn '<span style="#loc.style#">#NumberFormat(field,"_____")#</span>'>
+				</cfif>
+			<cfelse>
+				<cfreturn "">
+			</cfif>
+		</cfoutput>
+	</cffunction>
+	
+	<cffunction name="KQueryToStruct" access="public" returntype="struct" output="false" hint="returns a struct for a single record from query.">
 		<cfargument name="queryname" type="query" required="true">
 		<cfset var qStruct={}>
 		<cfset var columns=queryname.columnlist>

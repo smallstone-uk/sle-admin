@@ -38,7 +38,7 @@
 			LIMIT 1
 		</cfquery>
     
-        <cfreturn QueryToStruct(loc.club)>
+        <cfreturn KQueryToStruct(loc.club)>
     </cffunction>
 
     <cffunction name="CreateClub" access="public" returntype="void">
@@ -361,7 +361,7 @@
 		</cfcatch>
 		</cftry>
 		
-		<cfreturn QueryToStruct(loc.publication)>
+		<cfreturn KQueryToStruct(loc.publication)>
 	</cffunction>
 
 	<cffunction name="LoadProductByID" access="public" returntype="struct">
@@ -385,7 +385,7 @@
 		</cfcatch>
 		</cftry>
 		
-		<cfreturn QueryToStruct(loc.product)>
+		<cfreturn KQueryToStruct(loc.product)>
 	</cffunction>
 
 	<cffunction name="LoadProductByBarcode" access="public" returntype="struct">
@@ -503,7 +503,7 @@
 			LIMIT 1
 		</cfquery>
 		
-		<cfreturn QueryToStruct(loc.deal)>
+		<cfreturn KQueryToStruct(loc.deal)>
 	</cffunction>
 	
 	<cffunction name="LoadLatestDeals" access="public" returntype="array">

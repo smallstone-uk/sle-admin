@@ -379,7 +379,7 @@
 			WHERE empID = #val(empID)#
 		</cfquery>
 
-		<cfreturn QueryToStruct(loc.employee)>
+		<cfreturn KQueryToStruct(loc.employee)>
 	</cffunction>
 
 	<cffunction name="LoadWeeklyPayrollRecords" access="public" returntype="array">
@@ -420,7 +420,7 @@
 				AND phEmployee = #val(loc.item.employee.ID)#
 			</cfquery>
 
-			<cfset loc.item.header = (loc.header.recordcount is 0) ? {} : QueryToStruct(loc.header)>
+			<cfset loc.item.header = (loc.header.recordcount is 0) ? {} : KQueryToStruct(loc.header)>
 
 			<cfif NOT StructIsEmpty(loc.item.header)>
 				<cfloop query="loc.depts">
@@ -458,7 +458,7 @@
 						AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.weekending#'
 						ORDER BY phDate
 					</cfquery>
-					<cfset loc.item.totals = QueryToStruct(loc.ytd)>
+					<cfset loc.item.totals = KQueryToStruct(loc.ytd)>
 
 					<cfif loc.item.employee.ServicePrd GT 11>
 						<cfset loc.item.totals.annual = val(loc.item.totals.WorkAvg) * 52 * 0.1207>
@@ -557,7 +557,7 @@
 				WHERE phEmployee = #val(args.form.employee)#
 				AND phDate = '#args.form.weekending#'
 			</cfquery>
-			<cfset loc.result.header = (loc.header.recordcount is 0) ? {} : QueryToStruct(loc.header)>
+			<cfset loc.result.header = (loc.header.recordcount is 0) ? {} : KQueryToStruct(loc.header)>
 			<cfset loc.WeekStartDate = LSDateFormat(loc.control.ctlWeekNoStartDate,"yyyy-mm-dd")>
 			<cfset loc.HolStartDate = LSDateFormat(loc.control.ctlHolidayStart,"yyyy-mm-dd")>
 			<cfquery name="loc.ytd" datasource="#args.datasource#">
@@ -589,7 +589,7 @@
 				AND phDate BETWEEN '#loc.HolStartDate#' AND '#args.form.weekending#'
 				ORDER BY phDate
 			</cfquery>
-			<cfset loc.result.totals = QueryToStruct(loc.ytd)>
+			<cfset loc.result.totals = KQueryToStruct(loc.ytd)>
 			<cfif loc.result.employee.ServicePrd GT 11>
 				<cfset loc.result.totals.annual = val(loc.result.totals.WorkAvg) * 52 * 0.1207>
 				<cfset loc.result.totals.accrued = 0>

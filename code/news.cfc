@@ -152,10 +152,16 @@
 						WHERE cltRef=#cltRef#
 					</cfquery>
 				</cfif>
-				<cfif Round(item.balance0) eq 0 AND skipZeros>
+				<!---<cfif Round(item.balance0) eq 0 AND skipZeros>
+				int(item.balance0 * 100)/100
+				<cfif ((int(item.balance0 * 100)/100) eq 0) AND skipZeros>--->
+				<cfset item.balance0 = int(item.balance0 * 1000 ) / 1000>
+				<cfif item.balance0 eq 0 AND skipZeros>
 				<cfelseif (item.balance0 gt minVal OR minVal eq 0)>
 					<cfset ArrayAppend(result.clients,item)>
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
+				<cfelse>
+					<cfdump var="#item#" label="#cltRef#" expand="false">
 				</cfif>
 
 				<!---<cfdump var="#item#" label="item" expand="true">--->

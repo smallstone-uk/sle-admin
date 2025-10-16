@@ -17,7 +17,7 @@
 			WHERE trnID = #val(args.tranID)#
 		</cfquery>
 		
-		<cfset loc.result.header = QueryToStruct(loc.tran)>
+		<cfset loc.result.header = KQueryToStruct(loc.tran)>
 		
 		<cfquery name="loc.items" datasource="#args.datasource#">
 			SELECT *
@@ -222,11 +222,20 @@
 		<cfset var loc = {}>
 		
 		<cfquery name="loc.nominal" datasource="#args.datasource#">
+			SELECT nomID,nomCode,nomTitle,nomGroup
+			FROM tblNominal
+			WHERE nomStatus=1
+			ORDER BY nomGroup, nomTitle
+		</cfquery>
+<!---		
+		<cfreturn QueryToArrayOfStruct(loc.noms)>
+		<cfquery name="loc.nominal" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNominal
 			ORDER BY nomType ASC, nomGroup ASC, nomCode ASC
 		</cfquery>
 		
+--->
 		<cfreturn QueryToArrayOfStruct(loc.nominal)>
 	</cffunction>
 
@@ -295,7 +304,7 @@
 			WHERE accCode = '#args.code#'
 		</cfquery>
 		
-		<cfreturn QueryToStruct(loc.account)>
+		<cfreturn KQueryToStruct(loc.account)>
 	</cffunction>
 	<cffunction name="LoadFundSources" access="public" returntype="array">
 		<cfargument name="args" type="struct" required="yes">
@@ -368,11 +377,13 @@
 			WHERE ngiChild = nomID
 			AND ngiParent != #val(grpID)#
 --->
-		<cfquery name="loc.noms" datasource="#GetDatasource()#" result="loc.noms_result">
-			SELECT *
+		<!--- #n.nomID#">#n.nomCode# - #n.nomTitle# --->
+		<cfquery name="loc.noms" datasource="#GetDatasource()#">
+			SELECT nomID,nomCode,nomTitle, ngiOrder, nomGroup
 			FROM tblNominal
 			LEFT JOIN tblNomGroupItems ON ngiChild = nomID
 			WHERE ngiParent != #val(grpID)# OR ngiParent IS NULL
+			ORDER BY nomGroup, nomCode, ngiOrder
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.noms)>
@@ -393,12 +404,12 @@
 			<cfquery name="loc.check" datasource="#args.datasource#">
 				SELECT *
 				FROM tblNomGroups
-				WHERE ngName = '#UCase(args.form.name)#'
+				WHERE ngCode = '#UCase(args.form.name)#'
 			</cfquery>
 			
 			<cfif loc.check.recordcount is 0>
 				<cfquery name="loc.newgrp" datasource="#args.datasource#">
-					INSERT INTO tblNomGroups (ngName) VALUES ('#UCase(args.form.name)#')
+					INSERT INTO tblNomGroups (ngCode) VALUES ('#UCase(args.form.name)#')
 				</cfquery>
 				<cfreturn 1>
 			<cfelse>
@@ -475,7 +486,7 @@
 				<cfquery name="loc.getGroupID" datasource="#args.datasource#">
 					SELECT ngID
 					FROM tblNomGroups
-					WHERE ngName = '#UCase(args.form.group)#'
+					WHERE ngCode = '#UCase(args.form.group)#'
 				</cfquery>
 				
 				<cfquery name="loc.maxOrder" datasource="#args.datasource#">
@@ -527,7 +538,7 @@
 			WHERE nomCode = '#args.nomcode#'
 		</cfquery>
 		
-		<cfreturn QueryToStruct(loc.nom)>
+		<cfreturn KQueryToStruct(loc.nom)>
 	</cffunction>
 	<cffunction name="AddNominal" access="public" returntype="void">
 		<cfargument name="args" type="struct" required="yes">
@@ -1313,7 +1324,7 @@
 				WHERE trnAccountID=accID
 				AND (trnID=#val(args.form.tranRef)# OR trnRef='#args.form.tranRef#')
 			</cfquery>
-			<cfset result.account=QueryToStruct(loc.QAccount)>
+			<cfset result.account=KQueryToStruct(loc.QAccount)>
 		<cfelseif val(args.form.accountID)>
 			<cfquery name="loc.QAccount" datasource="#args.datasource#">
 				SELECT *,
@@ -1322,7 +1333,7 @@
 				FROM tblAccount
 				WHERE accID=#args.form.accountID#
 			</cfquery>
-			<cfset result.account=QueryToStruct(loc.QAccount)>
+			<cfset result.account=KQueryToStruct(loc.QAccount)>
 		<cfelse>
 			<cfset result.account={}>
 		</cfif>
@@ -1398,7 +1409,7 @@
 			<cfquery name="loc.items" datasource="#args.datasource#">
 				SELECT nomID
 				FROM tblNominal
-				WHERE nomGroup = '#ngName#'
+				WHERE nomGroup = '#ngCode#'
 			</cfquery>
 			<cfloop query="loc.items">
 				<cfquery name="loc.newItem" datasource="#args.datasource#">
@@ -1423,7 +1434,7 @@
 		<cfquery name="loc.group" datasource="#args.datasource#">
 			SELECT ngID
 			FROM tblNomGroups
-			WHERE ngName = '#args.form.group#'
+			WHERE ngCode = '#args.form.group#'
 		</cfquery>
 		
 		<cfloop array="#args.items#" index="item">
@@ -1459,12 +1470,12 @@
 			<cfquery name="loc.check" datasource="#args.datasource#">
 				SELECT ngID
 				FROM tblNomGroups
-				WHERE ngName = '#nomGroup#'
+				WHERE ngCode = '#nomGroup#'
 			</cfquery>
 			
 			<cfif loc.check.recordcount is 0>
 				<cfquery name="loc.newGroup" datasource="#args.datasource#">
-					INSERT INTO tblNomGroups (ngName) VALUES ('#nomGroup#')
+					INSERT INTO tblNomGroups (ngCode) VALUES ('#nomGroup#')
 				</cfquery>
 			</cfif>
 		</cfloop>
@@ -1477,7 +1488,7 @@
 		<cfquery name="loc.groups" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNomGroups
-			ORDER BY ngName ASC
+			ORDER BY ngCode ASC
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.groups)>
@@ -1501,7 +1512,7 @@
 		<cfquery name="loc.getGroupID" datasource="#args.datasource#">
 			SELECT ngID
 			FROM tblNomGroups
-			WHERE ngName = '#UCase(args.form.group)#'
+			WHERE ngCode = '#UCase(args.form.group)#'
 		</cfquery>
 		
 		<cfquery name="loc.updateItem" datasource="#args.datasource#">
@@ -1520,14 +1531,15 @@
 		<cfquery name="loc.groups" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNomGroups
-			ORDER BY ngName ASC
+			ORDER BY ngCode ASC
 		</cfquery>
 		
 		<cfloop query="loc.groups">
 			<cfset loc.item = {}>
 			<cfset loc.item.group = {}>
 			<cfset loc.item.group.id = ngID>
-			<cfset loc.item.group.name = ngName>
+			<cfset loc.item.group.code = ngCode>
+			<cfset loc.item.group.title = ngTitle>
 			<cfset loc.item.items = []>
 			
 <!---
@@ -1563,15 +1575,16 @@
 		<cfquery name="loc.groups" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNomGroups
-			WHERE ngName = '#args.grpName#'
-			ORDER BY ngName ASC
+			WHERE ngCode = '#args.grpName#'
+			ORDER BY ngCode ASC
 		</cfquery>
 		
 		<cfloop query="loc.groups">
 			<cfset loc.item = {}>
 			<cfset loc.item.group = {}>
 			<cfset loc.item.group.id = ngID>
-			<cfset loc.item.group.name = ngName>
+			<cfset loc.item.group.code = ngCode>
+			<cfset loc.item.group.title = ngTitle>
 			<cfset loc.item.items = []>
 			
 			<cfquery name="loc.items" datasource="#args.datasource#">
@@ -1600,15 +1613,16 @@
 		<cfquery name="loc.groups" datasource="#args.datasource#">
 			SELECT *
 			FROM tblNomGroups
-			WHERE ngName = '#args.grpName#'
-			ORDER BY ngName ASC
+			WHERE ngCode = '#args.grpName#'
+			ORDER BY ngCode ASC
 		</cfquery>
 		
 		<cfloop query="loc.groups">
 			<cfset loc.item = {}>
 			<cfset loc.item.group = {}>
 			<cfset loc.item.group.id = ngID>
-			<cfset loc.item.group.name = ngName>
+			<cfset loc.item.group.code = ngCode>
+			<cfset loc.item.group.title = ngTitle>
 			<cfset loc.item.items = []>
 			
 			<cfquery name="loc.items" datasource="#args.datasource#">
@@ -1651,6 +1665,27 @@
 		</cfquery>
 		
 		<cfreturn QueryToArrayOfStruct(loc.noms)>
+	</cffunction>
+
+	<cffunction name="LoadNominalAccounts2" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfquery name="loc.result.QNomList" datasource="#args.datasource#">
+				SELECT nomID,nomCode,nomTitle,nomGroup, ngTitle
+				FROM tblNominal
+				LEFT JOIN tblnomgroups ON ngCode = nomGroup
+				WHERE nomStatus = 1
+				ORDER BY nomGroup, nomTitle
+			</cfquery>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
 	</cffunction>
 
 	<cffunction name="LoadNominalCodes" access="public" returntype="struct">
@@ -2281,7 +2316,7 @@
 		<cfelse>
 			<cfset loc.toDate = DateAdd("d",1,args.fromDate)>
 		</cfif>
-		<cfset result.supplier=QueryToStruct(QAccount)>
+		<cfset result.supplier=KQueryToStruct(QAccount)>
 		<cfquery name="QTrans" datasource="#args.datasource#">
 			SELECT tblTrans.*, COUNT(niID) AS nomRecs, SUM( niAmount) AS Total
 			FROM tblTrans 
@@ -3031,6 +3066,7 @@
 			<cfquery name="QTrans" datasource="#args.datasource#">
 				INSERT INTO tblTrans (
 					trnAccountID,
+					trnClientID,
 					trnClientRef,
 					trnRef,
 					trnDate,
@@ -3040,6 +3076,7 @@
 					trnAmnt1,
 					trnAmnt2
 				) VALUES (
+					4,
 					#val(args.form.clientID)#,
 					#val(args.form.clientRef)#,
 					'#args.form.crnRef#',

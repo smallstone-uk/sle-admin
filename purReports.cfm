@@ -523,7 +523,7 @@
 											<td align="right">#DecimalFormat(StructFind(trans,"net#key#"))#</td>
 											<td align="right">#DecimalFormat(StructFind(trans,"vat#key#"))#</td>
 										</cfloop>
-											<td align="right">#DecimalFormat(trans.TotalNet)#</td>
+											<td align="right">#DecimalFormat(trans.rowTotalNet)#</td>
 											<td align="right">#DecimalFormat(trans.TotalVAT)#</td>
 										</tr>
 									</table>
@@ -543,12 +543,12 @@
 												<td align="right">#DecimalFormat(item.rate)#</td>
 												<td align="right">#DecimalFormat(item.net)#</td>
 												<td align="right">#DecimalFormat(item.vat)#</td>
-												<td align="right">#DecimalFormat((item.net/trans.TotalNet)*100)#%</td>
+												<td align="right">#DecimalFormat((item.net/trans.rowTotalNet)*100)#%</td>
 											</tr>
 										</cfloop>
 										<tr>
 											<td>Totals</td>
-											<td align="right">#DecimalFormat(trans.TotalNet)#</td>
+											<td align="right">#DecimalFormat(trans.rowTotalNet)#</td>
 											<td align="right">#DecimalFormat(trans.TotalVAT)#</td>
 											<td>&nbsp;</td>
 										</tr>
@@ -2104,23 +2104,56 @@
 									<cfset data=pur.EndofYearSummary(parms)>
 									<!---<cfdump var="#data#" label="data" expand="yes">--->
                                     <h1>Balance Sheet (draft) as at #DateFormat(data.prdTo,'dd-mmm-yyyy')#</h1>
-                                    <table class="tableList" border="1"> 
-                                    <cfloop collection="#data.panel#" item="key">
-                                    	<cfset nom = StructFind(data.panel,key)>
-                                    	<tr>
-                                        	<td>#nom.ID#</td>
-                                        	<td>#nom.title#</td>
-                                            <cfif nom.group eq "asset">
-                                           		<td align="right">#DecimalFormat(nom.value)#</td><td></td>
-											<cfelseif nom.group eq "liability">
-                                            	<td></td><td align="right">#DecimalFormat(nom.value)#</td>
-											<cfelseif val(nom.value) gte 0>
-                                            	<td align="right">#DecimalFormat(nom.value)#</td><td></td>
-                                            <cfelse>
-                                            	<td></td><td align="right">#DecimalFormat(nom.value)#</td>
-                                            </cfif>
-                                        </tr>
-                                    </cfloop>
+                                    <table class="tableList" border="1">
+										<tr>
+											<th>Nom ID</th>
+											<th>Nominal Account</th>
+											<th>DR</th>
+											<th>CR</th>
+										</tr>
+										<cfset drTotal = 0>
+										<cfset crTotal = 0> 
+										<cfloop collection="#data.panel#" item="key">
+											<cfset nom = StructFind(data.panel,key)>
+											<cfset nom.value = val(nom.value)>
+											<tr>
+												<td>#nom.ID#</td>
+												<td>#nom.title#</td>
+												<cfif nom.group eq "asset">
+													<cfset drTotal += nom.value>
+													<td align="right">#DecimalFormat(nom.value)#</td><td></td>
+												<cfelseif nom.group eq "liability">
+													<cfset crTotal += nom.value>
+													<td></td><td align="right">#DecimalFormat(nom.value)#</td>
+												<cfelseif nom.value gte 0>
+													<cfset drTotal += nom.value>
+													<td align="right">#DecimalFormat(nom.value)#</td><td></td>
+												<cfelse>
+													<cfset crTotal += nom.value>
+													<td></td><td align="right">#DecimalFormat(nom.value)#</td>
+												</cfif>
+											</tr>
+										</cfloop>
+										<cfset equity = drTotal + crTotal>
+										<tr>
+											<td></td>
+											<td>Owners Equity</td>
+											<cfif equity gte 0>
+												<cfset equity = -equity>
+												<cfset crTotal +=  equity>
+												<td></td><td align="right">#DecimalFormat(equity)#</td>
+											<cfelse>
+												<cfset equity = -equity>
+												<cfset drTotal +=  equity>
+												<td align="right">#DecimalFormat(equity)#</td><td></td>
+											</cfif>
+										</tr>
+										<tr>
+											<th></th>
+											<th>Totals</th>
+											<th>#DecimalFormat(drTotal)#</th>
+											<th>#DecimalFormat(crTotal)#</th>
+										</tr>
                                     </table>
 								</cfcase>
 							</cfswitch>

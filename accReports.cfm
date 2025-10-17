@@ -88,8 +88,8 @@
 
 <!--- default parameters --->
 <cfparam name="srchReport" default="1">
-<cfparam name="srchDateFrom" default="2024-01-01">
-<cfparam name="srchDateTo" default="2024-03-31">
+<cfparam name="srchDateFrom" default="">
+<cfparam name="srchDateTo" default="">
 <cfparam name="srchSort" default="1">
 <cfobject component="code/accReports" name="report">
 

@@ -34,7 +34,7 @@
 }
 #nomGroup {width:300px;}
 
-.balanceError {background-color:#FF0000 !important;}
+.balanceError {color: #FFF !important; background-color:#FF0000 !important;}
 
 .pm-flag {
   cursor: pointer;

@@ -396,33 +396,38 @@
 			<cfset loc.result.QTransIDs = loc.QTransIDs>
 			<cfset loc.result.tranCount = loc.QTransIDs.recordcount>
 			
+			<cfset loc.TransIDs = {}>
 			<cfloop query="loc.QTransIDs">
-				<cfset loc.tran = {
-					trnID = trnID,
-					trnRef = trnRef,
-					trnDate = trnDate,
-					trnType = trnType,
-					trnDesc = trnDesc,
-					items = []
-				}>
-				<cfset loc.tranID = trnID>
-				<cfquery name="loc.QTransItems" datasource="#args.datasource#">
-					SELECT nomCode,nomTitle,nomGroup, niID,niAmount
-					FROM tblNomItems 
-					INNER JOIN tblNominal ON nomID = niNomID 
-					WHERE niTranID = #loc.tranID#
-				</cfquery>
-				<cfloop query="loc.QTransItems">
-					<cfset ArrayAppend(loc.tran.items,{
-						nomCode = nomCode,
-						nomTitle = nomTitle,
-						nomGroup = nomGroup, 
-						niID = niID,
-						niAmount = niAmount
-					})>
-				</cfloop>
-				<cfset ArrayAppend(loc.result.trans, loc.tran)>
+				<cfif !StructKeyExists(loc.TransIDs,trnID)>
+					<cfset StructInsert(loc.TransIDs,trnID,0)>
+					<cfset loc.tran = {
+						trnID = trnID,
+						trnRef = trnRef,
+						trnDate = trnDate,
+						trnType = trnType,
+						trnDesc = trnDesc,
+						items = []
+					}>
+					<cfset loc.tranID = trnID>
+					<cfquery name="loc.QTransItems" datasource="#args.datasource#">
+						SELECT nomCode,nomTitle,nomGroup, niID,niAmount
+						FROM tblNomItems 
+						INNER JOIN tblNominal ON nomID = niNomID 
+						WHERE niTranID = #loc.tranID#
+					</cfquery>
+					<cfloop query="loc.QTransItems">
+						<cfset ArrayAppend(loc.tran.items,{
+							nomCode = nomCode,
+							nomTitle = nomTitle,
+							nomGroup = nomGroup, 
+							niID = niID,
+							niAmount = niAmount
+						})>
+					</cfloop>
+					<cfset ArrayAppend(loc.result.trans, loc.tran)>
+				</cfif>
 			</cfloop>
+			<cfset loc.result.tranIDs = loc.TransIDs>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

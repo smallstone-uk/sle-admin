@@ -1281,10 +1281,11 @@
 		<cfset result.ledgers="">
 		
 		<cfquery name="QTrans" datasource="#args.datasource#" result="result.QTRANSRESULT">
-			SELECT nomID,nomGroup,nomCode,nomType,nomClass,nomTitle,nomBFwd,trnLedger,SUM(niAmount) AS nomTotal
+			SELECT ngTitle,nomID,nomGroup,nomCode,nomType,nomClass,nomTitle,nomBFwd,trnLedger,SUM(niAmount) AS nomTotal, Count(*) AS itemCount
 			FROM ((tblNominal 
 			INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID)
 			INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID)
+			LEFT JOIN tblNomGroups ON nomGroup = ngCode
 			WHERE 1 
 			<cfif val(args.form.srchAccount) gt 0>AND trnAccountID=#args.form.srchAccount#</cfif>
 			<cfif len(args.form.srchLedger) gt 0>AND nomType='#args.form.srchLedger#'</cfif>
@@ -1304,18 +1305,21 @@
 			GROUP BY trnLedger,nomGroup,nomClass,nomCode
 			ORDER BY trnLedger,nomGroup,nomClass,nomCode
 		</cfquery>
-<cfdump var="#QTrans#" label="QTrans" expand="false">
+
 		<cfif len(args.form.srchDateFrom)>
 			<cfset result.dateFrom=LSDateFormat(args.form.srchDateFrom,"dd-mmm-yyyy")>
 			<cfset result.dateTo=LSDateFormat(args.form.srchDateTo,"dd-mmm-yyyy")>
 		</cfif>
 		<cfloop query="QTrans">
 			<cfset rec={}>
+			<cfset rec.ngTitle=ngTitle>
 			<cfset rec.nomGroup=nomGroup>
 			<cfset rec.nomClass=nomClass>
+			<cfset rec.nomID=nomID>
 			<cfset rec.nomCode=nomCode>
 			<cfset rec.nomTitle=nomTitle>
 			<cfset rec.nomTotal=nomTotal>
+			<cfset rec.itemCount=itemCount>
 			<cfset rec.nomBFwd=nomBFwd>
 			
 			<cfif nomBFwd>

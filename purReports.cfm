@@ -444,7 +444,6 @@
 										</td>
 									</tr>
 									</table>
-									<cfdump var="#noms#" label="noms" expand="false">
 									<cfif ArrayLen(errArray)>
 										<cfset errTotal=0>
 										<table>
@@ -633,25 +632,33 @@
 										<tr>
 											<th width="50">Ledger</th>
 											<th width="50">Group</th>
+											<th width="150">Title</th>
 											<th width="50">Class</th>
+											<th width="50">ID</th>
 											<th width="50">CODE</th>
-											<th width="150">TITLE</th>
+											<th>Description</th>
 											<th width="70" align="right">DR</th>
 											<th width="70" align="right">CR</th>
 											<th width="70" align="right">BFWD</th>
+											<th width="70" align="right">Items</th>
 										</tr>
+									<cfset rec = {}>
+									<cfset rec.count = 0>
 									<cfset rec.drTotal=0>
 									<cfset rec.crTotal=0>
 									<cfloop list="#trans.ledgers#" delimiters="," index="key">
 										<cfset ledger=StructFind(trans,key)>
 										<cfset codes=ListSort(StructKeyList(ledger,","),"text","asc")>
 										<cfloop list="#codes#" delimiters="," index="code">
+											<cfset rec.count++>
 											<cfset item=StructFind(ledger,code)>
 											<cfset balance = item.nomTotal + item.BFwd>
 											<tr>
 												<td>#key#</td>
 												<td>#item.nomGroup#</td>
+												<td>#item.ngTitle#</td>
 												<td>#item.nomClass#</td>
+												<td align="right">#item.nomID#</td>
 												<td>#item.nomCode#</td>
 												<td>#item.nomTitle#</td>
 												<cfif balance lt 0>
@@ -666,18 +673,21 @@
 													<td>&nbsp;</td>
 													<td>&nbsp;</td>
 												</cfif>
-												<td>#item.bfwd#</td>
+												<td align="right"><cfif item.bfwd neq 0>#DecimalFormat(item.bfwd)#</cfif></td>
+												<td align="right">#item.itemCount#</td>
 											</tr>
 										</cfloop>
 									</cfloop>
 									<tr>
-										<td colspan="5"></td>
+										<td colspan="7">#rec.count# accounts</td>
 										<td align="right">#DecimalFormat(rec.drTotal)#</td>
 										<td align="right">#DecimalFormat(rec.crTotal)#</td>
+										<td colspan="2"></td>
 									</tr>
 									<tr>
-										<td colspan="6"></td>
+										<td colspan="7"></td>
 										<td align="right">#DecimalFormat(rec.crTotal+rec.drTotal)#</td>
+										<td colspan="2"></td>
 									</tr>
 									</table>
 								</cfcase>

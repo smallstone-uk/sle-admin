@@ -34,4 +34,27 @@
 }
 #nomGroup {width:300px;}
 
+.balanceError {background-color:#FF0000 !important;}
+
+.pm-flag {
+  cursor: pointer;
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+}
+.pm-flag .tick {
+  background: url("/images/icons/revert-green.png") no-repeat center center;
+  background-size: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.pm-flag .cross {
+  background: url("/images/icons/revert-red.png") no-repeat center center;
+  background-size: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 

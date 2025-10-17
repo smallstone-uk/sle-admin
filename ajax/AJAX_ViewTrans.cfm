@@ -9,10 +9,11 @@
 
 <cfset loc = {}>
 <cfset loc.totalBalance = 0>
+<cfset loc.errorCount = 0>
 <cfoutput>
 	<table class="tableList" border="1">
 		<tr>
-			<td colspan="6" align="center">
+			<td colspan="5" align="center">
 				<table>
 					<tr>
 						<td>Account:</td>
@@ -31,68 +32,72 @@
 			<th>Date</th>
 			<th>Type</th>
 			<th>Description</th>
-			<th>Item Analysis</th>
 		</tr>
 		<cfloop array="#data.trans#" index="loc.tran">
-		<tr>
-			<td>#loc.tran.trnID#</td>
-			<td>#loc.tran.trnRef#</td>
-			<td>#LSDateFormat(loc.tran.trnDate,'dd-mmm-yy')#</td>
-			<td>#loc.tran.trnType#</td>
-			<td>#loc.tran.trnDesc#</td>
-			<td>
-				<table width="100%">
-					<tr>
-						<th>Code</th>
-						<th>Account</th>
-						<th>Group</th>
-						<th>Value</th>
-						<th>Invert</th>
-					</tr>
-					<cfset loc.balance = 0>
-					<cfloop array="#loc.tran.items#" index="loc.item">
-						<cfset loc.balance += loc.item.niAmount>
+			<tr>
+				<td>#loc.tran.trnID#</td>
+				<td>#loc.tran.trnRef#</td>
+				<td>#LSDateFormat(loc.tran.trnDate,'dd-mmm-yy')#</td>
+				<td>#loc.tran.trnType#</td>
+				<td>#loc.tran.trnDesc#</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<table width="100%">
 						<tr>
-							<td>#loc.item.nomCode#</td>
-							<td>#loc.item.nomTitle#</td>
-							<td>#loc.item.nomGroup#</td>
-							<td align="right"><i class="icon-text tran#loc.tran.trnID#" id="#loc.item.niID#">#loc.item.niAmount#</i></td>
-							<td align="center">
-								<span class="pm-flag" data-id="#loc.item.niID#" data-toggle="0" data-tran="#loc.tran.trnID#" data-value="#loc.item.niAmount#" title="click to invert this value">
-    								<i class="icon-img tick"></i>
-								</span>
-							</td>
+							<th>Code</th>
+							<th>Account</th>
+							<th>Group</th>
+							<th>Value</th>
+							<th>Invert</th>
 						</tr>
-					</cfloop>
-					<cfif loc.balance lt 0.001><cfset loc.balance = 0></cfif>
-					<cfif loc.balance neq 0>
-						<cfset loc.class = "balanceError">
-					<cfelse><cfset loc.class = ""></cfif>
-					<cfset loc.totalBalance += loc.balance>
-					<tr>
-						<th colspan="3">Balance</th>
-						<th align="right" id="bal#loc.tran.trnID#" class="#loc.class#">#DecimalFormat(loc.balance)#</th>
-						<th></th>
-					</tr>
-				</table>
-			</td>
-		</tr>
+						<cfset loc.balance = 0>
+						<cfloop array="#loc.tran.items#" index="loc.item">
+							<cfset loc.balance += loc.item.niAmount>
+							<tr>
+								<td>#loc.item.nomCode#</td>
+								<td>#loc.item.nomTitle#</td>
+								<td>#loc.item.nomGroup#</td>
+								<td align="right"><i class="icon-text tran#loc.tran.trnID#" id="#loc.item.niID#">#loc.item.niAmount#</i></td>
+								<td align="center">
+									<span class="pm-flag" data-id="#loc.item.niID#" data-toggle="0" data-tran="#loc.tran.trnID#" data-value="#loc.item.niAmount#" title="click to invert this value">
+										<i class="icon-img tick"></i>
+									</span>
+								</td>
+							</tr>
+						</cfloop>
+						<cfif loc.balance lt 0.001><cfset loc.balance = 0></cfif>
+						<cfif loc.balance neq 0>
+							<cfset loc.class = "balanceError">
+							<cfset loc.errorCount++>
+						<cfelse><cfset loc.class = ""></cfif>
+						<cfset loc.totalBalance += loc.balance>
+						<tr>
+							<th colspan="2">Balance</th>
+							<th></th>
+							<th align="right" id="bal#loc.tran.trnID#" class="#loc.class#">#DecimalFormat(loc.balance)#</th>
+							<th></th>
+						</tr>
+					</table>
+				</td>
+			<tr>
 		</cfloop>
 		<cfif loc.totalBalance neq 0>
 			<cfset loc.class = "balanceError">
 		<cfelse><cfset loc.class = ""></cfif>
 		<tr>
-			<th colspan="5">#data.tranCount# transactions.</th>
-			<th>
+			<th colspan="5">
 				<table width="100%" class="tableList">
 					<tr>
-						<th></th>
+						<th>#loc.errorCount# errors</th>
+						<th>#data.tranCount# transactions.</th>
 						<th>Balance</th>
-						<th></th>
 						<th align="right" class="#loc.class#">#DecimalFormat(loc.totalBalance)#</th>
+						<th></th>
 					</tr>
 				</table>
 			</th>
 		</tr>
 	</table>
 </cfoutput>
+

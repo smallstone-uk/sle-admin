@@ -6,7 +6,6 @@
 <cfset parms.form = form>
 
 <cfset data = report.ViewTrans(parms)>
-<cfdump var="#data#" label="data" expand="false">
 
 <cfset loc = {}>
 <cfset loc.totalBalance = 0>
@@ -38,7 +37,7 @@
 		<tr>
 			<td>#loc.tran.trnID#</td>
 			<td>#loc.tran.trnRef#</td>
-			<td>#loc.tran.trnDate#</td>
+			<td>#LSDateFormat(loc.tran.trnDate,'dd-mmm-yy')#</td>
 			<td>#loc.tran.trnType#</td>
 			<td>#loc.tran.trnDesc#</td>
 			<td>
@@ -71,7 +70,7 @@
 					<cfelse><cfset loc.class = ""></cfif>
 					<cfset loc.totalBalance += loc.balance>
 					<tr>
-						<th colspan="3">Balance #loc.balance#</th>
+						<th colspan="3">Balance</th>
 						<th align="right" id="bal#loc.tran.trnID#" class="#loc.class#">#DecimalFormat(loc.balance)#</th>
 						<th></th>
 					</tr>

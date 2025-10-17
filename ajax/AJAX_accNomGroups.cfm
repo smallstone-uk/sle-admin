@@ -13,6 +13,10 @@
 		<cfset data = LoadStockValue(parms)>
 		<cfset ViewStockValue(data)>
 	</cfcase>
+	<cfcase value="3">
+		<cfset data = AgedAccountReport(parms)>
+		<cfset ViewAgedAccountReport(data)>
+	</cfcase>
 </cfswitch>
 
 <cffunction name="LoadReport" access="public" returntype="struct">

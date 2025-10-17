@@ -6,41 +6,61 @@
 	<link rel="stylesheet" type="text/css" href="css/main3.css">	<!--- SLE styles --->
 	<link rel="stylesheet" type="text/css" href="css/main4.css">	<!--- SLE styles --->
 	<link rel="stylesheet" type="text/css" href="css/accReports.css"><!--- accounting report styles --->
+	<link rel="stylesheet" type="text/css" href="css/chosen.css">
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.3.custom.min.css">
 	<script src="scripts/jquery-1.9.1.js"></script>					<!--- core JQuery code --->
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>	<!--- JQuery required for menu code --->
 	<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>		<!--- top menu navigation --->
 	<script src="scripts/jquery.hoverIntent.minified.js"></script>	<!--- top menu navigation --->
-	<script src="scripts/accReports.js"></script>					<!--- accounting report scripts --->
+	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
+	<!---<script src="scripts/accReports.js"></script>--->			<!--- accounting report scripts load later --->
 	<script type="text/javascript">
 		$(document).ready(function() {
+			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
 			$('#menu').dcMegaMenu({rowItems: '3',event: 'hover',fullWidth: false});		<!--- init top menu navigation --->
+			$.getScript('scripts/accReports.js',function(){});		<!--- load when DOM ready otherwise code won't run --->
 
-			function LoadGroups ()	{
-				$.ajax({
-					type: 'POST',
-					url: 'ajax/AJAX_accReports.cfm',
-					data: $('#srchForm').serialize(),
-					beforeSend:function(){
-						$("#resultDiv").empty(); // clear out old stuff
-						$("#resultDiv").hide(); 
-						$('#loadingDiv').html("<img src='images/loading_2.gif' class='loadingGif'>&nbsp;Loading...").fadeIn();
-					},
-					success:function(data){
-						$('#loadingDiv').html('&nbsp;');
-						$('#resultDiv').html(data).show();
-					},
-					error:function(data){
-						$('#resultDiv').html(data);
-						$('#loadingDiv').loading(false);
-					}
-				});				
+			function Dispatch (e,formData)	{
+				var formObj = {};
+				$.each(formData, function(_, field) {
+					formObj[field.name] = field.value;
+				});
+				console.log(formObj);
+				if (formObj.srchReport = 1)	{
+					LoadGroups();
+				} else if (formObj.srchReport = 2) {
+					
+				} else if (formObj.srchReport = 3) {
+					
+				}
+		//		console.log(formObj.srchReport);
+				e.preventDefault();
+				e.stopPropagation();
 			}
+
 			$('#btnRun').click(function(e) {	<!--- run report --->
+				Dispatch(e,$('#srchForm').serializeArray());
 				LoadGroups();
 				e.preventDefault();
 				e.stopPropagation();
 			});
 			
+			$(document).on("click", ".openTrans", function() {	<!--- open modal box --->
+				$("#overlay").fadeIn(200);
+				$("#modal").fadeIn(200);
+		
+				// Show loading text
+				$("#modal-content").html("<p>Loading content...</p>");
+				var ref = $(this).data("ref");
+				var group = $(this).data("group");
+				var title = $(this).data("title");
+				var mode = $(this).data("mode");
+				var srchDateFrom = $('#srchDateFrom').val();
+				var srchDateTo = $('#srchDateTo').val();
+				if (mode = "viewTrans") {
+					ViewTrans(ref,mode,group,title,srchDateFrom,srchDateTo,"#modal-content");
+				}
+  			});
 			$(document).on("click", ".openModal", function() {	<!--- open modal box --->
 				$("#overlay").fadeIn(200);
 				$("#modal").fadeIn(200);
@@ -49,15 +69,16 @@
 				$("#modal-content").html("<p>Loading content...</p>");
 				var ref = $(this).data("ref");
 				var group = $(this).data("group");
+				var title = $(this).data("title");
 				var mode = $(this).data("mode");
 				var srchDateFrom = $('#srchDateFrom').val();
 				var srchDateTo = $('#srchDateTo').val();
 				if (mode = "editGroup") {
-					EditGroup(ref,mode,group,srchDateFrom,srchDateTo,"#modal-content");
+					EditGroup(ref,mode,group,title,srchDateFrom,srchDateTo,"#modal-content");
 				}
   			});
 
-			$("#closeModal").on("click", function() {
+			$("#closeModal").on("click", function() {	<!--- close modal box --->
 				closeModal();
 				LoadGroups();
 			});
@@ -67,8 +88,8 @@
 
 <!--- default parameters --->
 <cfparam name="srchReport" default="1">
-<cfparam name="srchDateFrom" default="">
-<cfparam name="srchDateTo" default="">
+<cfparam name="srchDateFrom" default="2024-01-01">
+<cfparam name="srchDateTo" default="2024-03-31">
 <cfparam name="srchSort" default="1">
 <cfobject component="code/accReports" name="report">
 

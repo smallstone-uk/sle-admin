@@ -20,6 +20,10 @@
 					<cfset data = report.LoadStockValue(parms)>
 					<cfset report.ViewStockValue(data)>
 				</cfcase>
+				<cfcase value="3">
+					<cfset data = report.AgedAccountReport(parms)>
+					<cfdump var="#data#" label="AgedAccountReport" expand="false">
+				</cfcase>
 			</cfswitch>
 		</cfif>
 	<cfelseif mode eq 2>
@@ -27,3 +31,4 @@
 		<cfoutput>#data.msg#</cfoutput>
 	</cfif>
 </cfif>
+ 

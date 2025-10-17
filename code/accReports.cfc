@@ -12,14 +12,20 @@
 		<cftry>
 			<cfset loc.option = 1>
 			<cfset ArrayAppend(loc.result.menu, {
-				Value = 1,
+				Value = #loc.option#,
 				Title = "Nominal Group Headings",
 				ID = "ID#loc.option#"
 			})>
 			<cfset loc.option++>
 			<cfset ArrayAppend(loc.result.menu, {
-				Value = 2,
+				Value = #loc.option#,
 				Title = "Monthly Stock Valuation",
+				ID = "ID#loc.option#"
+			})>
+			<cfset loc.option++>
+			<cfset ArrayAppend(loc.result.menu, {
+				Value = #loc.option#,
+				Title = "Aged Account Report",
 				ID = "ID#loc.option#"
 			})>
 
@@ -71,12 +77,13 @@
 						<th>Title</th>
 						<th>Items</th>
 						<th>Details</th>
+						<th>Trans</th>
 					</tr>
 					<cfset group = "">
 					<cfloop query="args.QReport">
 						<cfif group neq nomGroup>
 							<tr>
-								<th colspan="7">#nomGroup# - #ngTitle#</th>
+								<th colspan="8">#nomGroup# - #ngTitle#</th>
 							</tr>
 						</cfif>
 						<cfset group = nomGroup>
@@ -87,7 +94,8 @@
 							<td>#nomClass#</td>
 							<td>#nomTitle#</td>
 							<td align="right">#NumberFormat(itemCount,',')#</td>
-							<td><button class="openModal" data-group="#nomGroup#" data-ref="#nomID#" data-mode="editGroup">Amend</button></td>
+							<td><button class="openModal" data-group="#nomGroup#" data-ref="#nomID#" data-title="#nomTitle#" data-mode="editGroup">Amend</button></td>
+							<td><button class="openTrans" data-group="#nomGroup#" data-ref="#nomID#" data-title="#nomTitle#" data-mode="viewTrans">Trans</button></td>
 						</tr>
 					</cfloop>
 				</table>
@@ -116,7 +124,7 @@
 			<cfloop condition="loc.srchDateTo gte loc.dateEnd">
 				<cfset loc.num++>
 				
-				<cfquery name="loc.QStockValue" datasource="#args.datasource#">	<!--- Tota stock value for last 14 days of the selected month --->
+				<cfquery name="loc.QStockValue" datasource="#args.datasource#">	<!--- Total stock value for last 14 days of the selected month --->
 					SELECT SUM(trnAmnt1) AS Total
 					FROM tbltrans
 					WHERE trnLedger = 'purch' 
@@ -189,6 +197,255 @@
 			</cfquery>
 			<cfset loc.result.QNomUpdate = loc.QNomUpdate>
 			<cfset loc.result.msg = "Record updated">
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="AgedAccount" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.data = {}>
+		
+		<cftry>
+			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
+				<cfset loc.srchDateFrom = FormatDate("2013-01-01",'yyyy-mm-dd')>
+			<cfelseif IsDate(args.form.srchDateFrom)>
+				<cfset loc.srchDateFrom = FormatDate(args.form.srchDateFrom,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateFrom = "">
+			</cfif>
+			<cfif !StructKeyExists(args.form,"srchDateTo") OR len(args.form.srchDateTo) IS 0>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			<cfelseif IsDate(args.form.srchDateTo)>
+				<!---<cfset loc.srchDateTo = DateAdd("d",1,args.form.srchDateTo)> for timed dates only --->
+				<cfset loc.srchDateTo = FormatDate(args.form.srchDateTo,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			</cfif>
+
+			<cfquery name="loc.QMonthTotals" datasource="#args.datasource#">
+				SELECT trnID,trnRef,trnDate,trnType,trnDesc, nomCode,nomTitle,nomGroup, 
+					SUM(niAmount) AS value, SUM(niVATAmount) AS VAT, DATE_FORMAT( trnDate, '%Y-%m' ) AS YYMM 
+				FROM tblnomitems 
+				INNER JOIN tblTrans ON trnID = niTranID 
+				INNER JOIN tblNominal ON nomID = niNomID 
+				WHERE niNomID = #args.nomAccount# 
+				AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#' 
+				GROUP BY nomGroup, YYMM;
+			</cfquery>
+			<cfif loc.QMonthTotals.recordcount gt 0>
+				<cfquery name="loc.QBfwd" datasource="#args.datasource#">
+					SELECT SUM(niAmount) AS Total
+					FROM tblNomItems
+					INNER JOIN tblTrans ON trnID = niTranID 
+					WHERE niNomID = #args.nomAccount#
+					AND trnDate < '#loc.srchDateFrom#'
+					GROUP BY niNomID
+				</cfquery>
+				<cfset loc.runTotal = val(loc.QBfwd.Total)>
+				<cfset loc.data = 
+					{" BFwd" = {"value" = val(loc.QBfwd.Total), "VAT" = 0, "balance" = val(loc.QBfwd.Total)},
+					 "Total" = {"value" = 0, "VAT" = 0, "balance" = val(loc.QBfwd.Total)}
+				}>
+					
+				<cfset loc.lastDate = DateFormat(loc.srchDateTo,'yyyy-mm')>
+				<cfloop from="1" to="12" index="loc.i">
+					<cfset StructInsert(loc.data,loc.lastDate,{
+						"value" = 0,
+						"VAT" = 0,
+						"balance" = 0
+					})>
+					<cfset loc.lastDate = DateFormat(DateAdd("m",-1,loc.lastDate),'yyyy-mm')>
+				</cfloop>
+				
+				<cfloop query="loc.QMonthTotals">
+					<cfset loc.runTotal += val(value)>
+					<cfif !StructKeyExists(loc.result,"#nomGroup#-#nomCode#")>
+						<cfset loc.result.nomCode = nomCode>
+						<cfset loc.result.nomTitle = nomTitle>
+						<cfset loc.result.nomGroup = nomGroup>
+					</cfif>
+					<cfif !StructKeyExists(loc.data,YYMM)>
+						<cfset loc.prd = StructFind(loc.data," BFwd")>
+						<cfset loc.prd.value += value>
+						<cfset loc.prd.VAT += VAT>
+						<cfset loc.prd.balance = loc.runTotal>
+					<cfelse>
+						<cfset loc.prd = StructFind(loc.data,YYMM)>
+						<cfset loc.prd.value += value>
+						<cfset loc.prd.VAT += VAT>
+						<cfset loc.prd.balance = loc.runTotal>
+					</cfif>
+					<cfset loc.prd = StructFind(loc.data,"Total")>
+						<cfset loc.prd.value += value>
+						<cfset loc.prd.VAT += VAT>
+						<cfset loc.prd.balance += value>
+				</cfloop>
+			</cfif>
+			<cfset loc.result.data = loc.data>			
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="AgedAccountReport" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.accounts = []>
+		<cfset loc.accList = "">
+		
+		<cftry>
+			<cfquery name="loc.QAccountList" datasource="#args.datasource#">
+				SELECT nomID, nomGroup, nomCode
+				FROM tblNominal
+				WHERE nomGroup IN ('R','R3','R4','RS')
+				ORDER BY nomGroup,nomCode
+			</cfquery>
+			<cfloop query="loc.QAccountList">
+				<cfset loc.accList = "#loc.accList#,#nomID#">
+			</cfloop>
+			
+			<cfloop list="#loc.accList#" index="loc.ID">
+				<cfset args.nomAccount = loc.ID>
+				<cfset loc.account = AgedAccount(args)>
+				<cfif  !StructIsEmpty(loc.account.data)>
+					<cfset ArrayAppend(loc.result.accounts,loc.account)>
+				</cfif>
+			</cfloop>
+			<cfif ArrayLen(loc.result.accounts) gt 0>
+				<cfset loc.header = loc.result.accounts[1]>
+				<cfset loc.headerlist = ListSort(StructKeyList(loc.header.data,","),"text","ASC")>
+				<cfoutput>
+					<table class="tableList" width="100%">
+						<tr>
+							<th>Group</th>
+							<th>Code</th>
+							<th>Title</th>
+							<cfloop list="#loc.headerlist#" index="loc.key">
+								<th align="right">#loc.key#</th>
+							</cfloop>
+						</tr>
+						<cfloop array="#loc.result.accounts#" index="loc.item">
+							<cfset loc.datalist = ListSort(StructKeyList(loc.item.data,","),"text","ASC")>
+							<tr>
+								<td>#loc.item.nomGroup#</td>
+								<td>#loc.item.nomCode#</td>
+								<td>#loc.item.nomTitle#</td>
+								<cfloop list="#loc.datalist#" index="loc.key">
+									<cfset loc.prd = StructFind(loc.item.data,loc.key)>
+									<td align="right">
+										<table class="tableList" width="100%">
+											<tr><td align="right">#showField(loc.prd.value,2)#&nbsp;</td></tr>
+											<tr><td align="right">#showField(loc.prd.balance,2)#&nbsp;</td></tr>
+										</table>
+									</td>
+								</cfloop>
+							</tr>
+						</cfloop>
+					</table>
+				</cfoutput>
+			</cfif>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="ViewTrans" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.trans = []>
+		
+		<cftry>
+			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
+				<cfset loc.srchDateFrom = FormatDate("2013-01-01",'yyyy-mm-dd')>
+			<cfelseif IsDate(args.form.srchDateFrom)>
+				<cfset loc.srchDateFrom = FormatDate(args.form.srchDateFrom,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateFrom = "">
+			</cfif>
+			<cfif !StructKeyExists(args.form,"srchDateTo") OR len(args.form.srchDateTo) IS 0>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			<cfelseif IsDate(args.form.srchDateTo)>
+				<cfset loc.srchDateTo = FormatDate(args.form.srchDateTo,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			</cfif>
+			<cfquery name="loc.QTransIDs" datasource="#args.datasource#">
+				SELECT trnID,trnRef,trnDate,trnType,trnDesc
+				FROM tblNomItems
+				INNER JOIN tblTrans ON trnID = niTranID 
+				WHERE niNomID = #val(args.form.ref)#
+				AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#' 
+				ORDER BY trnDate
+				<!---LIMIT 50; --->
+			</cfquery>
+			<cfset loc.result.QTransIDs = loc.QTransIDs>
+			<cfset loc.result.tranCount = loc.QTransIDs.recordcount>
+			
+			<cfloop query="loc.QTransIDs">
+				<cfset loc.tran = {
+					trnID = trnID,
+					trnRef = trnRef,
+					trnDate = trnDate,
+					trnType = trnType,
+					trnDesc = trnDesc,
+					items = []
+				}>
+				<cfset loc.tranID = trnID>
+				<cfquery name="loc.QTransItems" datasource="#args.datasource#">
+					SELECT nomCode,nomTitle,nomGroup, niID,niAmount
+					FROM tblNomItems 
+					INNER JOIN tblNominal ON nomID = niNomID 
+					WHERE niTranID = #loc.tranID#
+				</cfquery>
+				<cfloop query="loc.QTransItems">
+					<cfset ArrayAppend(loc.tran.items,{
+						nomCode = nomCode,
+						nomTitle = nomTitle,
+						nomGroup = nomGroup, 
+						niID = niID,
+						niAmount = niAmount
+					})>
+				</cfloop>
+				<cfset ArrayAppend(loc.result.trans, loc.tran)>
+			</cfloop>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="InvertValue" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+
+		<cftry>
+			<cfquery name="loc.QInvert" datasource="#args.datasource#">
+				UPDATE tblNomItems
+				SET niAmount = -niAmount
+				WHERE niID = #val(args.form.recordID)#
+				LIMIT 1;
+			</cfquery>
+			<cfset loc.result.value = -args.form.value>
+			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

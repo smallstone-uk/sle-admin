@@ -83,13 +83,14 @@ $(document).on("click", ".pm-flag", function() {
 			$el.data("toggle", newVal);
 			$el.data("value", -currentVal);
 			//console.log($('#'+id));
-			$('#'+id).html(-currentVal);
+			var newValue = Number(response).toFixed(2);
+			$('#'+id).html(newValue);
 			if (newVal == 0) {
 				$el.find("i.icon-img").removeClass("cross").addClass("tick");
-				$el.find("i.icon-text").html(response);
+				$el.find("i.icon-text").html(newValue);
 			} else {
 				$el.find("i.icon-img").removeClass("tick").addClass("cross");
-				$el.find("i.icon-text").html(response);
+				$el.find("i.icon-text").html(newValue);
 			}
 			//console.log('response ' +response);
 			total(tran);
@@ -106,6 +107,11 @@ function total(tranClass) {
 		tranTotal = tranTotal + value;
 	})
 	tranTotal = Math.round(tranTotal * 100) / 100
+	if (tranTotal == 0) {
+		$('#bal'+tranClass).removeClass("balanceError");
+	} else {
+		$('#bal'+tranClass).addClass("balanceError");
+	}
 	//console.log('#bal'+tranClass + ' balance = ' + tranTotal);
 	$('#bal'+tranClass).html(tranTotal.toFixed(2));
 };

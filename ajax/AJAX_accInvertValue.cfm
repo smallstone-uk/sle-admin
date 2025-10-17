@@ -7,4 +7,4 @@
 
 <cfset data = report.InvertValue(parms)>
 
-<cfoutput>#data.value#</cfoutput>
+<cfoutput>#DecimalFormat(data.value)#</cfoutput>

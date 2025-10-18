@@ -6,6 +6,10 @@
 <cfset parms.form = form>
 
 <cfset data = report.ViewTrans(parms)>
+<cfif StructKeyExists(data,"msg")>
+	<cfoutput><p>#data.msg#</p></cfoutput>
+	<cfexit>
+</cfif>
 
 <cfset loc = {}>
 <cfset loc.totalBalance = 0>
@@ -73,7 +77,7 @@
 						<cfelse><cfset loc.class = ""></cfif>
 						<cfset loc.totalBalance += loc.balance>
 						<tr>
-							<th colspan="2">Balance</th>
+							<th colspan="2">Balance #loc.class#</th>
 							<th></th>
 							<th align="right" id="bal#loc.tran.trnID#" class="#loc.class#">#DecimalFormat(loc.balance)#</th>
 							<th></th>

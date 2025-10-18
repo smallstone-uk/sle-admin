@@ -384,6 +384,18 @@
 			<cfelse>
 				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
 			</cfif>
+			<cfquery name="loc.QLimit" datasource="#args.datasource#">
+				SELECT count(*) AS maxRecs
+				FROM tblNomItems
+				INNER JOIN tblTrans ON trnID = niTranID 
+				WHERE niNomID = #val(args.form.ref)#
+				AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#' 
+			</cfquery>
+			<cfif loc.QLimit.maxRecs gt 1000>
+				<cfset loc.result.msg = "Your selection will return #NumberFormat(loc.QLimit.maxRecs,',')# records 
+					which is too many in one go.<br>The limit is 1,000. Try narrowing your search criteria.">
+				<cfreturn loc.result>
+			</cfif>
 			<cfquery name="loc.QTransIDs" datasource="#args.datasource#">
 				SELECT trnID,trnRef,trnDate,trnType,trnDesc
 				FROM tblNomItems

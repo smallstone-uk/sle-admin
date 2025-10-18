@@ -39,8 +39,8 @@
 .pm-flag {
   cursor: pointer;
   display: inline-block;
-  width: 36px;
-  height: 36px;
+  width: 18px;
+  height: 18px;
 }
 .pm-flag .tick {
   background: url("/images/icons/revert-green.png") no-repeat center center;

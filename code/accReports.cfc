@@ -28,6 +28,12 @@
 				Title = "Aged Account Report",
 				ID = "ID#loc.option#"
 			})>
+			<cfset loc.option++>
+			<cfset ArrayAppend(loc.result.menu, {
+				Value = #loc.option#,
+				Title = "Sales Data Corrections",
+				ID = "ID#loc.option#"
+			})>
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
@@ -463,6 +469,171 @@
 			</cfquery>
 			<cfset loc.result.value = -args.form.value>
 			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="SalesDataCorrections" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.trans = []>
+		<cfset loc.fixData = StructKeyExists(args.form,"srchFixData")>
+
+		<cftry>
+			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
+				<cfset loc.srchDateFrom = FormatDate("2013-01-01",'yyyy-mm-dd')>
+			<cfelseif IsDate(args.form.srchDateFrom)>
+				<cfset loc.srchDateFrom = FormatDate(args.form.srchDateFrom,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateFrom = "">
+			</cfif>
+			<cfif !StructKeyExists(args.form,"srchDateTo") OR len(args.form.srchDateTo) IS 0>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			<cfelseif IsDate(args.form.srchDateTo)>
+				<cfset loc.srchDateTo = FormatDate(args.form.srchDateTo,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			</cfif>
+			
+			<!--- check for cashback items --->
+			<cfquery name="loc.QCashbackItems" datasource="#args.datasource#">
+				SELECT trnID,trnDate, tblNomItems.*
+				FROM tblNomItems
+				INNER JOIN tbltrans ON niTranID=trnID
+				WHERE trnAccountID=1
+				AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#'
+				AND niNomID=1411
+				AND niAmount > 0;
+			</cfquery>
+			<cfset loc.result.QCashbackItems = loc.QCashbackItems>
+			<cfif (loc.QCashbackItems.recordcount gt 0) AND loc.fixData>
+				<cfquery name="loc.QDeleteCashbackItems" datasource="#args.datasource#">
+					DELETE tblNomItems
+					FROM tblNomItems
+					inner join tbltrans ON niTranID=trnID
+					WHERE trnAccountID=1
+					AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#'
+					AND niNomID=1411
+					AND niAmount > 0;			
+				</cfquery>
+			</cfif>
+			
+			<!--- check for error balances --->
+			<cfquery name="loc.QTranBalances" datasource="#args.datasource#">
+				SELECT trnID,trnRef,trnDate,trnType,trnAmnt1,trnAmnt2, SUM(niAmount) AS Total
+				FROM tblNomItems
+				INNER JOIN tblTrans ON trnID = niTranID 
+				WHERE trnAccountID = 1
+				AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#'
+				GROUP BY trnID
+				HAVING Total != 0
+				ORDER BY trnDate
+			</cfquery>
+			<cfset loc.result.QTranBalances = loc.QTranBalances>
+			<cfloop query="loc.QTranBalances">
+				<cfset loc.tranID = trnID>
+				<cfset loc.tran = {
+					trnID = trnID,
+					trnRef = trnRef,
+					trnDate = trnDate,
+					trnType = trnType,
+					trnAmnt1 = trnAmnt1,
+					trnAmnt2 = trnAmnt2,
+					itemID = 0,
+					errorTotal = Total,
+					Items = [],
+					fixMe = false,
+					updated = false
+				}>
+				<cfquery name="loc.QNomItems" datasource="#args.datasource#">
+					SELECT *
+					FROM tblNomItems
+					WHERE niTranID = #loc.tranID#
+					AND niNomID IN (181,491)
+				</cfquery>
+				<cfif loc.QNomItems.recordcount gt 0>
+					<cfset loc.cash = 0>
+					<cfset loc.supplier = 0>
+					<cfloop query="loc.QNomItems">
+						<cfset ArrayAppend(loc.tran.items,{
+							niID = niID,
+							niNomID = niNomID,
+							niAmount = niAmount
+						})>
+						<cfif niNomID eq 491 AND niAmount neq 0>
+							<cfset loc.supplier = niAmount>
+						</cfif>
+						<cfif niNomID eq 181 AND niAmount neq 0>
+							<cfset loc.cash = niAmount>
+							<cfset loc.tran.itemID = niID>
+						</cfif>
+					</cfloop>
+					<cfset loc.tran.itemValue = loc.cash - loc.supplier>
+					<cfif loc.tran.itemValue neq 0><cfset loc.tran.fixMe = true></cfif>
+					<cfset ArrayAppend(loc.result.trans,loc.tran)>
+				</cfif>
+				<cfif loc.fixData AND loc.tran.fixMe>
+					<cfquery name="loc.QUpdateItems" datasource="#args.datasource#">
+						UPDATE tblNomItems
+						SET niAmount = #loc.tran.itemValue#
+						WHERE niID = #loc.tran.itemID#
+					</cfquery>
+					<cfset loc.tran.updated = true>
+				</cfif>
+			</cfloop>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="ViewCorrections" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfoutput>
+				<table class="tableList" border="1" width="700">
+					<tr>
+						<th>Tran ID</th>
+						<th>Type</th>
+						<th>Date</th>
+						<th>Inv Total</th>
+						<th>Balance Error</th>
+						<th>Item ID</th>
+						<th>New Value</th>
+						<th>Updated</th>
+					</tr>
+					<cfset loc.grandError = 0>
+					<cfloop array="#args.trans#" index="loc.item">
+						<cfset loc.grandError += loc.item.errorTotal>
+						<tr>
+							<td align="right"><a href="#application.site.normal#salesMain3.cfm?acc=1&tran=#loc.item.trnID#" target="#loc.item.trnID#">#loc.item.trnID#</a></td>
+							<td>#loc.item.trnType#</td>
+							<td align="right">#LSDateFormat(loc.item.trnDate,'ddd dd-mmm-yy')#</td>
+							<td align="right">#DecimalFormat(loc.item.trnAmnt1)#</td>
+							<td align="right">#DecimalFormat(loc.item.errorTotal)#</td>
+							<td align="right">#loc.item.itemID#</td>
+							<td align="right">#DecimalFormat(loc.item.itemValue)#</td>
+							<td align="right">#loc.item.updated#</td>
+						</tr>
+					</cfloop>
+					<tr>
+						<th colspan="4">Totals</th>
+						<th align="right">#DecimalFormat(loc.grandError)#</th>
+						<th colspan="3"></th>
+					</tr>
+				</table>
+			</cfoutput>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

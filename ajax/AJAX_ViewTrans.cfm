@@ -39,7 +39,7 @@
 		</tr>
 		<cfloop array="#data.trans#" index="loc.tran">
 			<tr>
-				<td>#loc.tran.trnID#</td>
+				<td><a href="#application.site.normal#salesMain3.cfm?acc=1&tran=#loc.tran.trnID#" target="#loc.tran.trnID#">#loc.tran.trnID#</a></td>
 				<td>#loc.tran.trnRef#</td>
 				<td>#LSDateFormat(loc.tran.trnDate,'dd-mmm-yy')#</td>
 				<td>#loc.tran.trnType#</td>

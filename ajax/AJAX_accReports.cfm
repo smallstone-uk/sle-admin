@@ -24,6 +24,11 @@
 					<cfset data = report.AgedAccountReport(parms)>
 					<cfdump var="#data#" label="AgedAccountReport" expand="false">
 				</cfcase>
+				<cfcase value="4">
+					<cfset data = report.SalesDataCorrections(parms)>
+					<!---<cfdump var="#data#" label="SalesDataCorrections" expand="false">--->
+					<cfset report.ViewCorrections(data)>
+				</cfcase>
 			</cfswitch>
 		</cfif>
 	<cfelseif mode eq 2>

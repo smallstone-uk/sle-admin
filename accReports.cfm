@@ -91,6 +91,7 @@
 <cfparam name="srchDateFrom" default="">
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchSort" default="1">
+<cfparam name="srchFixData" default="">
 <cfobject component="code/accReports" name="report">
 
 <cfset init = report.initInterface({})>
@@ -144,6 +145,12 @@
 												<option value="1"<cfif srchSort eq "1"> selected="selected"</cfif>>Nominal Code</option>
 												<option value="2"<cfif srchSort eq "2"> selected="selected"</cfif>>Account Code</option>
 											</select>
+										</td>
+									</tr>
+									<tr>
+										<td><b>Options</b></td>
+										<td>
+											<input type="checkbox" name="srchFixData" id="srchFixData" value="1" /> Fix Data (for specific reports only)
 										</td>
 									</tr>
 								</table>

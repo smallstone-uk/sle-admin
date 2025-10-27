@@ -162,7 +162,7 @@
 			<cfquery name="loc.QInsertTran" datasource="#application.site.datasource1#" result="loc.QInsertTranResult">
 				INSERT INTO tblTrans
 					(trnLedger,trnRef,trnDate,trnDesc,trnType,trnAlloc,trnActive)
-				VALUES ('nom','#args.trnRef#','#acc.FormatDate(args.trnDate,"yyyy-mm-dd")#','#args.trnDesc#','nom',1,1)
+				VALUES ('nom','#args.trnRef#','#args.trnDate#','#args.trnDesc#','nom',1,1)
 			</cfquery>
 			<cfset loc.tranID = loc.QInsertTranResult.generatedKey>
             <cfset loc.str = "">

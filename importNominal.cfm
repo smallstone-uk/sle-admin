@@ -84,7 +84,7 @@
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
 				columns="1-12" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
 			<!---<cfdump var="#QData#" label="QData" expand="false">--->
-            <cfset colNames = QData.ColumnList>
+            <cfset colNames = QData.ColumnList><cfdump var="#QData#" label="QData" expand="false">
 			<cfoutput>
 				<table class="tableStyle" border="1" width="100%">
 					<tr>	<!--- data block header --->

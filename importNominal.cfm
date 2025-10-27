@@ -156,32 +156,39 @@
 		<cfargument name="args" type="struct" required="yes">
      	  <cfdump var="#args#" label="InsertTran" expand="false"> 
 		<cfset var loc={}>
-		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
-			SELECT *
-			FROM tblTrans
-			WHERE trnRef='#args.trnRef#'
-		</cfquery>
-		<cfif loc.QCheckExists.recordCount eq 0>
-			<cfquery name="loc.QInsertTran" datasource="#application.site.datasource1#" result="loc.QInsertTranResult">
-				INSERT INTO tblTrans
-					(trnLedger,trnRef,trnDate,trnDesc,trnType,trnAlloc,trnActive)
-				VALUES ('nom','#args.trnRef#','#args.trnDate#','#args.trnDesc#','nom',1,1)
+		<cftry>
+			<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
+				SELECT *
+				FROM tblTrans
+				WHERE trnRef='#args.trnRef#'
 			</cfquery>
-			<cfset loc.tranID = loc.QInsertTranResult.generatedKey>
-            <cfset loc.str = "">
-            <cfloop array="#args.items#" index="loc.rec">
-                <cfset loc.str = "#loc.str#(#loc.rec.niNomID#,#loc.tranID#,#loc.rec.niAmount#),">
-            </cfloop>
-            <cfset loc.str = RemoveChars(loc.str, len(loc.str),1)>
-            <!--- <cfdump var="#loc.str#" label="loc.str" expand="false"> --->
-			<cfquery name="loc.QInsertItems" datasource="#application.site.datasource1#">
-				INSERT INTO tblNomItems
-					(niNomID,niTranID,niAmount)
-				VALUES
-                	#loc.str#
-			</cfquery>
-			<cfreturn "Inserted">    
-		</cfif> 
+			<cfif loc.QCheckExists.recordCount eq 0>
+				<cfquery name="loc.QInsertTran" datasource="#application.site.datasource1#" result="loc.QInsertTranResult">
+					INSERT INTO tblTrans
+						(trnLedger,trnRef,trnDate,trnDesc,trnType,trnAlloc,trnActive)
+					VALUES ('nom','#args.trnRef#','#args.trnDate#','#args.trnDesc#','nom',1,1)
+				</cfquery>
+				<cfset loc.tranID = loc.QInsertTranResult.generatedKey>
+				<cfset loc.str = "">
+				<cfloop array="#args.items#" index="loc.rec">
+					<cfset loc.str = "#loc.str#(#loc.rec.niNomID#,#loc.tranID#,#loc.rec.niAmount#),">
+				</cfloop>
+				<cfset loc.str = RemoveChars(loc.str, len(loc.str),1)>
+				<!--- <cfdump var="#loc.str#" label="loc.str" expand="false"> --->
+				<cfquery name="loc.QInsertItems" datasource="#application.site.datasource1#">
+					INSERT INTO tblNomItems
+						(niNomID,niTranID,niAmount)
+					VALUES
+						#loc.str#
+				</cfquery>
+				<cfreturn "Inserted">    
+			</cfif> 
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
 		<cfreturn "Exists">
 	</cffunction>
     		

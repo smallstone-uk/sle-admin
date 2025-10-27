@@ -82,7 +82,7 @@
 
 		<cfloop from="1" to="#reconInfo.rowCount#" index="loc.i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
-				columns="1-12" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
+				columns="1-11" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
 			<!---<cfdump var="#QData#" label="QData" expand="false">--->
             <cfset colNames = QData.ColumnList><cfdump var="#QData#" label="QData" expand="false">
 			<cfoutput>
@@ -91,6 +91,7 @@
 						<cfloop list="#colNames#" index="fld">
 							<td>#fld#</td>
 						</cfloop>
+						<td>clean</td>
 						<td>Result</td>
 					</tr>
 					<cfloop query="QData">
@@ -136,6 +137,7 @@
 								<cfloop list="#colNames#" index="fld">
 									<td>#Evaluate(fld)#</td>
 								</cfloop>
+								<td>#loc.cleanValue#</td>
 								<td>#insertCount#</td>
                             </tr>
                         </cfif>

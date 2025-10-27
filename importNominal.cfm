@@ -74,43 +74,47 @@
 		<cfset loc.inFilter=true>
 		<cfset loc.inRange=true>
         <cfset loc.trans = []>
+		<cfset loc.i = 0>
 		
 		<cfspreadsheet action="read" src="#args.fileName#" name="spready">
 		<cfset SpreadsheetSetActiveSheet(spready,"Bank Recon")>
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
 
-		<cfloop from="1" to="#reconInfo.rowCount#" index="i" step="50">
+		<cfloop from="1" to="#reconInfo.rowCount#" index="loc.i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
-				columns="1-12" rows="#i#-#i+49#" headerrow="1" excludeHeaderRow="true" />
+				columns="1-12" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
 			<!---<cfdump var="#QData#" label="QData" expand="false">--->
             <cfset colNames = QData.ColumnList>
 			<cfoutput>
-				<table class="tableStyle" border="1">
-                    <tr>
-                    <cfloop list="#colNames#" index="fld">
-                        <td>#fld#</td>
-                    </cfloop>
-                    </tr>
+				<table class="tableStyle" border="1" width="100%">
+					<tr>	<!--- data block header --->
+						<cfloop list="#colNames#" index="fld">
+							<td>#fld#</td>
+						</cfloop>
+						<td>Result</td>
+					</tr>
 					<cfloop query="QData">
 						<cfset loc.exists = 0>
 						<cfset loc.inRange = true>
 						<cfif StructKeyExists(args,"form")>
 							<cfset loc.inRange = Qdata.Date GTE args.form.srchDateFrom AND (Qdata.Date LTE args.form.srchDateTo OR len(args.form.srchDateTo) IS 0)>
-                            <cfset loc.inRange = loc.inRange AND Evaluate(srchColName) eq srchFilter>
+                            <!---<cfif len(srchFilter)><cfset loc.inRange = loc.inRange AND (Evaluate(srchColName) eq srchFilter)></cfif>--->
+                           	<cfif len(srchFilter)><cfset loc.inRange = loc.inRange AND (FindNoCase(srchFilter,Evaluate(srchColName),1) gt 0)></cfif>
 						</cfif>
 						<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 							SELECT *
 							FROM tblTrans
 							WHERE trnRef='#Ref#'
 						</cfquery>
-                        <cfset loc.cleanValue = val(Value)>
+                        <!---<cfset loc.cleanValue = val(Value)>--->
+						<cfset loc.cleanValue = ReReplace(Value,"[^0-9.\-]","","all")>
 						<cfif loc.QCheckExists.recordcount gt 0>
 							<cfset loc.exists = 1>
 							<cfset recordCount++>
 						<cfelseif loc.inRange AND loc.cleanValue neq 0>
 							<cfset insertCount++>
 							<cfset loc.rec = {
-                                "trnDate" = LSDateFormat(Date,'yyyy-mm-dd'),
+                                "trnDate" = acc.FormatDate(Date,'yyyy-mm-dd'),
                                 "trnRef" = Ref,
                                 "trnDesc" = Description,
 								"items" = [
@@ -129,9 +133,10 @@
 						</cfif>
 						<cfif loc.inRange>
                         	<tr>
-                            <cfloop list="#colNames#" index="fld">
-                                <td>#Evaluate(fld)#</td>
-                            </cfloop>
+								<cfloop list="#colNames#" index="fld">
+									<td>#Evaluate(fld)#</td>
+								</cfloop>
+								<td>#insertCount#</td>
                             </tr>
                         </cfif>
 					</cfloop>
@@ -139,13 +144,12 @@
                 <!---<cfdump var="#loc.trans#" label="loc.trans" expand="false">--->
 			</cfoutput>
 		</cfloop>
-
 		<cfreturn loc.result>
 	</cffunction>
 		
 	<cffunction name="InsertTran" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
-      <!---  <cfdump var="#args#" label="args" expand="false">--->
+     	<!---  <cfdump var="#args#" label="args" expand="false"> --->
 		<cfset var loc={}>
 		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 			SELECT *
@@ -156,7 +160,7 @@
 			<cfquery name="loc.QInsertTran" datasource="#application.site.datasource1#" result="loc.QInsertTranResult">
 				INSERT INTO tblTrans
 					(trnLedger,trnRef,trnDate,trnDesc,trnType,trnAlloc,trnActive)
-				VALUES ('nom','#args.trnRef#','#DateFormat(args.trnDate,"yyyy-mm-dd")#','#args.trnDesc#','nom',1,1)
+				VALUES ('nom','#args.trnRef#','#acc.FormatDate(args.trnDate,"yyyy-mm-dd")#','#args.trnDesc#','nom',1,1)
 			</cfquery>
 			<cfset loc.tranID = loc.QInsertTranResult.generatedKey>
             <cfset loc.str = "">
@@ -164,14 +168,16 @@
                 <cfset loc.str = "#loc.str#(#loc.rec.niNomID#,#loc.tranID#,#loc.rec.niAmount#),">
             </cfloop>
             <cfset loc.str = RemoveChars(loc.str, len(loc.str),1)>
-            <!---<cfdump var="#loc.str#" label="loc.str" expand="false">--->
+            <!--- <cfdump var="#loc.str#" label="loc.str" expand="false"> --->
 			<cfquery name="loc.QInsertItems" datasource="#application.site.datasource1#">
 				INSERT INTO tblNomItems
 					(niNomID,niTranID,niAmount)
 				VALUES
                 	#loc.str#
 			</cfquery>
-		</cfif>       
+			<cfreturn "Inserted">    
+		</cfif> 
+		<cfreturn "Exists">
 	</cffunction>
     		
 <!--- main --->
@@ -187,7 +193,7 @@
 				<cfset parm.process=form.srchMode EQ 2>
 				<cfset parm.fileName="#application.site.dir_data#spreadsheets\#fileSrc#">
 				<cfoutput><p class="title">#parm.fileName#</p></cfoutput>
-				<h1><cfif form.srchMode eq 2>Import<cfelse>View</cfif></h1>
+				<h1><cfif form.srchMode eq 2>Import<cfelse>View</cfif> Transactions</h1>
 				<cfset processSheet(parm)>
 			</cfloop>
 			<cfoutput>
@@ -230,14 +236,14 @@
 			<td><input type="text" name="srchDateTo" value="#srchDateTo#" size="15" class="datepicker" /></td>
 		</tr>
 		<tr>
-			<td>Match Column Name</td>
+			<td>Using Column Name:</td>
 			<td>
             	<select name="srchColName" class="select">
                 	<cfloop list="#colNames#" index="fld">
                     	<option value="#fld#"<cfif fld is srchColName> selected="selected"</cfif>>#fld#</option>
                     </cfloop>
             	</select>
-                To: <input type="text" name="srchFilter" value="#srchFilter#" size="15" />
+                Find This: <input type="text" name="srchFilter" value="#srchFilter#" size="15" />
             </td>
 		</tr>
 		<tr>
@@ -247,7 +253,7 @@
 					<option value="">Select...</option>
 					<cfloop array="#nominals.nomArray#" index="nom">
 						<option value="#nom.nomID#"<cfif nom.nomID is srchDebit> selected="selected"</cfif>>
-							#NumberFormat(nom.nomID,'0000')# - #nom.nomGroup# - #nom.nomCode# - #nom.nomTitle#</option>
+							#nom.nomTitle# - #nom.nomGroup# - #nom.nomCode# - #NumberFormat(nom.nomID,'0000')#</option>
 					</cfloop>
 				</select>
 			</td>					
@@ -259,7 +265,7 @@
 					<option value="">Select...</option>
 					<cfloop array="#nominals.nomArray#" index="nom">
 						<option value="#nom.nomID#"<cfif nom.nomID is srchCredit> selected="selected"</cfif>>
-							#NumberFormat(nom.nomID,'0000')# - #nom.nomGroup# - #nom.nomCode# - #nom.nomTitle#</option>
+							#nom.nomTitle# - #nom.nomGroup# - #nom.nomCode# - #NumberFormat(nom.nomID,'0000')#</option>
 					</cfloop>
 				</select>
 			</td>					
@@ -293,7 +299,7 @@
 								<td>#currentrow#</td>
 								<td><input type="checkbox" name="srchFile" value="#name#" <cfif ListFind(srchFile,name,",")> checked </cfif> /></td>
 								<td><a href="#application.site.url_data#spreadsheets/#name#" title="download spreadsheet">#name#</a></td>
-								<td>#LSDateFormat(datelastmodified,"dd-mmm-yyyy")#</td>
+								<td>#acc.FormatDate(datelastmodified,"dd-mmm-yyyy")#</td>
 								<td align="right">#acc.FormatBytes(size)#</td>
 							</tr>
 						</cfif>

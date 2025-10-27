@@ -79,7 +79,7 @@
 		<cfspreadsheet action="read" src="#args.fileName#" name="spready">
 		<cfset SpreadsheetSetActiveSheet(spready,"Bank Recon")>
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
-
+		<cfdump var="#form#" label="form" expand="false">
 		<cfloop from="1" to="#reconInfo.rowCount#" index="loc.i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
 				columns="1-11" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />

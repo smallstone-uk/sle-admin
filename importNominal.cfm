@@ -83,7 +83,7 @@
 		<cfloop from="1" to="#reconInfo.rowCount#" index="loc.i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
 				columns="1-11" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
-			<!---<cfdump var="#QData#" label="QData" expand="false">--->
+			<cfdump var="#QData#" label="QData #loc.i#" expand="false">
             <cfset colNames = QData.ColumnList>
 			<cfoutput>
 				<table class="tableStyle" border="1" width="100%">
@@ -151,7 +151,7 @@
 		
 	<cffunction name="InsertTran" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
-     	<!---  <cfdump var="#args#" label="args" expand="false"> --->
+     	  <cfdump var="#args#" label="args" expand="false"> 
 		<cfset var loc={}>
 		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 			SELECT *
@@ -195,7 +195,7 @@
 				<cfset parm.process=form.srchMode EQ 2>
 				<cfset parm.fileName="#application.site.dir_data#spreadsheets\#fileSrc#">
 				<cfoutput><p class="title">#parm.fileName#</p></cfoutput>
-				<h1><cfif form.srchMode eq 2>Import<cfelse>View</cfif> Transactions</h1>
+				<h1><cfif form.srchMode eq 2>Import<cfelse>View</cfif> Nominal Transactions</h1>
 				<cfset processSheet(parm)>
 			</cfloop>
 			<cfoutput>

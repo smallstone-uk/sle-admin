@@ -10,7 +10,7 @@
 	<cfif StructKeyExists(parm.header, "paidCOD") AND parm.header.paidCOD AND parm.header.tranType IS 'inv'>
 		<cfset parm.header.allocate=true>	<!--- to be allocated to subsequent payment --->
 		<cfquery name="loc.QAccountID" datasource="#parm.database#">
-			SELECT accAllocID
+			SELECT accPayAcc, accAllocID
 			FROM tblAccount
 			WHERE accID = #val(parm.header.accID)#
 			LIMIT 1;
@@ -29,14 +29,20 @@
 --->
 	<cfif parm.header.allocate AND TransRecord.isNew>	<!--- write matching payment --->
 		<cfset parm.header.trnID=0>
-		<cfset parm.header.PaymentAccounts=491>		<!--- SUPP - was 181 (cash in till) --->
+		<cfif val(loc.QAccountID.accPayAcc) gt 0>
+			<cfset parm.header.PaymentAccounts=loc.QAccountID.accPayAcc>	<!--- use assigned payment method 27/10/25 --->
+			<cfset parm.header.trnRef='DC'>
+			<cfset parm.header.trnDesc='CARD Payment'>
+		<cfelse>
+			<cfset parm.header.PaymentAccounts=491>		<!--- SUPP - was 181 (cash in till) --->
+			<cfset parm.header.trnRef='SHOP'>
+			<cfset parm.header.trnDesc='COD Payment'>
+		</cfif>
 		<cfset parm.header.tranType='pay'>
 		<cfset trnTotalNum=val(Replace(parm.header.trnTotal,",","","all"))>
 		<cfset parm.header.trnAmnt1=trnTotalNum>
 		<cfset parm.header.trnAmnt2=0>
 		<cfset parm.header.trnTotal=-trnTotalNum>
-		<cfset parm.header.trnRef='SHOP'>
-		<cfset parm.header.trnDesc='COD Payment'>
 		<cfif StructKeyExists(parm.header,"paidDate")>
 			<cfif len(parm.header.paidDate)><cfset parm.header.trnDate=parm.header.paidDate></cfif>
 		</cfif>

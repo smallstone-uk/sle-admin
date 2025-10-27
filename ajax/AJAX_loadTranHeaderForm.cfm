@@ -118,7 +118,7 @@
 					<td><input type="text" name="trnID" value="#trans.trnID#" id="EditID" disabled="disabled" tabindex="-1">
 						<label>
 						<input type="checkbox" name="paidCOD" id="paidCOD" value="1" tabindex="-1" 
-							title="tick this box to create a payment entry for the same amount." /> Paid cash from till</label>
+							title="tick this box to create a payment entry for the same amount." /> Paid from account on: </label>
 					</td>
 					<th width="100" align="left">Net Amount</th>
 					<td><input type="text" name="trnAmnt1" value="#abs(trans.trnAmnt1)#" id="NetAmount" style="text-align:right;" tabindex="11"></td>

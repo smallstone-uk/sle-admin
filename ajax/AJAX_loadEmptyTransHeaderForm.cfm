@@ -150,7 +150,7 @@
 						<label>
 						<input type="checkbox" name="paidCOD" id="paidCOD" value="1" tabindex="-1" 
 							<cfif acctData.account.PAYACCNOMCODE IS "CASH"> checked="checked"</cfif>
-							title="tick this box to create a payment entry for the same amount." /> Paid cash from till on: </label>
+							title="tick this box to create a payment entry for the same amount." /> Paid from account on: </label>
 							<input type="text" name="paidDate" class="datepicker" value="" id="paidDate" tabindex="6"></td>
 						<th width="100" align="left">Net Amount</th>
 						<td><input type="text" name="trnAmnt1" value="" id="NetAmount" style="text-align:right;" tabindex="9"></td>

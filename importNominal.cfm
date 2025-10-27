@@ -126,6 +126,9 @@
 								]
                             }>
                             <cfset ArrayAppend(loc.trans,loc.rec)>
+                            	<tr>
+									<td><cfdump var="#loc#" label="#Date#" expand="false"></td>
+                                </tr>
 							<cfif srchMode eq 2>
                             	<tr>
 									<td><cfset InsertTran(loc.rec)></td>
@@ -151,7 +154,7 @@
 		
 	<cffunction name="InsertTran" access="public" returntype="string">
 		<cfargument name="args" type="struct" required="yes">
-     	  <cfdump var="#args#" label="args" expand="false"> 
+     	  <cfdump var="#args#" label="InsertTran" expand="false"> 
 		<cfset var loc={}>
 		<cfquery name="loc.QCheckExists" datasource="#application.site.datasource1#">
 			SELECT *

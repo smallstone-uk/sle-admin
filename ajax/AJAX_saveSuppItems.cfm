@@ -10,7 +10,7 @@
 	<cfif StructKeyExists(parm.header, "paidCOD") AND parm.header.paidCOD AND parm.header.tranType IS 'inv'>
 		<cfset parm.header.allocate=true>	<!--- to be allocated to subsequent payment --->
 		<cfquery name="loc.QAccountID" datasource="#parm.database#">
-			SELECT accPayAcc, accAllocID
+			SELECT accCode,accPayAcc,accAllocID
 			FROM tblAccount
 			WHERE accID = #val(parm.header.accID)#
 			LIMIT 1;
@@ -32,7 +32,7 @@
 		<cfif val(loc.QAccountID.accPayAcc) gt 0>
 			<cfset parm.header.PaymentAccounts=loc.QAccountID.accPayAcc>	<!--- use assigned payment method 27/10/25 --->
 			<cfset parm.header.trnRef='DC'>
-			<cfset parm.header.trnDesc='CARD Payment'>
+			<cfset parm.header.trnDesc='#loc.QAccountID.accCode# CARD Payment'>
 		<cfelse>
 			<cfset parm.header.PaymentAccounts=491>		<!--- SUPP - was 181 (cash in till) --->
 			<cfset parm.header.trnRef='SHOP'>

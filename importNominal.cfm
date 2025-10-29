@@ -81,7 +81,7 @@
 		<cfset reconInfo=SpreadsheetRead(args.fileName,"Bank Recon")>
 		<cfloop from="1" to="#reconInfo.rowCount#" index="loc.i" step="50">
 			<cfspreadsheet action="read" src="#args.fileName#" sheetname="Bank Recon" query="QData"
-				columns="1-11" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
+				columns="1-12" rows="#loc.i#-#loc.i+49#" headerrow="1" excludeHeaderRow="true" />
 			<!---<cfdump var="#QData#" label="QData #loc.i#" expand="false">--->
             <cfset colNames = QData.ColumnList>
 			<cfoutput>

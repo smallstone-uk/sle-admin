@@ -38,7 +38,7 @@
 			}
 		}
 	</style>
-	
+	<cfdump var="#trans.QTrans#" label="QTrans" expand="false">
 	<body>
 		<div id="content">
 			<table id="tranTable" class="tableList" border="1" style="font-size:14px; margin-left:20px;">

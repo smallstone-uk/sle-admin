@@ -233,7 +233,7 @@
 										<cfset dayDiff = 0>
 										<cfset dayAvg = 0>
 										<cfset payFound = false>
-										<tr><th colspan="14">
+										<!---<tr><th colspan="14">
 										<cfloop array="#item.lags#" index="lagitem">
 											<cfif lagitem.diff neq 0>
 												<cfset dayDiff += lagitem.diff> #lagitem.diff# &nbsp;
@@ -243,7 +243,7 @@
 											</cfif>
 										</cfloop>
 										</th>
-										<th>#dayAvg#</th></tr>
+										<th>#dayAvg#</th></tr>--->
 										<cfif NOT payFound>
 											<cfset dayAvg = item.diff>
 										</cfif>
@@ -336,7 +336,9 @@
 								</cfif>
 								<cfif creditCount gt 0>
 									<tr>
-										<td colspan="4">#creditCount# in credit</td>
+										<td></td>
+										<td class="noPrint"></td>
+										<td colspan="2">#creditCount# in credit</td>
 										<td colspan="3">Credit Totals</td>
 										<td class="amountTotal">#showNum(credits[1])#</td>
 										<td class="amountTotal">#showNum(credits[2])#</td>
@@ -347,7 +349,9 @@
 									</tr>
 								</cfif>
 									<tr>
-										<td colspan="4">#creditCount + debitCount# transactions</td>
+										<td></td>
+										<td class="noPrint"></td>
+										<td colspan="2">#creditCount + debitCount# transactions</td>
 										<td colspan="3">Aged Totals</td>
 										<td class="amountTotal">#showNum(credits[1] + totals[1])#</td>
 										<td class="amountTotal">#showNum(credits[2] + totals[2])#</td>

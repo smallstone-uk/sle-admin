@@ -67,6 +67,7 @@
 											<option value="">Select...</option>
 											<option value="1"<cfif srchReport eq "1"> selected="selected"</cfif>>Aged Debtors</option>
 											<option value="2"<cfif srchReport eq "2"> selected="selected"</cfif>>Shop Payments Reconcilliation</option>
+											<option value="3"<cfif srchReport eq "3"> selected="selected"</cfif>>Aged Payments</option>
 										</select>
 									</td>
 								</tr>
@@ -421,8 +422,54 @@
 									</cfloop>
 								</table>
 							</cfoutput>
-						</cfif>
-					</cfif>
+						</cfif> <!--- date check--->
+						
+					<cfelseif form.srchReport eq 3>
+						<cfset debtors = news.AgedPayments(parms)>
+						<cfset months = ListSort(StructKeyList(debtors.months,","),"text","asc")>
+						<cfset methods = ListSort(StructKeyList(debtors.methTree,","),"text","asc")>
+						<cfoutput>
+							<table border="1" class="tableList">
+								<tr>
+									<th>Method</th>
+									<cfloop list="#months#" index="key">
+										<th colspan="2">#key#</th>
+									</cfloop>
+									<th colspan="2">Totals</th>
+								</tr>
+								<tr>
+									<td></td>
+									<cfloop list="#months#" index="key">
+										<td align="center">Count</td><td align="right">Value</td>
+									</cfloop>
+									<td align="center">Count</td><td align="right">Value</td>
+								</tr>
+								<cfloop list="#methods#" index="method">
+									<tr>
+										<cfset item = StructFind(debtors.methTree,method)>
+										<td>#method#</td>
+										<cfloop list="#months#" index="key">
+											<cfset data = StructFind(item,key)>
+											<td align="center">#data.count#</td>
+											<td align="right">#DecimalFormat(data.value)#</td>
+										</cfloop>
+										<td align="center">#item.count#</td>
+										<td align="right">#item.value#</td>
+									</tr>
+								</cfloop>
+								<tr>
+									<th>Totals</th>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<th align="center">#total.count#</th>
+										<th align="right">#DecimalFormat(total.value)#</th>
+									</cfloop>
+									<th align="center">#StructFind(debtors.grandTotal,"count")#</th>
+									<th align="right">#DecimalFormat(StructFind(debtors.grandTotal,"value"))#</th>
+								</tr>
+							</table>
+						</cfoutput>		
+					</cfif>	<!--- report select --->
 				</cfif>
 			</div>
 		</div>

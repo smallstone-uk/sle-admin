@@ -152,9 +152,6 @@
 						WHERE cltRef=#cltRef#
 					</cfquery>
 				</cfif>
-				<!---<cfif Round(item.balance0) eq 0 AND skipZeros>
-				int(item.balance0 * 100)/100
-				<cfif ((int(item.balance0 * 100)/100) eq 0) AND skipZeros>--->
 				<cfset item.balance0 = int(item.balance0 * 1000 ) / 1000>
 				<cfif item.balance0 eq 0 AND skipZeros>
 				<cfelseif (item.balance0 gt minVal OR minVal eq 0)>
@@ -162,12 +159,7 @@
 					<cfset ArrayAppend(result.balances,"#Numberformat(item.balance0,'000000.00')#_#ArrayLen(result.clients)#")>
 				<cfelse>
 					<cfdump var="#item#" label="#cltRef#" expand="false">
-				</cfif>
-
-				<!---<cfdump var="#item#" label="item" expand="true">--->
-				<!---<cfif currentrow gt 50><cfbreak></cfif>--->
-				
-
+				</cfif>				
 			</cfloop>
 			<cfset ArraySort(result.balances,"text","desc")>
 			
@@ -179,19 +171,82 @@
 		<cfreturn result>
 	</cffunction>
 
-	<cffunction name="myFunction" access="public" returntype="struct">
+	<cffunction name="AgedPayments" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
+		<cfset loc.methTree = {}>
+		<cfset loc.months = {}>
+		<cfset loc.grandTotal = {value = 0, count = 0}>
 		
 		<cftry>
-			<cfquery name="loc.QQuery" datasource="#args.datasource#" result="loc.QQueryResult">
-				SELECT *
-				FROM table
-				WHERE ID=#val(id)#
-				LIMIT 1;
+			<cfquery name="loc.QMethods" datasource="#args.datasource#">
+				SELECT DISTINCT trnMethod, trnType
+				FROM tblTrans
+				WHERE trnAccountID = 4
+				AND trnType IN ('pay','jnl')
+				<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc = 0</cfif>
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 			</cfquery>
-			<cfset loc.result.QQuery = loc.QQuery>
+			<cfset loc.thisDate = DateFormat(args.form.srchDateFrom,'yyyy-mm')>
+			<cfset loc.lastDate = args.form.srchDateTo>
+			<cfloop condition="loc.thisDate LTE loc.lastDate">
+				<cfset StructInsert(loc.months,loc.thisDate,{value = 0, count = 0})>
+				<cfset loc.thisDate = DateFormat(DateAdd("m",1,loc.thisDate),'yyyy-mm')>
+			</cfloop>
+			<cfset loc.result.methods = loc.QMethods>
+			<cfloop query="loc.QMethods">
+				<cfif len(trnMethod) eq 0>
+					<cfset loc.method = trnType>
+				<cfelse>
+					<cfset loc.method = trnMethod>
+				</cfif>
+				<cfif !StructKeyExists(loc.methTree,loc.method)>
+					<cfset StructInsert(loc.methTree,loc.method,Duplicate(loc.months))>
+					<cfset loc.tree = StructFind(loc.methTree,loc.method)>
+					<cfset loc.tree.value = 0>
+					<cfset loc.tree.count = 0>
+				</cfif>
+			</cfloop>
+			<cfquery name="loc.QTrans" datasource="#args.datasource#">
+				SELECT tblTrans.*, DATE_FORMAT( trnDate, '%Y-%m' ) AS YYMM
+				FROM tblTrans
+				WHERE trnAccountID = 4
+				AND trnType IN ('pay','jnl')
+				<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc = 0</cfif>
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+				ORDER BY trnDate
+			</cfquery>
+			<cfloop query="loc.QTrans">
+				<cfif len(trnMethod) eq 0>
+					<cfset loc.method = trnType>
+				<cfelse>
+					<cfset loc.method = trnMethod>
+				</cfif>
+				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+				<cfset loc.midge = StructFind(loc.methTree,loc.method)>
+				<cfset loc.modge = StructFind(loc.midge,loc.thisDate)>
+				<cfset loc.mudge = StructFind(loc.months,loc.thisDate)>
+				
+				<cfset loc.midge.value += trnAmnt1>
+				<cfset loc.midge.count++>
+				
+				<cfset loc.modge.value += trnAmnt1>
+				<cfset loc.modge.count++>
+				
+				<cfset loc.mudge.value += trnAmnt1>
+				<cfset loc.mudge.count++>
+				
+				<cfset loc.grandTotal.value += trnAmnt1>
+				<cfset loc.grandTotal.count++>
+				
+			</cfloop>
+			<cfset loc.result.methTree = loc.methTree>
+			<cfset loc.result.months = loc.months>
+			<cfset loc.result.grandTotal = loc.grandTotal>
+			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

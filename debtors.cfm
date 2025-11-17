@@ -426,9 +426,13 @@
 						
 					<cfelseif form.srchReport eq 3>
 						<cfset debtors = news.AgedPayments(parms)>
-						<cfset months = ListSort(StructKeyList(debtors.months,","),"text","asc")>
-						<cfset methods = ListSort(StructKeyList(debtors.methTree,","),"text","asc")>
 						<cfoutput>
+							<cfif len(debtors.msg) gt 0>
+								#debtors.msg#
+								<cfexit>
+							</cfif>
+							<cfset months = ListSort(StructKeyList(debtors.months,","),"text","asc")>
+							<cfset methods = ListSort(StructKeyList(debtors.methTree,","),"text","asc")>
 							<table border="1" class="tableList">
 								<tr>
 									<th>Method</th>
@@ -454,7 +458,7 @@
 											<td align="right">#DecimalFormat(data.value)#</td>
 										</cfloop>
 										<td align="center">#item.count#</td>
-										<td align="right">#item.value#</td>
+										<td align="right">#DecimalFormat(item.value)#</td>
 									</tr>
 								</cfloop>
 								<tr>

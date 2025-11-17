@@ -178,6 +178,8 @@
 		<cfset loc.methTree = {}>
 		<cfset loc.months = {}>
 		<cfset loc.grandTotal = {value = 0, count = 0}>
+		<cfset loc.abort = false>
+		<cfset loc.result.msg = "">
 		
 		<cftry>
 			<cfquery name="loc.QMethods" datasource="#args.datasource#">
@@ -185,10 +187,15 @@
 				FROM tblTrans
 				WHERE trnAccountID = 4
 				AND trnType IN ('pay','jnl')
-				<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc = 0</cfif>
-				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
-				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'
+					<cfelse><cfset loc.abort = true></cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'
+					<cfelse><cfset loc.abort = true></cfif>
 			</cfquery>
+			<cfif loc.abort>
+				<cfset loc.result.msg = "date range has not been specified correctly.">
+				<cfreturn loc.result>
+			</cfif>
 			<cfset loc.thisDate = DateFormat(args.form.srchDateFrom,'yyyy-mm')>
 			<cfset loc.lastDate = args.form.srchDateTo>
 			<cfloop condition="loc.thisDate LTE loc.lastDate">

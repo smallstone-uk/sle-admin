@@ -426,6 +426,7 @@
 						
 					<cfelseif form.srchReport eq 3>
 						<cfset debtors = news.AgedPayments(parms)>
+						<!---<cfdump var="#debtors#" label="debtors" expand="false">--->
 						<cfoutput>
 							<cfif len(debtors.msg) gt 0>
 								#debtors.msg#
@@ -433,9 +434,11 @@
 							</cfif>
 							<cfset months = ListSort(StructKeyList(debtors.months,","),"text","asc")>
 							<cfset methods = ListSort(StructKeyList(debtors.methTree,","),"text","asc")>
+							<cfset colCount = ListLen(months,",")>
+							
 							<table border="1" class="tableList">
 								<tr>
-									<th>Method</th>
+									<th width="150">Method</th>
 									<cfloop list="#months#" index="key">
 										<th colspan="2">#key#</th>
 									</cfloop>
@@ -462,7 +465,7 @@
 									</tr>
 								</cfloop>
 								<tr>
-									<th>Totals</th>
+									<th>Round Income</th>
 									<cfloop list="#months#" index="key">
 										<cfset total = StructFind(debtors.months,key)>
 										<th align="center">#total.count#</th>
@@ -471,7 +474,70 @@
 									<th align="center">#StructFind(debtors.grandTotal,"count")#</th>
 									<th align="right">#DecimalFormat(StructFind(debtors.grandTotal,"value"))#</th>
 								</tr>
-							</table>
+								<tr>
+									<th>Counter Sales</th>
+									<cfset rowtotal = 0>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<cfset rowtotal += total.sales>
+										<th align="center"></th>
+										<th align="right">#DecimalFormat(total.sales)#</th>
+									</cfloop>
+									<th></th>
+									<th align="right">#DecimalFormat(rowtotal)#</th>
+								</tr>
+								<tr>
+									<th>Total Income</th>
+									<cfset rowtotal = 0>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<cfset rowtotal += (total.sales + total.value)>
+										<th align="center"></th>
+										<th align="right">#DecimalFormat(total.sales + total.value)#</th>
+									</cfloop>
+									<th></th>
+									<th align="right">#DecimalFormat(rowtotal)#</th>
+								</tr>
+								<tr>
+									<td colspan="#colCount#">&nbsp;</td>
+								</tr>
+								<tr>
+									<th>Smiths Stock</th>
+									<cfset rowtotal = 0>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<cfset rowtotal += total.purch>
+										<th align="center"></th>
+										<th align="right">#DecimalFormat(total.purch)#</th>
+									</cfloop>
+									<th></th>
+									<th align="right">#DecimalFormat(rowtotal)#</th>
+								</tr>
+								<tr>
+									<th>Drivers Pay</th>
+									<cfset rowtotal = 0>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<cfset rowtotal += total.driver>
+										<th align="center"></th>
+										<th align="right">#DecimalFormat(total.driver)#</th>
+									</cfloop>
+									<th></th>
+									<th align="right">#DecimalFormat(rowtotal)#</th>
+								</tr>
+								<tr>
+									<th>Gross Profit</th>
+									<cfset rowtotal = 0>
+									<cfloop list="#months#" index="key">
+										<cfset total = StructFind(debtors.months,key)>
+										<cfset rowtotal += (total.purch - total.value - total.sales - total.driver)>
+										<th align="center"></th>
+										<th align="right">#DecimalFormat(total.purch - total.value - total.sales - total.driver)#</th>
+									</cfloop>
+									<th></th>
+									<th align="right">#DecimalFormat(rowtotal)#</th>
+								</tr>
+							</table>#colCount#
 						</cfoutput>		
 					</cfif>	<!--- report select --->
 				</cfif>

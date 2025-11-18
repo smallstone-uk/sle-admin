@@ -177,6 +177,7 @@
 		<cfset loc.result = {}>
 		<cfset loc.methTree = {}>
 		<cfset loc.months = {}>
+		<cfset loc.purch = {}>
 		<cfset loc.grandTotal = {value = 0, count = 0}>
 		<cfset loc.abort = false>
 		<cfset loc.result.msg = "">
@@ -199,10 +200,10 @@
 			<cfset loc.thisDate = DateFormat(args.form.srchDateFrom,'yyyy-mm')>
 			<cfset loc.lastDate = args.form.srchDateTo>
 			<cfloop condition="loc.thisDate LTE loc.lastDate">
-				<cfset StructInsert(loc.months,loc.thisDate,{value = 0, count = 0})>
+				<cfset StructInsert(loc.months,loc.thisDate,{value = 0, count = 0, purch = 0, driver = 0, sales = 0})>
 				<cfset loc.thisDate = DateFormat(DateAdd("m",1,loc.thisDate),'yyyy-mm')>
 			</cfloop>
-			<cfset loc.result.methods = loc.QMethods>
+			<cfset loc.purch = Duplicate(loc.months)>
 			<cfloop query="loc.QMethods">
 				<cfif len(trnMethod) eq 0>
 					<cfset loc.method = trnType>
@@ -250,9 +251,62 @@
 				<cfset loc.grandTotal.count++>
 				
 			</cfloop>
+			
+			<cfquery name="loc.QPurTrans" datasource="#args.datasource#">	<!--- load smiths payments --->
+				SELECT *  
+				FROM `tbltrans` 
+				WHERE `trnAccountID` = 351 
+				AND `trnType` = 'pay'
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+			</cfquery>
+			<cfloop query="loc.QPurTrans">
+				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+				<cfset loc.smooze = StructFind(loc.purch,loc.thisDate)>
+				<cfset loc.smooze.value += trnAmnt1>
+				<cfset loc.smooze.count++>
+				
+				<cfset loc.mudge = StructFind(loc.months,loc.thisDate)>
+				<cfset loc.mudge.purch += trnAmnt1>
+			</cfloop>
+
+			<cfquery name="loc.QDriverTrans" datasource="#args.datasource#">	<!--- load drivers payments --->
+				SELECT trnDate, niAmount
+				FROM tblNomItems
+				INNER JOIN tblNominal ON niNomID = nomID
+				INNER JOIN tblTrans ON niTranId = trnID
+				WHERE niNomID = 2092
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+			</cfquery>
+			<cfloop query="loc.QDriverTrans">
+				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+				<cfset loc.chisel = StructFind(loc.months,loc.thisDate)>
+				<cfset loc.chisel.driver += niAmount>
+			</cfloop>
+			
+			<cfquery name="loc.QCounterSales" datasource="#args.datasource#">	<!--- load drivers payments --->
+				SELECT trnDate, niAmount
+				FROM tblNomItems
+				INNER JOIN tblNominal ON niNomID = nomID
+				INNER JOIN tblTrans ON niTranId = trnID
+				WHERE niNomID = 761
+				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
+				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
+			</cfquery>
+			<cfloop query="loc.QCounterSales">
+				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+				<cfset loc.chisel = StructFind(loc.months,loc.thisDate)>
+				<cfset loc.chisel.sales += niAmount>
+			</cfloop>
+			
 			<cfset loc.result.methTree = loc.methTree>
 			<cfset loc.result.months = loc.months>
+			<cfset loc.result.purch = loc.purch>
 			<cfset loc.result.grandTotal = loc.grandTotal>
+			<cfset loc.result.QPurTrans = loc.QPurTrans>
+			<cfset loc.result.QDriverTrans = loc.QDriverTrans>
+			<cfset loc.result.QCounterSales = loc.QCounterSales>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

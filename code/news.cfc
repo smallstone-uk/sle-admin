@@ -222,7 +222,7 @@
 				FROM tblTrans
 				WHERE trnAccountID = 4
 				AND trnType IN ('pay','jnl')
-				<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc = 0</cfif>
+				<!---<cfif StructKeyExists(args.form,"srchSkipAllocated")>AND trnAlloc = 0</cfif>--->
 				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 				ORDER BY trnDate
@@ -233,12 +233,12 @@
 				<cfelse>
 					<cfset loc.method = trnMethod>
 				</cfif>
-				<cfif trnPaidIn gt 0>
+				<!---<cfif trnPaidIn gt 0> 	crashes if date paid in is beyond date range
 					<cfset loc.tranDate = "20#mid(trnPaidIn,1,2)#-#mid(trnPaidIn,3,2)#-#mid(trnPaidIn,5,2)#">
 				<cfelse>
 					<cfset loc.tranDate = trnDate>
-				</cfif>
-				<cfset loc.thisDate = DateFormat(loc.tranDate,'yyyy-mm')>
+				</cfif>--->
+				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
 				<cfset loc.midge = StructFind(loc.methTree,loc.method)>
 				<cfset loc.modge = StructFind(loc.midge,loc.thisDate)>
 				<cfset loc.mudge = StructFind(loc.months,loc.thisDate)>
@@ -261,7 +261,7 @@
 				SELECT *  
 				FROM `tbltrans` 
 				WHERE `trnAccountID` = 351 
-				AND `trnType` = 'pay'
+				AND trnType IN ('pay','jnl','rfd')
 				<cfif StructKeyExists(args.form,"srchDateFrom") AND IsDate(args.form.srchDateFrom)>AND trnDate >= '#args.form.srchDateFrom#'</cfif>
 				<cfif StructKeyExists(args.form,"srchDateTo") AND IsDate(args.form.srchDateTo)>AND trnDate <= '#args.form.srchDateTo#'</cfif>
 			</cfquery>

@@ -233,7 +233,12 @@
 				<cfelse>
 					<cfset loc.method = trnMethod>
 				</cfif>
-				<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+				<cfif trnPaidIn gt 0>
+					<cfset loc.tranDate = "20#mid(trnPaidIn,1,2)#-#mid(trnPaidIn,3,2)#-#mid(trnPaidIn,5,2)#">
+				<cfelse>
+					<cfset loc.tranDate = trnDate>
+				</cfif>
+				<cfset loc.thisDate = DateFormat(loc.tranDate,'yyyy-mm')>
 				<cfset loc.midge = StructFind(loc.methTree,loc.method)>
 				<cfset loc.modge = StructFind(loc.midge,loc.thisDate)>
 				<cfset loc.mudge = StructFind(loc.months,loc.thisDate)>
@@ -307,6 +312,7 @@
 			<cfset loc.result.QPurTrans = loc.QPurTrans>
 			<cfset loc.result.QDriverTrans = loc.QDriverTrans>
 			<cfset loc.result.QCounterSales = loc.QCounterSales>
+			<cfset loc.result.QTrans = loc.QTrans>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

@@ -526,7 +526,7 @@
 									<th align="right">#DecimalFormat(rowtotal)#</th>
 								</tr>
 								<tr>
-									<th>Gross Profit</th>
+									<th>Balance Remaining</th>
 									<cfset rowtotal = 0>
 									<cfloop list="#months#" index="key">
 										<cfset total = StructFind(debtors.months,key)>

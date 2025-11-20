@@ -7,37 +7,50 @@
 </head>
 
 <body>
-
-<cfquery name="QBirthdays" datasource="#application.site.datasource1#">
-	SELECT 
-		empDOB,empStart,MONTH(empDOB )*100 + DAY(empDOB) AS mmdd, 
-		empFirstName,empLastName,CONCAT(LPAD(DAY(empDOB),2,'0'),'-',MONTHNAME(empDOB)) AS Birthday, 
-		FLOOR(DATEDIFF(CurDate(),empDOB)/365) AS Age
-	FROM tblemployee
-	WHERE empStatus = 'active' 
-	ORDER BY mmdd ASC
-</cfquery>
-
-<cfoutput>
-<table class="tableList" width="500" border="1">
-	<tr>
-		<th>Name</th>
-		<th>Birthday</th>
-		<th>Age</th>
-		<th>Start Date</th>
-	</tr>
-	<cfloop query="QBirthdays">
-	<tr>
-		<td>#empFirstName# #empLastName#</td>
-		<td>#Birthday#</td>
-		<td align="center">#Age#</td>
-		<td>#DateFormat(empStart,'dd-mmm-yyyy')#</td>
-	</tr>
-	</cfloop>
-	<tr>
-		<th colspan="4">#QBirthdays.recordCount# current employees as at: #DateFormat(Now(),'dd-mmm-yyyy')#</th>
-	</tr>
-</table>
-</cfoutput>
+	<cfparam name="all" default="false">
+	<cfparam name="sort" default="birthdate">
+	<cfquery name="QBirthdays" datasource="#application.site.datasource1#">
+		SELECT 
+			empDOB,empStart,empLeave,MONTH(empDOB )*100 + DAY(empDOB) AS mmdd, 
+			empFirstName,empLastName,CONCAT(LPAD(DAY(empDOB),2,'0'),'-',MONTHNAME(empDOB)) AS Birthday, 
+			FLOOR(DATEDIFF(CurDate(),empDOB)/365) AS Age,
+			IF (LENGTH(empLeave) > 0, ROUND(DATEDIFF(empLeave,empStart)/365,2),
+				ROUND(DATEDIFF(CurDate(),empStart)/365,2)) AS Service
+		FROM tblemployee
+		WHERE 1
+		<cfif all eq false>AND empStatus = 'active' </cfif>
+		<cfif sort eq 'birthdate'>
+			ORDER BY mmdd ASC
+		<cfelse>
+			ORDER BY empLastName ASC
+		</cfif>
+	</cfquery>
+	<p>all = show all employees</p>
+	<p>birthdate = order by birthday</p>
+	<cfoutput>
+		<table class="tableList" border="1">
+			<tr>
+				<th>Name</th>
+				<th>Birthday</th>
+				<th>Age</th>
+				<th width="100">Start Date</th>
+				<th width="100">Leave Date</th>
+				<th>Service</th>
+			</tr>
+			<cfloop query="QBirthdays">
+				<tr>
+					<td>#empLastName# #empFirstName#</td>
+					<td>#Birthday#</td>
+					<td align="center">#Age#</td>
+					<td>#DateFormat(empStart,'dd-mmm-yyyy')#</td>
+					<td>#DateFormat(empLeave,'dd-mmm-yyyy')#</td>
+					<td align="center">#Service#</td>
+				</tr>
+			</cfloop>
+			<tr>
+				<th colspan="5">#QBirthdays.recordCount# records as at: #DateFormat(Now(),'dd-mmm-yyyy')#</th>
+			</tr>
+		</table>
+	</cfoutput>
 </body>
 </html>

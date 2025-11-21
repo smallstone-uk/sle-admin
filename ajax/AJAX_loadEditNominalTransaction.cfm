@@ -6,7 +6,7 @@
 <cfset parm.form = DeserializeJSON(formData)>
 <cfset parm.tranID = val(tranID)>
 <cfset tran = acc.LoadNominalTransaction(parm)>
-<cfset nominal_accounts = acc.LoadNominalAccounts(parm)>
+<cfset nominal_accounts = acc.LoadNominalAccounts2(parm)>
 
 <cfoutput>
 	<div class='module NT_Header'>
@@ -48,18 +48,8 @@
 				<td><input type="text" name="tranDate" class="datepicker" value="#LSDateFormat(tran.header.trnDate, 'dd/mm/yyyy')#" /></td>
 				<th align="left">VAT Amount</th>
 				<td><input type="text" name="tranVATAmnt" value="#tran.header.trnAmnt2#" /></td>
-				<th>Type</th>
-				<td>
-					<!---<select name="tranType">
-						<option value="inv" <cfif tran.header.trnType eq "inv">selected="selected"</cfif>>Invoice</option>
-						<option value="crn" <cfif tran.header.trnType eq "crn">selected="selected"</cfif>>Credit Note</option>
-						<option value="pay" <cfif tran.header.trnType eq "pay">selected="selected"</cfif>>Payment</option>
-						<option value="rfd" <cfif tran.header.trnType eq "rfd">selected="selected"</cfif>>Refund</option>
-						<option value="jnl" <cfif tran.header.trnType eq "jnl">selected="selected"</cfif>>Credit Journal</option>
-						<option value="dbt" <cfif tran.header.trnType eq "dbt">selected="selected"</cfif>>Debit Journal</option>
-						<option value="nom" <cfif tran.header.trnType eq "nom">selected="selected"</cfif>>Nominal</option>
-					</select>--->
-				</td>
+				<th></th>
+				<td></td>
 			</tr>
 			<tr>
 				<th align="left">Trans Ref</th>
@@ -180,9 +170,21 @@
 							<a href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();writeTotals();" class="delRow" tabindex="-1" title="Delete Row"></a>
 						</td>
 						<td>
+<!---						old layout
 							<select name="nomAccount" class="nomAccountSel">
 								<cfloop array="#nominal_accounts#" index="i">
 									<option value="#i.nomID#" <cfif val(i.nomID) is val(item.niNomID)>selected="true"</cfif>>#i.nomCode# - #i.nomTitle#</option>
+								</cfloop>
+							</select>
+--->
+							<select name="nomAccount" class="nomAccountSel">
+								<cfset groupTitle = "">
+								<cfloop query="nominal_accounts.QNomList">
+									<cfif groupTitle neq ngTitle>
+										<option disabled="disabled" class="optiondisabled">#nomGroup# - #ngTitle#</option>
+									</cfif>
+									<option value="#nomID#" <cfif val(nomID) is val(item.niNomID)>selected="true"</cfif>>#nomTitle# - #nomCode#</option>
+									<cfset groupTitle = ngTitle>
 								</cfloop>
 							</select>
 						</td>
@@ -197,14 +199,24 @@
 					</tr>
 				</cfloop>
 			</cfif>
-			<tr class="staticItem" style="display:none;">
+			<tr class="staticItem"><!--- style="display:none;"--->
 				<td>
 					<a href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();writeTotals();" class="delRow" tabindex="-1" title="Delete Row"></a>
 				</td>
 				<td>
-					<select name="nomAccount" class="nomAccountSel">
+					<!---<select name="nomAccount" class="nomAccountSel">
 						<cfloop array="#nominal_accounts#" index="i">
 							<option value="#i.nomID#">#i.nomCode# - #i.nomTitle#</option>
+						</cfloop>
+					</select>--->
+					<select name="nomAccount" class="nomAccountSel">
+						<cfset groupTitle = "">
+						<cfloop query="nominal_accounts.QNomList">
+							<cfif groupTitle neq ngTitle>
+								<option disabled="disabled" class="optiondisabled">#nomGroup# - #ngTitle#</option>
+							</cfif>
+							<option value="#nomID#" <cfif val(nomID) is val(item.niNomID)>selected="true"</cfif>>#nomTitle# - #nomCode#</option>
+							<cfset groupTitle = ngTitle>
 						</cfloop>
 					</select>
 				</td>
@@ -230,6 +242,7 @@
 </cfoutput>
 
 <cfcatch type="any">
-	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
+	<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 </cfcatch>
 </cftry>

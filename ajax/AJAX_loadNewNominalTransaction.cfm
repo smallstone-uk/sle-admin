@@ -4,7 +4,7 @@
 <cfset parm.datasource = application.site.datasource1>
 <cfset parm.url = application.site.normal>
 <cfset parm.form = DeserializeJSON(formData)>
-<cfset nominal_accounts = acc.LoadNominalAccounts(parm)>
+<cfset nominal_accounts = acc.LoadNominalAccounts2(parm)>
 
 <cfoutput>
 	<div class='module NT_Header'>
@@ -135,6 +135,7 @@
 				});
 			});
 		</script>
+
 		<table class="tableList" border="1" width="100%">
 			<tr>
 				<th width="10"></th>
@@ -144,14 +145,21 @@
 			</tr>
 			<tr class="staticItem" style="display:none;">
 				<td>
-					<a href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();writeTotals();" class="delRow" tabindex="-1" title="Delete Row"></a>
+					<a href="javascript:void(0)" onclick="javascript:$(this).parents('tr').remove();writeTotals();" 
+						class="delRow" tabindex="-1" title="Delete Row"></a>
 				</td>
 				<td>
 					<select name="nomAccount" class="nomAccountSel">
-						<cfloop array="#nominal_accounts#" index="i">
-							<option value="#i.nomID#">#i.nomCode# - #i.nomTitle#</option>
+						<cfset groupTitle = "">
+						<cfloop query="nominal_accounts.QNomList">
+							<cfif groupTitle neq ngTitle>
+								<option disabled="disabled" class="optiondisabled">#nomGroup# - #ngTitle#</option>
+							</cfif>
+							<option value="#nomID#">#nomTitle# - #nomCode#</option>
+							<cfset groupTitle = ngTitle>
 						</cfloop>
 					</select>
+					<!--- #n.nomGroup# - #n.nomCode# - #n.nomTitle# - #n.ngiOrder# #i.nomCode# - #i.nomTitle#--->
 				</td>
 				<td class="nomAmntCell_wrap">
 					<input type="text" name="nomDebit" class="nomAmntCell" data-pos="left" style="text-align:right;" />
@@ -174,7 +182,8 @@
 	</div>
 </cfoutput>
 
-<cfcatch type="any">
-	<cfdump var="#cfcatch#" label="cfcatch" expand="no">
-</cfcatch>
+	<cfcatch type="any">
+		<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+		output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+	</cfcatch>
 </cftry>

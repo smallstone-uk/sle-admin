@@ -100,6 +100,7 @@
 									<td width="160">Customer Reference</td>
 									<td>
 										<input type="text" name="clientRef" id="clientRef" class="inputfield" size="6" maxlength="4" value="#rec#" onBlur="LoadData()" />
+										<input type="text" name="allocID" id="allocID" class="inputfield" size="3" />
 									</td>
 									<td>
 										<input type="checkbox" name="allTrans" id="allTrans" value="1" onClick="LoadData()" /> &nbsp; All transactions from: 

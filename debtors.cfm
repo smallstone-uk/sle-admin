@@ -352,7 +352,7 @@
 									<tr>
 										<td></td>
 										<td class="noPrint"></td>
-										<td colspan="2">#creditCount + debitCount# transactions</td>
+										<td colspan="2">#creditCount + debitCount# accounts.</td>
 										<td colspan="3">Aged Totals</td>
 										<td class="amountTotal">#showNum(credits[1] + totals[1])#</td>
 										<td class="amountTotal">#showNum(credits[2] + totals[2])#</td>

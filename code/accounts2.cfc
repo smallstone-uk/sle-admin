@@ -120,6 +120,7 @@
 		<cfset loc.result.args = args>
 		<cfset loc.result.bfwd = 0>
 		<cfset loc.clientRef = val(args.form.clientRef)>
+		<cfset loc.allocID = val(args.form.allocID)>
 		<cfset loc.allTrans = int(StructKeyExists(args.form,"allTrans"))>
 		<cftry>
 			<cfif loc.clientRef eq 0>
@@ -134,7 +135,9 @@
 						AND trnDate < '#args.form.srchDateFrom#'
 						AND trnAllocID = 0	<!--- ignore allocated trans --->
 					</cfquery>
-					<cfset loc.result.bfwd = val(loc.QBfwd.total)>				
+					<cfif loc.allocID eq 0>
+						<cfset loc.result.bfwd = val(loc.QBfwd.total)>	
+					</cfif>			
 				</cfif>
 				<!--- Get last allocID --->
 				<cfquery name="loc.QClient" datasource="#args.datasource1#">
@@ -158,6 +161,7 @@
 						<!---AND trnAlloc = 0--->
 					<!---</cfif>--->
 					AND trnAllocID != 0
+					<cfif loc.allocID neq 0>AND trnAllocID = #loc.allocID#</cfif>
 					ORDER BY trnAllocID, trnDate ASC, trnID	<!--- show all payments before invoices on same date --->
 					<!---LIMIT 100;--->
 				</cfquery>

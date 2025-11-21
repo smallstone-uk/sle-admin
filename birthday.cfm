@@ -25,8 +25,9 @@
 			ORDER BY empLastName ASC
 		</cfif>
 	</cfquery>
-	<p>all = show all employees</p>
-	<p>birthdate = order by birthday</p>
+	<p>all = show all employees<br />
+	sort = birthdate = order by birthday<br />
+	sort = name = order by last name</p>
 	<cfoutput>
 		<table class="tableList" border="1">
 			<tr>

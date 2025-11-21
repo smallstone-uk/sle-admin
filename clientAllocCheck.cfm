@@ -20,7 +20,7 @@
 	<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Allocation Check-#trans.cltRef#-#DateFormat(Now(),"yyyy-mm")#</title>
+		<title>Allocation Report - #trans.cltRef#-#DateFormat(Now(),"yyyy-mm")#</title>
 		<link rel="stylesheet" type="text/css" href="css/invoice.css"/>
 	</head>
 	<style type="text/css">
@@ -38,7 +38,7 @@
 			}
 		}
 	</style>
-	<cfdump var="#trans.QTrans#" label="QTrans" expand="false">
+
 	<body>
 		<div id="content">
 			<table id="tranTable" class="tableList" border="1" style="font-size:14px; margin-left:20px;">
@@ -99,7 +99,7 @@
 					<cfset allocCount = trnAllocID>
 				</cfloop>
 				<tr>
-					<td height="40" colspan="7" class="amountTotal">Transaction Total</td>
+					<td height="40" colspan="7" class="amountTotal">Report Total</td>
 					<td class="amountTotal-box">#DecimalFormat(balance)#</td>
 					<td></td>
 				</tr>

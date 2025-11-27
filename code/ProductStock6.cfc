@@ -1,13 +1,13 @@
 <cfcomponent displayname="productstock" extends="core">
 
-	<cffunction name="formatNum" access="public" returntype="string">
+	<cffunction name="xformatNum" access="public" returntype="string">
 		<cfargument name="num" type="numeric" required="yes">
 		<cfif num lt 0>
 			<cfreturn '<span class="negativeNum">#DecimalFormat(num)#</span>'>
 		<cfelseif num gt 0>
 			<cfreturn '<span class="">#DecimalFormat(num)#</span>'>
 		<cfelse>
-			<cfreturn "">
+			<cfreturn "">	<!--- zero returns blank --->
 		</cfif>
 	</cffunction>
 
@@ -788,9 +788,9 @@
 		
 		<cfset var loc = {}>
 		<cfset loc.result = "">
-		<cfset loc.pattern = "^(?:(\d{4})[-\/.](\d{2})[-\/.](\d{2})|(\d{2})[-\/.](\d{2})[-\/.](\d{4}))$">		
+		<!--- <cfset loc.pattern = "^(?:(\d{4})[-\/.](\d{2})[-\/.](\d{2})|(\d{2})[-\/.](\d{2})[-\/.](\d{4}))$">	--->
+		<cfset loc.pattern = "^(?:(\d{4})[-\/.](\d{2})[-\/.](\d{2})|(\d{2})[-\/.](\d{2})[-\/.](\d{4})|\{ts '\s*(\d{4})-(\d{2})-(\d{2})\s+\d{2}:\d{2}:\d{2}'\})$">
 		<cfset loc.matchGroups = REFind(loc.pattern, dateStr, 1, "TRUE")>
-
 		<cfif ArrayLen(loc.matchGroups.len) gt 1>
 			<cfif loc.matchGroups.len[2] GT 0>
 				<!--- Format is YYYY-MM-DD --->
@@ -802,6 +802,11 @@
 				<cfset loc.lday   = Mid(dateStr, loc.matchGroups.pos[5], loc.matchGroups.len[5])>
 				<cfset loc.lmonth = Mid(dateStr, loc.matchGroups.pos[6], loc.matchGroups.len[6])>
 				<cfset loc.lyear  = Mid(dateStr, loc.matchGroups.pos[7], loc.matchGroups.len[7])>
+			<cfelseif loc.matchGroups.len[8] GT 0>
+				<!--- Format is {ts '2025-03-07 00:00:00'} --->
+				<cfset loc.lday   = Mid(dateStr, loc.matchGroups.pos[10], loc.matchGroups.len[10])>
+				<cfset loc.lmonth = Mid(dateStr, loc.matchGroups.pos[9], loc.matchGroups.len[9])>
+				<cfset loc.lyear  = Mid(dateStr, loc.matchGroups.pos[8], loc.matchGroups.len[8])>
 			</cfif>
 			<cfset loc.dateCheck = loc.lyear & "-" & loc.lmonth & "-" & loc.lday>
 			<cfif IsDate(loc.dateCheck)>

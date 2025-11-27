@@ -26,8 +26,17 @@
 				</cfcase>
 				<cfcase value="4">
 					<cfset data = report.SalesDataCorrections(parms)>
-					<!---<cfdump var="#data#" label="SalesDataCorrections" expand="false">--->
 					<cfset report.ViewCorrections(data)>
+				</cfcase>
+				<cfcase value="5">
+					<cfset data = report.LoadBalanceSheet(parms)>
+					<cfdump var="#data#" label="BalanceSheet" expand="false">
+					<cfset report.ViewBalanceSheet(data)>
+				</cfcase>
+				<cfcase value="6">
+					<cfset data = report.LoadSuppliersReport(parms)>
+					<!---<cfdump var="#data#" label="Suppliers" expand="false">--->
+					<cfset report.ViewSuppliersReport(data)>
 				</cfcase>
 			</cfswitch>
 		</cfif>

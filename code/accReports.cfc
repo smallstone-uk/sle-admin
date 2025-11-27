@@ -34,6 +34,18 @@
 				Title = "Sales Data Corrections",
 				ID = "ID#loc.option#"
 			})>
+			<cfset loc.option++>
+			<cfset ArrayAppend(loc.result.menu, {
+				Value = #loc.option#,
+				Title = "Balance Sheet",
+				ID = "ID#loc.option#"
+			})>
+			<cfset loc.option++>
+			<cfset ArrayAppend(loc.result.menu, {
+				Value = #loc.option#,
+				Title = "Suppliers Report",
+				ID = "ID#loc.option#"
+			})>
 
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
@@ -255,7 +267,7 @@
 				</cfquery>
 				<cfset loc.runTotal = val(loc.QBfwd.Total)>
 				<cfset loc.data = 
-					{" BFwd" = {"value" = val(loc.QBfwd.Total), "VAT" = 0, "balance" = val(loc.QBfwd.Total)},
+					{" BFWD" = {"value" = val(loc.QBfwd.Total), "VAT" = 0, "balance" = val(loc.QBfwd.Total)},
 					 "Total" = {"value" = 0, "VAT" = 0, "balance" = val(loc.QBfwd.Total)}
 				}>
 					
@@ -277,7 +289,7 @@
 						<cfset loc.result.nomGroup = nomGroup>
 					</cfif>
 					<cfif !StructKeyExists(loc.data,YYMM)>
-						<cfset loc.prd = StructFind(loc.data," BFwd")>
+						<cfset loc.prd = StructFind(loc.data," BFWD")>
 						<cfset loc.prd.value += value>
 						<cfset loc.prd.VAT += VAT>
 						<cfset loc.prd.balance = loc.runTotal>
@@ -634,6 +646,442 @@
 					</tr>
 				</table>
 			</cfoutput>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="LoadBalanceSheet" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.accounts = {}>
+		
+		<cftry>
+			<cfquery name="loc.QNominals" datasource="#args.datasource#">
+				SELECT ngType,ngCode,ngTitle, nomID,nomCode,nomGroup,nomType,nomClass,nomTitle,
+					(SELECT count(*) FROM tblNomItems WHERE niNomID = nomID) AS ItemCount,
+					SUM(niAmount) AS total
+				FROM tblNominal 
+				LEFT JOIN tblNomGroups ON ngCode = nomGroup 
+				INNER JOIN tblNomItems ON niNomID = nomID
+				WHERE ngType = 'bs'
+				GROUP BY ngType, ngCode, nomCode
+				ORDER BY ngType, ngCode, nomCode;
+			</cfquery>
+			<cfset loc.result.QNominals = loc.QNominals>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="ViewBalanceSheet" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfoutput>
+				<table class="tableList" border="1">
+					<tr>
+						<th>Group Type</th>
+						<th>Group Code</th>
+						<th>Group Title</th>
+						<th>ID</th>
+						<th>Nom Code</th>
+						<th>Nom Type</th>
+						<th>Class</th>
+						<th>Nom Title</th>
+						<th>Count</th>
+						<th>DR</th>
+						<th>CR</th>
+					</tr>
+					<cfloop query="args.QNominals">
+						<tr>
+							<td align="right">#ngType#</td>
+							<td>#ngCode#</td>
+							<td>#ngTitle#</td>
+							<td>#nomID#</td>
+							<td>#nomCode#</td>
+							<td>#nomType#</td>
+							<td>#nomClass#</td>
+							<td>#nomTitle#</td>
+							<td align="right">#NumberFormat(ItemCount,',')#</td>
+							<cfif total lt 0>
+								<td></td>
+								<td align="right">#DecimalFormat(total)#</td>
+							<cfelse>
+								<td align="right">#DecimalFormat(total)#</td>
+								<td></td>							
+							</cfif>
+						</tr>
+					</cfloop>
+				</table>
+			</cfoutput>
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	
+	<cffunction name="LoadSuppliersReportOrig" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.parms = args>
+		<cfset loc.suppliers = {}>
+		<cfset loc.data = {}>
+		
+		<cftry>
+			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
+				<cfset loc.srchDateFrom = FormatDate("2013-01-01",'yyyy-mm-dd')>
+			<cfelseif IsDate(args.form.srchDateFrom)>
+				<cfset loc.srchDateFrom = FormatDate(args.form.srchDateFrom,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateFrom = "">
+			</cfif>
+			<cfif !StructKeyExists(args.form,"srchDateTo") OR len(args.form.srchDateTo) IS 0>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			<cfelseif IsDate(args.form.srchDateTo)>
+				<cfset loc.srchDateTo = FormatDate(args.form.srchDateTo,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateTo = LSDateFormat(Now(),"yyyy-mm-dd")>
+			</cfif>
+			<cfset loc.data = 
+				{" BFWD" = {"net" = 0, "VAT" = 0, "bal" = 0},
+				 "Total" = {"net" = 0, "VAT" = 0, "bal" = 0}
+			}>
+			<cfset loc.lastDate = DateFormat(loc.srchDateTo,'yyyy-mm')>
+			<cfloop from="1" to="12" index="loc.i">
+				<cfset StructInsert(loc.data,loc.lastDate,{
+					"net" = 0,
+					"VAT" = 0,
+					"bal" = 0
+				})>
+				<cfset loc.lastDate = DateFormat(DateAdd("m",loc.i,loc.srchDateTo),'yyyy-mm')>
+			</cfloop>
+			<cfset loc.result.header = Duplicate(loc.data)>
+			<cfquery name="loc.QAccounts" datasource="#args.datasource#">
+				SELECT * 
+				FROM tblaccount
+				WHERE accType = 'purch' 
+				AND accStatus = 'active'
+				AND accCode IN ('BOOK','BOOKBUN','ALLWYN','EBUYER','REDBULL','STORM','WHS')
+				ORDER BY accName
+			</cfquery>
+			<cfloop query="loc.QAccounts">
+				<cfset loc.accountID = val(accID)>
+				<cfset loc.accountName = accName>
+				<cfset StructInsert(loc.suppliers,accCode,{
+					"ID" = loc.accountID,
+					"Code" = accCode,
+					"Account" = accName,
+					"Values" = Duplicate(loc.data)
+				})>
+				<cfset loc.supp = StructFind(loc.suppliers,accCode)>
+				<cfquery name="loc.QBFwd" datasource="#args.datasource#">
+					SELECT SUM(trnAmnt1) AS net, SUM(trnAmnt2) AS VAT, SUM(trnAmnt1 + trnAmnt2) AS gross
+					FROM tblTrans
+					WHERE trnAccountID = #loc.accountID#
+					AND trnDate < '#loc.srchDateFrom#'
+					GROUP BY trnAccountID
+				</cfquery>
+				<cfset loc.bfwd = StructFind(loc.supp.values," BFWD")>
+				<cfset loc.bfwd.net = val(loc.QBFwd.net)>
+				<cfset loc.bfwd.VAT = val(loc.QBFwd.VAT)>
+				<cfset loc.bfwd.bal = val(loc.QBFwd.gross)>
+				<cfset loc.total = StructFind(loc.supp.values,"Total")>
+				<cfset loc.total.net = loc.bfwd.net>
+				<cfset loc.total.VAT = loc.bfwd.VAT>
+				<cfset loc.total.bal = loc.bfwd.bal>
+				
+				<cfset loc.header = StructFind(loc.result.header," BFWD")>
+				<cfset loc.header.net = loc.bfwd.net>
+				<cfset loc.header.VAT = loc.bfwd.VAT>
+				<cfset loc.header.bal = loc.bfwd.bal>
+				<cfset loc.header = StructFind(loc.result.header,"Total")>
+				<cfset loc.header.net = loc.bfwd.net>
+				<cfset loc.header.VAT = loc.bfwd.VAT>
+				<cfset loc.header.bal = loc.bfwd.bal>
+				<cfquery name="loc.QTrans" datasource="#args.datasource#">
+					SELECT trnAccountID,trnType,trnDate,trnAmnt1,trnAmnt2, SUM(trnAmnt1 + trnAmnt2) AS gross
+					FROM tblTrans
+					WHERE trnAccountID = #loc.accountID#
+					AND trnDate BETWEEN '#loc.srchDateFrom#' AND '#loc.srchDateTo#'
+				</cfquery>
+				<cfif loc.QTrans.recordcount gt 0>
+					<!---<cfif accCode eq 'ALLWYN'>
+						<cfdump var="#loc.QTrans#" label="QTrans" expand="false">
+					</cfif>--->
+					<cfloop query="loc.QTrans">
+						<cfset loc.thisDate = DateFormat(trnDate,'yyyy-mm')>
+						<cfset loc.gross = INT((val(trnAmnt1) + val(trnAmnt2)) * 100) / 100>
+						<cfif StructKeyExists(loc.supp.values,loc.thisDate)>
+							<cfset loc.values = StructFind(loc.supp.values,loc.thisDate)>
+							<cfset loc.values.net += val(trnAmnt1)>
+							<cfset loc.values.VAT += val(trnAmnt2)>
+							<cfset loc.values.bal += val(loc.gross)>
+							<cfset loc.header = StructFind(loc.result.header,loc.thisDate)>
+							<cfset loc.header.net += val(trnAmnt1)>
+							<cfset loc.header.VAT += val(trnAmnt2)>
+							<cfset loc.header.bal += val(loc.gross)>
+						<cfelse>
+							<cfset loc.bfwd.net += val(trnAmnt1)>
+							<cfset loc.bfwd.VAT += val(trnAmnt2)>
+							<cfset loc.bfwd.bal += val(loc.gross)>
+							<cfset loc.header = StructFind(loc.result.header," BFWD")>
+							<cfset loc.header.net += val(trnAmnt1)>
+							<cfset loc.header.VAT += val(trnAmnt2)>
+							<cfset loc.header.bal += val(loc.gross)>
+						</cfif>
+						
+						<cfset loc.total.net += val(trnAmnt1)>
+						<cfset loc.total.VAT += val(trnAmnt2)>
+						<cfset loc.total.bal += val(loc.gross)>
+					</cfloop>
+				</cfif>
+			</cfloop>
+			<cfset loc.result.suppliers = loc.suppliers>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+<cffunction name="LoadSuppliersReport" access="public" returntype="struct">
+    <cfargument name="args" type="struct" required="yes">
+
+    <cfset var loc = {} />
+    <cfset var i = 0 />
+    <cfset var monthDate = "" />
+
+    <cfset loc.result = {} />
+    <cfset loc.result.parms = arguments.args />
+    <cfset loc.suppliers = {} />
+    <cfset loc.data = {} />
+
+    <cftry>
+
+        <!--- Validate date inputs --->
+        <cfif StructKeyExists(args.form, "srchDateFrom") 
+                AND len(trim(args.form.srchDateFrom)) 
+                AND IsDate(args.form.srchDateFrom)>
+            <cfset loc.srchDateFromDate = ParseDateTime(args.form.srchDateFrom) />
+        <cfelse>
+            <cfset loc.srchDateFromDate = CreateDate(2013, 1, 1) />
+        </cfif>
+
+        <cfif StructKeyExists(args.form, "srchDateTo") 
+                AND len(trim(args.form.srchDateTo)) 
+                AND IsDate(args.form.srchDateTo)>
+            <cfset loc.srchDateToDate = ParseDateTime(args.form.srchDateTo) />
+        <cfelse>
+            <cfset loc.srchDateToDate = Now() />
+        </cfif>
+
+        <!--- Swap if needed --->
+        <cfif loc.srchDateFromDate GT loc.srchDateToDate>
+            <cfset temp = loc.srchDateFromDate />
+            <cfset loc.srchDateFromDate = loc.srchDateToDate />
+            <cfset loc.srchDateToDate = temp />
+        </cfif>
+
+        <!--- Template struct for BFWD, Total, 12 months --->
+        <cfset loc.data = {
+            " BFWD" = {"net"=0, "VAT"=0, "bal"=0},
+            "Total" = {"net"=0, "VAT"=0, "bal"=0}
+        } />
+
+        <!--- Add 12 months (yyyy-mm) ending at srchDateToDate --->
+        <cfloop from="0" to="11" index="i">
+            <cfset monthDate = DateAdd("m", -i, loc.srchDateToDate) />
+            <cfset loc.data[ DateFormat(monthDate, "yyyy-mm") ] = {"net"=0,"VAT"=0,"bal"=0} />
+        </cfloop>
+
+        <cfset loc.result.header = Duplicate(loc.data) />
+
+        <!--- Get supplier accounts --->
+        <cfquery name="loc.QAccounts" datasource="#args.datasource#">
+            SELECT accID, accName, accCode
+            FROM tblaccount
+            WHERE accType='purch'
+              AND accStatus='active'
+              <!---AND accCode IN ('BOOK','BOOKBUN','ALLWYN','EBUYER','REDBULL','STORM','WHS')--->
+            ORDER BY accName
+        </cfquery>
+
+        <!--- Loop suppliers --->
+        <cfloop query="loc.QAccounts">
+            <cfset var accountID = val(accID) />
+            <cfset var accountCode = accCode />
+            <cfset var accountName = accName />
+
+            <cfset loc.suppliers[accountCode] = {
+                "ID" = accountID,
+                "Code" = accountCode,
+                "Account" = accountName,
+                "Values" = Duplicate(loc.data)
+            } />
+
+            <cfset var supp = loc.suppliers[accountCode] />
+            <cfset var suppVals = supp.Values />
+            <cfset var bfwdKey = " BFWD" />
+            <cfset var totalVals = suppVals["Total"] />
+
+            <!--- Brought Forward --->
+            <cfquery name="loc.QBFwd" datasource="#args.datasource#">
+                SELECT SUM(trnAmnt1) AS net,
+                       SUM(trnAmnt2) AS VAT,
+                       SUM(trnAmnt1 + trnAmnt2) AS gross
+                FROM tblTrans
+                WHERE trnAccountID = <cfqueryparam value="#accountID#" cfsqltype="cf_sql_integer">
+                  AND trnDate < <cfqueryparam value="#DateFormat(loc.srchDateFromDate,'yyyy-mm-dd')#" cfsqltype="cf_sql_date">
+                GROUP BY trnAccountID
+            </cfquery>
+
+            <cfif loc.QBFwd.recordcount>
+                <cfset suppVals[bfwdKey].net  = Round(Val(loc.QBFwd.net) * 100) / 100 />
+                <cfset suppVals[bfwdKey].VAT  = Round(Val(loc.QBFwd.VAT) * 100) / 100 />
+                <cfset suppVals[bfwdKey].bal  = Round(Val(loc.QBFwd.gross) * 100) / 100 />
+            </cfif>
+
+            <!--- Supplier Total starts as BFWD --->
+            <cfset totalVals.net = suppVals[bfwdKey].net />
+            <cfset totalVals.VAT = suppVals[bfwdKey].VAT />
+            <cfset totalVals.bal = suppVals[bfwdKey].bal />
+
+            <!--- Add BFWD to header --->
+            <cfset loc.result.header[bfwdKey].net = Round((loc.result.header[bfwdKey].net + suppVals[bfwdKey].net)*100)/100 />
+            <cfset loc.result.header[bfwdKey].VAT = Round((loc.result.header[bfwdKey].VAT + suppVals[bfwdKey].VAT)*100)/100 />
+            <cfset loc.result.header[bfwdKey].bal = Round((loc.result.header[bfwdKey].bal + suppVals[bfwdKey].bal)*100)/100 />
+
+            <!--- Transactions within range --->
+            <cfquery name="loc.QTrans" datasource="#args.datasource#">
+                SELECT trnDate, trnAmnt1, trnAmnt2,
+                       (trnAmnt1 + trnAmnt2) AS gross
+                FROM tblTrans
+                WHERE trnAccountID = <cfqueryparam value="#accountID#" cfsqltype="cf_sql_integer">
+                  AND trnDate BETWEEN
+                        <cfqueryparam value="#DateFormat(loc.srchDateFromDate,'yyyy-mm-dd')#" cfsqltype="cf_sql_date">
+                  AND <cfqueryparam value="#DateFormat(loc.srchDateToDate,'yyyy-mm-dd')#" cfsqltype="cf_sql_date">
+                ORDER BY trnDate
+            </cfquery>
+
+            <!--- Process transactions --->
+            <cfloop query="loc.QTrans">
+                <cfset var txNet   = Round(val(trnAmnt1) * 100) / 100 />
+                <cfset var txVAT   = Round(val(trnAmnt2) * 100) / 100 />
+                <cfset var txGross = Round(val(gross) * 100) / 100 />
+
+                <cfset var txMonthKey = DateFormat(trnDate, "yyyy-mm") />
+
+                <cfif StructKeyExists(suppVals, txMonthKey)>
+                    <cfset suppVals[txMonthKey].net   = Round((suppVals[txMonthKey].net   + txNet) * 100)/100 />
+                    <cfset suppVals[txMonthKey].VAT   = Round((suppVals[txMonthKey].VAT   + txVAT) * 100)/100 />
+                    <cfset suppVals[txMonthKey].bal   = Round((suppVals[txMonthKey].bal   + txGross) * 100)/100 />
+
+                    <cfset loc.result.header[txMonthKey].net = Round((loc.result.header[txMonthKey].net + txNet) * 100)/100 />
+                    <cfset loc.result.header[txMonthKey].VAT = Round((loc.result.header[txMonthKey].VAT + txVAT) * 100)/100 />
+                    <cfset loc.result.header[txMonthKey].bal = Round((loc.result.header[txMonthKey].bal + txGross) * 100)/100 />
+                <cfelse>
+                    <cfset suppVals[bfwdKey].net = Round((suppVals[bfwdKey].net + txNet) * 100)/100 />
+                    <cfset suppVals[bfwdKey].VAT = Round((suppVals[bfwdKey].VAT + txVAT) * 100)/100 />
+                    <cfset suppVals[bfwdKey].bal = Round((suppVals[bfwdKey].bal + txGross) * 100)/100 />
+
+                    <cfset loc.result.header[bfwdKey].net = Round((loc.result.header[bfwdKey].net + txNet) * 100)/100 />
+                    <cfset loc.result.header[bfwdKey].VAT = Round((loc.result.header[bfwdKey].VAT + txVAT) * 100)/100 />
+                    <cfset loc.result.header[bfwdKey].bal = Round((loc.result.header[bfwdKey].bal + txGross) * 100)/100 />
+                </cfif>
+
+                <!-- Always add to supplier Total -->
+                <cfset totalVals.net = Round((totalVals.net + txNet) * 100)/100 />
+                <cfset totalVals.VAT = Round((totalVals.VAT + txVAT) * 100)/100 />
+                <cfset totalVals.bal = Round((totalVals.bal + txGross) * 100)/100 />
+            </cfloop>
+
+            <!-- Add supplier totals to header Total -->
+            <cfset loc.result.header["Total"].net = Round((loc.result.header["Total"].net + totalVals.net) * 100)/100 />
+            <cfset loc.result.header["Total"].VAT = Round((loc.result.header["Total"].VAT + totalVals.VAT) * 100)/100 />
+            <cfset loc.result.header["Total"].bal = Round((loc.result.header["Total"].bal + totalVals.bal) * 100)/100 />
+        </cfloop>
+
+        <cfset loc.result.suppliers = loc.suppliers />
+
+    <cfcatch type="any">
+        <cfdump var="#cfcatch#" expand="yes" format="html"
+            output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+        <cfset loc.result.error = cfcatch />
+    </cfcatch>
+    </cftry>
+
+    <cfreturn loc.result />
+</cffunction>
+
+	<cffunction name="ViewSuppliersReport" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.args = args>
+		
+		<cftry>
+			<!---<cfdump var="#args#" label="ViewSuppliersReport" expand="false">--->
+			<cfoutput>
+				<cfset loc.keys = ListSort(StructKeyList(args.suppliers,','),"text","asc",",")>
+				<table class="tableList" border="1">
+					<!--- header --->
+					<tr>
+						<th>Supplier</th>
+						<th>Code</th>
+						<th>ID</th>
+						<cfset loc.titles = ListSort(StructKeyList(args.header,','),"text","asc",",")>
+						<cfloop list="#loc.titles#" index="loc.head" delimiters=",">
+							<th>#loc.head#</th>
+						</cfloop>
+					</tr>
+					<!--- data --->
+					<cfloop list="#loc.keys#" index="loc.item">
+						<cfset loc.supp = StructFind(args.suppliers,loc.item)>
+						<cfset loc.zero = StructFind(loc.supp.values,"Total")>
+						<cfif loc.zero.bal neq 0>
+						<tr>
+							<td>#loc.supp.Account#</td>
+							<td>#loc.supp.Code#</td>
+							<td>#loc.supp.ID#</td>
+							<cfloop list="#loc.titles#" index="loc.key" delimiters=",">
+								<cfset loc.values = StructFind(loc.supp.values,loc.key)>
+								<td align="right"><cfif loc.values.bal neq 0>#formatNum(loc.values.bal)#</cfif></td>
+							</cfloop>
+						</tr>
+						</cfif>
+					</cfloop>
+					<!--- totals --->
+					<tr>
+						<th>Totals</th>
+						<th></th>
+						<th></th>
+						<cfset loc.titles = ListSort(StructKeyList(args.header,','),"text","asc",",")>
+						<cfloop list="#loc.titles#" index="loc.head" delimiters=",">
+							<cfset loc.total = StructFind(args.header,loc.head)>
+							<th>#formatNum(loc.total.bal)#</th>
+						</cfloop>
+					</tr>
+				</table>
+				<p>&nbsp;</p>
+			</cfoutput>
+			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">

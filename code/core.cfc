@@ -28,6 +28,17 @@
 		<cfreturn true>
 	</cffunction>
 	
+	<cffunction name="formatNum" access="public" returntype="string">
+		<cfargument name="num" type="numeric" required="yes">
+		<cfif num lt 0>
+			<cfreturn '<span class="negativeNum">#DecimalFormat(num)#</span>'>
+		<cfelseif num gt 0>
+			<cfreturn '<span class="">#DecimalFormat(num)#</span>'>
+		<cfelse>
+			<cfreturn "">	<!--- zero returns blank --->
+		</cfif>
+	</cffunction>
+
 	<cffunction name="GetInfo" output="false" returnType="any">
 		<cfargument name="structure" type="struct" required="true">
 		<cfargument name="field" type="string" required="true">

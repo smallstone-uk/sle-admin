@@ -335,7 +335,7 @@ AND `trnPaidIn` = 170206
 SELECT sum(trnAmnt1) as total
 FROM `tbltrans` 
 WHERE `trnAccountID` = 4 
-AND `trnDate` < '2017-02-01'
+AND `trnDate` < '2025-04-01'
 
 
 // creditors balance as at specified date
@@ -343,6 +343,16 @@ SELECT SUM( trnAmnt1 + trnAmnt2 ) AS total
 FROM `tbltrans`
 WHERE `trnLedger` = 'purch'
 AND `trnDate` < '2023-02-01'
+
+// Purchase analysis by year from day 1 to specified date
+SELECT accname, trnDate,trnLedger,trnAccountID, sum(trnAmnt1 + trnAmnt2) AS total, 
+	DATE_FORMAT( trnDate, '%Y' ) AS yyyy 
+FROM `tbltrans` 
+INNER JOIN tblAccount ON accid=trnAccountID 
+WHERE `trnLedger` = 'purch' 
+AND `trnDate` < '2025-12-01' 
+GROUP by trnAccountID, yyyy 
+order by accname, trndate
 
 
 // bank balance at specified date

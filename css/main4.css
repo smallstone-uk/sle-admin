@@ -411,3 +411,4 @@ input[type="checkbox"].form-control {
     border: 1px solid rgba(0, 0, 0, 0.15);
 }
 .roundname {padding:5px; line-height:30px;}
+.negativeNum {color:#FF0000}

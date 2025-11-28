@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Import Square EPOS Data</title>
+	<title>Import Excel Data</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 	<link href="css/chosen.css" rel="stylesheet" type="text/css">
 	<link href="css/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css">
@@ -198,7 +198,7 @@
 </cftry>
 
 <cfdirectory directory="#dataDir#" action="list" name="QDir">
-<h2><a href="importExcel.cfm">Import Square EPOS Data</a></h2>
+<h2><a href="importExcel.cfm">Import Excel Data</a></h2>
 <cfoutput>
 <form name="importForm" id="importForm" method="post" enctype="multipart/form-data">
 	<input type="text" name="srchProcess" id="srchProcess" size="5" />

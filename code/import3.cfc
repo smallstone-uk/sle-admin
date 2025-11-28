@@ -486,9 +486,9 @@
 							<td>#loc.tranID#</td>
 							<td>#loc.status#</td>
 						</tr>
-						<cfif loc.counter eq 20>
+						<!---<cfif loc.counter eq 20>
 							<cfbreak>
-						</cfif>
+						</cfif>--->
 					</cfloop>
 				</table>
 			</cfoutput>

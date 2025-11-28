@@ -25,7 +25,7 @@
 				$.each(formData, function(_, field) {
 					formObj[field.name] = field.value;
 				});
-				console.log(formObj);
+			//	console.log(formObj);
 				if (formObj.srchReport = 1)	{
 					LoadGroups();
 				} else if (formObj.srchReport = 2) {

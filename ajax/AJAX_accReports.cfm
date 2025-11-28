@@ -35,7 +35,6 @@
 				</cfcase>
 				<cfcase value="6">
 					<cfset data = report.LoadSuppliersReport(parms)>
-					<!---<cfdump var="#data#" label="Suppliers" expand="false">--->
 					<cfset report.ViewSuppliersReport(data)>
 				</cfcase>
 			</cfswitch>

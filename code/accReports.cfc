@@ -1045,33 +1045,32 @@
 					<tr>
 						<th>Supplier</th>
 						<th>Code</th>
-						<th>ID</th>
 						<cfset loc.titles = ListSort(StructKeyList(args.header,','),"text","asc",",")>
 						<cfloop list="#loc.titles#" index="loc.head" delimiters=",">
 							<th>#loc.head#</th>
 						</cfloop>
 					</tr>
 					<!--- data --->
+					<cfset loc.linecount = 0>
 					<cfloop list="#loc.keys#" index="loc.item">
 						<cfset loc.supp = StructFind(args.suppliers,loc.item)>
 						<cfset loc.zero = StructFind(loc.supp.values,"Total")>
 						<cfif loc.zero.bal neq 0>
-						<tr>
-							<td>#loc.supp.Account#</td>
-							<td>#loc.supp.Code#</td>
-							<td>#loc.supp.ID#</td>
-							<cfloop list="#loc.titles#" index="loc.key" delimiters=",">
-								<cfset loc.values = StructFind(loc.supp.values,loc.key)>
-								<td align="right"><cfif loc.values.bal neq 0>#formatNum(loc.values.bal)#</cfif></td>
-							</cfloop>
-						</tr>
+							<cfset loc.linecount++>
+							<tr>
+								<td>#loc.supp.Account#</td>
+								<td><a href="tranMain2.cfm?acc=#loc.supp.ID#" target="#loc.supp.Code#">#loc.supp.Code#</td>
+								<cfloop list="#loc.titles#" index="loc.key" delimiters=",">
+									<cfset loc.values = StructFind(loc.supp.values,loc.key)>
+									<td align="right"><cfif loc.values.bal neq 0>#formatNum(loc.values.bal)#</cfif></td>
+								</cfloop>
+							</tr>
 						</cfif>
 					</cfloop>
 					<!--- totals --->
 					<tr>
 						<th>Totals</th>
-						<th></th>
-						<th></th>
+						<th>#loc.linecount# records</th>
 						<cfset loc.titles = ListSort(StructKeyList(args.header,','),"text","asc",",")>
 						<cfloop list="#loc.titles#" index="loc.head" delimiters=",">
 							<cfset loc.total = StructFind(args.header,loc.head)>

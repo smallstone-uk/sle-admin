@@ -73,7 +73,7 @@
 							VALUES (#QItem.trnDate#,'#tranRef# #bankRef#','Deposit reallocation',#identKey#)
 						</cfquery>
 						<cfset newKey=QRes.generatedkey>newKey = #newKey#<br />
-						<cfquery name="QInserItems" datasource="#application.site.datasource1#">
+						<cfquery name="QInsertItems" datasource="#application.site.datasource1#">
 							INSERT INTO tblNomItems
 								(niTranID,niNomID,niAmount) 
 							VALUES 

@@ -373,34 +373,79 @@
 						loc.cols = deserializeJSON(queryToJSON,true);
 					</cfscript>
 					<cfset loc.result.columns = loc.cols.columns>
+
+					<cfquery name="loc.QSupplier" datasource="#args.datasource#">
+						SELECT accID,accCode,accName,accPayAcc
+						FROM tblAccount
+						WHERE accID = #val(args.form.srchSupplier)#
+					</cfquery>
+					
 					<!--- get data --->
 					<cfspreadsheet action="read" src="#loc.filePath#" sheetname="#args.form.srchSheet#" 
-						query="loc.QData" headerrow="1" excludeHeaderRow="true" rows="1-100" />
+						query="loc.QData" headerrow="1" excludeHeaderRow="true" rows="1-200" />
 					<cfloop query="loc.QData">
-						<cfif !StructKeyExists(loc.trans,Reference)>
-							<cfif Find("(",Amount,1)>
-								<cfset loc.amount = ReReplaceNoCase(Amount,"[^0-9,\.]","","ALL")>
-								<cfset loc.amount = -loc.amount>
-							<cfelse>
-								<cfset loc.amount = Amount>
-							</cfif>
-							<cfset StructInsert(loc.trans,Reference, {
-								"trnAccountID" = args.form.srchSupplier,
-								"trnDate" = Date,
-								"trnRef" = Reference,
-								"trnType" = Source,
-								"trnDesc" = Description,
-								"trnAmnt1" = loc.amount,
-								"Balance" = Balance,
-								"items" = {
-									"niAmount" = loc.amount, 
-									"debit" = args.form.srchDebit,
-									"credit" = args.form.srchCredit
-								}
-							})>
+						<cfset loc.date = loc.QData.Date>
+						<cfif StructKeyExists(args,"form")>
+							<cfset loc.inRange = loc.date GTE args.form.srchDateFrom AND (loc.date LTE args.form.srchDateTo OR len(args.form.srchDateTo) IS 0)>
 						<cfelse>
-							<cfif !StructKeyExists(loc.dupes,Reference)>
-								<cfset StructInsert(loc.dupes,Reference,1)>
+							<cfset loc.inRange = true>
+						</cfif>
+						<cfif loc.inRange>
+							<cfif FindNoCase("Invoice",Source,1)>
+								<cfset loc.type = 'inv'>
+								<cfset loc.payAcc = 0>
+							<cfelseif FindNoCase("Credit",Source,1)>
+								<cfset loc.type = 'crn'>
+								<cfset loc.payAcc = 0>
+							<cfelseif FindNoCase("Payment",Source,1)>
+								<cfset loc.type = 'pay'>
+								<cfset loc.payAcc = val(loc.QSupplier.accPayAcc)>
+							<cfelse>
+								<cfset loc.type = Source>
+								<cfset loc.payAcc = 0>
+							</cfif>
+							<cfif len(Reference) IS 0>
+								<cfset loc.m = REFind("\d+", Description, 1, true)>
+								<cfif loc.m.len[1] GT 0>
+									<cfset loc.numberOnly = Mid(Description, loc.m.pos[1], loc.m.len[1])>
+									<cfset loc.ref = "#loc.type##loc.numberOnly#">
+								<cfelse>
+									<cfset loc.ref = Reference>
+								</cfif>
+							<cfelse>
+								<cfset loc.ref = Reference>
+							</cfif>
+							<cfif !StructKeyExists(loc.trans,loc.ref)>
+								<cfif Find("(",Amount,1)>
+									<cfset loc.amount = ReReplaceNoCase(Amount,"[^0-9,\.]","","ALL")>
+									<cfset loc.amount = -loc.amount>
+								<cfelse>
+									<cfset loc.amount = Amount>
+								</cfif>
+								<cfset StructInsert(loc.trans,loc.ref, {
+									"trnAccountID" = args.form.srchSupplier,
+									"row" = Row,
+									"trnDate" = Date,
+									"trnRef" = loc.ref,
+									"trnType" = loc.type,
+									"trnDesc" = Description,
+									"trnAmnt1" = loc.amount,
+									"trnPayAcc" = loc.payAcc,
+									"Balance" = Balance,
+									"items" = {
+										"niAmount" = loc.amount, 
+										"debit" = args.form.srchDebit,
+										"credit" = args.form.srchCredit,
+										"payAccount" = loc.payAcc
+									}
+								})>
+							<cfelse>
+								<cfif !StructKeyExists(loc.dupes,loc.ref)>
+									<cfset StructInsert(loc.dupes,loc.ref,1)>
+								<cfelse>
+									<cfset loc.check = StructFind(loc.dupes,loc.ref)>
+									<cfset StructUpdate(loc.dupes,loc.ref,loc.check++)>
+								</cfif>
 							</cfif>
 						</cfif>
 					</cfloop>
@@ -434,6 +479,7 @@
 						</cfloop>
 						<th>Debit</th>
 						<th>Credit</th>
+						<th>Pay ID</th>
 						<th>Tran ID</th>
 						<th>Status</th>
 					</tr>
@@ -453,28 +499,55 @@
 							<cfif args.parms.form.srchMode eq 2>
 								<cfquery name="loc.QInsertTran" datasource="#args.parms.datasource#" result="loc.QInsertTranResult">
 									INSERT INTO tblTrans
-										(trnAccountID,trnDate,trnRef,trnDesc,trnAmnt1) 
-									VALUES (#loc.data.trnAccountID#, '#loc.data.trnDate#', '#loc.data.trnRef#', '#loc.data.trnDesc#', #loc.data.items.niAmount#)
+										(trnAccountID,trnType,trnDate,trnRef,trnDesc,trnAmnt1,trnPayAcc) 
+									VALUES (#loc.data.trnAccountID#, '#loc.data.trnType#', '#loc.data.trnDate#', 
+										'#loc.data.trnRef#', '#loc.data.trnDesc#', #loc.data.items.niAmount#, '#loc.data.trnPayAcc#')
 								</cfquery>
 								<cfset loc.tranID = loc.QInsertTranResult.generatedkey>
-								<cfquery name="loc.QInsertItems" datasource="#args.parms.datasource#">
-									INSERT INTO tblNomItems
-										(niTranID,niNomID,niAmount) 
-									VALUES 
-										(#loc.tranID#,#loc.data.items.credit#,#-loc.data.items.niAmount#),
-										(#loc.tranID#,#loc.data.items.debit#,#loc.data.items.niAmount#)			
-								</cfquery>
-								<cfset loc.status = "inserted">
+								<cfif Find(loc.data.trnType,'inv,crn',1)>
+									<cfquery name="loc.QInsertItems" datasource="#args.parms.datasource#">
+										INSERT INTO tblNomItems
+											(niTranID,niNomID,niAmount) 
+										VALUES 
+											(#loc.tranID#,#loc.data.items.credit#,#-loc.data.items.niAmount#),
+											(#loc.tranID#,#loc.data.items.debit#,#loc.data.items.niAmount#)			
+									</cfquery>
+									<cfset loc.status = "inv/crn inserted">
+								<cfelse>
+									<cfquery name="loc.QInsertItems" datasource="#args.parms.datasource#">
+										INSERT INTO tblNomItems
+											(niTranID,niNomID,niAmount) 
+										VALUES 
+											(#loc.tranID#,#loc.data.items.payAccount#,#-loc.data.items.niAmount#),
+											(#loc.tranID#,#loc.data.items.credit#,#loc.data.items.niAmount#)			
+									</cfquery>
+									<cfset loc.status = "pay/jnl inserted">
+								</cfif>
 							<cfelse>
 								<cfset loc.status = "not found">
 							</cfif>
 						<cfelse>
 							<cfset loc.tranID = loc.QTranExist.trnID>
-							<cfset loc.status = "found">
+							<cfquery name="loc.QUpdate" datasource="#args.parms.datasource#">
+								UPDATE tblTrans
+								SET
+									trnAccountID = #loc.data.trnAccountID#,
+									trnType = '#loc.data.trnType#',
+									trnDate = '#loc.data.trnDate#',
+									trnRef = '#loc.data.trnRef#',
+									trnDesc = '#loc.data.trnDesc#',
+									trnAmnt1 = #loc.data.items.niAmount#,
+									trnPayAcc = #loc.data.items.payAccount#
+								WHERE
+									trnID = #loc.tranID#
+							</cfquery>
+							<!--- update nom items too --->
+							<cfset loc.status = "updated #loc.tranID#">
 						</cfif>
 						<tr>
 							<td>#loc.counter#</td>
 							<td>#loc.data.trnAccountID#</td>
+							<td>#loc.data.Row#</td>
 							<td>#loc.data.trnDate#</td>
 							<td>#loc.data.trnType#</td>
 							<td>#loc.data.trnRef#</td>
@@ -483,6 +556,7 @@
 							<td>#loc.data.Balance#</td>
 							<td>#loc.data.items.debit#</td>
 							<td>#loc.data.items.credit#</td>
+							<td>#loc.data.items.payAccount#</td>
 							<td>#loc.tranID#</td>
 							<td>#loc.status#</td>
 						</tr>

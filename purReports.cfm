@@ -27,6 +27,7 @@
 		.tranList {	
 			font-family:Arial, Helvetica, sans-serif;
 			font-size:13px;
+			font-weight:normal;
 			border-collapse:collapse;
 		}
 		.tranList th, .tranList td {
@@ -1737,12 +1738,74 @@
 									</cfif>
 								</cfcase>
 								<cfcase value="14">
-									<cfset trans=pur.TranDetail(parms)><cfdump var="#trans#" label="trans" expand="false">
-									<cfloop array="#trans.tranArray#" index="tran">
-										<cfif tran.itemTotal neq 0>
-											<cfdump var="#tran#" label="#tran.trnDate#" expand="false">
-										</cfif>
+									<cfset trans = pur.TranDetail(parms)>
+									<table class="tranList">
+										<tr>
+											<th>accID</th>
+											<th>Account Name</th>
+											<th>Tran ID</th>
+											<th>Tran Date</th>
+											<th>Reference</th>
+											<th>Type</th>
+											<th>Amount 1</th>
+											<th>Amount 2</th>
+											<th>Balance</th>
+											<th>
+												<table width="100%">
+													<th>niID</th>
+													<th>nomID</th>
+													<th>Nom Code</th>
+													<th>Nom Title</th>
+													<th>Item Amount</th>
+													<th>Balance</th>
+												</table>
+											</th>
+											<th>Nom Balance</th>
+										</tr>
+									<cfset accBalance = 0>
+									<cfset tranbalance = 0>
+									<cfset nombalance = 0>
+									<cfloop array="#trans.tranArray#" index="loc.tran">
+										<cfset accBalance += loc.tran.trnAmnt1>
+										<cfset tranbalance += loc.tran.trnAmnt1>
+										<tr>
+											<td align="right">#loc.tran.accID#</td>
+											<td>#loc.tran.accName#</td>
+											<td align="right">#loc.tran.trnID#</td>
+											<td align="right">#loc.tran.trnDate#</td>
+											<td>#loc.tran.trnref#</td>
+											<td>#loc.tran.trnType#</td>
+											<td align="right">#pur.formatNum(loc.tran.trnAmnt1)#</td>
+											<td align="right">#pur.formatNum(loc.tran.trnAmnt2)#</td>
+											<td align="right">#pur.formatNum(tranbalance)#</td>
+											<td>
+												<table border="0" width="100%">
+												<cfset itembalance = 0>
+												<cfloop query="loc.tran.items">
+													<cfset nombalance += niAmount>
+													<cfset itembalance += niAmount>
+													<tr>
+														<td align="right">#niID#</td>
+														<td>#nomID#</td>
+														<td>#nomCode#</td>
+														<td>#nomTitle#</td>
+														<td align="right">#pur.formatNum(niAmount)#</td>
+														<td align="right">#pur.formatNum(itembalance)#</td>
+													</tr>
+												</cfloop>
+												</table>
+											</td>
+											<td align="right">#pur.formatNum(nombalance)#</td>
+										</tr>
 									</cfloop>
+									<tr>
+										<th colspan="3">Account Balance</th>
+										<th colspan="3">#NumberFormat(ArrayLen(trans.tranArray),",")# transactions</th>
+										<th align="right">#DecimalFormat(accBalance)#</th>
+										<th colspan="3">Nominal Balance</th>
+										<th align="right">#DecimalFormat(nombalance)#</th>
+									</tr>
+									</table>
 								</cfcase>
 								<cfcase value="15">
 									<cfset parms.sortOrder = "trnAllocID,trnDate,trnID">

@@ -1194,7 +1194,7 @@
 			<cfset rec.trnAmnt1=trnAmnt1>
 			<cfset rec.trnAmnt2=trnAmnt2>
 			<cfquery name="QItems" datasource="#args.datasource#">
-				SELECT nomCode,nomTitle,niID,niAmount
+				SELECT nomID,nomCode,nomTitle,niID,niAmount
 				FROM tblNominal,tblNomItems
 				WHERE nomID=niNomID
 				AND niTranID=<cfqueryparam cfsqltype="cf_sql_integer" value="#trnID#">

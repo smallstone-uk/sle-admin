@@ -1773,6 +1773,7 @@
 									<cfset tranbalance = 0>
 									<cfset nombalance = 0>
 									<cfset analysis = {}>
+									<cfset errors = 0>
 									<cfloop array="#trans.tranArray#" index="loc.tran">
 										<cfset accBalance += (loc.tran.trnAmnt1 + loc.tran.trnAmnt2)>
 										<cfset tranbalance += (loc.tran.trnAmnt1 + loc.tran.trnAmnt2)>
@@ -1787,7 +1788,7 @@
 											<td align="right">#pur.formatNum(loc.tran.trnAmnt2)#</td>
 											<td align="right">#pur.formatNum(tranbalance)#</td>
 											<td>
-												<cfif loc.tran.items.recordcount gt 0>
+												<cfif loc.tran.items.recordcount gt 1>
 													<table border="0" width="100%">
 													<cfset itembalance = 0>
 													<cfloop query="loc.tran.items">
@@ -1811,6 +1812,7 @@
 													</table>
 												<cfelse>
 													<span class="err">transaction analysis missing</span>
+													<cfset errors++>
 												</cfif>
 											</td>
 											<td align="right">#pur.formatNum(nombalance)#</td>
@@ -1820,7 +1822,8 @@
 										<th colspan="3">Account Balance</th>
 										<th colspan="3">#NumberFormat(ArrayLen(trans.tranArray),",")# transactions</th>
 										<th align="right">#DecimalFormat(accBalance)#</th>
-										<th colspan="3">Nominal Balance</th>
+										<th colspan="2">#errors# Errors</th>
+										<th>Nominal Balance</th>
 										<th align="right">#DecimalFormat(nombalance)#</th>
 									</tr>
 									<tr>

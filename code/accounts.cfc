@@ -981,13 +981,14 @@
 	<cffunction name="SaveNominalTransaction" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">
 		<cfset var loc = {}>
-
+<cfdump var="#args#" label="SaveNominalTransaction" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		<cftry>
 			<cfset loc.result = {}>
 			<cfset loc.args = arguments>
 			<cfset loc.isNew = true>
 			<cfset loc.newTranDate = LSDateFormat(args.form.header.tranDate, "yyyy-mm-dd")>
-		
+			
 			<cfquery name="loc.tranExists" datasource="#args.datasource#" result="loc.tranExists_result">
 				SELECT trnID, trnPayAcc, trnDate
 				FROM tblTrans
@@ -1030,7 +1031,7 @@
 				<cfset loc.result.tranID = val(args.form.header.tranID)>
 				<cfset loc.oldTranDate = LSDateFormat(loc.originalTran.trnDate, "yyyy-mm-dd")>
 				
-				<cfquery name="loc.originalItems" datasource="#args.datasource#" result="loc.originalItems_result">
+				<cfquery name="loc.originalItems" datasource="#args.datasource#">
 					SELECT *
 					FROM tblNomItems
 					WHERE niTranID = #val(args.form.header.tranID)#
@@ -1051,7 +1052,7 @@
 					WHERE trnID = #val(args.form.header.tranID)#
 				</cfquery>
 				
-				<cfquery name="loc.delItemsAll" datasource="#args.datasource#" result="loc.delItemsAll_result">
+				<cfquery name="loc.delItemsAll" datasource="#args.datasource#">
 					DELETE FROM tblNomItems
 					WHERE niTranID = #val(args.form.header.tranID)#
 				</cfquery>
@@ -1274,7 +1275,8 @@
 					</cfloop>
 				</cfif>
 			</cfif>
-			
+		<cfdump var="#args.items#" label="args.items" expand="yes" format="html" 
+	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">	
 			<cfset loc.newItemStr = "">
 			<cfloop array="#args.items#" index="loc.item">
 				<cfif loc.item.netAmount neq 0>
@@ -1679,6 +1681,7 @@
 				LEFT JOIN tblnomgroups ON ngCode = nomGroup
 				WHERE nomStatus = 1
 				ORDER BY nomGroup, nomTitle
+				LIMIT 10;		<!--- test only --->
 			</cfquery>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
@@ -1963,7 +1966,7 @@
 				AND niNomID = nomID
 				AND niNomID != #val(args.form.accNomAcct)#
 				AND niNomID != #GetNominalVATRecordID()#
-				AND niNomID != 21
+				AND niNomID NOT IN (11,21)
 				ORDER BY niID asc
 			</cfquery>
 			

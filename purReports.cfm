@@ -1779,7 +1779,7 @@
 										<tr>
 											<td align="right">#loc.tran.accID#</td>
 											<td>#loc.tran.accName#</td>
-											<td align="right">#loc.tran.trnID#</td>
+											<td align="right"><a href="tranMain2.cfm?acc=#loc.tran.accID#&tran=#loc.tran.trnID#" target="acctran">#loc.tran.trnID#</a>
 											<td align="right">#DateFormat(loc.tran.trnDate,'ddd dd-mmm-yy')#</td>
 											<td>#loc.tran.trnref#</td>
 											<td>#loc.tran.trnType#</td>

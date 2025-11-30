@@ -1811,7 +1811,7 @@
 													</cfloop>
 													</table>
 												<cfelse>
-													<span class="err">transaction analysis missing</span>
+													<span class="err">ERROR: transaction analysis missing</span>
 													<cfset errors++>
 												</cfif>
 											</td>

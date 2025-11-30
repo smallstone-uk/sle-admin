@@ -43,7 +43,7 @@
 		}
 		.vatTable th {padding: 5px; background:#eee; border-color: #ccc;}
 		.vatTable td {padding: 5px; border-color: #ccc;}
-		.err {background-color:#FF0000}
+		.err {background-color:#FF0000; color:#fff; font-size:16px;}
 		.ok {background-color:#00DF00}
 		.summary {font-size:11px; color:#0033FF;}
 		.disabled {background-color:#CCCCCC;}
@@ -1787,27 +1787,31 @@
 											<td align="right">#pur.formatNum(loc.tran.trnAmnt2)#</td>
 											<td align="right">#pur.formatNum(tranbalance)#</td>
 											<td>
-												<table border="0" width="100%">
-												<cfset itembalance = 0>
-												<cfloop query="loc.tran.items">
-													<cfset nombalance += niAmount>
-													<cfset itembalance += niAmount>
-													<cfif !StructKeyExists(analysis,nomCode)>
-														<cfset StructInsert(analysis,nomCode,{bal = 0, num = 0, title = nomTitle})>
-													</cfif>
-													<cfset anna = StructFind(analysis,nomCode)>
-													<cfset anna.bal += niAmount>
-													<cfset anna.num++>
-													<tr>
-														<td align="right">#niID#</td>
-														<td>#nomID#</td>
-														<td>#nomCode#</td>
-														<td>#nomTitle#</td>
-														<td align="right">#pur.formatNum(niAmount)#</td>
-														<td align="right">#pur.formatNum(itembalance)#</td>
-													</tr>
-												</cfloop>
-												</table>
+												<cfif loc.tran.items.recordcount gt 0>
+													<table border="0" width="100%">
+													<cfset itembalance = 0>
+													<cfloop query="loc.tran.items">
+														<cfset nombalance += niAmount>
+														<cfset itembalance += niAmount>
+														<cfif !StructKeyExists(analysis,nomCode)>
+															<cfset StructInsert(analysis,nomCode,{bal = 0, num = 0, title = nomTitle})>
+														</cfif>
+														<cfset anna = StructFind(analysis,nomCode)>
+														<cfset anna.bal += niAmount>
+														<cfset anna.num++>
+														<tr>
+															<td align="right">#niID#</td>
+															<td>#nomID#</td>
+															<td>#nomCode#</td>
+															<td>#nomTitle#</td>
+															<td align="right">#pur.formatNum(niAmount)#</td>
+															<td align="right">#pur.formatNum(itembalance)#</td>
+														</tr>
+													</cfloop>
+													</table>
+												<cfelse>
+													<span class="err">transaction analysis missing</span>
+												</cfif>
 											</td>
 											<td align="right">#pur.formatNum(nombalance)#</td>
 										</tr>

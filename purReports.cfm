@@ -46,6 +46,7 @@
 		.err {background-color:#FF0000}
 		.ok {background-color:#00DF00}
 		.summary {font-size:11px; color:#0033FF;}
+		.disabled {background-color:#CCCCCC;}
 	</style>
 </head>
 
@@ -118,7 +119,13 @@
 										<select name="srchAccount">
 											<option value="0">Select...</option>
 											<option value="-1"<cfif srchAccount eq -1> selected="selected"</cfif>>Ignore Client Records</option>
+											<option disabled="disabled" class="disabled">Sales Accounts</option>
+											<cfset thisType = "sales">
 											<cfloop array="#suppliers.list#" index="item">
+												<cfif item.accType neq thisType>
+													<option disabled="disabled" class="disabled">Supplier Accounts</option>
+													<cfset thisType = item.accType>
+												</cfif>
 												<option value="#item.accID#"<cfif item.accID eq srchAccount> selected="selected"</cfif>>#item.accName#</option>
 											</cfloop>
 										</select>									
@@ -1765,14 +1772,15 @@
 									<cfset accBalance = 0>
 									<cfset tranbalance = 0>
 									<cfset nombalance = 0>
+									<cfset analysis = {}>
 									<cfloop array="#trans.tranArray#" index="loc.tran">
-										<cfset accBalance += loc.tran.trnAmnt1>
-										<cfset tranbalance += loc.tran.trnAmnt1>
+										<cfset accBalance += (loc.tran.trnAmnt1 + loc.tran.trnAmnt2)>
+										<cfset tranbalance += (loc.tran.trnAmnt1 + loc.tran.trnAmnt2)>
 										<tr>
 											<td align="right">#loc.tran.accID#</td>
 											<td>#loc.tran.accName#</td>
 											<td align="right">#loc.tran.trnID#</td>
-											<td align="right">#loc.tran.trnDate#</td>
+											<td align="right">#DateFormat(loc.tran.trnDate,'ddd dd-mmm-yy')#</td>
 											<td>#loc.tran.trnref#</td>
 											<td>#loc.tran.trnType#</td>
 											<td align="right">#pur.formatNum(loc.tran.trnAmnt1)#</td>
@@ -1784,6 +1792,12 @@
 												<cfloop query="loc.tran.items">
 													<cfset nombalance += niAmount>
 													<cfset itembalance += niAmount>
+													<cfif !StructKeyExists(analysis,nomCode)>
+														<cfset StructInsert(analysis,nomCode,{bal = 0, num = 0, title = nomTitle})>
+													</cfif>
+													<cfset anna = StructFind(analysis,nomCode)>
+													<cfset anna.bal += niAmount>
+													<cfset anna.num++>
 													<tr>
 														<td align="right">#niID#</td>
 														<td>#nomID#</td>
@@ -1805,8 +1819,33 @@
 										<th colspan="3">Nominal Balance</th>
 										<th align="right">#DecimalFormat(nombalance)#</th>
 									</tr>
+									<tr>
+										<td colspan="9"></td>
+										<td colspan="2">
+											<cfset keys = ListSort(StructKeyList(analysis,","),"text","asc",",")>
+											<table class="tableList" width="100%">
+												<cfset total = 0>
+												<cfloop list="#keys#" index="key">
+													<cfset data = StructFind(analysis,key)>
+													<cfset total += data.bal>
+													<tr>
+														<td>#key#</td>
+														<td>#data.title#</td>
+														<td>#data.num#</td>
+														<td align="right">#pur.formatNum(data.bal)#</td>
+													</tr>
+												</cfloop>
+												<tr>
+													<th colspan="3">Balance</th>
+													<th align="right">#pur.formatNum(total)#</th>
+												</tr>
+											</table>
+										</td>
+									</tr>
 									</table>
+									<!---<cfdump var="#analysis#" label="analysis" expand="false">--->
 								</cfcase>
+								
 								<cfcase value="15">
 									<cfset parms.sortOrder = "trnAllocID,trnDate,trnID">
 									<cfset trans=pur.TranDetail(parms)>

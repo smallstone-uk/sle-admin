@@ -11,16 +11,17 @@
 		
 		<cfset result.list=[]>
 		<cfquery name="QSuppliers" datasource="#args.datasource#">
-			SELECT accID,accCode,accName
+			SELECT accID,accCode,accType,accName
 			FROM tblAccount
 			WHERE accType IN ('purch','sales')
-			ORDER BY accCode
+			ORDER BY accType, accName
 		</cfquery>
 		<cfloop query="QSuppliers">
 			<cfset rec={}>
 			<cfset rec.accID=accID>
 			<cfset rec.accCode=accCode>
 			<cfset rec.accName=accName>
+			<cfset rec.accType=accType>
 			<cfset ArrayAppend(result.list,rec)>
 		</cfloop>
 		<cfreturn result>

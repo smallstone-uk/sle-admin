@@ -202,12 +202,12 @@
 						<!---<cfset keys = ListSort(StructKeyList(nominals, ","), "text", "asc", ",")>
 						<cfloop list="#keys#" index="key">--->
 						<cfloop query="loadnoms.QNominal">
-							<option value="#nomCode#">#nomCode# - #nomGroup# - #nomTitle#</option>
+							<option value="#nomCode#">#nomTitle# - #nomGroup# - #nomCode#</option>
 						</cfloop>
 					</select>
 				</td>
 				<td align="right" class="aifHiddenVATRate"><input type="text" name="vat" id="aifVAT" value="0%" disabled="disabled" style="text-align:right;" tabindex="-1"></td>
-				<td align="right" class="aifNetAmountCell"><input type="text" name="niAmount" class="niAmount" value=""></td>
+				<td align="right" class="aifNetAmountCell"><input type="text" name="niAmount" class="niAmount" value="" autocomplete="off"></td>
 				<td align="right" class="aifVatAmountCell"><input type="text" name="vatAmount" class="vatAmountFld" id="aifVATAmount" value="0" disabled="disabled" tabindex="-1"></td>
 			</tr>
 			<cfif StructKeyExists(parm, "load")>

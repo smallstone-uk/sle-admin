@@ -121,13 +121,13 @@
 							title="tick this box to create a payment entry for the same amount." /> Paid from account on: </label>
 					</td>
 					<th width="100" align="left">Net Amount</th>
-					<td><input type="text" name="trnAmnt1" value="#abs(trans.trnAmnt1)#" id="NetAmount" style="text-align:right;" tabindex="11"></td>
+					<td><input type="text" name="trnAmnt1" value="#abs(trans.trnAmnt1)#" id="NetAmount" style="text-align:right;" tabindex="11" autocomplete="off"></td>
 				</tr>
 				<tr>
 					<th width="100" align="left">Trans Date</th>
 					<td><input type="text" name="trnDate" class="datepicker" value="#LSDateFormat(trans.trnDate, 'dd/mm/yyyy')#" id="trnDate" tabindex="8"></td>
 					<th width="100" align="left" id="hfVATAmntLbl">VAT Amount</th>
-					<td><input type="text" name="trnAmnt2" value="#abs(trans.trnAmnt2)#" id="VATAmount" style="text-align:right;" tabindex="12"></td>
+					<td><input type="text" name="trnAmnt2" value="#abs(trans.trnAmnt2)#" id="VATAmount" style="text-align:right;" tabindex="12" autocomplete="off"></td>
 				</tr>
 				<tr>
 					<th width="100" align="left">Trans Ref</th>

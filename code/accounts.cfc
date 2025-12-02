@@ -1966,7 +1966,7 @@
 				AND niNomID = nomID
 				AND niNomID != #val(args.form.accNomAcct)#
 				AND niNomID != #GetNominalVATRecordID()#
-				AND niNomID NOT IN (11,21)
+				AND niNomID NOT IN (11,21,201)	<!--- skip balancing accounts --->
 				ORDER BY niID asc
 			</cfquery>
 			

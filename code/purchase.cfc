@@ -1155,7 +1155,7 @@
 		
 		<cfset result.args=args>
 		<cfquery name="QTrans" datasource="#args.datasource#" result="QResult">
-			SELECT accID,accName, trnID, trnLedger, trnRef,trnDate, trnAccountID, trnType,trnAmnt1,trnAmnt2,trnAlloc,trnAllocID,trnMethod,trnDesc
+			SELECT accID,accName, trnID,trnLedger,trnRef,trnDesc,trnDate,trnAccountID,trnType,trnAmnt1,trnAmnt2,trnAlloc,trnAllocID,trnMethod
 			FROM tblTrans,tblAccount
 			WHERE trnAccountID=accID
 			
@@ -1190,6 +1190,7 @@
 			<cfset rec.accName=accName>
 			<cfset rec.trnID=trnID>
 			<cfset rec.trnRef=trnRef>
+			<cfset rec.trnDesc=trnDesc>
 			<cfset rec.trnDate=trnDate>
 			<cfset rec.trnType=trnType>
 			<cfset rec.trnAmnt1=trnAmnt1>

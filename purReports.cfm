@@ -1753,6 +1753,7 @@
 											<th>Tran ID</th>
 											<th>Tran Date</th>
 											<th>Reference</th>
+											<th>Description</th>
 											<th>Type</th>
 											<th>Amount 1</th>
 											<th>Amount 2</th>
@@ -1782,7 +1783,8 @@
 											<td>#loc.tran.accName#</td>
 											<td align="right"><a href="tranMain2.cfm?acc=#loc.tran.accID#&tran=#loc.tran.trnID#" target="acctran">#loc.tran.trnID#</a>
 											<td align="right">#DateFormat(loc.tran.trnDate,'ddd dd-mmm-yy')#</td>
-											<td>#loc.tran.trnref#</td>
+											<td>#loc.tran.trnRef#</td>
+											<td>#loc.tran.trnDesc#</td>
 											<td>#loc.tran.trnType#</td>
 											<td align="right">#pur.formatNum(loc.tran.trnAmnt1)#</td>
 											<td align="right">#pur.formatNum(loc.tran.trnAmnt2)#</td>
@@ -1819,7 +1821,7 @@
 										</tr>
 									</cfloop>
 									<tr>
-										<th colspan="3">Account Balance</th>
+										<th colspan="4">Account Balance</th>
 										<th colspan="3">#NumberFormat(ArrayLen(trans.tranArray),",")# transactions</th>
 										<th align="right">#DecimalFormat(accBalance)#</th>
 										<th colspan="2">#errors# Errors</th>
@@ -1827,7 +1829,7 @@
 										<th align="right">#DecimalFormat(nombalance)#</th>
 									</tr>
 									<tr>
-										<td colspan="9"></td>
+										<td colspan="10"></td>
 										<td colspan="2">
 											<cfset keys = ListSort(StructKeyList(analysis,","),"text","asc",",")>
 											<table class="tableList" width="100%">

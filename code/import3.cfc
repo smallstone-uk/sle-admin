@@ -424,7 +424,7 @@
 								</cfif>
 								<cfset StructInsert(loc.trans,loc.ref, {
 									"trnAccountID" = args.form.srchSupplier,
-									"row" = Row,
+									"row" = currentRow,
 									"trnDate" = Date,
 									"trnRef" = loc.ref,
 									"trnType" = loc.type,

@@ -115,10 +115,10 @@
 						<li><a href="nomTran.cfm">Nominal Transactions</a></li>
 						<li class="spacer"></li>
 						<li><a href="#application.site.url2#reportdaysheet3.cfm" target="_blank">Import Till Data</a></li>
-						<li><a href="spread2.cfm">Import Bank Statement</a></li>
-						<li><a href="spreadloan.cfm">Import Bank Loan Statement</a></li>
-						<li><a href="importnominal.cfm">Import Nominal Transactions</a></li>
-						<li><a href="importExcel.cfm">Import Excel Data (new)</a></li>
+						<li><a href="spread2.cfm" target="importBank">Import Bank Statement</a></li>
+						<li><a href="spreadloan.cfm" target="importLoan" >Import Bank Loan Statement</a></li>
+						<li><a href="importnominal.cfm" target="importNom">Import Nominal Transactions</a></li>
+						<li><a href="importExcel.cfm" target="importExcel">Import Excel Data (new)</a></li>
 						<li class="spacer"></li>
 						<li><a href="nomManager.cfm">Nominal Manager</a></li>
 						<li><a href="nomReports.cfm">Nominal Graphs</a></li>

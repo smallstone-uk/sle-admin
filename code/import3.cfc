@@ -547,7 +547,7 @@
 						<tr>
 							<td>#loc.counter#</td>
 							<td>#loc.data.trnAccountID#</td>
-							<td>#loc.data.Row#</td>
+							<td>#loc.data.row#</td>
 							<td>#loc.data.trnDate#</td>
 							<td>#loc.data.trnType#</td>
 							<td>#loc.data.trnRef#</td>

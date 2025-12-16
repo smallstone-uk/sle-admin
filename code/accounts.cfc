@@ -1681,7 +1681,7 @@
 				LEFT JOIN tblnomgroups ON ngCode = nomGroup
 				WHERE nomStatus = 1
 				ORDER BY nomGroup, nomTitle
-				LIMIT 10;		<!--- test only --->
+				<!--- LIMIT 10;		test only --->
 			</cfquery>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

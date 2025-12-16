@@ -71,7 +71,7 @@
 				<td>
 					<select name="group">
 						<cfloop array="#groups#" index="i">
-							<option value="#i.ngName#">#i.ngName#</option>
+							<option value="#i.ngCode#">#i.ngCode#</option>
 						</cfloop>
 					</select>
 				</td>

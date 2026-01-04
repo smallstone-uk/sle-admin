@@ -3693,7 +3693,7 @@
 							'#LSDateFormat(args.form.psDate,"YYYY-MM-DD")#',
 							'#issue#',
 							#val(QLoad.psArrivalDay)#,
-							#args.form.psQty#,
+							#val(args.form.psQty)#,
 							#QLoad.psRetail#,
 							#QLoad.psDiscount#,
 							'#QLoad.psDiscountType#',
@@ -3761,8 +3761,6 @@
 						WHERE psID=#val(args.form.psID)#
 					</cfquery>
 					<cfset result.msg="Done">
-<cfdump var="#loc.QUpdateReturnResult#" label="QUpdateReturn" expand="yes" format="html" 
-	output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 					
 				<cfelse>
 					<cfset result.msg="Mode is #args.form.mode# nothing happened">

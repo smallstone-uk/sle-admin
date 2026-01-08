@@ -137,6 +137,8 @@
 						<li><a href="purReports.cfm">Transaction Reports</a></li>
 						<li><a href="suppliers.cfm">Supplier Reports</a></li>
 						<li class="spacer"></li>
+						<li><a href="newsReports.cfm">News Reports</a></li>
+						<li class="spacer"></li>
 						<li><a href="vatReport.cfm">VAT Reports</a></li>
 						<li><a href="accReports.cfm">Accounting Reports</a></li>
 						<li class="spacer"></li>

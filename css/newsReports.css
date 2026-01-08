@@ -1,0 +1,61 @@
+@charset "utf-8";
+/* accounting reports functions */
+
+/* Overlay */
+#overlay {
+	display: none;
+	position: fixed;
+	top: 0; left: 0;
+	width: 100%; height: 100%;
+	background: rgba(0,0,0,0.5);
+	z-index: 1000;
+}
+/* Modal */
+#modal {
+	display: none;
+	position: fixed;
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	z-index: 1001;
+	min-width: 300px;
+	box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+#modal h2 {
+	margin-top: 0;
+}	
+#modal-content {
+	margin: 15px 0;
+	max-height: 80vh; 
+	overflow-y: auto;
+	border: solid 1px #CCCCCC;
+}
+#nomGroup {width:300px;}
+
+.balanceError {color: #FFF !important; background-color:#FF0000 !important;}
+
+.pm-flag {
+  cursor: pointer;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+}
+.pm-flag .tick {
+  background: url("/images/icons/revert-green.png") no-repeat center center;
+  background-size: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.pm-flag .cross {
+  background: url("/images/icons/revert-red.png") no-repeat center center;
+  background-size: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.error {background-color:#FF0000; color:#FFFFFF;}
+.amber {background-color:#FC3;}
+

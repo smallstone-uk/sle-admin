@@ -138,7 +138,8 @@
 											<input type="text" name="srchDateTo" id="srchDateTo" value="#srchDateTo#" class="datepicker" />
 										</td>
 									</tr>
-									<tr>
+<!---	
+								<tr>
 										<td><b>Sort By</b></td>
 										<td>
 											<select name="srchSort">
@@ -153,6 +154,7 @@
 											<input type="checkbox" name="srchFixData" id="srchFixData" value="1" /> Fix Data (for specific reports only)
 										</td>
 									</tr>
+--->
 								</table>
 							</div>
 						</form>	<!--- end form --->

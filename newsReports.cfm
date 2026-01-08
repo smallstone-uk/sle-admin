@@ -24,7 +24,7 @@
 				$.each(formData, function(_, field) {
 					formObj[field.name] = field.value;
 				});
-				console.log(formObj);
+			//	console.log(formObj);
 				if (formObj.srchReport = 1)	{
 					LoadSales();
 				} else if (formObj.srchReport = 2) {
@@ -32,7 +32,7 @@
 				} else if (formObj.srchReport = 3) {
 					
 				}
-				console.log(formObj.srchReport);
+		//		console.log(formObj.srchReport);
 				e.preventDefault();
 				e.stopPropagation();
 			}

@@ -6,7 +6,7 @@
 <cfset parms.datasource = application.site.datasource1>
 <cfset parms.form = form>
 
-<cfdump var="#form#" label="form newsReports" expand="true">
+<!---<cfdump var="#form#" label="form newsReports" expand="true">--->
 
 <cfif StructKeyExists(form,"mode")>
 	<cfif mode eq 1>

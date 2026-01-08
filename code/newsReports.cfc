@@ -57,6 +57,7 @@
 				WHERE psType = 'received'
 				AND psRetail > 0
 				<!---AND pubID IN (28861,31401,17021)--->
+				<cfif len(args.form.srchGroup)> AND pubGroup LIKE '#args.form.srchGroup#'</cfif>
 				AND psDate BETWEEN '#LSDateFormat(loc.srchDateFrom,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.srchDateTo,"yyyy-mm-dd")#'
 				ORDER BY pubID,psType
 			</cfquery>
@@ -174,6 +175,7 @@
 						<th>Type</th>
 						<th>Retail</th>
 						<th>Trade</th>
+						<th>Date</th>
 						<th>Received</th>
 						<th>Delivered</th>
 						<th>Returned</th>
@@ -202,6 +204,7 @@
 							<td>#loc.data.pubType#</td>
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
+							<td align="right">#loc.data.yymmdd#</td>
 							<td align="center">#loc.data.received#</td>
 							<td align="center">#loc.data.delivered#</td>
 							<td align="center">#loc.data.returned#</td>
@@ -214,7 +217,7 @@
 						</tr>
 					</cfloop>
 					<tr class="#loc.data.style#">
-						<th colspan="5" align="right">Totals</th>
+						<th colspan="6" align="right">Totals</th>
 						<th align="center">#loc.totals.received#</th>
 						<th align="center">#loc.totals.delivered#</th>
 						<th align="center">#loc.totals.returned#</th>

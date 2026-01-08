@@ -137,16 +137,18 @@
 											<input type="text" name="srchDateTo" id="srchDateTo" value="#srchDateTo#" class="datepicker" />
 										</td>
 									</tr>
-<!---	
 								<tr>
-										<td><b>Sort By</b></td>
-										<td>
-											<select name="srchSort">
-												<option value="1"<cfif srchSort eq "1"> selected="selected"</cfif>>Nominal Code</option>
-												<option value="2"<cfif srchSort eq "2"> selected="selected"</cfif>>Account Code</option>
-											</select>
-										</td>
-									</tr>
+									<td><b>Publication Type</b></td>
+									<td>
+										<select name="srchGroup">
+											<option value=""<cfif srchSort eq ""> selected="selected"</cfif>>Any Group</option>
+											<option value="News"<cfif srchSort eq "News"> selected="selected"</cfif>>News</option>
+											<option value="Magazine"<cfif srchSort eq "Magazine"> selected="selected"</cfif>>Magazine</option>
+											<option value="Unknown"<cfif srchSort eq "Unknown"> selected="selected"</cfif>>Unknown</option>
+										</select>
+									</td>
+								</tr>
+<!---	
 									<tr>
 										<td><b>Options</b></td>
 										<td>

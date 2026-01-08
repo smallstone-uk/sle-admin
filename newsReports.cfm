@@ -13,7 +13,6 @@
 	<script src="scripts/jquery.dcmegamenu.1.3.3.js"></script>		<!--- top menu navigation --->
 	<script src="scripts/jquery.hoverIntent.minified.js"></script>	<!--- top menu navigation --->
 	<script src="scripts/chosen.jquery.js" type="text/javascript"></script>
-	<!---<script src="scripts/accReports.js"></script>--->			<!--- accounting report scripts load later --->
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.datepicker').datepicker({dateFormat: "yy-mm-dd",changeMonth: true,changeYear: true,showButtonPanel: true, minDate: new Date(2013, 1 - 1, 1)});
@@ -25,7 +24,7 @@
 				$.each(formData, function(_, field) {
 					formObj[field.name] = field.value;
 				});
-			//	console.log(formObj);
+				console.log(formObj);
 				if (formObj.srchReport = 1)	{
 					LoadSales();
 				} else if (formObj.srchReport = 2) {
@@ -33,7 +32,7 @@
 				} else if (formObj.srchReport = 3) {
 					
 				}
-		//		console.log(formObj.srchReport);
+				console.log(formObj.srchReport);
 				e.preventDefault();
 				e.stopPropagation();
 			}

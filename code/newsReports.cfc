@@ -51,7 +51,7 @@
 			</cfif>
 
 			<cfquery name="loc.QPubStockReceived" datasource="#args.datasource#">
-				SELECT pubID,pubTitle, psIssue,psDate,psQty,psType,psRetail,psTradePrice, DATE_FORMAT( psDate, '%Y-%m-%d' ) AS YYMMDD
+				SELECT pubID,pubTitle,pubType, psIssue,psDate,psQty,psType,psRetail,psTradePrice, DATE_FORMAT( psDate, '%Y-%m-%d' ) AS YYMMDD
 				FROM tblPubStock
 				INNER JOIN tblPublication ON psPubID = pubID
 				WHERE psType = 'received'
@@ -71,6 +71,7 @@
 						pubTitle = pubTitle,
 						psIssue = psIssue,
 						psDate = psDate,
+						pubType = pubType,
 						yymmdd = YYMMDD,
 						Retail = psRetail,
 						Trade = psTradePrice,
@@ -170,13 +171,14 @@
 					<tr>
 						<th>Title</th>
 						<th>Issue</th>
+						<th>Type</th>
 						<th>Retail</th>
 						<th>Trade</th>
 						<th>Received</th>
 						<th>Delivered</th>
 						<th>Returned</th>
-						<th>Credited</th>
 						<th>Claimed</th>
+						<th>Credited</th>
 						<th>Missing</th>
 						<th>Sales</th>
 						<th>Sales Value</th>
@@ -197,13 +199,14 @@
 						<tr class="#loc.data.style#">
 							<td>#loc.data.pubTitle#</td>
 							<td>#loc.data.psIssue#</td>
+							<td>#loc.data.pubType#</td>
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
 							<td align="center">#loc.data.received#</td>
 							<td align="center">#loc.data.delivered#</td>
 							<td align="center">#loc.data.returned#</td>
-							<td align="center">#loc.data.credited#</td>
 							<td align="center">#loc.data.claim#</td>
+							<td align="center">#loc.data.credited#</td>
 							<td align="center">#loc.data.missing#</td>
 							<td align="center">#loc.data.sales#</td>
 							<td align="right">#FormatNum(loc.data.salesValue)#</td>
@@ -211,19 +214,16 @@
 						</tr>
 					</cfloop>
 					<tr class="#loc.data.style#">
-						<th></th>
-						<th>Totals</th>
-						<th align="right"></th>
-						<th align="right"></th>
+						<th colspan="5" align="right">Totals</th>
 						<th align="center">#loc.totals.received#</th>
 						<th align="center">#loc.totals.delivered#</th>
 						<th align="center">#loc.totals.returned#</th>
-						<th align="center">#loc.totals.credited#</th>
 						<th align="center">#loc.totals.claim#</th>
+						<th align="center">#loc.totals.credited#</th>
 						<th align="center">#loc.totals.missing#</th>
 						<th align="center">#loc.totals.sales#</th>
-						<th align="center">#FormatNum(loc.totals.salesValue)#</th>
-						<th align="center">#FormatNum(loc.totals.tradeValue)#</th>
+						<th align="right">#FormatNum(loc.totals.salesValue)#</th>
+						<th align="right">#FormatNum(loc.totals.tradeValue)#</th>
 					</tr>
 				</table>
 			</cfoutput>

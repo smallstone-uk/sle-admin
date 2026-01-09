@@ -30,6 +30,18 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.result.Stock = {}>
+		<cfset loc.result.queries = []>
+		
+		<cfset loc.spans = {
+			"Fortnightly" = 14,
+			"Monthly" = 31,
+			"Weekly" = 7,
+			"Four-Weekly" = 28,
+			"Morning" = 1,
+			"Sunday" = 7,
+			"Saturday" = 7,
+			"Weekend" = 7
+		}>
 		
 		<cftry>
 			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
@@ -66,13 +78,22 @@
 				<cfset loc.pubID = val(pubID)>
 				<cfset loc.psIssue = psIssue>
 				<cfset loc.psDate = psDate>
+				<cfif StructKeyExists(loc.spans,pubType)>
+					<cfset loc.span = StructFind(loc.spans,pubType)>
+					<cfset loc.delDate = DateAdd("d",loc.span,psDate)>
+				<cfelse>
+					<cfset loc.span = 1>
+					<cfset loc.delDate = DateAdd("d",1,psDate)>
+				</cfif>
 				<cfset loc.compKey = "#loc.pubID#-#loc.psIssue#">
 				<cfif !StructKeyExists(loc.result.Stock,loc.compKey)>
 					<cfset StructInsert(loc.result.Stock,loc.compKey,{
+						pubID = pubID,
 						pubTitle = pubTitle,
 						psIssue = psIssue,
 						psDate = psDate,
 						pubType = pubType,
+						span = loc.span,
 						yymmdd = YYMMDD,
 						Retail = psRetail,
 						Trade = psTradePrice,
@@ -109,16 +130,17 @@
 					</cfloop>
 				</cfif>
 				
-				<cfquery name="loc.QDelivered" datasource="#args.datasource#">
-					SELECT pubID,pubTitle, diType,diDate,SUM(diPrice) AS netTotal, SUM(diPriceTrade) AS tradeTotal, SUM(IF(diType = 'credit',-diQty,diQty)) AS Qty
+				<cfquery name="loc.QDelivered" datasource="#args.datasource#" result="loc.QDelResult">
+					SELECT pubID,pubTitle,pubType, diType,diDate,SUM(diPrice) AS netTotal, SUM(diPriceTrade) AS tradeTotal, SUM(IF(diType = 'credit',-diQty,diQty)) AS Qty
 					FROM tbldelitems 
 					INNER JOIN tblPublication ON diPubID = pubID
 					WHERE diPubID = #loc.pubID#
 					AND diIssue = '#loc.psIssue#'
-					AND diDate = '#LSDateFormat(loc.psDate,"yyyy-mm-dd")#'
+					AND diDate BETWEEN '#LSDateFormat(loc.psDate,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.delDate,"yyyy-mm-dd")#'
 					ORDER BY pubID
 				</cfquery>
 				<cfif loc.QDelivered.recordcount gt 0>
+					<!---<cfset ArrayAppend(loc.result.queries,{"result" = loc.QDelResult, "data" = loc.QDelivered})>--->
 					<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
 					<cfif !StructKeyExists(loc.data,"delivered")>
 						<cfset StructInsert(loc.data,"delivered", val(loc.QDelivered.Qty))>
@@ -165,17 +187,17 @@
 			"tradeValue" = 0
 		}>
 		<!---<cfdump var="#args#" label="ViewShopSalesReport" expand="true">--->
-		
 		<cftry>
 			<cfoutput>
 				<table class="tableList" border="1">
 					<tr>
+						<th>ID</th>
 						<th>Title</th>
 						<th>Issue</th>
 						<th>Type</th>
 						<th>Retail</th>
 						<th>Trade</th>
-						<th>Date</th>
+						<th width="80">Date</th>
 						<th>Received</th>
 						<th>Delivered</th>
 						<th>Returned</th>
@@ -199,25 +221,26 @@
 						<cfset loc.totals.salesValue += loc.data.salesValue>
 						<cfset loc.totals.tradeValue += loc.data.tradeValue>
 						<tr class="#loc.data.style#">
+							<td>#loc.data.pubID#</td>
 							<td>#loc.data.pubTitle#</td>
 							<td>#loc.data.psIssue#</td>
-							<td>#loc.data.pubType#</td>
+							<td>#loc.data.pubType# (#loc.data.span#)</td>
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
 							<td align="right">#loc.data.yymmdd#</td>
-							<td align="center">#loc.data.received#</td>
-							<td align="center">#loc.data.delivered#</td>
-							<td align="center">#loc.data.returned#</td>
-							<td align="center">#loc.data.claim#</td>
-							<td align="center">#loc.data.credited#</td>
-							<td align="center">#loc.data.missing#</td>
-							<td align="center">#loc.data.sales#</td>
+							<td align="center" class="ncol1">#loc.data.received#</td>
+							<td align="center" class="ncol2">#loc.data.delivered#</td>
+							<td align="center" class="ncol3">#loc.data.returned#</td>
+							<td align="center" class="ncol4">#loc.data.claim#</td>
+							<td align="center" class="ncol5">#loc.data.credited#</td>
+							<td align="center" class="ncol6">#loc.data.missing#</td>
+							<td align="center" class="ncol7">#loc.data.sales#</td>
 							<td align="right">#FormatNum(loc.data.salesValue)#</td>
 							<td align="right">#FormatNum(loc.data.tradeValue)#</td>
 						</tr>
 					</cfloop>
 					<tr class="#loc.data.style#">
-						<th colspan="6" align="right">Totals</th>
+						<th colspan="7" align="right">Totals</th>
 						<th align="center">#loc.totals.received#</th>
 						<th align="center">#loc.totals.delivered#</th>
 						<th align="center">#loc.totals.returned#</th>
@@ -227,6 +250,11 @@
 						<th align="center">#loc.totals.sales#</th>
 						<th align="right">#FormatNum(loc.totals.salesValue)#</th>
 						<th align="right">#FormatNum(loc.totals.tradeValue)#</th>
+					</tr>
+					<tr>
+						<th colspan="12"></th>
+						<th align="right" colspan="3">Profit</th>
+						<th align="right">#FormatNum(loc.totals.salesValue - loc.totals.tradeValue)#</th>
 					</tr>
 				</table>
 			</cfoutput>

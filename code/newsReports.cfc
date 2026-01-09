@@ -41,7 +41,7 @@
 			"Sunday" = 7,
 			"Saturday" = 7,
 			"Weekend" = 7,
-			"o/shot" = 90
+			"One Shots" = 90
 		}>
 		
 		<cftry>

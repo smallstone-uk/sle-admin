@@ -40,7 +40,8 @@
 			"Morning" = 1,
 			"Sunday" = 7,
 			"Saturday" = 7,
-			"Weekend" = 7
+			"Weekend" = 7,
+			"o/shot" = 90
 		}>
 		
 		<cftry>
@@ -80,10 +81,10 @@
 				<cfset loc.psDate = psDate>
 				<cfif StructKeyExists(loc.spans,pubType)>
 					<cfset loc.span = StructFind(loc.spans,pubType)>
-					<cfset loc.delDate = DateAdd("d",loc.span,psDate)>
+					<cfset loc.endDate = LSDateFormat(DateAdd("d",loc.span,psDate),"yyyy-mm-dd")>
 				<cfelse>
 					<cfset loc.span = 1>
-					<cfset loc.delDate = DateAdd("d",1,psDate)>
+					<cfset loc.endDate = LSDateFormat(DateAdd("d",1,psDate),"yyyy-mm-dd")>
 				</cfif>
 				<cfset loc.compKey = "#loc.pubID#-#loc.psIssue#">
 				<cfif !StructKeyExists(loc.result.Stock,loc.compKey)>
@@ -94,6 +95,7 @@
 						psDate = psDate,
 						pubType = pubType,
 						span = loc.span,
+						endDate = loc.endDate,
 						yymmdd = YYMMDD,
 						Retail = psRetail,
 						Trade = psTradePrice,
@@ -136,7 +138,7 @@
 					INNER JOIN tblPublication ON diPubID = pubID
 					WHERE diPubID = #loc.pubID#
 					AND diIssue = '#loc.psIssue#'
-					AND diDate BETWEEN '#LSDateFormat(loc.psDate,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.delDate,"yyyy-mm-dd")#'
+					AND diDate BETWEEN '#LSDateFormat(loc.psDate,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.endDate,"yyyy-mm-dd")#'
 					ORDER BY pubID
 				</cfquery>
 				<cfif loc.QDelivered.recordcount gt 0>
@@ -149,6 +151,9 @@
 						<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.credited>
 					<cfelse>
 						<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.returned - loc.data.claim>
+					</cfif>
+					<cfif (Now() lt loc.endDate) AND loc.data.returned IS 0>
+						<cfset loc.data.sales = 0>
 					</cfif>
 					<cfif loc.data.sales gt 0>
 						<cfset loc.data.salesValue = loc.data.sales * loc.data.Retail>
@@ -194,7 +199,7 @@
 						<th>ID</th>
 						<th>Title</th>
 						<th>Issue</th>
-						<th>Type</th>
+						<th width="110">Type</th>
 						<th>Retail</th>
 						<th>Trade</th>
 						<th width="80">Date</th>
@@ -227,7 +232,7 @@
 							<td>#loc.data.pubType# (#loc.data.span#)</td>
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
-							<td align="right">#loc.data.yymmdd#</td>
+							<td align="right">#loc.data.yymmdd#<br>#loc.data.endDate#</td>
 							<td align="center" class="ncol1">#loc.data.received#</td>
 							<td align="center" class="ncol2">#loc.data.delivered#</td>
 							<td align="center" class="ncol3">#loc.data.returned#</td>

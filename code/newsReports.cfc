@@ -142,7 +142,7 @@
 					ORDER BY pubID
 				</cfquery>
 				<cfif loc.QDelivered.recordcount gt 0>
-					<cfset ArrayAppend(loc.result.queries,{"result" = loc.QDelResult, "data" = loc.QDelivered})>
+					<!---<cfset ArrayAppend(loc.result.queries,{"result" = loc.QDelResult, "data" = loc.QDelivered})>--->
 					<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
 					<cfif !StructKeyExists(loc.data,"delivered")>
 						<cfset StructInsert(loc.data,"delivered", val(loc.QDelivered.Qty))>
@@ -191,7 +191,7 @@
 			"salesValue" = 0,
 			"tradeValue" = 0
 		}>
-		<cfdump var="#args#" label="ViewShopSalesReport" expand="true">
+		<!---<cfdump var="#args#" label="ViewShopSalesReport" expand="true">--->
 		<cftry>
 			<cfoutput>
 				<table class="tableList" border="1">

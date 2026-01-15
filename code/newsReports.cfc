@@ -387,7 +387,7 @@
 			"salesValue" = 0,
 			"tradeValue" = 0
 		}>
-		<!---<cfdump var="#args#" label="ViewShopSalesReport" expand="true">--->
+		<cfdump var="#args#" label="ViewShopSalesReport" expand="true">
 		<cftry>
 			<cfoutput>
 				<div id="nwrapper">

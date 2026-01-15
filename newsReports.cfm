@@ -26,9 +26,9 @@
 				});
 			//	console.log(formObj);
 				if (formObj.srchReport = 1)	{
-					LoadSales();
-				} else if (formObj.srchReport = 2) {
 					
+				} else if (formObj.srchReport = 2) {
+					LoadSales();
 				} else if (formObj.srchReport = 3) {
 					
 				}

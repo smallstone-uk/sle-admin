@@ -13,10 +13,206 @@
 			<cfset loc.option = 1>
 			<cfset ArrayAppend(loc.result.menu, {
 				Value = #loc.option#,
+				Title = "Book in Stock",
+				ID = "ID#loc.option#"
+			})>
+			<cfset loc.option++>
+			<cfset ArrayAppend(loc.result.menu, {
+				Value = #loc.option#,
 				Title = "Stock Movement",
 				ID = "ID#loc.option#"
 			})>
 
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+
+	<cffunction name="ShopStock" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.pubs = {}>
+		<cfset loc.result.viewOrder = []>
+		
+		<cftry>
+			<cfif !StructKeyExists(args.form,"srchDateFrom") OR len(args.form.srchDateFrom) IS 0>
+				<cfset loc.srchDateFrom = FormatDate(Now(),'yyyy-mm-dd')>
+			<cfelseif IsDate(args.form.srchDateFrom)>
+				<cfset loc.srchDateFrom = FormatDate(args.form.srchDateFrom,'yyyy-mm-dd')>
+			<cfelse>
+				<cfset loc.srchDateFrom = FormatDate(Now(),'yyyy-mm-dd')>
+			</cfif>
+			<cfset loc.result.srchDateFrom = loc.srchDateFrom>
+			<cfset loc.dayNo = DayOfWeek(loc.srchDateFrom)>
+			<cfif loc.dayNo eq 1>
+				<cfset loc.dayName = '"Sunday"'>
+			<cfelseif loc.dayNo eq 7>
+				<cfset loc.dayName = '"Saturday","Weekend"'>
+			<cfelse>
+				<cfset loc.dayName = '"Morning"'>
+			</cfif>
+			<cfset loc.dayNo = ((loc.dayNo + (7 -2)) MOD 7) + 1>	<!--- pubArrival is based on Monday = day 1 --->
+			<!---  return (((DayOfWeek(date) + (7 -day_1)) MOD 7) +1);
+				return ((DayOfWeek(loc.srchDateFrom) + (7 -2)) MOD 7) + 1
+			 --->
+			<cfset loc.result.arrival = loc.dayNo>
+			<cfset loc.result.query = 1>
+			<cfquery name="loc.QPubs" datasource="#args.datasource#" result="loc.result.rpubs">
+				SELECT pubID,pubRef,pubTitle,pubType,pubGroup,pubLinkPub,pubSup,pubArrival,pubActive, psIssue,psRetail,psDiscount,psDiscountType,psQty,psVATRate,psVAT
+				FROM tblPublication
+				INNER JOIN tblPubStock ON psPubID = pubID
+				WHERE pubActive = 1
+				AND psDate = '#loc.srchDateFrom#'
+				AND psType = 'received'
+				AND (
+					pubType IN (#loc.dayName#)
+					OR (pubType IN ('Weekly','Monthly') AND pubArrival = #loc.dayNo#)
+				)
+				ORDER BY pubGroup ASC, pubType ASC, pubTitle ASC, pubRef
+			</cfquery>
+			<cfif loc.QPubs.recordCount IS 0>
+				<cfset loc.srchDateFrom = FormatDate(DateAdd("d",-7,loc.srchDateFrom),'yyyy-mm-dd')>		<!--- look at previous week --->
+				<cfset loc.result.query = 2>
+				<cfquery name="loc.QPubs" datasource="#args.datasource#" result="loc.result.rpubs">
+					SELECT pubID,pubRef,pubTitle,pubType,pubGroup,pubLinkPub,pubSup,pubArrival, psIssue,psRetail,psDiscount,psDiscountType,0 AS psQty,psVATRate,psVAT
+					FROM tblPublication
+					INNER JOIN tblPubStock ON psPubID = pubID
+					WHERE pubActive = 1
+					AND psDate = '#loc.srchDateFrom#'
+					AND psType = 'received'
+					AND (
+						pubType IN (#loc.dayName#)
+						OR (pubType IN ('Weekly','Monthly') AND pubArrival = #loc.dayNo#)
+					)
+					ORDER BY pubGroup ASC, pubType ASC, pubTitle ASC, pubRef
+				</cfquery>
+				<cfif loc.QPubs.recordCount eq 0>
+					<cfset loc.result.query = 3>
+					<cfquery name="loc.QPubs" datasource="#args.datasource#" result="loc.result.rpubs">
+						SELECT pubID,pubRef,pubTitle,pubType,pubGroup,pubLinkPub,pubSup,pubArrival,pubActive, 
+						'' AS psIssue,
+						pubPrice AS psRetail,
+						pubDiscount AS psDiscount,
+						pubDiscType AS psDiscountType,
+						0 AS psQty,
+						pubVAT AS psVATRate,
+						pubVATCode AS psVAT
+						FROM tblPublication
+						WHERE pubActive = 1
+						AND (
+							pubType IN (#loc.dayName#)
+							OR (pubType IN ('Weekly','Monthly') AND pubArrival = #loc.dayNo#)
+						)
+						ORDER BY pubGroup ASC, pubType ASC, pubTitle ASC, pubRef
+					</cfquery>
+				</cfif>
+			</cfif>
+			<cfloop query="loc.QPubs">
+				<cfset ArrayAppend(loc.result.viewOrder,pubID)>
+				<cfif pubLinkPub neq 0>
+					<cfset ArrayAppend(loc.result.viewOrder,pubLinkPub)>
+				</cfif>
+				<cfif !StructKeyExists(loc.result.pubs,pubID)>
+					<cfset loc.issue = ''>
+					<cfswitch expression="#loc.result.query#">
+						<cfcase value="1">
+							<cfset loc.issue = psIssue>
+						</cfcase>
+						<cfcase value="2">
+							<cfif pubGroup eq "NEWS">
+								<cfset loc.issue = LSDateFormat(loc.result.srchDateFrom,"ddmmm")>
+							<cfelseif IsNumeric(psIssue)>
+								<cfset loc.issue = val(psIssue) + 1>
+							</cfif>
+						</cfcase>
+						<cfcase value="3">
+							<cfif pubGroup eq "NEWS">
+								<cfset loc.issue = LSDateFormat(loc.result.srchDateFrom,"ddmmm")>
+							</cfif>
+						</cfcase>
+						<cfdefaultcase></cfdefaultcase>
+					</cfswitch>
+					<cfset StructInsert(loc.result.pubs,pubID,{
+						qType = loc.result.query,
+						pubRef = pubRef,
+						pubTitle = pubTitle,
+						pubType = pubType,
+						pubGroup = pubGroup,
+						pubLinkPub = pubLinkPub,
+						pubSup = pubSup,
+						pubArrival = pubArrival,
+						psIssue = loc.issue,
+						psRetail = psRetail,
+						psDiscount = psDiscount,
+						psDiscountType = psDiscountType,
+						psQty = psQty,
+						psVATRate = psVATRate,
+						psVAT = psVAT
+					})>
+				</cfif>
+			</cfloop>
+			<cfset loc.result.QPubs = loc.QPubs>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="ViewShopStock" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		
+		<cftry>
+			<cfdump var="#args#" label="ViewShopStock" expand="false">
+			<!---,,,,,,,PUBACTIVE,,,PUBID,PUBLINKPUB,PUBREF,PUBSUP,,--->
+			<cfoutput>
+				<table class="tableList" border="1">
+					<tr>
+						<th>ID</th>
+						<th>Title</th>
+						<th>Type</th>
+						<th>Group</th>
+						<th>Arrival</th>
+						<th>VAT</th>
+						<th>Rate</th>
+						<th>Retail</th>
+						<th>Discount</th>
+						<th>Disc. Type</th>
+						<th width="60">Issue</th>
+						<th width="60">Qty</th>
+					</tr>
+					<!---<cfloop query="args.QPubs">--->
+					<form>
+					<cfloop array="#args.viewOrder#" index="loc.item">
+						<cfif StructKeyExists(args.pubs,loc.item)>
+							<cfset loc.data = StructFind(args.pubs,loc.item)>
+							<tr>
+								<td>#loc.item#</td>
+								<td>#loc.data.PUBTITLE#</td>
+								<td>#loc.data.PUBTYPE#</td>
+								<td>#loc.data.PUBGROUP#</td>
+								<td>#loc.data.PUBARRIVAL#</td>
+								<td>#loc.data.PSVAT#</td>
+								<td>#loc.data.PSVATRATE#%</td>
+								<td><input name="PSRETAIL" id="PSRETAIL" class="newsfld" value="#loc.data.PSRETAIL#" /></td>
+								<td><input name="PSDISCOUNT" id="PSDISCOUNT" class="newsfld" value="#loc.data.PSDISCOUNT#" /></td>
+								<td>#loc.data.PSDISCOUNTTYPE#</td>
+								<td><input name="PSISSUE" id="PSISSUE" class="newsfld" value="#loc.data.PSISSUE#" /></td>
+								<td><input name="PSQTY" id="PSQTY" class="newsfld" value="#loc.data.PSQTY#" /></td>
+							</tr>
+						</cfif>
+					</cfloop>
+					</form>
+				</table>			
+			</cfoutput>
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
@@ -160,7 +356,7 @@
 						<cfset loc.data.tradeValue = loc.data.sales * loc.data.trade>
 					</cfif>
 					<cfset loc.data.missing = loc.data.returned + loc.data.claim - loc.data.credited>
-					<cfif loc.data.returned neq loc.data.credited>
+					<cfif loc.data.returned gt loc.data.received>
 						<cfset loc.data.style = "amber">
 					<cfelseif loc.data.missing neq 0>
 						<cfset loc.data.style = "error">
@@ -194,7 +390,9 @@
 		<!---<cfdump var="#args#" label="ViewShopSalesReport" expand="true">--->
 		<cftry>
 			<cfoutput>
+				<div id="nwrapper">
 				<table class="tableList" border="1">
+					<thead>
 					<tr>
 						<th>ID</th>
 						<th>Title</th>
@@ -213,6 +411,7 @@
 						<th>Sales Value</th>
 						<th>Trade Value</th>
 					</tr>
+					</thead>
 					<cfset loc.keys = ListSort(StructKeyList(args.stock,","),"text","asc")>
 					<cfloop list="#loc.keys#" index="loc.key">
 						<cfset loc.data = StructFind(args.stock,loc.key)>
@@ -233,13 +432,13 @@
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
 							<td align="right">#loc.data.yymmdd#<br>#loc.data.endDate#</td>
-							<td align="center" class="ncol1">#loc.data.received#</td>
-							<td align="center" class="ncol2">#loc.data.delivered#</td>
-							<td align="center" class="ncol3">#loc.data.returned#</td>
-							<td align="center" class="ncol4">#loc.data.claim#</td>
-							<td align="center" class="ncol5">#loc.data.credited#</td>
-							<td align="center" class="ncol6">#loc.data.missing#</td>
-							<td align="center" class="ncol7">#loc.data.sales#</td>
+							<td align="center">#loc.data.received#</td>
+							<td align="center">#loc.data.delivered#</td>
+							<td align="center">#loc.data.returned#</td>
+							<td align="center">#loc.data.claim#</td>
+							<td align="center">#loc.data.credited#</td>
+							<td align="center">#loc.data.missing#</td>
+							<td align="center">#loc.data.sales#</td>
 							<td align="right">#FormatNum(loc.data.salesValue)#</td>
 							<td align="right">#FormatNum(loc.data.tradeValue)#</td>
 						</tr>
@@ -262,6 +461,7 @@
 						<th align="right">#FormatNum(loc.totals.salesValue - loc.totals.tradeValue)#</th>
 					</tr>
 				</table>
+				</div>
 			</cfoutput>
 
 		<cfcatch type="any">

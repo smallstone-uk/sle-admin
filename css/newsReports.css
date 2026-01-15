@@ -67,4 +67,22 @@
 .ncol6 {background-color:#CFC;}
 .ncol7 {background-color:#CF9;}
 
-
+#nwrapper {
+	margin-left:10px;
+	width: 1400px;
+	height: 500px;
+	overflow: auto;
+}
+table thead th {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+	background-color: #edecec;
+		border: 2px solid;
+}
+.newsfld {width:80px;}
+/*table tr th,
+	table tr td {
+		border: 2px solid;
+	}
+*/

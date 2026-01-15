@@ -13,6 +13,11 @@
 		<cfif StructKeyExists(form,"srchReport")>
 			<cfswitch expression="#form.srchReport#">
 				<cfcase value="1">
+					<cfset data = report.ShopStock(parms)>
+					<!---<cfdump var="#data#" label="ShopStock" expand="true">--->
+					<cfset report.ViewShopStock(data)>
+				</cfcase>
+				<cfcase value="2">
 					<cfset data = report.ShopSales(parms)>
 					<cfset report.ViewShopSalesReport(data)>
 				</cfcase>

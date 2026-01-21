@@ -73,14 +73,22 @@
 	height: 500px;
 	overflow: auto;
 }
+@media print {
+  #nwrapper {
+    height: auto !important;
+    width: auto !important;   /* optional */
+    overflow: visible !important;
+  }
+}
 table thead th {
 	position: -webkit-sticky;
 	position: sticky;
 	top: 0;
 	background-color: #edecec;
-		border: 2px solid;
+	/*border: 3px solid;*/
 }
 .newsfld {width:80px;}
+.smallText {font-size:11px;}
 /*table tr th,
 	table tr td {
 		border: 2px solid;

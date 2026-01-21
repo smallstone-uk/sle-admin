@@ -276,7 +276,7 @@
 				<cfset loc.psIssue = psIssue>
 				<cfset loc.psDate = psDate>
 				<cfif StructKeyExists(loc.spans,pubType)>
-					<cfset loc.span = StructFind(loc.spans,pubType)>
+					<cfset loc.span = StructFind(loc.spans,pubType) + 3>
 					<cfset loc.endDate = LSDateFormat(DateAdd("d",loc.span,psDate),"yyyy-mm-dd")>
 				<cfelse>
 					<cfset loc.span = 1>
@@ -303,7 +303,8 @@
 						"missing" = 0,
 						"tradeValue" = 0,
 						"salesValue" = 0,
-						"style" = ""
+						"style" = "",
+						"msg" = ""
 					})>
 				</cfif>
 				<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
@@ -343,25 +344,32 @@
 					<cfif !StructKeyExists(loc.data,"delivered")>
 						<cfset StructInsert(loc.data,"delivered", val(loc.QDelivered.Qty))>
 					</cfif>
-					<cfif loc.data.credited gt loc.data.returned>
-						<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.credited>
-					<cfelse>
-						<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.returned - loc.data.claim>
-					</cfif>
-					<cfif (Now() lt loc.endDate) AND loc.data.returned IS 0>
-						<cfset loc.data.sales = 0>
-					</cfif>
-					<cfif loc.data.sales gt 0>
-						<cfset loc.data.salesValue = loc.data.sales * loc.data.Retail>
-						<cfset loc.data.tradeValue = loc.data.sales * loc.data.trade>
-					</cfif>
-					<cfset loc.data.missing = loc.data.returned + loc.data.claim - loc.data.credited>
-					<cfif loc.data.returned gt loc.data.received>
-						<cfset loc.data.style = "amber">
-					<cfelseif loc.data.missing neq 0>
-						<cfset loc.data.style = "error">
-					</cfif> 
 				</cfif>
+				
+				<cfset loc.data.missing = 0>
+				<cfif loc.data.credited gt loc.data.returned>
+					<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.credited>
+					<cfset loc.data.msg = "#loc.data.msg#<br>credits exceed returns">
+				<cfelse>
+					<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.returned - loc.data.claim>
+				</cfif>
+				<cfif (Now() lt loc.endDate)>	<!--- not due to be returned yet --->
+					<cfset loc.data.sales = 0>
+					<cfset loc.data.msg = "#loc.data.msg#<br>returns not due yet">
+				<cfelse>
+					<cfset loc.data.missing = loc.data.returned + loc.data.claim - loc.data.credited>
+				</cfif>
+				<cfif loc.data.sales gt 0>
+					<cfset loc.data.salesValue = loc.data.sales * loc.data.Retail>
+					<cfset loc.data.tradeValue = loc.data.sales * loc.data.trade>
+				</cfif>
+				<cfif loc.data.returned gt loc.data.received>
+					<cfset loc.data.style = "amber">
+					<cfset loc.data.msg = "#loc.data.msg#<br>returns exceed received">
+				<cfelseif loc.data.missing neq 0>
+					<cfset loc.data.style = "error">
+					<cfset loc.data.msg = "#loc.data.msg#<br>credits mismatch">
+				</cfif> 
 			</cfloop>
 			
 		<cfcatch type="any">
@@ -387,7 +395,7 @@
 			"salesValue" = 0,
 			"tradeValue" = 0
 		}>
-		<cfdump var="#args#" label="ViewShopSalesReport" expand="true">
+		<!---<cfdump var="#args#" label="ViewShopSalesReport" expand="true">--->
 		<cftry>
 			<cfoutput>
 				<div id="nwrapper">
@@ -410,6 +418,7 @@
 						<th>Sales</th>
 						<th>Sales Value</th>
 						<th>Trade Value</th>
+						<th>Message</th>
 					</tr>
 					</thead>
 					<cfset loc.keys = ListSort(StructKeyList(args.stock,","),"text","asc")>
@@ -431,7 +440,7 @@
 							<td>#loc.data.pubType# (#loc.data.span#)</td>
 							<td align="right">#loc.data.Retail#</td>
 							<td align="right">#loc.data.Trade#</td>
-							<td align="right">#loc.data.yymmdd#<br>#loc.data.endDate#</td>
+							<td align="right">#loc.data.yymmdd#<br><span class="smallText">#loc.data.endDate#</span></td>
 							<td align="center">#loc.data.received#</td>
 							<td align="center">#loc.data.delivered#</td>
 							<td align="center">#loc.data.returned#</td>
@@ -441,6 +450,7 @@
 							<td align="center">#loc.data.sales#</td>
 							<td align="right">#FormatNum(loc.data.salesValue)#</td>
 							<td align="right">#FormatNum(loc.data.tradeValue)#</td>
+							<td align="center">#loc.data.msg#</td>
 						</tr>
 					</cfloop>
 					<tr class="#loc.data.style#">
@@ -454,11 +464,13 @@
 						<th align="center">#loc.totals.sales#</th>
 						<th align="right">#FormatNum(loc.totals.salesValue)#</th>
 						<th align="right">#FormatNum(loc.totals.tradeValue)#</th>
+						<th></th>
 					</tr>
 					<tr>
 						<th colspan="12"></th>
 						<th align="right" colspan="3">Profit</th>
 						<th align="right">#FormatNum(loc.totals.salesValue - loc.totals.tradeValue)#</th>
+						<th></th>
 					</tr>
 				</table>
 				</div>

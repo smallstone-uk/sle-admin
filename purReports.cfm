@@ -109,7 +109,7 @@
 											<option value="16"<cfif srchReport eq "16"> selected="selected"</cfif>>Data Check Reports</option>
 											<option value="17"<cfif srchReport eq "17"> selected="selected"</cfif>>Business Report</option>
 											<option value="18"<cfif srchReport eq "18"> selected="selected"</cfif>>Balance Sheet Report</option>
-											
+											<option value="19"<cfif srchReport eq "19"> selected="selected"</cfif>>Purchases Aged</option>
 										</select>
 									</td>
 								</tr>
@@ -1155,7 +1155,12 @@
 											<th align="right">#DecimalFormat(abs(drTotal + crTotal))#</th>
 										</tr>
 									</table>
-									<p></p>						
+								</cfcase>
+								
+								<cfcase value="19">
+									<cfset data=pur.VATTransactions(parms)>
+									<cfset analysis = {}>
+									<h1>From #DateFormat(srchDateFrom,'dd-mmm-yy')# To #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
 									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>

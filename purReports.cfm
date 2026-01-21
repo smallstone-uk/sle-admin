@@ -111,6 +111,7 @@
 											<option value="18"<cfif srchReport eq "18"> selected="selected"</cfif>>Balance Sheet Report</option>
 											<option value="19"<cfif srchReport eq "19"> selected="selected"</cfif>>Purchases Aged</option>
 											<option value="20"<cfif srchReport eq "20"> selected="selected"</cfif>>Sales Aged</option>
+											
 										</select>
 									</td>
 								</tr>

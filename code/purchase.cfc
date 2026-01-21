@@ -739,6 +739,63 @@
 		
 		<cfreturn loc.result>
 	</cffunction>
+
+	<cffunction name="AgedSales" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.result.salesRows = {}>
+		<cfset loc.result.totals = {}>
+		
+		<cftry>
+			<cfquery name="loc.QSalesTrans" datasource="#args.datasource#">
+				SELECT nomID,nomClass,nomGroup,nomType,nomCode,nomTitle,niAmount,trnID,trnDate
+				FROM ((tblNominal INNER JOIN tblNomItems ON tblNominal.nomID = tblNomItems.niNomID) 
+				INNER JOIN tblTrans ON tblNomItems.niTranID = tblTrans.trnID) 
+				WHERE trnLedger='sales' 
+				AND nomType='sales'
+				AND nomClass != 'exclude'
+				<cfif len(args.form.srchDept) gt 0>AND nomClass='#args.form.srchDept#'</cfif>
+				AND niAmount<>0
+				AND trnDate BETWEEN '#args.form.srchDateFrom#' AND '#args.form.srchDateTo#'
+				ORDER BY nomClass,nomCode,trnDate,trnID
+			</cfquery>
+			<cfset loc.result.QSalesTrans = loc.QSalesTrans>
+			<cfloop query="loc.QSalesTrans">
+				<cfset loc.grpCode = "#nomGroup#-#nomCode#">
+				<cfif NOT StructKeyExists(loc.result.salesRows,loc.grpCode)>
+					<cfset StructInsert(loc.result.salesRows,loc.grpCode,{
+						nomID = nomID,
+						nomGroup = nomGroup,
+						nomCode = nomCode,
+						nomType = nomType,
+						nomTitle = nomTitle,
+						nomBals = {}
+					})>
+				</cfif>
+				<cfset loc.yymm = Year(trnDate)*100 + Month(trnDate)>
+				<cfset loc.nomLine = StructFind(loc.result.salesRows,loc.grpCode)>
+				<cfif NOT StructKeyExists(loc.nomLine.nomBals,loc.yymm)>
+					<cfset StructInsert(loc.nomLine.nomBals,loc.yymm,niAmount)>
+				<cfelse>
+					<cfset loc.bal = StructFind(loc.nomLine.nomBals,loc.yymm)>
+					<cfset StructUpdate(loc.nomLine.nomBals,loc.yymm,loc.bal + niAmount)>
+				</cfif>
+				<cfif NOT StructKeyExists(loc.result.totals,loc.yymm)>
+					<cfset StructInsert(loc.result.totals,loc.yymm,niAmount)>
+				<cfelse>
+					<cfset loc.total = StructFind(loc.result.totals,loc.yymm)>
+					<cfset StructUpdate(loc.result.totals,loc.yymm,loc.total + niAmount)>
+				</cfif>
+			</cfloop>
+
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
 	
 	<cffunction name="VATTransactions" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">

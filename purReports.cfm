@@ -110,6 +110,7 @@
 											<option value="17"<cfif srchReport eq "17"> selected="selected"</cfif>>Business Report</option>
 											<option value="18"<cfif srchReport eq "18"> selected="selected"</cfif>>Balance Sheet Report</option>
 											<option value="19"<cfif srchReport eq "19"> selected="selected"</cfif>>Purchases Aged</option>
+											<option value="20"<cfif srchReport eq "20"> selected="selected"</cfif>>Sales Aged</option>
 										</select>
 									</td>
 								</tr>
@@ -1160,6 +1161,7 @@
 								<cfcase value="19">
 									<cfset data=pur.VATTransactions(parms)>
 									<cfset analysis = {}>
+									<cfdump var="#data#" label="data" expand="false">
 									<h1>From #DateFormat(srchDateFrom,'dd-mmm-yy')# To #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
 									<table class="tableList" border="1">
 									<cfset nomList = ListSort(StructKeyList(data.purRows,","),"text","asc")>
@@ -1176,6 +1178,60 @@
 										</tr>
 									<cfloop list="#nomList#" delimiters="," index="item">
 										<cfset nom = StructFind(data.purRows,item)>
+										<tr>
+											<td>#nom.nomGroup#</td>
+											<td>#nom.nomCode#</td>
+											<td>#nom.nomType#</td>
+											<td>#nom.nomTitle#</td>
+											<cfset rowTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<td align="right">
+													<cfif StructKeyExists(nom.nomBals,i)>
+														<cfset value = StructFind(nom.nomBals,i)>
+														<cfset rowTotal += value>
+														#DecimalFormat(value)#
+													</cfif>
+												</td>
+											</cfloop>
+											<td align="right">#DecimalFormat(rowTotal)#</td>
+										</tr>
+									</cfloop>
+										<tr>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th>Totals</th>
+											<cfset rowTotal = 0>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<cfset total = StructFind(data.totals,i)>
+												<cfset rowTotal += total>
+												<th align="right">#DecimalFormat(total)#</th>
+											</cfloop>
+											<th align="right">#DecimalFormat(rowTotal)#</th>
+										</tr>
+									</table>
+								</cfcase>
+								
+								<cfcase value="20">
+									<cfset data=pur.AgedSales(parms)>
+									<!---<cfdump var="#data#" label="data" expand="false">--->
+									<cfset analysis = {}>
+									<h1>From #DateFormat(srchDateFrom,'dd-mmm-yy')# To #DateFormat(srchDateTo,'dd-mmm-yy')#</h1>
+									<table class="tableList" border="1">
+									<cfset nomList = ListSort(StructKeyList(data.salesRows,","),"text","asc")>
+									<cfset monthList = ListSort(StructKeyList(data.totals,","),"numeric","asc")>
+										<tr>
+											<th>Group</th>
+											<th>Code</th>
+											<th>Type</th>
+											<th>Title</th>
+											<cfloop list="#monthList#" delimiters="," index="i">
+												<th align="right">#i#</th>
+											</cfloop>
+											<th>Total</th>
+										</tr>
+									<cfloop list="#nomList#" delimiters="," index="item">
+										<cfset nom = StructFind(data.salesRows,item)>
 										<tr>
 											<td>#nom.nomGroup#</td>
 											<td>#nom.nomCode#</td>

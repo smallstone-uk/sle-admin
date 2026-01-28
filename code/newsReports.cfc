@@ -265,7 +265,7 @@
 				INNER JOIN tblPublication ON psPubID = pubID
 				WHERE psType = 'received'
 				AND psRetail > 0
-				<!---AND pubID IN (28861,31401,17021)--->
+				<!---AND pubID IN (26581)--->
 				<cfif len(args.form.srchGroup)> AND pubGroup LIKE '#args.form.srchGroup#'</cfif>
 				AND psDate BETWEEN '#LSDateFormat(loc.srchDateFrom,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.srchDateTo,"yyyy-mm-dd")#'
 				ORDER BY pubID,psType
@@ -295,42 +295,45 @@
 						yymmdd = YYMMDD,
 						Retail = psRetail,
 						Trade = psTradePrice,
-						"received" = 0,
+						"received" = psQty,
+						"delivered" = 0,
 						"claim" = 0,
 						"returned" = 0,
 						"credited" = 0,
 						"sales" = 0,
 						"missing" = 0,
+						"error" = 0,
 						"tradeValue" = 0,
 						"salesValue" = 0,
 						"style" = "",
 						"msg" = ""
 					})>
+					<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
+				<cfelse>
+					<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
+					<cfset loc.data.received += psQty>
 				</cfif>
-				<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
 				
 				<cfquery name="loc.QPubStockOther" datasource="#args.datasource#">	<!--- get other stock items related to the received stock --->
 					SELECT pubID,pubTitle, psIssue,psDate,psQty,psType,psRetail,psTradePrice, DATE_FORMAT( psDate, '%Y-%m-%d' ) AS YYMMDD
 					FROM tblPubStock
 					INNER JOIN tblPublication ON psPubID = pubID
 					WHERE pubID = #loc.pubID#
+					AND psType != 'received'
 					AND psIssue = '#loc.psIssue#'
 					AND psDate >= '#LSDateFormat(loc.srchDateFrom,"yyyy-mm-dd")#'
 					ORDER BY pubID,psType
 				</cfquery>
 				<cfif loc.QPubStockOther.recordcount gt 0>
+					<!---<cfset ArrayAppend(loc.result.queries,{"query" = "QPubStockOther", "data" = loc.QPubStockOther})>--->
 					<cfloop query="loc.QPubStockOther">
-						<cfif !StructKeyExists(loc.data,psType)>
-							<cfset StructInsert(loc.data,psType, psQty)>
-						<cfelse>
-							<cfset loc.dataQty = StructFind(loc.data,psType)>
-							<cfset StructUpdate(loc.data,psType,loc.dataQty + psQty)>
-						</cfif>
+						<cfset loc.dataQty = StructFind(loc.data,psType)>
+						<cfset StructUpdate(loc.data,psType,loc.dataQty + psQty)>
 					</cfloop>
 				</cfif>
 				
 				<cfquery name="loc.QDelivered" datasource="#args.datasource#" result="loc.QDelResult">
-					SELECT pubID,pubTitle,pubType, diType,diDate,SUM(diPrice) AS netTotal, SUM(diPriceTrade) AS tradeTotal, SUM(IF(diType = 'credit',-diQty,diQty)) AS Qty
+					SELECT pubID,pubTitle,pubType, diIssue,diType,diDate,SUM(diPrice) AS netTotal, SUM(diPriceTrade) AS tradeTotal, SUM(IF(diType = 'credit',-diQty,diQty)) AS Qty
 					FROM tbldelitems 
 					INNER JOIN tblPublication ON diPubID = pubID
 					WHERE diPubID = #loc.pubID#
@@ -341,13 +344,11 @@
 				<cfif loc.QDelivered.recordcount gt 0>
 					<!---<cfset ArrayAppend(loc.result.queries,{"result" = loc.QDelResult, "data" = loc.QDelivered})>--->
 					<cfset loc.data = StructFind(loc.result.Stock,loc.compKey)>
-					<cfif !StructKeyExists(loc.data,"delivered")>
-						<cfset StructInsert(loc.data,"delivered", val(loc.QDelivered.Qty))>
-					</cfif>
+					<cfset loc.data.delivered += val(loc.QDelivered.Qty)>
 				</cfif>
 				
 				<cfset loc.data.missing = 0>
-				<cfif loc.data.credited gt loc.data.returned>
+				<cfif loc.data.credited gt (loc.data.returned + loc.data.claim)>
 					<cfset loc.data.sales = loc.data.received - loc.data.delivered - loc.data.credited>
 					<cfset loc.data.msg = "#loc.data.msg#<br>credits exceed returns">
 				<cfelse>
@@ -359,9 +360,12 @@
 				<cfelse>
 					<cfset loc.data.missing = loc.data.returned + loc.data.claim - loc.data.credited>
 				</cfif>
-				<cfif loc.data.sales gt 0>
+				<cfif loc.data.sales gte 0>
 					<cfset loc.data.salesValue = loc.data.sales * loc.data.Retail>
 					<cfset loc.data.tradeValue = loc.data.sales * loc.data.trade>
+				<cfelse>
+					<cfset loc.data.error = loc.data.sales>
+					<cfset loc.data.sales = 0>
 				</cfif>
 				<cfif loc.data.returned gt loc.data.received>
 					<cfset loc.data.style = "amber">
@@ -392,6 +396,7 @@
 			"credited" = 0,
 			"sales" = 0,
 			"missing" = 0,
+			"error" = 0,
 			"salesValue" = 0,
 			"tradeValue" = 0
 		}>
@@ -415,6 +420,7 @@
 						<th>Claimed</th>
 						<th>Credited</th>
 						<th>Missing</th>
+						<th>Error</th>
 						<th>Sales</th>
 						<th>Sales Value</th>
 						<th>Trade Value</th>
@@ -430,6 +436,7 @@
 						<cfset loc.totals.credited += loc.data.credited>
 						<cfset loc.totals.claim += loc.data.claim>
 						<cfset loc.totals.missing += loc.data.missing>
+						<cfset loc.totals.error += loc.data.error>
 						<cfset loc.totals.sales += loc.data.sales>
 						<cfset loc.totals.salesValue += loc.data.salesValue>
 						<cfset loc.totals.tradeValue += loc.data.tradeValue>
@@ -447,6 +454,7 @@
 							<td align="center">#loc.data.claim#</td>
 							<td align="center">#loc.data.credited#</td>
 							<td align="center">#loc.data.missing#</td>
+							<td align="center">#loc.data.error#</td>
 							<td align="center">#loc.data.sales#</td>
 							<td align="right">#FormatNum(loc.data.salesValue)#</td>
 							<td align="right">#FormatNum(loc.data.tradeValue)#</td>
@@ -461,13 +469,14 @@
 						<th align="center">#loc.totals.claim#</th>
 						<th align="center">#loc.totals.credited#</th>
 						<th align="center">#loc.totals.missing#</th>
+						<th align="center">#loc.totals.error#</th>
 						<th align="center">#loc.totals.sales#</th>
 						<th align="right">#FormatNum(loc.totals.salesValue)#</th>
 						<th align="right">#FormatNum(loc.totals.tradeValue)#</th>
 						<th></th>
 					</tr>
 					<tr>
-						<th colspan="12"></th>
+						<th colspan="13"></th>
 						<th align="right" colspan="3">Profit</th>
 						<th align="right">#FormatNum(loc.totals.salesValue - loc.totals.tradeValue)#</th>
 						<th></th>

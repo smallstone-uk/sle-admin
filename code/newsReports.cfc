@@ -234,9 +234,9 @@
 			"Weekly" = 7,
 			"Four-Weekly" = 28,
 			"Morning" = 1,
-			"Sunday" = 7,
-			"Saturday" = 7,
-			"Weekend" = 7,
+			"Sunday" = 1,
+			"Saturday" = 2,
+			"Weekend" = 2,
 			"One Shots" = 90
 		}>
 		

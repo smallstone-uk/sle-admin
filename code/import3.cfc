@@ -415,6 +415,7 @@
 							<cfelse>
 								<cfset loc.ref = Reference>
 							</cfif>
+							<cfset loc.ref = Left(loc.ref,20)>
 							<cfif !StructKeyExists(loc.trans,loc.ref)>
 								<cfif Find("(",Amount,1)>
 									<cfset loc.amount = ReReplaceNoCase(Amount,"[^0-9,\.]","","ALL")>

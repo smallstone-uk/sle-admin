@@ -91,6 +91,9 @@
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchSort" default="1">
 <cfparam name="srchFixData" default="">
+<cfparam name="bblContribution" default="165">
+<cfparam name="deliveryWages" default="494">
+
 <cfobject component="code/newsReports" name="report">
 
 <cfset init = report.initInterface({})>
@@ -146,6 +149,18 @@
 											<option value="Magazine"<cfif srchSort eq "Magazine"> selected="selected"</cfif>>Magazine</option>
 											<option value="Unknown"<cfif srchSort eq "Unknown"> selected="selected"</cfif>>Unknown</option>
 										</select>
+									</td>
+								</tr>
+								<tr>
+									<td><b>BBL Contribution</b></td>
+									<td>
+										<input type="text" name="bblContribution" id="bblContribution" value="#bblContribution#" />
+									</td>
+								</tr>
+								<tr>
+									<td><b>Delivery Wages</b></td>
+									<td>
+										<input type="text" name="deliveryWages" id="deliveryWages" value="#deliveryWages#" />
 									</td>
 								</tr>
 <!---	

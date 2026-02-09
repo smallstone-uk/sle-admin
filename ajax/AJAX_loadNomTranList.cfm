@@ -5,7 +5,9 @@
 	<cfset parm.datasource = application.site.datasource1>
 	<cfset parm.url = application.site.normal>
 	<cfset parm.form = form>
+	<cfset parm.searchform = form>
 	<cfset transactions = acc.LoadNominalTransactions(parm)>
+
 	<style type="text/css">
 		.shaded { background-color:#ddd; border:#ff0000;}
 		.normal { background-color:#fff; border:#ccc;}
@@ -28,7 +30,7 @@
 			$('.NT_New').click(function(event) {
 				$.ajax({
 					type: "POST",
-					url: "#parm.url#ajax/AJAX_loadNewNominalTransaction.cfm",
+					url: "#parm.url#ajax/AJAX_loadNewNominalTransaction2.cfm",
 					data: {"formData": JSON.stringify(formData)},
 					success: function(data) {
 						$('.NT_Header, .NT_Items').remove();
@@ -38,10 +40,13 @@
 				event.preventDefault();
 			});
 			$('.nomTranList_editLink').click(function(event) {
+				$('.feedback').empty();
+				#toScript(parm.searchform, "searchForm")#
 				$.ajax({
 					type: "POST",
 					url: "#parm.url#ajax/AJAX_loadEditNominalTransaction.cfm",
 					data: {
+						"searchForm": JSON.stringify(searchForm),
 						"formData": JSON.stringify(formData),
 						"tranID": $(this).html().trim()
 					},
@@ -77,16 +82,35 @@
 					} else {
 						$(this).show();
 					}
-					
+					recalcTotals(); // 👈 recalc after filtering
 				});
 			});
+			function recalcTotals() {
+				var drTotal = 0;
+				var crTotal = 0;
+				var tranCount = 0;
+				
+				$('.searchrow:visible').each(function () {
+					var dr = $(this).find('.drAmount').text().replace(/,/g, '');
+					var cr = $(this).find('.crAmount').text().replace(/,/g, '');
+			
+					if (dr) drTotal += parseFloat(dr);
+					if (cr) crTotal += parseFloat(cr);
+					tranCount++;
+				});
+			
+				$('.drTotal').text(drTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+				$('.crTotal').text(crTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+				$('.tranCount').text(tranCount + ' transactions (filtered)');
+			}
 			if (document.title != "#transactions.nomAccount.nomTitle#") {
 				document.title = "#transactions.nomAccount.nomTitle#";
 			}
 		});
 	</script>
 	<cfif !ArrayIsEmpty(transactions.tranList)>
-		<!---<input value="Export" type="button" class="noPrint" onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">--->
+		<!---<input value="Export" type="button" class="noPrint" 
+			onclick="$('##tranTable').table2CSV({header:['icon','ID','Date','Type','PaidIn','Ref','Description','DR','CR','Balance']})">--->
 		<table id="tranTable" class="tableList" border="1">
 			<tr>
 				<th class="noPrint"></th>
@@ -143,7 +167,6 @@
 				<cfset lastDate = item.trnDate>
 
 				<tr class="#rowStyle# searchrow" data-title="#item.trnRef# #item.trnClientRef# #item.trnDesc# #item.niAmount#" data-tranID="#item.trnID#" id="trnItem_#item.trnID#">
-				<!---<tr class="#rowStyle#">--->
 					<td width="10" align="center" class="noPrint">
 						<cfif item.trnClientRef GT 0>
 							<a href="javascript:void(0)" class="delTranRow" data-itemID="#item.trnID#" tabindex="-1"></a>
@@ -174,26 +197,26 @@
 					<td>#ReReplace(item.trnDesc,"\d+","")#</td>
 					<cfif item.niAmount GT 0>
 						<cfset drTotal += item.niAmount>
-						<td align="right">#item.niAmount#</td>
+						<td align="right" class="drAmount">#acc.FormatNum(item.niAmount)#</td>
 						<td></td>
 					<cfelse>
 						<cfset crTotal += item.niAmount>
 						<td></td>
-						<td align="right">#item.niAmount#</td>
+						<td align="right" class="crAmount">#acc.FormatNum(-item.niAmount)#</td>
 					</cfif>
 					<cfset balance=balance+item.niAmount>
-					<td align="right">#DecimalFormat(balance)#</td>
+					<td align="right">#acc.FormatNum(balance)#</td>
 				</tr>
 			</cfloop>
 			<tr>
-				<td class="noPrint"></td>
-				<td class="noPrint"></td>
-				<td></td>
-				<td class="noPrint"></td>
-				<td colspan="2">#tranCount# transactions</td>
-				<td align="right">#DecimalFormat(drTotal)#</td>
-				<td align="right">#DecimalFormat(crTotal)#</td>
-				<td></td>
+				<th class="noPrint"></th>
+				<th class="noPrint"></th>
+				<th class="range"></th>
+				<th class="noPrint"></th>
+				<th colspan="2" class="tranCount">#tranCount# transactions</th>
+				<th align="right" class="drTotal">#DecimalFormat(drTotal)#</th>
+				<th align="right" class="crTotal">#DecimalFormat(crTotal)#</th>
+				<th></th>
 			</tr>
 		</table>
 	<cfelse>

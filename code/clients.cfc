@@ -84,7 +84,7 @@
 					<cfset loc.result.name = "#cltTitle# #cltInitial# #cltName# #cltCompanyName#">
 					<cffile action="append" addnewline="yes" 
 						file="#application.site.dir_logs#email\mailcheck-#DateFormat(Now(),'yyyymmdd')#.txt"
-							output="Message #loc.result.name#">
+							output="Message #loc.result.name# #cltEMail# #args.tranRef# #DateFormat(args.srchDate,"yyyy-mm-dd")#">
 				</cfloop>
 				<cfset loc.result.status = "found">
 			<cfelse>

@@ -90,7 +90,11 @@
 				<cfset parms.srchDate = form.srchDate>
 				<cfset parms.srchPwd = form.srchPwd>
 				<cfset parms.testMsgs = StructKeyExists(form,"testMsgs")>
+				<cfdump var="#parms#" label="parms" expand="yes" format="html" 
+					output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 				<cfset detail = cust.CheckInvoiceToEmail(parms)>
+				<cfdump var="#detail#" label="detail" expand="yes" format="html" 
+					output="#application.site.dir_logs#dump-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 				<cfif StructKeyExists(form,"sendMsgs")>
 					<cfset result = cust.SendInvoiceByEmail(parms)>
 					<tr>
@@ -101,6 +105,7 @@
 							<cfif detail.status eq "found"><img src="images/icons/tick-green.png" width="36" height="36">
 								<cfelse><img src="images/icons/cross-red.png" width="36" height="36"></cfif>
 						</td>
+						<td>#result.msg#</td>
 					</tr>
 				<cfelse>
 					<tr>

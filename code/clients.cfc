@@ -82,6 +82,9 @@
 			<cfif loc.QClient.recordCount eq 1>
 				<cfloop query="loc.QClient">
 					<cfset loc.result.name = "#cltTitle# #cltInitial# #cltName# #cltCompanyName#">
+					<cffile action="append" addnewline="yes" 
+						file="#application.site.dir_logs#email\mailcheck-#DateFormat(Now(),'yyyymmdd')#.txt"
+							output="Message #loc.result.name#">
 				</cfloop>
 				<cfset loc.result.status = "found">
 			<cfelse>
@@ -142,7 +145,8 @@
 					bcc="#application.siteclient.cltMailOffice#"
 					from="#application.siteclient.cltMailOffice#"
 					server="#application.siteclient.cltMailServer#"
-					username="#application.siteclient.cltMailAccount#"
+					username="#application.siteclient.cltMailAccount#" 
+					replyto="news@shortlanesendstore.co.uk"		<!--- needs testing 10/12/25 --->
 					password="#args.srchPwd#"
 					subject="#loc.msg.subject# - #application.siteclient.cltCompanyName#">
 					<cfmailpart charset="utf-8" type="text/plain">#textMessage(loc.msg.text)#</cfmailpart>

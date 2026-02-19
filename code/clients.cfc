@@ -149,7 +149,7 @@
 					from="#application.siteclient.cltMailOffice#"
 					server="#application.siteclient.cltMailServer#"
 					username="#application.siteclient.cltMailAccount#" 
-					replyto="news@shortlanesendstore.co.uk"		<!--- needs testing 10/12/25 --->
+					<!--- replyto="news@shortlanesendstore.co.uk"		needs testing 10/12/25 --->
 					password="#args.srchPwd#"
 					subject="#loc.msg.subject# - #application.siteclient.cltCompanyName#">
 					<cfmailpart charset="utf-8" type="text/plain">#textMessage(loc.msg.text)#</cfmailpart>

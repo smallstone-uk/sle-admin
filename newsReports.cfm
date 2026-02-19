@@ -158,20 +158,6 @@
 										<input type="text" name="bblContribution" id="bblContribution" value="#bblContribution#" />
 									</td>
 								</tr>
-								<tr>
-									<td><b>Delivery Wages</b></td>
-									<td>
-										<input type="text" name="deliveryWages" id="deliveryWages" value="#deliveryWages#" />
-									</td>
-								</tr>
-<!---	
-									<tr>
-										<td><b>Options</b></td>
-										<td>
-											<input type="checkbox" name="srchFixData" id="srchFixData" value="1" /> Fix Data (for specific reports only)
-										</td>
-									</tr>
---->
 								</table>
 							</div>
 						</form>	<!--- end form --->

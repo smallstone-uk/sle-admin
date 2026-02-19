@@ -279,8 +279,7 @@
 			<cfif loc.saturdayCount gt 1>
 				<cfset loc.result.numWeeks = loc.saturdayCount>
 			</cfif>
-			<cfset loc.result.deliveryWages = -args.form.deliveryWages * loc.result.numWeeks>
-			<cfset loc.result.bblContribution = -args.form.bblContribution * loc.result.numWeeks>
+			<cfset loc.result.bblContribution = -val(args.form.bblContribution) * loc.result.numWeeks>
 			
 			<cfquery name="loc.QPubStockReceived" datasource="#args.datasource#">
 				SELECT pubID,pubTitle,pubType,pubGroup, psIssue,psDate,psQty,psType,psRetail,psTradePrice, DATE_FORMAT( psDate, '%Y-%m-%d' ) AS YYMMDD
@@ -501,22 +500,8 @@
 							<th align="right">Profit: #FormatNum(loc.totals.salesValue - loc.totals.tradeValue)#</th>
 						</tr>
 					</table>
-					<cfset loc.newstotal = 0>
-					<cfset loc.grandTotal = loc.totals.tradeValue + loc.newstotal - args.bblContribution - args.deliveryWages>
-					<cfif loc.grandTotal lt 0>
-						<cfset loc.totalTitle = "Balance due to shop">
-					<cfelse>
-						<cfset loc.totalTitle = "Balance due from shop">
-					</cfif>
-					<table class="tableList" border="1">
-						<tr><th>Date Range</th>						<td>#LSDateFormat(args.SrchDateFrom,'ddd dd-mmm-yy')# To #LSDateFormat(args.srchDateTo,'ddd dd-mmm-yy')#</td></tr>
-						<tr><th>No.of Weeks</th>					<td>#args.numWeeks#</td></tr>
-						<tr><th>Trade Value of Papers</th>			<td align="right">#FormatNum(loc.totals.tradeValue)#</td></tr>
-						<tr><th>Less BBL Loan Contribution</th>		<td align="right">#FormatNum(-args.bblContribution)#</td></tr>
-						<tr><th>Less Delivery Wages</th>			<td align="right">#FormatNum(-args.deliveryWages)#</td></tr>
-						<tr><th>#loc.totalTitle#</th>				<td align="right">#FormatNum(loc.grandTotal)#</td></tr>						
-					</table>
 				</div>
+				<p></p>
 			</cfoutput>
 
 		<cfcatch type="any">
@@ -571,7 +556,7 @@
 			<cfif loc.saturdayCount gt 1>
 				<cfset loc.result.numWeeks = loc.saturdayCount>
 			</cfif>
-			<cfset loc.result.bblContribution = -args.form.bblContribution * loc.result.numWeeks>
+			<cfset loc.result.bblContribution = -val(args.form.bblContribution) * loc.result.numWeeks>
 			
 			<cfset loc.SalesData = ShopSales(args)>
 			<!---<cfdump var="#loc.SalesData#" label="ShopSales" expand="false">--->
@@ -694,9 +679,6 @@
 			<cfset loc.summary.BBLoan = {
 				"title" = "BB Loan Contribution", value = args.bblContribution
 			}>
-			<!---<cfset loc.summary.wagesDue = {
-				"title" = "Wages Due", value = args.deliveryWages
-			}>--->
 			<cfoutput>
 				<!--- output news stock movement --->
 				<cfset loc.keys = ListSort(StructKeyList(args.pubSort,","),"text","asc")>

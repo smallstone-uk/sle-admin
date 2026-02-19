@@ -141,7 +141,7 @@
 			<cfset loc.msg.attach = "#application.site.dir_invoices##loc.result.folderName#/inv-#loc.QTran.trnRef#.pdf">
 		<cffile action="append" addnewline="yes" 
 			file="#application.site.dir_logs#email\mailcheck-#DateFormat(Now(),'yyyymmdd')#.txt"
-				output="Message #loc.msg.name# #loc.msg.subject# #loc.msg.email# #loc.msg.cltRef# #loc.msg.trnRef# #loc.msg.url#">
+				output="Message #loc.msg.name# #loc.msg.subject# #loc.msg.email# #loc.msg.cltRef# #loc.msg.trnRef# #loc.msg.url# #loc.msg.attach#">
 			<cfif FileExists(loc.msg.attach)>
 				<cfmail 
 					to="#loc.msg.address#"

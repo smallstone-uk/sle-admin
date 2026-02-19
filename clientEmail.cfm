@@ -55,7 +55,7 @@
 	<cfset parms.datasource = application.site.datasource1>
 	<cfset parms.emailTemplate = 'invoice'>
 	<cfset emailList = cust.LoadLatestInvoicesForEmail(parms)>
-	<cfset aFewDaysAgo = DateAdd("d",-7,now())>
+	<cfset aFewDaysAgo = DateAdd("d",-21,now())>
 	<cfdirectory action="list" directory="#application.site.dir_invoices#letters" name="QDir" filter="*.pdf">
 	<cfoutput>
 		<h1>Send invoices by email...</h1>

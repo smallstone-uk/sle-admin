@@ -142,6 +142,7 @@
 		<cffile action="append" addnewline="yes" 
 			file="#application.site.dir_logs#email\mailcheck-#DateFormat(Now(),'yyyymmdd')#.txt"
 				output="Message #loc.msg.name# #loc.msg.subject# #loc.msg.email# #loc.msg.cltRef# #loc.msg.trnRef# #loc.msg.url# #loc.msg.attach#">
+					<!--- replyto="news@shortlanesendstore.co.uk"		needs testing 10/12/25 --->
 			<cfif FileExists(loc.msg.attach)>
 				<cfmail 
 					to="#loc.msg.address#"
@@ -149,7 +150,6 @@
 					from="#application.siteclient.cltMailOffice#"
 					server="#application.siteclient.cltMailServer#"
 					username="#application.siteclient.cltMailAccount#" 
-					<!--- replyto="news@shortlanesendstore.co.uk"		needs testing 10/12/25 --->
 					password="#args.srchPwd#"
 					subject="#loc.msg.subject# - #application.siteclient.cltCompanyName#">
 					<cfmailpart charset="utf-8" type="text/plain">#textMessage(loc.msg.text)#</cfmailpart>
@@ -159,6 +159,9 @@
 						<cfmailparam type="application/pdf" disposition="attachment" file="#args.attachFile#"></cfmailparam>								
 					</cfif>
 				</cfmail>
+		<cffile action="append" addnewline="yes" 
+			file="#application.site.dir_logs#email\mailcheck-#DateFormat(Now(),'yyyymmdd')#.txt"
+				output="Message after cfmail">
 				<cfset loc.result.msg = "sent successfully">
 				<cffile action="append" addnewline="yes" 
 					file="#application.site.dir_logs#email\mail-#DateFormat(Now(),'yyyymmdd')#.txt"

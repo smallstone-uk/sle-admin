@@ -95,6 +95,7 @@
 <cfparam name="deliveryWages" default="494">
 
 <cfobject component="code/newsReports" name="report">
+<cfsetting requesttimeout="900">
 
 <cfset init = report.initInterface({})>
 <body>

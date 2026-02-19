@@ -21,6 +21,10 @@
 					<cfset data = report.ShopSales(parms)>
 					<cfset report.ViewShopSalesReport(data)>
 				</cfcase>
+				<cfcase value="3">
+					<cfset data = report.ReconcilliationReport(parms)>
+					<cfset report.ViewReconcilliationReport(data)>
+				</cfcase>
 			</cfswitch>
 		</cfif>
 	</cfif>

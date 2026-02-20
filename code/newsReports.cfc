@@ -397,7 +397,8 @@
 				<cfelseif loc.data.missing neq 0>
 					<cfset loc.data.style = "error">
 					<cfset loc.data.msg = "#loc.data.msg#<br>credits mismatch">
-				</cfif> 
+					<cfset loc.data.sales = 0>
+				</cfif>
 			</cfloop>
 			
 		<cfcatch type="any">
@@ -621,7 +622,17 @@
 				AND `trnMethod` IN ('cash','card') 
 				AND `trnDate` BETWEEN '#LSDateFormat(loc.srchDateFrom,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.srchDateTo,"yyyy-mm-dd")#'
 			</cfquery>
-			
+			<!--- news payments taken through Lloyds account --->
+			<cfquery name="loc.result.QPaymentsLloyds" datasource="#args.datasource#">	
+				SELECT cltRef,cltTitle,cltName,trnID,trnClientRef,trnDate,trnMethod,trnAmnt1
+				FROM tbltrans
+				INNNER JOIN tblClients ON cltRef = trnClientRef 
+				INNER JOIN tblNomItems ON niTranID=trnID
+				WHERE trnAccountID = 4 <!--- news acc payment --->
+				AND niNomID = 41	<!--- lloyds bank --->
+				AND `trnDate` BETWEEN '#LSDateFormat(loc.srchDateFrom,"yyyy-mm-dd")#' AND '#LSDateFormat(loc.srchDateTo,"yyyy-mm-dd")#'
+			</cfquery>
+
 			<!--- delivery wages due to drivers --->
 			<cfquery name="loc.result.QWagesDue" datasource="#args.datasource#">
 				SELECT trnID,trnDate,trnRef,trnDesc, nomCode,nomTitle, niAmount
@@ -658,6 +669,7 @@
 		<cfset loc.result = {}>
 		<cfset loc.cardpay = 0>
 		<cfset loc.cashpay = 0>
+		<cfset loc.ibpay = 0>
 		<cfset loc.value = 0>
 		<cfset loc.wageTotal = 0>
 		<cfset loc.paidTotal = 0>
@@ -757,13 +769,14 @@
 				<p></p>
 				<table class="tableList" border="1">
 					<tr>
-						<th colspan="6">News Account Payments via Till</th>
+						<th colspan="7">News Account Payments via Till and Lloyds Bank</th>
 					</tr>
 					<tr>
 						<th>Reference</th>
 						<th>Name</th>
 						<th>Tran ID</th>
 						<th>Date</th>
+						<th width="60">Bank</th>
 						<th width="60">Card</th>
 						<th width="60">Cash</th>
 					</tr>
@@ -777,22 +790,41 @@
 							<cfif trnMethod eq 'cash'>
 								<cfset loc.cashpay += loc.value>
 								<td></td>
+								<td></td>
 								<td align="right">#FormatNum(loc.value)#</td>
 							<cfelse>
 								<cfset loc.cardpay += loc.value>
+								<td></td>
 								<td align="right">#FormatNum(loc.value)#</td>
 								<td></td>
 							</cfif>
 						</tr>
 					</cfloop>
 					<tr>
+						<th colspan="7"></th>
+					</tr>
+					<cfloop query="args.QPaymentsLloyds">
+						<cfset loc.value = -trnAmnt1>
+						<tr>
+							<td>#cltRef#</td>
+							<td>#cltTitle# #cltName#</td>
+							<td>#trnID#</td>
+							<td>#LSDateFormat(trnDate,'dd-mmm-yy')#</td>
+							<cfset loc.ibpay += loc.value>
+							<td align="right">#FormatNum(loc.value)#</td>
+							<td></td>
+							<td></td>
+						</tr>
+					</cfloop>
+					<tr>
 						<th colspan="4">Totals</th>
+						<th align="right">#FormatNum(loc.ibpay)#</th>
 						<th align="right">#FormatNum(loc.cardpay)#</th>
 						<th align="right">#FormatNum(loc.cashpay)#</th>
 					</tr>
-					<cfset loc.payTotal = loc.cashpay + loc.cardpay>
+					<cfset loc.payTotal = loc.cashpay + loc.cardpay + loc.ibpay>
 					<tr>
-						<th colspan="5">Total News Payments</th>
+						<th colspan="6">Total News Payments</th>
 						<th align="right">#FormatNum(loc.payTotal)#</th>
 					</tr>
 				</table>
@@ -884,7 +916,8 @@
 					</tr>
 					<cfset loc.drTotal = 0>
 					<cfset loc.crTotal = 0>
-					<cfloop collection="#loc.summary#" item="loc.key">
+					<cfset loc.keys = ListSort(StructKeyList(loc.summary,","),"text","asc")>
+					<cfloop list="#loc.keys#" index="loc.key">
 						<cfset loc.item = StructFind(loc.summary,loc.key)>
 						<tr>
 							<td>#loc.item.title#</td>

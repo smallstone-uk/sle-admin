@@ -913,9 +913,10 @@
 				<p></p>
 				<table class="tableList">
 					<tr>
-						<th>Summary</th>
+						<th>Summary (#args.numWeeks# weeks)</th>
 						<th align="right">DR</th>
 						<th align="right">CR</th>
+						<th align="right">Average</th>
 					</tr>
 					<cfset loc.drTotal = 0>
 					<cfset loc.crTotal = 0>
@@ -933,6 +934,7 @@
 								<td align="right">#FormatNum(loc.item.value)#</td>
 								<td></td>
 							</cfif>
+							<td align="right">#FormatNum(loc.item.value / args.numWeeks)#</td>
 						</tr>
 					</cfloop>
 					<cfset loc.balance = loc.drTotal + loc.crTotal>
@@ -940,6 +942,7 @@
 						<th>Totals</th>
 						<th align="right">#FormatNum(loc.crTotal)#</th>
 						<th align="right">#FormatNum(loc.drTotal)#</th>
+						<th align="right">#FormatNum((loc.crTotal + loc.drTotal) / args.numWeeks)#</th>
 					</tr>
 					<cfif loc.balance gt 0><cfset loc.legend = "from"><cfelse><cfset loc.legend = "to"></cfif>
 					<tr>

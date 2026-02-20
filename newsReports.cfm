@@ -91,7 +91,7 @@
 <cfparam name="srchDateTo" default="">
 <cfparam name="srchSort" default="1">
 <cfparam name="srchFixData" default="">
-<cfparam name="bblContribution" default="85">
+<cfparam name="bblContribution" default="165">
 
 <cfobject component="code/newsReports" name="report">
 <cfsetting requesttimeout="900">

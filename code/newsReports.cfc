@@ -697,7 +697,10 @@
 				<table class="tableList" border="1">
 					<tr>
 						<th colspan="7">Publication Shop Sales</th>
-						<th colspan="7">From: #LSDateFormat(args.srchDateFrom,'ddd dd-mmm-yy')# To: #LSDateFormat(args.srchDateTo,'ddd dd-mmm-yy')#</th>
+						<th colspan="7">
+							From: #LSDateFormat(args.srchDateFrom,'ddd dd-mmm-yy')# To: #LSDateFormat(args.srchDateTo,'ddd dd-mmm-yy')#
+							&nbsp; (#args.numWeeks# weeks)
+						</th>
 					</tr>
 					<tr>
 						<th>pubID</th>
@@ -941,8 +944,11 @@
 					<cfif loc.balance gt 0><cfset loc.legend = "from"><cfelse><cfset loc.legend = "to"></cfif>
 					<tr>
 						<th>Balance due #loc.legend# shop</th>
-						<th></th>
-						<th align="right">#FormatNum(loc.balance)#</th>
+						<cfif loc.balance gt 0>
+							<th></th><th>#FormatNum(loc.balance)#</th>
+						<cfelse>
+							<th>#FormatNum(loc.balance)#</th><th></th>
+						</cfif>
 					</tr>
 				</table>
 			</cfoutput>

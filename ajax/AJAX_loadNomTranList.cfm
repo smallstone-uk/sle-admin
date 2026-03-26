@@ -30,7 +30,7 @@
 			$('.NT_New').click(function(event) {
 				$.ajax({
 					type: "POST",
-					url: "#parm.url#ajax/AJAX_loadNewNominalTransaction2.cfm",
+					url: "#parm.url#ajax/AJAX_loadNewNominalTransaction.cfm",
 					data: {"formData": JSON.stringify(formData)},
 					success: function(data) {
 						$('.NT_Header, .NT_Items').remove();

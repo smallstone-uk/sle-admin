@@ -1,0 +1,164 @@
+
+IMPORT DESIGN
+
+The import data contains the following fields:-
+
+{
+	"category":"Medicines",
+	"barcode":"5017353503190",
+	"productCode":"244388",
+	"description":"Galpharm Paracetamol 500mg Capsules 16 Capsules",
+	"packSize":"10 x 16pk",
+	"wsp":"\u00A34.29",
+	"rsp":"\u00A31.00",
+	"vat":"20%",
+	"qtyOrderedPrevWks":[0,0,0,0],
+	"stockLevel":"inStock",
+	"qtyInTrolley":1,
+	"barcodeFormat":"ean13"
+}
+
+Use productCode to get the existing products details (if any).
+e.g
+	SELECT prodID,prodLastBought,prodMinPrice,prodPriceMarked,prodLocked, pcatID,pcatTitle, pgTitle, pgTarget
+	FROM tblProducts
+	INNER JOIN tblProductCats ON prodCatID = pcatID
+	INNER JOIN tblProductGroups ON pcatGroup = pgID
+	WHERE prodRef = '#productCode#'
+	AND prodSuppID IN (21,2682)	<!--- booker accounts ---> 
+	LIMIT 1;
+
+This will return the following information:-
+
+	prodID			ID of the existing product record
+	prodLastBought	Date it was last bought
+	prodMinPrice	A predefined minimum retail price (if our calculated price works out too low)
+	prodPriceMarked	Whether it is already marked as a pricemarked product
+	prodLocked		Whether the record is locked against changes from subsequent import runs
+	pcatID			The associated Product Category record ID
+	pcatTitle		The associated Product Category record title (assigned by Booker) e.g. Australian Wine
+	pgTitle			The associated Product Group record, e.g. Beers & Wines
+	pgTarget		Target Markup for non-pricemarked products
+	
+If this is a new product then we will use the category field to retrieve the following data:-
+e.g
+	SELECT pcatID,pcatTitle, pgTitle, pgTarget
+	FROM tblProductCats
+	INNER JOIN tblProductGroups ON pcatGroup = pgID
+	WHERE pcatTitle = '#category#'
+	LIMIT 1;
+
+	pcatID			productCat ID to assign to the new product record.
+	pcatTitle		The associated Product Category record (assigned by Booker) e.g. Australian Wine
+	pgTitle			Our associated Product Group record, e.g. Beers & Wines
+	pgTarget		Target Markup for non-pricemarked products
+
+If the category does not exist, a new record will be created and assigned to the "Undefined" Product Group
+e.g.
+	INSERT INTO tblProductCats
+		(pcatTitle,pcatGroup) VALUES ('#category#',1);
+	
+	generatedKey = pcatID
+	This ID to be assigned to the new product record.
+	
+	
+SANITIZE DATA
+	
+	extract case qty & packSize
+		loc.product.a_caseQty = Trim(ListFirst(loc.product.packSize,"x"));	// get first item (qty)
+		if caseqty is zero, make it 1.
+		loc.product.a_unitSize = Trim(ListRest(loc.product.packSize,"x"));	// get last item (unit size)
+
+	search for hints of price marked and set flag
+		Find("PM",loc.product.description) gt 0) OR (Find("#chr(163)#",loc.product.description) gt 0 OR (Find("\u00A3",loc.product.description) gt 0 OR ReFind("\d+p",loc.product.description) gt 0)
+		set pm flag true
+	
+	cleanup description
+		Remove a_unitSize from description
+		Coca-Cola Original Taste PM \u00A31.15 330ml Can
+		Remove \u00A3 (£ character) from description
+		remove PM or PMP text and price
+	
+	cleanup wsp
+		Remove \u00A3 (£ character) from text
+	
+	cleanup rsp
+		Remove \u00A3 (£ character) from text
+	
+	cleanup VAT
+		Remove % sign from text & divide by 100
+	
+	set qtyInTrolley to 1 if zero.
+	
+	check if barcode exists
+		add if missing
+	else
+	*	check barcode product ID matches productID
+	*	flag error on mismatch
+
+	fields to ignore
+		qtyOrderedPrevWks
+		stockLevel
+		barcodeFormat
+		
+		
+CHECK PRICE
+
+	calculate netUnitPrice (wsp / a_caseQty)
+	calculate netRetailPrice (RoundDec(rsp / (1 + vatRate)))
+	calculate profit (netRetailPrice - netUnitPrice)
+	calculate POR (profit / netRetailPrice)
+	calculate Markup (profit / netUnitPrice)
+	if NOT PM	{
+		if Markup < Target	{
+			calculate targetNetPrice = netUnitPrice * (1 + Target)
+			calculate profit (targetNetPrice - netUnitPrice)
+			calculate POR (profit / targetNetPrice)
+		} else	{
+			calculate targetNetPrice = netRetailPrice
+		}
+		add vat if required
+		round number up
+	} else {
+		ourPrice = rsp
+	}
+
+USER INTERFACE
+
+	Select file from order list	
+	
+	Processing options:-
+	
+		View Only (default)
+		Import Data
+	
+		Process File btn
+	
+	Output data
+	
+	Updating values should only occur on data already imported
+	
+WRITE DATA
+
+	STOCK ORDER (tblstockorder)
+	Inserted or updated in preview stage
+	
+	CATEGORY (tblProductCats)
+	Inserted or updated in preview stage
+	
+	PRODUCT (tblproducts)
+	Insert product record
+		or update if any changes required
+	
+	STOCK ITEM (tblstockitem)
+	Insert stock item record
+		or update if any changes required
+
+	BARCODE (tblbarcodes)
+	Insert Barcode record if required
+	
+	
+	
+	
+	
+	

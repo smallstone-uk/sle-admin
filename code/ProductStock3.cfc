@@ -410,49 +410,56 @@
 		<cfset var loc = {}>
 		<cfset loc.result={}>
 		
-		<cfset loc.args = args>
-		<cfif val(args.received) lt val(args.due)>
-			<cfset loc.received = val(args.received) + 1>
-			<cfset loc.qty=val(args.qtytotal) + val(args.packqty)>
-			<cfquery name="loc.QStockItem" datasource="#args.datasource#">
-				UPDATE tblStockItem
-				SET <cfif loc.received is val(args.due)>siStatus='closed',</cfif>
-					siBookedIn = #Now()#,
-					siQtyItems=#loc.qty#,
-					siReceived=#loc.received#
+		<cftry>
+			<cfset loc.args = args>
+			<cfif val(args.received) lt val(args.due)>
+				<cfset loc.received = val(args.received) + 1>
+				<cfset loc.qty=val(args.qtytotal) + val(args.packqty)>
+				<cfquery name="loc.QStockItem" datasource="#args.datasource#">
+					UPDATE tblStockItem
+					SET <cfif loc.received is val(args.due)>siStatus='closed',</cfif>
+						siBookedIn = #Now()#,
+						siQtyItems=#loc.qty#,
+						siReceived=#loc.received#
+					WHERE siID=#val(args.ID)#
+				</cfquery>
+			<cfelse>
+				<cfquery name="loc.QStockItem" datasource="#args.datasource#">
+					UPDATE tblStockItem
+					SET siBookedIn = #Now()#,
+						siStatus='closed'
+					WHERE siID=#val(args.ID)#
+				</cfquery>
+			</cfif>
+			<!--- check if order items left --->
+			<cfquery name="loc.QGetOrder" datasource="#args.datasource#">
+				SELECT soID
+				FROM tblStockOrder
+				INNER JOIN tblStockItem ON siOrder=soID
 				WHERE siID=#val(args.ID)#
 			</cfquery>
-		<cfelse>
-			<cfquery name="loc.QStockItem" datasource="#args.datasource#">
-				UPDATE tblStockItem
-				SET siBookedIn = #Now()#,
-					siStatus='closed'
-				WHERE siID=#val(args.ID)#
+			<cfquery name="loc.QStockItems" datasource="#args.datasource#">
+				SELECT *
+				FROM tblStockItem
+				INNER JOIN tblStockOrder ON soID=siOrder
+				WHERE soID=#val(loc.QGetOrder.soID)#
+				AND siStatus='open'
+				AND soStatus='open'
 			</cfquery>
-		</cfif>
-		<!--- check if order items left --->
-		<cfquery name="loc.QGetOrder" datasource="#args.datasource#">
-			SELECT soID
-			FROM tblStockOrder
-			INNER JOIN tblStockItem ON siOrder=soID
-			WHERE siID=#val(args.ID)#
-		</cfquery>
-		<cfquery name="loc.QStockItems" datasource="#args.datasource#">
-			SELECT *
-			FROM tblStockItem
-			INNER JOIN tblStockOrder ON soID=siOrder
-			WHERE soID=#val(loc.QGetOrder.soID)#
-			AND siStatus='open'
-			AND soStatus='open'
-		</cfquery>
-		<cfif loc.QStockItems.recordcount IS 0>
-			<!--- mark order closed --->
-			<cfquery name="loc.QOrderUpdate" datasource="#args.datasource#">
-				UPDATE tblStockOrder
-				SET soStatus = 'closed'
-				WHERE soID = #loc.QGetOrder.soID#
-			</cfquery>
-		</cfif>
+			<cfif loc.QStockItems.recordcount IS 0>
+				<!--- mark order closed --->
+				<cfquery name="loc.QOrderUpdate" datasource="#args.datasource#">
+					UPDATE tblStockOrder
+					SET soStatus = 'closed'
+					WHERE soID = #loc.QGetOrder.soID#
+				</cfquery>
+			</cfif>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="BookInProductStock" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
 		<cfreturn loc.result>
 	</cffunction>
 
@@ -472,6 +479,72 @@
 			</cfquery>
 		</cfif>
 		
+		<cfreturn result>
+	</cffunction>
+
+	<cffunction name="BookStockIn" access="public" returntype="array">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset var result = []>
+		<cfset loc.QStockItem = "">
+		<cfset loc.items = []>
+		
+		<cftry>
+			<cfif StructKeyExists(args.form,"selectitem")>
+				<cfif len(args.form.selectitem)>
+					<cfloop list="#args.form.selectitem#" index="loc.item">
+						<cfquery name="loc.QStockItem" datasource="#args.datasource#">
+							SELECT prodTitle, soDate, tblStockItem.* 
+							FROM tblStockItem
+							INNER JOIN tblstockorder ON soID = siOrder
+							INNER JOIN tblProducts ON prodID = siProduct
+							WHERE siID = #loc.item#
+							LIMIT 1;
+						</cfquery>
+						<cfif loc.QStockItem.recordcount eq 1>
+							<cfloop query="loc.QStockItem">
+								<cfset loc.qtyReceived = Iif(siQtyPacks eq 0,1,siQtyPacks)>
+								<cfset loc.qtyItems = siPackQty * loc.qtyReceived>
+								<cfset loc.orderDay = DayOfWeek(soDate)>
+								<cfif loc.orderDay EQ 1>
+									<!--- Sunday -> Monday --->
+									<cfset loc.bookdate = DateAdd("d", 1, soDate)>
+								<cfelseif loc.orderDay LTE 4>
+									<!--- Monday to Wednesday -> Thursday --->
+									<cfset loc.bookdate = DateAdd("d", 5 - loc.orderDay, soDate)>
+								<cfelse>
+									<!--- Thursday to Saturday -> Monday --->
+									<cfset loc.bookdate = DateAdd("d", 9 - loc.orderDay, soDate)>
+								</cfif>
+								<cfquery name="loc.QStockItemUpdate" datasource="#args.datasource#">
+									UPDATE tblStockItem
+									SET siBookedIn = '#DateFormat(loc.bookdate,"yyyy-mm-dd")#',
+										siStatus = 'closed',
+										siQtyPacks = #loc.qtyReceived#,	<!--- in case it was zero --->
+										siReceived = #loc.qtyReceived#,
+										siQtyItems = #loc.qtyItems#
+									WHERE siID = #loc.item#
+								</cfquery>
+								<cfquery name="loc.QStockItem" datasource="#args.datasource#">	<!--- refresh view --->
+									SELECT prodTitle, soDate, tblStockItem.* 
+									FROM tblStockItem
+									INNER JOIN tblstockorder ON soID = siOrder
+									INNER JOIN tblProducts ON prodID = siProduct
+									WHERE siID = #loc.item#
+									LIMIT 1;
+								</cfquery>
+							</cfloop>
+							<cfset ArrayAppend(result,Duplicate(loc))>
+						</cfif>
+					</cfloop>
+				</cfif>
+			</cfif>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
 		<cfreturn result>
 	</cffunction>
 
@@ -508,8 +581,9 @@
 				</cfquery>
 				<cfset BookInProductStock4(args)>
 			</cfif>
+
 		<cfcatch type="any">
-			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			<cfdump var="#cfcatch#" label="SetSubstitute4" expand="yes" format="html" 
 			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
 		</cfcatch>
 		</cftry>

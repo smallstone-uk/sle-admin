@@ -137,6 +137,31 @@
 					}
 				});
 			});
+			var isEditingPrice = false;
+			$('.sod_price').click(function(event) {
+				if (!isEditingPrice) {
+					var value = $(this).html();
+					var prodID = $(this).attr("data-id");
+					var htmlStr = "<input type='text' size='6' value='" + value + "' class='sod_price_input' data-id='" + prodID + "'>";
+					$(this).html(htmlStr);
+					$(this).find('.sod_price_input').focus();
+				}
+				isEditingPrice = true;
+			});
+			$(document).on("blur", ".sod_price_input", function(event) {
+				var value = $(this).val();
+				var prodID = $(this).attr("data-id");
+				var cell = $(this).parent('.sod_price');
+				$.ajax({
+					type: "POST",
+					url: "saveProductPrice.cfm",
+					data: {"price": value, "prodID": prodID},
+					success: function(data) {
+						cell.html(data.trim());
+						isEditingPrice = false;
+					}
+				});
+			});
 			var isEditingStock = false;
 			$('.sod_restock').click(function(event) {
 				if (!isEditingStock) {
@@ -473,6 +498,7 @@
 													<th>Lock</th>
 													<th width="100">Reorder</th>
 													<th>Our Price</th>
+													<th>Price<br>Marked</th>
 													<th>Pack Qty</th>
 													<th>Stock<br>Status</th>
 													<th>Last Purchased</th>
@@ -483,7 +509,7 @@
 												<cfif prodCatID neq category>
 													<tr class="searchrowheader" data-title="">
 														<th><input type="checkbox" class="selectAll" value="#prodCatID#" style="width:20px; height:20px;" /></th>
-														<th colspan="#colspan#" align="left"><strong>#pCatTitle#</strong>
+														<th colspan="#colspan#" align="left"><strong>(#prodCatID#) #pCatTitle#</strong>
 															<cfif pcatShow><span class="catActive">Active</span>
 																<cfelse><span class="catInactive">Inactive</span></cfif>
 														</th>
@@ -502,7 +528,8 @@
 													<td align="center" class="sod_discount" data-id="#prodID#">#prodStaffDiscount#</td>
 													<td align="center" class="sod_lock disable-select" data-id="#prodID#">#GetToken("unlocked,locked",int(prodLocked)+1,",")#</td>
 													<td align="center" class="sod_reorder disable-select" data-id="#prodID#">#prodReorder#</td>
-													<td class="ourPrice">&pound;#ourPrice# <span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
+													<td align="right" class="sod_price ourPrice" data-id="#prodID#">#ourPrice#</td>
+													<td><span class="tiny">#GetToken(" ,PM",prodPriceMarked+1,",")#</span></td>
 													<td>#siPackQty#</td>
 													<td>#siStatus#</td>
 													<td>

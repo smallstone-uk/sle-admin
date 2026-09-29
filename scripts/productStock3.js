@@ -107,6 +107,21 @@ function MarkStockItems(form,result) {
 	});
 }
 
+function BookStockIn(form,result) {
+	$.ajax({
+		type: 'POST',
+		url: 'ProductStock3BookIn.cfm',
+		data: $(form).serialize(),
+		beforeSend:function(){
+			$(result).html("<img src='images/loading_2.gif' class='loadingGif' style='float:none;'>&nbsp;Booking in Items...");
+		},
+		success:function(data){
+			$(result).html(data);
+			LoadStockList();
+		}
+	});
+}
+
 function SetSubstitute(siID,prodID) {
 	$.ajax({
 		type: 'POST',

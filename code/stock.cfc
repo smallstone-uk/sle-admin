@@ -56,6 +56,43 @@
 			WHERE prodID = #val(args.product)#
 		</cfquery>
 	</cffunction>
+	<cffunction name="SaveProductPrice" access="public" returntype="void" hint="save product price and latest stock item price if relevant">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cftry>
+			<cfif val(args.product) gt 0>
+				<cfquery name="loc.save" datasource="#args.datasource#">
+					UPDATE tblProducts
+					SET prodOurPrice = '#args.newPrice#'
+					WHERE prodID = #val(args.product)#
+				</cfquery>
+		
+				<cfquery name="loc.saveLatestStockItem" datasource="#args.datasource#" >
+					SELECT siID
+					FROM tblProducts
+					INNER JOIN tblStockItem ON prodID = siProduct
+					AND tblStockItem.siID = (
+						SELECT MAX( siID )
+						FROM tblStockItem
+						WHERE prodID = siProduct
+					)
+					AND prodID = #val(args.product)#
+				</cfquery>
+				<cfif loc.saveLatestStockItem.recordcount eq 1>
+					<cfquery name="loc.saveItem" datasource="#args.datasource#">
+						UPDATE tblStockItem
+						SET siOurPrice = '#args.newPrice#'
+						WHERE siID = #val(loc.saveLatestStockItem.siID)#
+					</cfquery>
+				</cfif>
+			</cfif>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="SaveProductPrice" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+	</cffunction>
 	
 	<cffunction name="SaveProductWSP" access="public" returntype="struct">
 		<cfargument name="args" type="struct" required="yes">

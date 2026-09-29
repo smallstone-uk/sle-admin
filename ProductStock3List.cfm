@@ -50,6 +50,14 @@
 			}
 			e.preventDefault();
 		});
+		$('#btnBookIn').click(function(e) {
+			if (confirm('Are you sure these items have been received.')) {
+				BookStockIn('#listForm','#marking');
+			} else {
+				alert('Operation cancelled');
+			}
+			e.preventDefault();
+		});
 	});
 </script>
 	
@@ -81,6 +89,7 @@
 			</div>
 			<div id="controls" style="display:none;margin:10px 0;">
 				<input type="button" id="btnMark" value="Out of Stock" style="float:left;"><span id="marking" style="float:right;"></span>
+				<input type="button" id="btnBookIn" value="Book In" style="float:left;"><span id="marking" style="float:right;"></span>
 				<div class="clear"></div>
 			</div>
 			<div class="clear"></div>

@@ -72,7 +72,7 @@
 				<cfset item.date1=DateAdd("d",-28,result.dateTo)>
 				<cfset item.allocTotal = -1>
 				<cfset item.diff = -1>
-				<cfset item.lastMethod = "unknown">
+				<cfset item.lastMethod = cltPayMethod>
 				<cfquery name="QTranAllocBalance" datasource="#args.datasource#">
 					SELECT SUM(trnAmnt1+trnAmnt2) AS total
 					FROM tblTrans

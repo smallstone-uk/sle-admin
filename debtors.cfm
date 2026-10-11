@@ -255,7 +255,7 @@
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
 											<td align="center">#item.cltPayType#</td>
-											<td align="center">#item.methodKey# <cfif StructKeyExists(form,"srchUpdate")>#item.lastMethod#</cfif></td>
+											<td align="center">#item.methodKey#<br>[#item.lastMethod#]</td>
 											<td class="#style#">#showNum(item.balance1)#</td>
 											<td class="#style#">#showNum(item.balance2)#</td>
 											<td class="#style#">#showNum(item.balance3)#</td>
@@ -308,7 +308,7 @@
 											<td align="center">#item.cltDelHouseName# #item.cltDelHouseNumber# #item.stName#</td>
 											<td align="center">#item.type#</td>
 											<td align="center">#item.cltPayType#</td>
-											<td align="center">#item.methodKey# <cfif StructKeyExists(form,"srchUpdate")>#item.lastMethod#</cfif></td>
+											<td align="center">#item.methodKey#<br>[#item.lastMethod#]</td>
 											<td class="#style#">#showNum(item.balance1)#</td>
 											<td class="#style#">#showNum(item.balance2)#</td>
 											<td class="#style#">#showNum(item.balance3)#</td>

@@ -38,15 +38,15 @@
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			width: 24px;
-			height: 24px;
+			width: 30px;
+			height: 30px;
 			cursor: pointer;
 		}
 		
 		.pm-flag .icon-img {
 			display: block;
-			width: 20px;
-			height: 20px;
+			width: 30px;
+			height: 30px;
 			background-repeat: no-repeat;
 			background-position: center center;
 			background-size: contain;
@@ -58,6 +58,9 @@
 		
 		.pm-flag .cross {
 			background-image: url("/images/icons/cross-round.png");
+		}
+		.pm-flag .warning {
+			background-image: url("/images/icons/warning.png");
 		}
 	</style>
 	<script src="scripts/jquery-1.11.1.min.js"></script>
@@ -79,6 +82,7 @@
 						// Update DOM only if CF update succeeded
 						$el.data("pm", newVal);
 						if (newVal == 1) {
+							$el.find("i.icon-img").removeClass("warning").addClass("tick");
 							$el.find("i.icon-img").removeClass("cross").addClass("tick");
 							$el.find("i.icon-text").html(response);
 						} else {

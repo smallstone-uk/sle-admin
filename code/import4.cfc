@@ -73,6 +73,8 @@
 				<cfset loc.result.action = "Product found">
 			<cfelse>
 				<cfset loc.result.action = "<span class='missing'>Product not found</span>">
+				<cfset loc.result.prodID = 0>
+				<cfset loc.result.prodPriceMarked = 0>
 				<cfquery name="loc.catExists" datasource="#application.site.datasource1#">
 					SELECT pcatID,pcatTitle, pgTitle, pgTarget
 					FROM tblProductCats
@@ -82,16 +84,12 @@
 				</cfquery>
 				<cfif loc.catExists.recordcount neq 0>
 					<cfset loc.result.action = "#loc.result.action# <br>Category found">
-					<cfset loc.result.prodID = 0>
-					<cfset loc.result.prodPriceMarked = 0>
 					<cfset loc.result.pcatID = loc.catExists.pcatID>
 					<cfset loc.result.pcatTitle = loc.catExists.pcatTitle>
 					<cfset loc.result.pgTitle = loc.catExists.pgTitle>
 					<cfset loc.result.pgTarget = loc.catExists.pgTarget>				
 				<cfelse>
 					<cfset loc.result.action = "#loc.result.action# <br><span class='missing'>Category not found</span>">
-					<cfset loc.result.prodID = 0>
-					<cfset loc.result.prodPriceMarked = 0>
 					<cfset loc.result.pcatID = 0>
 				</cfif>
 			</cfif>
@@ -152,24 +150,33 @@
 		<cfset loc.result.action = "">
 		
 		<cftry>
+			<!--- standardize format --->
+			<cfif len(barcode) lt 9>
+				<cfset loc.result.barcode = NumberFormat(Left(barcode,8),"0000000000000")>
+			<cfelseif len(barcode) lt 14>
+				<cfset loc.result.barcode = NumberFormat(Left(barcode,13),"0000000000000")>
+			<cfelse>
+				<cfset loc.result.barcode = barcode>
+			</cfif>
+
 			<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
 				SELECT barID,barcode,barType,barProdID
 				FROM tblbarcodes
 				WHERE barType LIKE 'product'
-				AND barcode LIKE '#barcode#'
+				AND barcode LIKE '#loc.result.barcode#'
 				LIMIT 1;
 			</cfquery>
 			<cfif loc.barcodeExists.recordcount neq 1>
 				<cfset loc.result.action = "Barcode created">
 				<cfquery name="loc.newBarcode" datasource="#application.site.datasource1#">
 					INSERT INTO tblbarcodes
-						(barcode,barType) VALUES ('#barcode#','product');
+						(barcode,barType) VALUES ('#loc.result.barcode#','product');
 				</cfquery>
 				<cfquery name="loc.barcodeExists" datasource="#application.site.datasource1#">
 					SELECT barID,barcode,barType,barProdID
 					FROM tblbarcodes
 					WHERE barType LIKE 'product'
-					AND barcode LIKE '#barcode#'
+					AND barcode LIKE '#loc.result.barcode#'
 					LIMIT 1;
 				</cfquery>
 			</cfif>
@@ -359,8 +366,13 @@
 		<cfset var loc = {}>
 		<cfset loc.result = {}>
 		<cfset loc.count = 0>
+		<cfset loc.result.totals.pricemarked = 0>
+		<cfset loc.result.totals.rsp = 0>
+		<cfset loc.result.totals.ambiguous = 0>
+		<cfset loc.result.totals.productFound = 0>
+		<cfset loc.result.totals.productMissing = 0>
 		<cfset loc.parm = args>
-<cfdump var="#args#" label="processFile4" expand="false">
+
 		<cftry>
 			<cfif !FileExists("#args.fileDir##args.sourcefile#")>
 				<cfset loc.result.msg = "Requested file not found.">
@@ -393,6 +405,9 @@
 						loc.product.a_problem = 0;
 						loc.product.a_status = 'unknown';
 						loc.product.existing = getExistingProduct(loc.product);
+						loc.result.totals.productFound += loc.product.existing.prodID gt 0;
+						loc.result.totals.productMissing += loc.product.existing.prodID eq 0;
+						
 					//	writedump(loc.product.existing);
 						loc.product.action = loc.product.existing.action;
 						loc.product.catRec = getCategory(loc.product.category);
@@ -409,8 +424,16 @@
 						}
 					//	loc.product.description = Replace(loc.product.description,"'","\'","all");
 						loc.product.a_description = loc.product.description;
-						loc.product.a_pm = (Find("PM",loc.product.description) gt 0) OR (Find("#chr(163)#",loc.product.description) gt 0) OR 
-							(Find("\u00A3",loc.product.description) gt 0) OR (ReFind("\d+p",loc.product.description) gt 0);
+					//	loc.product.a_pm = (Find("PM",loc.product.description) gt 0) OR (Find("#chr(163)#",loc.product.description) gt 0) OR 
+					//		(Find("\u00A3",loc.product.description) gt 0) OR (ReFind("\d+p",loc.product.description) gt 0);
+						loc.product.a_pm = (ReFindNoCase("\bPMP?\b", loc.product.description) GT 0);
+						if (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked) {
+							loc.result.totals.ambiguous += (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked);												
+						} else if (int(loc.product.a_pm eq 1)) {
+							loc.result.totals.pricemarked += (int(loc.product.a_pm eq 1));
+						} else if (int(loc.product.a_pm eq 0)) {
+							loc.result.totals.rsp += (int(loc.product.a_pm eq 0));
+						}
 						loc.product.a_WSP = ReReplace(loc.product.wsp,"[^0-9.]","","all"); // remove non numerics
 						loc.product.a_netUnitPrice = RoundDec(loc.product.a_WSP / loc.product.a_caseQty);
 						loc.product.a_qtyInTrolley = loc.product.qtyInTrolley;
@@ -536,15 +559,13 @@
 					<p>#args.file#</p>
 				</cfif>
 				
-				<table class="dataTable">
+				<table class="dataTable" id="dataTable">
 					<tr>
 						<th>##</th>
-						<th>barcode</th>
-						<th>Product Code</th>
-						<th>Category</th>
-						<th>Description</th>
+						<th>Barcode / Ref</th>
+						<th>Description / Category</th>
 						<th>Unit Size</th>
-						<th>PM?</th>
+						<th>Price&nbsp;Marked</th>
 						<th>Case Qty</th>
 						<th>RRP</th>
 						<th>Our Price</th>
@@ -571,28 +592,56 @@
 						<cfif loc.item.a_pm><cfset loc.pmClass = "pricemarked"></cfif>
 						<cfif int(loc.item.a_pm) neq loc.item.existing.prodPriceMarked><cfset loc.pmClassDiff = "pricemarkdiff"></cfif>
 						<cfset ArrayAppend(loc.barcodeList,"#loc.dateTime#,OB,#loc.item.ean.barcode#")>
-						<tr>
+						<tr data-id="#loc.count#">
 							<td align="right">#loc.count#</td>
-							<td><a href="#loc.booker#?keywords=#loc.item.ean.barcode#" target="booker">#loc.item.ean.barcode#</a></td>
 							<td>
-								<cfif val(loc.item.productCode) eq 0>
-									MISSING
-									<cfset loc.errors.missing++>
-								<cfelse>
-									<a href="productStock6.cfm?product=#loc.item.existing.prodID#" target="product" title="edit product & stock records manually">#loc.item.productCode#</a>
-								</cfif>
-								<br>#loc.item.productCode#
+								<p><a href="#loc.booker#?keywords=#loc.item.ean.barcode#" target="booker">#loc.item.ean.barcode#</a></p>
+								<p>
+									<cfif val(loc.item.productCode) eq 0>
+										MISSING
+										<cfset loc.errors.missing++>
+									<cfelse>
+										<a href="productStock6.cfm?product=#loc.item.existing.prodID#" 
+											target="product" title="edit product & stock records manually">#loc.item.productCode#</a>
+									</cfif>
+								</p>
+								<p>#loc.item.productCode#</p>
 							</td>
-							<td class="productPanel">#loc.item.category#</td>
 							<td class="productPanel">
-								&nbsp;#loc.item.a_description#<br>
-								[#loc.item.description#]
+								<p>&nbsp;#loc.item.a_description#</p>
+								<p>[#loc.item.description#]</p>
+								<p>#loc.item.category#</p>
 							</td>
 							<td class="productPanel">#loc.item.a_unitsize#</td>
 							<cfif args.header.srchMode eq 1>
 								<td align="center">
-									Found:#int(loc.item.a_pm)#<br>
-									Previous:#loc.item.existing.prodPriceMarked#
+									<p>Previous:#loc.item.existing.prodPriceMarked#<br>
+									Found:#int(loc.item.a_pm)#</p>
+									<!---<cfif int(loc.item.a_pm) gt loc.item.existing.prodPriceMarked>
+										<cfset loc.marker = "warning">
+										<p><span class="pm-flag" title="inconsistent price marked product."><i class="icon-img #loc.marker#"></i></span></p>
+									</cfif>--->
+									<cfif int(loc.item.existing.prodPriceMarked) EQ 1>
+										<cfset loc.marker = "tick">
+										<cfset loc.displayPM = 1>
+									<cfelseif int(loc.item.a_pm) GT loc.item.existing.prodPriceMarked>
+										<cfset loc.marker = "warning">
+										<cfset loc.displayPM = 0>
+									<cfelseif int(loc.item.a_pm) EQ 1>
+										<cfset loc.marker = "tick">
+										<cfset loc.displayPM = 1>
+									<cfelse>
+										<cfset loc.marker = "cross">
+										<cfset loc.displayPM = 0>
+									</cfif>
+									<span class="pm-flag"
+										  data-id="#loc.item.existing.prodID#"
+										  data-pm="#loc.displayPM#"
+										  title="click to toggle the price mark flag">
+										<i class="icon-img #loc.marker#"></i>
+										<!---<i class="icon-text">#loc.displayPM#</i>--->
+									</span>
+									<p>#loc.marker#</p>
 								</td>
 							<cfelse>
 								<td align="center" class="#loc.pmClass# #loc.pmClassDiff#">
@@ -828,7 +877,7 @@
 				</cfif>
 				<!--- barcode record update --->
 				<cfif loc.item.ean.barProdID eq 0>
-					<cfquery name="loc.barcodeUpdate" datasource="#application.site.datasource1#">
+					<cfquery name="loc.QbarcodeUpdate" datasource="#application.site.datasource1#">
 						UPDATE tblBarcodes
 						SET barProdID = #loc.item.existing.prodID#
 						WHERE barID = #loc.item.ean.barID#
@@ -837,6 +886,15 @@
 					<cfset loc.item.action = "#loc.item.action# <span class='update'>barcode updated</span><br>">
 				</cfif>
 			</cfloop>
+			<!--- stock order record update --->
+			<cfif loc.result.insertCount neq 0 OR (loc.result.updateCount neq 0)>
+				<cfquery name="loc.QstockOrderUpdate" datasource="#application.site.datasource1#">
+					UPDATE tblstockOrder
+					SET soItems = #loc.result.insertCount + loc.result.updateCount#
+					WHERE soID = #args.header.stockOrderID#
+				</cfquery>
+				<cfset loc.item.action = "#loc.item.action# <span class='update'>stock order updated</span><br>">
+			</cfif>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 

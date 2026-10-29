@@ -21,6 +21,8 @@
 		/* */
 		.stockPanel {background-color:#FCF;}
 		.productPanel {background-color:#CCFFFF;}
+		.calcPanel {background-color:#FCC;}
+		.prodTitle {font-weight:bold;}
 		.pricemarked {
 			color: #FF00ff;
 			font-size: 16px;
@@ -33,7 +35,19 @@
 			font-size: 16px;
 			font-weight: bold !Important;
 		}
+		.rsp {font-weight:bold; font-size:18px; color:#FF6633;}
+		.ourPrice {font-weight:bold; color:#0066CC; font-size:20px !Important;}
+		.negative {
+			color: red;
+			font-size: 16px;
+			font-weight: bold;
+		}
 		
+		.positive {
+			color: green;
+			font-size: 16px;
+			font-weight: bold;
+		}		
 		.pm-flag {
 			display: inline-flex;
 			align-items: center;
@@ -62,6 +76,9 @@
 		.pm-flag .warning {
 			background-image: url("/images/icons/warning.png");
 		}
+		.pm-flag .noentry {
+			background-image: url("/images/icons/noentry.png");
+		}
 	</style>
 	<script src="scripts/jquery-1.11.1.min.js"></script>
 	<script src="scripts/jquery-ui-1.10.3.custom.min.js"></script>
@@ -71,8 +88,13 @@
 			$(document).on("click", ".pm-flag", function() {
 				var $el = $(this);
 				var id = $el.data("id");
+				var $row = $(this).closest("tr");
 				var currentVal = $el.data("pm");
-				var newVal = currentVal == 1 ? 0 : 1;
+				if (currentVal > -1) {
+					var newVal = currentVal == 1 ? 0 : 1;
+				} else {
+					var newVal = -1
+				}
 			
 				$.ajax({
 					url: "ajax/AJAX_productSetValue.cfm",
@@ -80,14 +102,19 @@
 					data: { productID: id, pm: newVal },
 					success: function(response) {
 						// Update DOM only if CF update succeeded
+						console.log(newVal);
 						$el.data("pm", newVal);
 						if (newVal == 1) {
 							$el.find("i.icon-img").removeClass("warning").addClass("tick");
 							$el.find("i.icon-img").removeClass("cross").addClass("tick");
 							$el.find("i.icon-text").html(response);
+							$row.find(".pm-title").html("tick");
+						} else if (newVal == -1) {
+							$el.find("i.icon-text").html(response);
 						} else {
 							$el.find("i.icon-img").removeClass("tick").addClass("cross");
 							$el.find("i.icon-text").html(response);
+							$row.find(".pm-title").html("cross");
 						}
 					}
 				});
@@ -141,7 +168,6 @@
 </cfif>
 
 <body>
-	<p>v4.0</p>
 	<cfoutput>
 		<cfset orderStatus = import.StockOrderStatus(parm)>
 		<form name="processForm" method="post" enctype="multipart/form-data">
@@ -152,7 +178,8 @@
 			<input type="hidden" name="orderDate" value="#parm.orderDate#" />
 			<table class="tableStyle" border="1" width="500">
 				<tr>
-					<th colspan="2" align="left">Import Settings</th>
+					<th align="left">Import Settings</th>
+					<th>v4.0</th>
 				</tr>
 				<tr>
 					<th>Import File</th>
@@ -217,12 +244,13 @@
 				<cfset parm.form = form>
 				<cfif form.srchMode eq 1>
 					<cfset dataImport = import.processFile4(parm)>
-					<cfset import.outputData4(dataImport)>
+					<cfset import.outputData5(dataImport)>
 				<cfelseif form.srchMode eq 2>
 					<cfset dataImport = import.processFile4(parm)>
 					<cfset progress = import.saveData(dataImport)>
+					<cfset dataImport = import.processFile4(parm)>
 					<!---<cfdump var="#progress#" label="progress" expand="false">--->
-					<cfset import.outputData4(dataImport)>
+					<cfset import.outputData5(dataImport)>
 				</cfif>
 			</cfif>
 		</cfif>

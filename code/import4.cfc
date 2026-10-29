@@ -74,7 +74,7 @@
 			<cfelse>
 				<cfset loc.result.action = "<span class='missing'>Product not found</span>">
 				<cfset loc.result.prodID = 0>
-				<cfset loc.result.prodPriceMarked = 0>
+				<cfset loc.result.prodPriceMarked = -1>
 				<cfquery name="loc.catExists" datasource="#application.site.datasource1#">
 					SELECT pcatID,pcatTitle, pgTitle, pgTarget
 					FROM tblProductCats
@@ -348,7 +348,7 @@
 			<cfelse>
 				<cfset loc.rec.action = "no stock item record found">
 				<cfset loc.rec.siID = 0>
-					<cfset loc.rec.siQtyPacks = 0>
+				<cfset loc.rec.siQtyPacks = 0>
 			</cfif>
 			<cfset loc.result = loc.rec>
 						
@@ -358,6 +358,69 @@
 		</cfcatch>
 		</cftry>
 		<cfreturn loc.result>
+	</cffunction>
+	
+	<cffunction name="CalculatePrice" access="public" returntype="struct">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+
+		<cftry>
+			<cfscript>
+				loc.pm = int(args.a_pm);
+				loc.rsp = val(args.a_rsp);
+				loc.unitNetPrice = args.a_netUnitPrice;
+				loc.unitGrossPrice = RoundDec(loc.unitNetPrice * (1 + args.a_vatRate));
+				loc.targetNetPrice = RoundDec(loc.unitNetPrice * (1 + args.existing.pgTarget / 100));
+				loc.targetGrossPrice = RoundDec(loc.targetNetPrice * (1 + args.a_vatRate));
+				if (loc.pm)	{
+					loc.ourPrice = loc.rsp;
+				} else {
+					loc.targetProfit = RoundDec(loc.targetNetPrice - loc.unitNetPrice);
+					loc.targetMarkup = RoundDec((loc.targetProfit / loc.unitNetPrice) * 100);
+					if (loc.targetMarkup lt args.existing.pgTarget)	{
+						loc.ourPrice = loc.rsp;
+					} else {
+						loc.ourPrice = loc.targetGrossPrice;
+					}
+					if (loc.ourPrice lt loc.rsp) {
+						loc.ourPrice = loc.rsp;
+					}
+				}
+
+				loc.priceInPence = loc.ourPrice * 100;
+				loc.lastDigit = loc.priceInPence MOD 10;
+				if (loc.lastDigit eq 0) {
+        			loc.roundedPrice = loc.ourPrice;
+    			} else {
+					loc.basePrice = fix(loc.ourPrice * 10) / 10;
+					loc.roundedPrice = (
+						loc.lastDigit <= 5
+						? loc.basePrice + 0.05
+						: loc.basePrice + 0.09
+					);
+				
+				}
+				loc.ourPrice = RoundDec(loc.roundedPrice);
+				loc.ourPriceNet = RoundDec(loc.ourPrice / (1 + args.a_vatRate));
+				loc.profit = RoundDec(loc.ourPriceNet - loc.unitNetPrice);
+				loc.Markup = RoundDec((loc.profit / loc.unitNetPrice) * 100);
+				loc.POR = RoundDec((loc.profit / loc.ourPriceNet) * 100);
+				loc.targetDiff = loc.Markup - args.existing.pgTarget;
+				if (loc.targetDiff gt 0) {
+					loc.targetDiffShow = "<span class='positive'>+#loc.targetDiff#%</span>";
+				} else {
+					loc.targetDiffShow = "<span class='negative'>#loc.targetDiff#%</span>";
+				}
+				loc.vatRate = "#args.a_vatRate * 100#%";
+			</cfscript>
+			<!---<cfdump var="#loc#" label="CalculatePrice #args.a_description#" expand="false">--->
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+			output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc>
 	</cffunction>
 
 	<!--- new version extracts json product array from saved page source --->
@@ -371,8 +434,10 @@
 		<cfset loc.result.totals.ambiguous = 0>
 		<cfset loc.result.totals.productFound = 0>
 		<cfset loc.result.totals.productMissing = 0>
-		<cfset loc.parm = args>
+		<cfset loc.result.totals.stockFound = 0>
 
+		<cfset loc.parm = args>
+		<!---<cfdump var="#args#" label="processFile4 args " expand="false">--->
 		<cftry>
 			<cfif !FileExists("#args.fileDir##args.sourcefile#")>
 				<cfset loc.result.msg = "Requested file not found.">
@@ -400,22 +465,27 @@
 
 					for (loc.product in loc.products) {
 						loc.count++;
-						//	if (loc.count gt 90) { break; }
-						loc.product.action = 'preview';
-						loc.product.a_problem = 0;
+						loc.product.action = (
+							args.srchMode eq 1
+							? 'preview'
+							: 'import'
+						);
+
+						loc.product.a_problem = '';
 						loc.product.a_status = 'unknown';
 						loc.product.existing = getExistingProduct(loc.product);
 						loc.result.totals.productFound += loc.product.existing.prodID gt 0;
 						loc.result.totals.productMissing += loc.product.existing.prodID eq 0;
 						
 					//	writedump(loc.product.existing);
-						loc.product.action = loc.product.existing.action;
+						loc.product.action = "#loc.product.action#<br>#loc.product.existing.action#";
 						loc.product.catRec = getCategory(loc.product.category);
 						if (loc.product.existing.prodID eq 0) {
 							loc.product.category = loc.product.catRec.pcatTitle;
 						}
 						loc.product.ean = getBarcode(loc.product.barcode);
 						loc.product.stock = CheckStockItem(loc.product,loc.result.header);
+						loc.result.totals.stockFound += loc.product.stock.siID gt 0;
 						
 						loc.product.a_caseQty = Val(Trim(ListFirst(loc.product.packSize,"x")));	// get first item (qty)
 						loc.product.a_unitSize = Trim(ListRest(loc.product.packSize,"x"));		// get unit size
@@ -426,23 +496,51 @@
 						loc.product.a_description = loc.product.description;
 					//	loc.product.a_pm = (Find("PM",loc.product.description) gt 0) OR (Find("#chr(163)#",loc.product.description) gt 0) OR 
 					//		(Find("\u00A3",loc.product.description) gt 0) OR (ReFind("\d+p",loc.product.description) gt 0);
-						loc.product.a_pm = (ReFindNoCase("\bPMP?\b", loc.product.description) GT 0);
-						if (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked) {
-							loc.result.totals.ambiguous += (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked);												
+					
+					//	loc.product.a_pm = (ReFindNoCase("\bPMP?\b", loc.product.description) GT 0);
+						loc.product.a_pm = (ReFindNoCase("PMP?|PM[0-9]+", loc.product.description) GT 0);
+						if (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked) { // product wasn't PM, now is?
+							loc.result.totals.ambiguous += (int(loc.product.a_pm) GT loc.product.existing.prodPriceMarked);		
+						} else if (loc.product.existing.prodPriceMarked) {
+							loc.product.a_pm = 1;		// was already pm so force import to the same
+							loc.result.totals.pricemarked++;
 						} else if (int(loc.product.a_pm eq 1)) {
 							loc.result.totals.pricemarked += (int(loc.product.a_pm eq 1));
 						} else if (int(loc.product.a_pm eq 0)) {
 							loc.result.totals.rsp += (int(loc.product.a_pm eq 0));
 						}
+						
 						loc.product.a_WSP = ReReplace(loc.product.wsp,"[^0-9.]","","all"); // remove non numerics
 						loc.product.a_netUnitPrice = RoundDec(loc.product.a_WSP / loc.product.a_caseQty);
 						loc.product.a_qtyInTrolley = loc.product.qtyInTrolley;
 						if (loc.product.a_qtyInTrolley eq 0) {
 							loc.product.a_qtyInTrolley = 1;
 						}
+
+						// cleanup description
+						if (Find(loc.product.a_unitSize,loc.product.description,0)) {
+							loc.product.a_description = Replace(loc.product.a_description,loc.product.a_unitSize,"");
+						}
+						if (Find("#chr(163)#",loc.product.a_description,1) gt 0) {	// remove price in pounds e.g. £3.49 assume price marked
+							loc.product.a_description = ReReplace(loc.product.a_description,"#chr(163)#\d+\.?\d*","");
+						}
+						if (Find("\u00A3",loc.product.a_description,1) gt 0) {	// remove pound symbol
+							loc.product.a_description = Replace(loc.product.a_description,"\u00A3","");
+						}
+						if (ReFind("PM[P]?\d*",loc.product.a_description) gt 0) {	// remove PM or PMP and numbers following
+							loc.product.a_description = ReReplace(loc.product.a_description,"PM[P]?\d*","");
+						}
+						if (ReFind("\d+\.?\d*\s?g",loc.product.a_description) gt 0) {	// remove product weight
+							loc.product.a_description = ReReplace(loc.product.a_description,"\d+\.?\d*\s?g","");
+						}
+						if (ReFind("\d+p",loc.product.a_description) gt 0) { // remove price in pence e.g. 49p assume price marked
+							loc.product.a_description = ReReplace(loc.product.a_description,"\d+p","");
+						}
+						
 						if (!StructKeyExists(loc.product,"rsp"))	{
 							// catering item
 							//writedump(loc.product);
+							loc.product.a_problem = "rsp value is undefined";
 							loc.product.a_RSP = 0;
 							loc.product.a_ourPrice = 0;
 							loc.product.a_vatRate = 0;
@@ -451,25 +549,6 @@
 							loc.product.a_Markup = 0;
 						} else {
 	
-							// cleanup description
-							if (Find(loc.product.a_unitSize,loc.product.description,0)) {
-								loc.product.a_description = Replace(loc.product.a_description,loc.product.a_unitSize,"");
-							}
-							if (Find("#chr(163)#",loc.product.a_description,1) gt 0) {	// remove price in pounds e.g. £3.49 assume price marked
-								loc.product.a_description = ReReplace(loc.product.a_description,"#chr(163)#\d+\.?\d*","");
-							}
-							if (Find("\u00A3",loc.product.a_description,1) gt 0) {	// remove pound symbol
-								loc.product.a_description = Replace(loc.product.a_description,"\u00A3","");
-							}
-							if (ReFind("PM[P]?\d*",loc.product.a_description) gt 0) {	// remove PM or PMP and numbers following
-								loc.product.a_description = ReReplace(loc.product.a_description,"PM[P]?\d*","");
-							}
-							if (ReFind("\d+\.?\d*\s?g",loc.product.a_description) gt 0) {	// remove product weight
-								loc.product.a_description = ReReplace(loc.product.a_description,"\d+\.?\d*\s?g","");
-							}
-							if (ReFind("\d+p",loc.product.a_description) gt 0) { // remove price in pence e.g. 49p assume price marked
-								loc.product.a_description = ReReplace(loc.product.a_description,"\d+p","");
-							}
 						
 							// cleanup other fields 
 							loc.product.a_RSP = ReReplace(loc.product.rsp,"[^0-9.]","","all"); // remove non numerics
@@ -481,6 +560,8 @@
 							loc.product.a_vatRate = loc.product.a_vatRate / 100;
 	
 							// calculate price
+							loc.product.calcs = CalculatePrice(loc.product);
+							
 							loc.product.a_netRetailPrice = RoundDec(loc.product.a_RSP / (1 + loc.product.a_vatRate));
 							loc.product.a_profit = RoundDec(loc.product.a_netRetailPrice - loc.product.a_netUnitPrice);
 							loc.product.a_POR = RoundDec((loc.product.a_profit / loc.product.a_netRetailPrice) * 100);
@@ -516,6 +597,7 @@
 							}
 						}
 						loc.product.a_diff = RoundDec(loc.product.a_ourPrice - loc.product.a_RSP);
+						// if (loc.count gt 10) { break; }
 					};
 
 				//	FileClose(loc.fileObj); & loc.filePath
@@ -526,6 +608,169 @@
 				loc.result.products = loc.products;
 			//	writedump(loc.result.products);
 			</cfscript>
+			
+		<cfcatch type="any">
+			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
+				output="#application.site.dir_logs#err-#DateFormat(Now(),'yyyymmdd')#-#TimeFormat(Now(),'HHMMSS')#.htm">
+		</cfcatch>
+		</cftry>
+		<cfreturn loc.result>
+	</cffunction>
+	
+	<!--- output extracted data to view --->
+	<cffunction name="outputData5" access="public" returntype="struct" description="output array of structs in UI">
+		<cfargument name="args" type="struct" required="yes">
+		<cfset var loc = {}>
+		<cfset loc.result = {}>
+		<cfset loc.count = 0>
+		<cfset loc.parm = args>
+		<cfset loc.booker = "https://www.booker.co.uk/products/product-list">
+		<cfset loc.pmClass = "pricemarked">
+		<cfset loc.pmClassDiff = "">               
+		<cfset loc.errors = {
+			missing = 0	
+		}>
+		<cfset loc.barcodeList = []>
+		<!--- 09/19/25,10:57:33,OB,8719200264007 --->
+		<cfset loc.dateTime = "#DateFormat(Now(),'mm/dd/yyyy')#,#TimeFormat(Now(),'HH:MM:SS')#">
+		<!---<cfdump var="#args#" label="outputData4" expand="false">--->
+		<cftry>
+			<cfoutput>
+				<cfif StructKeyExists(args,"msg")>
+					<h1>#args.msg#</h1>
+					<p>#args.file#</p>
+				</cfif>
+				
+				<table class="dataTable" id="dataTable">
+					<tr>
+						<th>##</th>
+						<th>Barcode / Ref</th>
+						<th width="300">Description / Category</th>
+						<th>Unit Size</th>
+						<th>Price&nbsp;Marked</th>
+						<th>Case Qty</th>
+						<th>RRP</th>
+						<th>VAT Rate</th>
+						<th>Unit Gross / Net</th>
+						<th>Target<br>Gross / Net</th>
+						<th width="100">Our Price / Net</th>
+						<th>Profit</th>
+						<th>POR</th>
+						<th>Markup</th>
+						<th>Target<br>Diff</th>
+						<th>Stock ID</th>
+						<th>No. Cases</th>
+						<th width="150">Status</th>
+					</tr>
+					<cfloop array="#args.products#" index="loc.item">
+						<cfset loc.count++>
+						<cfset loc.pmClass = "">
+						<cfset loc.pmClassDiff = "">               
+						<tr data-id="#loc.count#">
+							<td align="right">#loc.count#</td>
+							<td class="productPanel">
+								<p><a href="#loc.booker#?keywords=#loc.item.ean.barcode#" target="booker" 
+									title="click to view this product on the Booker website">#loc.item.ean.barcode#</a></p>
+								<p>
+									<cfif val(loc.item.productCode) eq 0>
+										MISSING
+										<cfset loc.errors.missing++>
+									<cfelse>
+										<a href="productStock6.cfm?product=#loc.item.existing.prodID#" 
+											target="product" title="click to view product & stock records">#loc.item.productCode#</a>
+									</cfif>
+								</p>
+								<p>Ref: #loc.item.productCode#</p>
+								<p>ID: #loc.item.existing.prodID#</p>
+							</td>
+							<td class="productPanel">
+								<p class="prodTitle">#loc.item.a_description#</p>
+								<p>[#loc.item.description#]</p>
+								<p>#loc.item.category#</p>
+								<p>#loc.item.catrec.pgTitle# #loc.item.catrec.pgTarget#%</p>
+							</td>
+							<td class="productPanel" align="center">#loc.item.a_unitsize#</td>
+							<td class="productPanel" align="center">
+								<p class="pm-exist">Previous:#loc.item.existing.prodPriceMarked#</p>
+								<p class="pm-found">Found:#int(loc.item.a_pm)#</p>
+								<cfif int(loc.item.existing.prodPriceMarked) EQ 1>
+									<cfset loc.marker = "tick">
+									<cfset loc.displayPM = 1>
+									<cfset loc.pmTitle = "product is price marked">
+								<cfelseif int(loc.item.existing.prodPriceMarked) EQ -1>
+									<cfset loc.marker = "noentry">
+									<cfset loc.displayPM = -1>
+									<cfset loc.pmTitle = "product does not exist yet">
+								<cfelseif int(loc.item.a_pm) GT loc.item.existing.prodPriceMarked>
+									<cfset loc.marker = "warning">
+									<cfset loc.displayPM = 0>
+									<cfset loc.pmTitle = "product was not previously price marked">
+								<cfelseif int(loc.item.a_pm) EQ 1>
+									<cfset loc.marker = "tick">
+									<cfset loc.displayPM = 1>
+									<cfset loc.pmTitle = "product to import appears to be price marked">
+								<cfelse>
+									<cfset loc.marker = "cross">
+									<cfset loc.displayPM = 0>
+									<cfset loc.pmTitle = "indeterminate">
+								</cfif>
+								<span class="pm-flag"
+									  data-id="#loc.item.existing.prodID#"
+									  data-pm="#loc.displayPM#"
+									  title="#loc.pmTitle#">
+									<i class="icon-img #loc.marker#"></i>
+								</span>
+								<p class="pm-title">#loc.marker#</p>
+							</td>
+							<td class="productPanel" align="center">#loc.item.a_caseQty#</td>
+							<td class="productPanel rsp" align="right">
+							<cfif StructKeyExists(loc.item,"calcs")>
+								<cfif loc.item.a_rsp lt 1>#loc.item.calcs.priceinpence#p<cfelse>&pound;#loc.item.a_rsp#</cfif></td>
+								<td class="calcPanel" align="right">#loc.item.calcs.vatRate#</td>
+								<td class="calcPanel" align="right">#loc.item.calcs.unitGrossPrice# / #loc.item.calcs.unitNetPrice#</td>
+								<td class="calcPanel" align="right">
+									<p>#loc.item.calcs.targetGrossPrice#</p>
+									<p>#loc.item.calcs.targetNetPrice#</p>
+								</td>
+								<td class="calcPanel" align="right">
+									<cfif loc.item.calcs.ourPrice lt 1>
+										<span class="ourPrice">
+											#loc.item.calcs.priceinpence#p <cfif loc.item.calcs.pm>pm</cfif>
+										</span>
+										<p>#loc.item.calcs.ourPriceNet * 100#p net</p>
+									<cfelse>
+										<span class="ourPrice">
+											&pound;#loc.item.calcs.ourPrice# <cfif loc.item.calcs.pm>pm</cfif>
+										</span>
+										<p>&pound;#loc.item.calcs.ourPriceNet# net</p>
+									</cfif>
+								</td>
+								<td class="calcPanel" align="right">#loc.item.calcs.profit#</td>
+								<td class="calcPanel" align="right">#loc.item.calcs.POR#%</td>
+								<td class="calcPanel" align="right">#loc.item.calcs.markup#%</td>
+								<td class="calcPanel" align="right">#loc.item.calcs.targetDiffShow#</td>
+								<cfif loc.item.stock.siID neq 0>
+									<cfif loc.item.stock.siQtyPacks neq 0>
+										<cfset loc.item.a_QtyPacks = loc.item.stock.siQtyPacks>
+									<cfelse>
+										<cfset loc.item.a_QtyPacks = loc.item.a_qtyInTrolley>
+									</cfif>
+									<td class="stockPanel">#loc.item.stock.siID#</td>
+									<td align="center" class="stockPanel">
+										<input type="number" min="1" max="99" size="3" data-id="#loc.item.stock.siID#" 
+											data-QtyPacks="#loc.item.a_QtyPacks#" name="QtyPacks" class="QtyPacks" 
+											value="#loc.item.a_QtyPacks#" autocomplete="off">
+									</td>
+								<cfelse>
+									<td align="center">#loc.item.a_qtyInTrolley#</td>
+								</cfif>
+								<td class="stockPanel">#loc.item.stock.action#</td>
+							<cfelse>
+								<td class="calcPanel" colspan="8" align="center">non-retail product</td>
+							</cfif>
+					</cfloop>				
+				</table>
+			</cfoutput>
 			
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#" label="cfcatch" expand="yes" format="html" 
@@ -551,7 +796,7 @@
 		<cfset loc.barcodeList = []>
 		<!--- 09/19/25,10:57:33,OB,8719200264007 --->
 		<cfset loc.dateTime = "#DateFormat(Now(),'mm/dd/yyyy')#,#TimeFormat(Now(),'HH:MM:SS')#">
-		<cfdump var="#args#" label="outputData4" expand="false">
+		<!---<cfdump var="#args#" label="outputData4" expand="false">--->
 		<cftry>
 			<cfoutput>
 				<cfif StructKeyExists(args,"msg")>
@@ -589,7 +834,7 @@
 						<cfset loc.count++>
 						<cfset loc.pmClass = "">
 						<cfset loc.pmClassDiff = "">               
-						<cfif loc.item.a_pm><cfset loc.pmClass = "pricemarked"></cfif>
+						<cfif int(loc.item.a_pm)><cfset loc.pmClass = "pricemarked"></cfif>
 						<cfif int(loc.item.a_pm) neq loc.item.existing.prodPriceMarked><cfset loc.pmClassDiff = "pricemarkdiff"></cfif>
 						<cfset ArrayAppend(loc.barcodeList,"#loc.dateTime#,OB,#loc.item.ean.barcode#")>
 						<tr data-id="#loc.count#">
@@ -706,7 +951,7 @@
 							<td align="right">#loc.item.vat#</td>
 							<td align="right">#loc.item.a_netUnitPrice#</td>
 							<td align="right">#loc.item.a_status#</td>
-							<td align="right">#loc.item.action#</td>
+							<td align="right">#loc.item.a_problem#<br>#loc.item.action#</td>
 						</tr>
 					</cfloop>
 				</table>
